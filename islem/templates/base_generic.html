@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+  {% block title %}<title>  balance  envanter  </title>{% endblock %}
+  {# Load the tag library #}
+  {% load bootstrap3 %}
+  {# Load CSS and JavaScript #}
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  {# Display django.contrib.messages as Bootstrap alerts #}
+  {% bootstrap_messages %}
+  {% load crispy_forms_tags %}
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+
+  <!-- Add additional CSS in static file -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+  <!-- for bootstrap   datepicker -->
+  {% load staticfiles%}
+  <link rel="stylesheet" href="{% static 'contrib/bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'contrib/font-awesome.min.css' %}">
+  <script src="{% static 'contrib/bootstrap.js' %}"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }} /js/jquery.js">  </script>
+
+  <style>
+  a:link, a:visited, a:active {
+  color : #668B1E;
+  text-decoration : none;
+  }
+  a:hover {
+  color : #FF0000;
+  text-decoration : underline;
+  }
+  </style>
+
+
+  <script>
+  $("form input[name='deneme']").click(function () {
+      deneme = demirbas;
+  });
+  </script>
+
+
+  <script>
+    function sayhello(w) {
+      document.write("hello,  " + w);
+      }
+  </script>
+
+
+
+
+
+</head>
+
+<body>
+
+  <div class="container-fluid">
+
+  <!--  <div class="row">  -->
+
+
+    <div class="row">
+          {% block siderow %}
+    <!--        <ul class="ustalan-nav">  -->
+              <div class="col-md-2">
+                <ul class="ustalan-nav">
+                  <li><a href="{% url 'index' %}">Ana Sayfa </a></li>
+                </ul>
+              </div>
+
+              <div class="col-md-6">
+                    <ul class="ustalan-nav">
+                      <h2>Denetim Sistemi</h2>
+                  </ul>
+              </div>
+
+              <div class="col-md-3">
+                <ul class="ustalan-nav">
+                {% if user.is_authenticated %}
+                  <li>Kulanıcı: {{ user.get_username }}</li>
+                {% else %}
+                    <h5></h5>
+                {% endif %}
+                  </ul>
+              </div>
+
+              <div class="col-md-1">
+                  <ul class="ustalan-nav">
+                {% if user.is_authenticated %}
+                  <li><a href="{% url 'logout'%}?next={{request.path}}">Çıkış</a></li>
+                {% else %}
+                  <li><a href="{% url 'login'%}?next={{request.path}}">Giriş</a></li>
+                {% endif %}
+                  </ul>
+              </div>
+    <!--        </ul>    -->
+          {% endblock %}
+        </div>
+
+
+
+    <div class="row">
+
+      <div class="col-md-2">
+          {% block sidebar %}
+
+          <div class="navbar navbar-default navbar-fixed-left">
+            <ul class="nav navbar-nav">
+             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">İşlemler <span class="caret"></span></a>
+               <ul class="dropdown-menu" role="menu">
+                 <li><a href="/giris/ariza/yarat">Masraf gir</a></li>
+                 <li><a href="/giris/hareket/proje_dem">Demirbaş taşı</a></li>
+                 <li><a href="/giris/demirbas_ara">Demirbaş ara</a></li>
+                 </ul>
+             </li>
+
+             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Detay işlemler <span class="caret"></span></a>
+               <ul class="dropdown-menu" role="menu">
+                 <li><a href="/giris/demirbas/proje">Proje bazında demirbaşlar</a></li>
+                 <li><a href="/giris/depo">Depoya kaldırılan demirbaşlar</a></li>
+                 <li><a href="/report_builder">Raporlar</a></li>
+                </ul>
+             </li>
+             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Tanımlar <span class="caret"></span></a>
+               <ul class="dropdown-menu" role="menu">
+                 <li><a href="/islem/tipi">Denetim Tipi</a></li>
+                 <li><a href="/islem/bolum">Denetim Bölümü</a></li>
+                 <li><a href="/islem/detay">Denetim Detayı</a></li>
+                 <li class="divider"></li>
+                 <li><a href="/islem/grup">Grup</a></li>
+                 <li><a href="/islem/sirket">Şirket</a></li>
+                 <li><a href="/islem/musteri">Müşteri</a></li>
+
+               </ul>
+             </li>
+             <p></p>
+             <p></p>
+             {% if user.is_staff %}
+                 <li><a href="/admin/">Yönetim</a></li>
+             {% endif %}
+
+
+            </ul>
+          </div>
+
+
+
+
+
+          {% endblock %}
+      </div>
+
+        <div class="col-md-10 ">
+
+           {% block content %}{% endblock %}
+
+
+              {% block pagination %}
+                {% if is_paginated %}
+                <div class="pagination">
+                  <span class="page-links">
+                    {% if page_obj.has_previous %}
+                        <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                    {% endif %}
+                  </span>
+                </div>
+              {% endif %}
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

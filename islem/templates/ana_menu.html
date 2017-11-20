@@ -1,0 +1,51 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+
+
+<h2>İçerik bilgisi</h2>
+
+  <p>Denetim sistemindeki kayıt listesi:</p>
+
+
+    <table border="0">
+          <tbody>
+              <tr>
+                  <td><b>Denetim Tipi..............:</b></td>
+                  <td> &emsp;     {{ num_tipi }}</td>
+              </tr>
+              <tr>
+                  <td><b>Denetim Bölümü..........:   </b></td>
+                  <td> &emsp;     {{ num_bolum }}</td>
+              </tr>
+              <tr>
+                  <td><b>Denetim Detayı......:</b></td>
+                  <td>  &emsp;      {{ num_detay }}</td>
+              </tr>
+              -------------------------------------------------
+              <tr>
+                  <td><b>Grup..............:   </b></td>
+                  <td> &emsp;     {{ num_grup }}</td>
+              </tr>
+              <tr>
+                  <td><b>Şirket.............:</b></td>
+                  <td>  &emsp;      {{ num_sirket }}</td>
+              </tr>
+              <tr>
+                  <td><b>Müşteri............: </b></td>
+                  <td>   &emsp;  {{ num_musteri }}</td>
+              </tr>
+              ----------------------------------------------------
+          </tbody>
+      </table>
+
+
+
+
+
+
+
+{% endblock %}

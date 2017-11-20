@@ -1,0 +1,27 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!--  buraya if konulacak ...-->
+
+
+      <h1>Denetim Bölümü Sil</h1>
+
+      <p>Bu denetim bölümünü silmek istediğinizden emin misiniz ???: </p>
+
+      <p>  <b> id: </b>   &emsp;   {{ sil_id }}</p>
+
+      <p>   <b>  adı: </b>  &emsp;   {{ sil_bolum }}</p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+      <!--<input type="submit" action="demirbas_sil_kesin" value="Evet, sil.." /> -->
+
+      <!-- <a href="giris/demirbas/{{ sil_id }}/kesin"> Evet sil... </a>  -->
+
+      <a href="kesin"> Evet sil... </a>
+      </form>
+
+{% endblock %}
