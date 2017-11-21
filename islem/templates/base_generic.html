@@ -140,22 +140,17 @@
                  <li><a href="/islem/grup">Grup</a></li>
                  <li><a href="/islem/sirket">Şirket</a></li>
                  <li><a href="/islem/musteri">Müşteri</a></li>
-
                </ul>
              </li>
-             <p></p>
-             <p></p>
-             {% if user.is_staff %}
-                 <li><a href="/admin/">Yönetim</a></li>
+
+
+            {% if user.is_staff %}
+              <li><a href="/admin/">Yönetim</a></li>
              {% endif %}
 
 
             </ul>
           </div>
-
-
-
-
 
           {% endblock %}
       </div>

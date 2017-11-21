@@ -14,7 +14,8 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, musteri, tipi, bolum, detay
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db import models, transaction
 
 
 
@@ -95,11 +96,34 @@ def index(request):
 
 
 
+#--------------------------------------------------------------------------------
+
+
+@login_required
+@transaction.atomic
+def update_profile(request):
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, _('Your profile was successfully updated!'))
+            return redirect('settings:profile')
+        else:
+            messages.error(request, _('Please correct the error below.'))
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+    return render(request, 'profiles/profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
 
 #------------------------------------------------------
 
 @login_required
-def tip_sil(request, pk=None):
+def tipi_sil(request, pk=None):
     print("tip sildeki pk:", pk)
     object = get_object_or_404(tip, pk=pk)
     sil_tip = object.tip_adi
@@ -107,11 +131,11 @@ def tip_sil(request, pk=None):
     print("sil_tip", sil_tip)
     print("sil_id", sil_id)
     args = {'sil_id': sil_id, 'sil_tip': sil_tip, 'pk': pk,}
-    return render(request, 'islem/tip_sil_soru.html', args)
+    return render(request, 'islem/tipi_sil_soru.html', args)
 
 
 @login_required
-def tip_sil_kesin(request, pk=None):
+def tipi_sil_kesin(request, pk=None):
     print("tip sil kesindeki pk:", pk)
     object = get_object_or_404(tip, pk=pk)
     try:
@@ -120,9 +144,9 @@ def tip_sil_kesin(request, pk=None):
         error_message = "bağlantılı veri var,  silinemez...!!"
         #return JsonResponse(error_message, safe=False)
         messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('tip')
+        return redirect('tipi')
     messages.success(request, 'Başarıyla silindi....')
-    return redirect('tip')
+    return redirect('tipi')
 
 
 #------------------------------------------------------
@@ -279,12 +303,12 @@ def musteri_sil_kesin(request, pk=None):
 class TipiCreate(LoginRequiredMixin,CreateView):
     model = tipi
     fields = '__all__'
-    success_url = "/denetim/tipi/create/"
+    success_url = "/islem/tipi/create/"
 
 class TipiUpdate(LoginRequiredMixin,UpdateView):
     model = tipi
     fields = '__all__'
-    success_url = "/denetim/tipi/"
+    success_url = "/islem/tipi/"
 
 class TipiDelete(LoginRequiredMixin,DeleteView):
     model = tipi
@@ -299,12 +323,12 @@ class TipiDelete(LoginRequiredMixin,DeleteView):
 class BolumCreate(LoginRequiredMixin,CreateView):
     model = bolum
     fields = '__all__'
-    success_url = "/denetim/bolum/create/"
+    success_url = "/islem/bolum/create/"
 
 class BolumUpdate(LoginRequiredMixin,UpdateView):
     model = bolum
     fields = '__all__'
-    success_url = "/denetim/bolum/"
+    success_url = "/islem/bolum/"
 
 class BolumDelete(LoginRequiredMixin,DeleteView):
     model = bolum
@@ -319,12 +343,12 @@ class BolumDelete(LoginRequiredMixin,DeleteView):
 class DetayCreate(LoginRequiredMixin,CreateView):
     model = detay
     fields = '__all__'
-    success_url = "/denetim/detay/create/"
+    success_url = "/islem/detay/create/"
 
 class DetayUpdate(LoginRequiredMixin,UpdateView):
     model = detay
     fields = '__all__'
-    success_url = "/denetim/detay/"
+    success_url = "/islem/detay/"
 
 class DetayDelete(LoginRequiredMixin,DeleteView):
     model = detay
@@ -339,12 +363,12 @@ class DetayDelete(LoginRequiredMixin,DeleteView):
 class GrupCreate(LoginRequiredMixin,CreateView):
     model = grup
     fields = '__all__'
-    success_url = "/denetim/grup/create/"
+    success_url = "/islem/grup/create/"
 
 class GrupUpdate(LoginRequiredMixin,UpdateView):
     model = grup
     fields = '__all__'
-    success_url = "/denetim/grup/"
+    success_url = "/islem/grup/"
 
 class GrupDelete(LoginRequiredMixin,DeleteView):
     model = grup
@@ -359,12 +383,12 @@ class GrupDelete(LoginRequiredMixin,DeleteView):
 class SirketCreate(LoginRequiredMixin,CreateView):
     model = sirket
     fields = '__all__'
-    success_url = "/denetim/sirket/create/"
+    success_url = "/islem/sirket/create/"
 
 class SirketUpdate(LoginRequiredMixin,UpdateView):
     model = sirket
     fields = '__all__'
-    success_url = "/denetim/sirket/"
+    success_url = "/islem/sirket/"
 
 class SirketDelete(LoginRequiredMixin,DeleteView):
     model = sirket
@@ -379,12 +403,12 @@ class SirketDelete(LoginRequiredMixin,DeleteView):
 class MusteriCreate(LoginRequiredMixin,CreateView):
     model = musteri
     fields = '__all__'
-    success_url = "/denetim/musteri/create/"
+    success_url = "/islem/musteri/create/"
 
 class MusteriUpdate(LoginRequiredMixin,UpdateView):
     model = musteri
     fields = '__all__'
-    success_url = "/denetim/musteri/"
+    success_url = "/islem/musteri/"
 
 class MusteriDelete(LoginRequiredMixin,DeleteView):
     model = musteri

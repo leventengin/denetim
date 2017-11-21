@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Detay Listesi</h3>
+
+    {% if detay_list %}
+    <ul>
+
+      {% for detay in detay_list %}
+      <li>
+        <a href="{{detay.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{detay.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{detay.detay_kodu}})    <a href="{{detay.id}}">{{ detay.detay_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/detay/create"> Detay Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı detay yok ....</p>
+      <p> </p>
+      <a href="/islem/detay/create"> Detay Ekle </a>
+    {% endif %}
+
+{% endblock %}

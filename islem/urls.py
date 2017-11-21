@@ -48,8 +48,8 @@ urlpatterns = [
     url(r'^tipi/(?P<pk>\d+)$', views.TipiDetailView.as_view(), name='tipi-detail'),
     url(r'^tipi/create/$', views.TipiCreate.as_view(), name='tipi_create'),
     url(r'^tipi/(?P<pk>\d+)/update/$', views.TipiUpdate.as_view(), name='tipi_update'),
-    url(r'^tipi/(?P<pk>\d+)/delete/$', views.tip_sil, name='tip_sil'),
-    url(r'^tipi/(?P<pk>\d+)/delete/kesin/$', views.tip_sil_kesin, name='tip_sil_kesin'),
+    url(r'^tipi/(?P<pk>\d+)/delete/$', views.tipi_sil, name='tipi_sil'),
+    url(r'^tipi/(?P<pk>\d+)/delete/kesin/$', views.tipi_sil_kesin, name='tipi_sil_kesin'),
 
     # bolum urlleri aşağıda....
     url(r'^bolum/$', views.BolumListView.as_view(), name='bolum'),

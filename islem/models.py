@@ -11,13 +11,13 @@ EVETHAYIR = (
 ('H', 'Hayır'),
 )
 
-class Profil(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR)
     denetim_takipcisi = models.CharField(max_length=1, choices=EVETHAYIR)
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR)
     def __str__(self):
-        return(self.user)
+        return(self.user.username)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -28,6 +28,39 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
+
+
+class denetim(models.Model):
+    denetim_adi = models.CharField(max_length=100)
+    musteri = models.ForeignKey(musteri, on_delete=models.PROTECT)
+    denetci = models.ForeignKey(User, on_delete=models.CASCADE)
+    durum = models.CharField(max_length=1)
+    yaratim_tarihi = models.DateField()
+    yaratan = models.ForeignKey(User, on_delete=models.CASCADE)
+    hedef_baslangic = models.DateField()
+    hedef_bitis = models.DateField()
+    ger_baslangic = models.DateField()
+    ger_bitis = models.DateField()
+    fiili_kapanis = models.DateField()
+    ilk_dosya = models.FileField(upload_to='yuklemeler/')
+    sonuc_dosya = models.FileField(upload_to='yuklemeler/')
+
+class gozlemci(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    gozlemci = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class icerik(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    detay = models.ForeignKey(detay, on_delete=models.PROTECT)
+
+class sonuc(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    detay = models.ForeignKey(detay, on_delete=models.PROTECT)
+    puan = models.IntegerField()
+    aciklama = models.CharField(max_length=100)
+    foto = models.ImageFiels
 
 
 class tipi(models.Model):

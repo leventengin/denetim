@@ -1,0 +1,27 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Grup Listesi</h3>
+
+    {% if grup_list %}
+    <ul>
+
+      {% for grup in grup_list %}
+      <li>
+        <a href="{{grup.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{grup.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{grup.id}})    <a href="{{grup.id}}">{{ grup.grup_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/grup/create"> Grup Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı grup yok ....</p>
+      <p> </p>
+      <a href="/islem/grup/create"> Grup Ekle </a>
+    {% endif %}
+
+{% endblock %}

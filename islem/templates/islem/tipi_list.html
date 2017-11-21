@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Denetim Tipi Listesi</h3>
+
+    {% if tipi_adi_list %}
+    <ul>
+
+      {% for tipi in tipi_list %}
+      <li>
+        <a href="{{tipi.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{tipi.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{tipi.id}})    <a href="{{tipi.id}}">{{ tipi.tipi_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/tipi/create"> Denetim Tipi Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı denetim tipi yok ....</p>
+      <p> </p>
+      <a href="/islem/tipi/create"> Denetim Tipi Ekle </a>
+    {% endif %}
+
+{% endblock %}

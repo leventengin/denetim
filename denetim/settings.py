@@ -40,6 +40,8 @@ EMAIL_USE_TLS = True
 
 # Application definition
 
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 INSTALLED_APPS = [
     'islem',
     'bootstrap3',
@@ -123,6 +125,54 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
+DATE_INPUT_FORMATS = ('%d-%m-%Y')
+
+LANGUAGES = [
+    ('en', ('English')),
+    ('tr', ('Turkish')),
+]
+
+LANGUAGE_CODE = 'tr-TR'
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+TIME_ZONE = 'Europe/Istanbul'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+
+STATIC_URL = '/static/'
+
+LOGIN_REDIRECT_URL = '/giris/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+
+
+
+
+
+
+
+
+
+"""
+# Internationalization
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -138,3 +188,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+"""

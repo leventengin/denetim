@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Bölüm Listesi</h1>
+
+    {% if bolum_list %}
+    <ul>
+
+      {% for bolum in bolum_list %}
+      <li>
+        <a href="{{bolum.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{bolum.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{bolum.bolum_kodu}})    <a href="{{bolum.id}}">{{ bolum.bolum_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/bolum/create"> Bölüm Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı bölüm yok ....</p>
+      <p> </p>
+      <a href="/islem/bolum/create"> Bölüm Ekle </a>
+    {% endif %}
+
+{% endblock %}

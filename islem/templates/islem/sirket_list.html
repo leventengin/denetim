@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Şirket Listesi</h3>
+
+    {% if sirket_list %}
+    <ul>
+
+      {% for sirket in sirket_list %}
+      <li>
+        <a href="{{sirket.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{sirket.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{sirket.id}})    <a href="{{sirket.id}}">{{ sirket.sirket_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/sirket/create"> Şirket Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı şirket yok ....</p>
+      <p> </p>
+      <a href="/islem/sirket/create"> Şirket Ekle </a>
+    {% endif %}
+
+{% endblock %}

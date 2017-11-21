@@ -1,0 +1,30 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h4>Denetim Detay Sayfası</h4>
+
+  <p> </p>
+  <p> </p>
+
+
+  <table border="0">
+      <tbody>
+          <tr>
+              <td><b>Denetim Bölümü..:</b></td>
+              <td>  &emsp;      {{ detay.bolum }}</td>
+          </tr>
+          <tr>
+              <td><b>Detay Kodu.....:</b></td>
+              <td> &emsp;     {{ detay.detay_kodu }}</td>
+          </tr>
+          <tr>
+              <td><b>Detay Adı.........:   </b></td>
+              <td> &emsp;     {{ detay.detay_adi }}</td>
+          </tr>
+      </tbody>
+  </table>
+
+
+
+
+{% endblock %}
