@@ -1,51 +1,25 @@
 
+
+
 {% extends "base_generic.html" %}
 
 {% block content %}
 
+    <h4>Bekleyen denetimler </h4>
 
+    {% if secili_denetimler %}
+    <ul>
 
-
-<h2>İçerik bilgisi</h2>
-
-  <p>Denetim sistemindeki kayıt listesi:</p>
-
-
-    <table border="0">
-          <tbody>
-              <tr>
-                  <td><b>Denetim Tipi..............:</b></td>
-                  <td> &emsp;     {{ num_tipi }}</td>
-              </tr>
-              <tr>
-                  <td><b>Denetim Bölümü..........:   </b></td>
-                  <td> &emsp;     {{ num_bolum }}</td>
-              </tr>
-              <tr>
-                  <td><b>Denetim Detayı......:</b></td>
-                  <td>  &emsp;      {{ num_detay }}</td>
-              </tr>
-              -------------------------------------------------
-              <tr>
-                  <td><b>Grup..............:   </b></td>
-                  <td> &emsp;     {{ num_grup }}</td>
-              </tr>
-              <tr>
-                  <td><b>Şirket.............:</b></td>
-                  <td>  &emsp;      {{ num_sirket }}</td>
-              </tr>
-              <tr>
-                  <td><b>Müşteri............: </b></td>
-                  <td>   &emsp;  {{ num_musteri }}</td>
-              </tr>
-              ----------------------------------------------------
-          </tbody>
-      </table>
-
-
-
-
-
-
+      {% for denetim in secili_denetimler %}
+        <li>
+          <a href="denetim/{{denetim.id}}">{{ denetim.denetim_adi }} </a>  &emsp; <a> {{ denetim.hedef_baslangic|date:"d/m/Y" }}</a>
+        </li>
+        {% endfor %}
+        <p> </p>
+      </ul>
+    {% else %}
+      <p>Kayıtlı bekleyen denetim yok ....</p>
+      <p> </p>
+    {% endif %}
 
 {% endblock %}

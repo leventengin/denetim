@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^pdf/', views.GeneratePDF.as_view(), name='GeneratePDF'),
     url(r'^eposta/', views.eposta_gonder, name='eposta_gonder'),
     url(r'^accounts/', include('django.contrib.auth.urls')),
+    url('^searchableselect/', include('searchableselect.urls')),
 
     ]
 

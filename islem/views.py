@@ -14,9 +14,11 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, musteri, tipi, bolum, detay
+from .models import Profile, denetim, gozlemci, sonuc, sonuc_bolum
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
-
+from islem.forms import GozlemciForm
+import collections
 
 
 
@@ -74,6 +76,24 @@ def eposta_gonder(request):
 
 @login_required
 def index(request):
+    kisi = request.user
+    print("kisi", kisi)
+    kullanici = Profile.objects.get(user=kisi)
+    print("kullanıcı", kullanici)
+
+    if kullanici.denetci == "E":
+        acik_denetimler = denetim.objects.filter(durum="B")
+        secili_denetimler = acik_denetimler.filter(denetci=request.user)
+        return render(request, 'ana_menu.html',
+            context={
+            'secili_denetimler': secili_denetimler,
+            },
+        )
+    else:
+        return render(request, 'ana_menu_2.html',)
+
+
+"""
     num_tipi=tipi.objects.all().count()
     num_bolum=bolum.objects.all().count()
     num_detay=detay.objects.all().count()
@@ -93,6 +113,43 @@ def index(request):
         'num_musteri': num_musteri,
         },
     )
+"""
+
+
+#------------------------------------------------------------------------------
+
+
+@login_required
+def denetim_detay(request, pk=None):
+
+    denetim_obj = denetim.objects.get(id=pk)
+    print("seçilen denetim", denetim_obj)
+    denetim_adi = denetim_obj.denetim_adi
+    musteri = denetim_obj.musteri
+    denetci = denetim_obj.denetci
+    tipi = denetim_obj.tipi
+    yaratim_tarihi = denetim_obj.yaratim_tarihi
+    yaratan = denetim_obj.yaratan
+    hedef_baslangic = denetim_obj.hedef_baslangic
+    hedef_bitis = denetim_obj.hedef_bitis
+    gerc_baslangic = denetim_obj.gerc_baslangic
+    gerc_bitis = denetim_obj.gerc_bitis
+    d = collections.defaultdict(list)
+    bolum_obj = sonuc_bolum.objects.filter(denetim=pk)
+    for bolum in bolum_obj:
+        print("bolum list . bolum", bolum.bolum)
+        detay_obj = sonuc.objects.filter(denetim=pk, bolum=bolum.bolum)
+        for detay in detay_obj:
+            print("detay list . detay", detay.bolum, detay.detay)
+            d[detay.bolum].append(detay.detay)
+    print("***********************")
+    print(d)
+    d.default_factory = None
+    bol_detay = dict(d)
+    print("************************")
+    print(bol_detay)
+    context = {'bol_detay':bol_detay}
+    return render(request, 'ana_menu_2.html', context )
 
 
 
@@ -121,6 +178,43 @@ def update_profile(request):
     })
 
 #------------------------------------------------------
+# gözlemci seçimi ile ilgili bölümler.....
+#-----------------------------------------------------
+
+@login_required
+def gozlemci_sec(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = GozlemciForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            kisi = request.POST.getlist('kisi', "")
+            print ("kisi", kisi)
+            #import pdb; pdb.set_trace()
+            #kaydetme_obj = deneme_giris(yazi = isim, user = kullanici, tarih = tarih)
+            #kaydetme_obj.save()
+            #text = form.cleaned_data["your_name"]
+            #myQS = yedek_parca.objects.none()
+            form = GozlemciForm()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('gozlemci_sec')
+        else:
+            return render(request, 'islem/denetim_takipcisi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = GozlemciForm()
+        #deneme_giris_QS = deneme_giris.objects.all().order_by('-tarih')
+        #args = {'form': form, 'deneme_giris_QS': deneme_giris_QS}
+        #import pdb; pdb.set_trace()
+        #return render(request, 'name.html', args)
+        return render(request, 'islem/denetim_takipcisi.html', {'form': form,})
+
+
+#---------------------------------------------------------------------
 
 @login_required
 def tipi_sil(request, pk=None):

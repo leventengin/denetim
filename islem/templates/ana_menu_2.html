@@ -1,0 +1,34 @@
+
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <h3>  merhaba teknoloji........... </h3>
+
+        {% if bol_detay %}
+            <strong>There are logs present.</strong>
+        {% else %}
+            <strong>There are nooooooooooooo logs present.</strong>
+        {% endif %}
+
+
+
+    {% for detay in bol_detay.items() %}
+        <tr>
+            <td>{{ detay.bolum }}</td>
+        </tr>
+        <!--
+        {% for detay in detaylar %}
+        <tr>
+            <td>{{ detay.detay_adi }}</td>
+        </tr>
+        {% endfor %}
+      -->
+    {% endfor %}
+
+
+
+
+{% endblock %}

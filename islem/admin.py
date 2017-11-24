@@ -26,3 +26,30 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+
+
+
+# register your models here ...
+
+from .models import grup
+from .models import sirket
+from .models import musteri
+from .models import tipi
+from .models import bolum
+from .models import detay
+from .models import denetim
+from .models import gozlemci
+from .models import sonuc
+from .models import sonuc_bolum
+
+
+admin.site.register(grup)
+admin.site.register(sirket)
+admin.site.register(musteri)
+admin.site.register(tipi)
+admin.site.register(bolum)
+admin.site.register(detay)
+admin.site.register(denetim)
+admin.site.register(gozlemci)
+admin.site.register(sonuc)
+admin.site.register(sonuc_bolum)

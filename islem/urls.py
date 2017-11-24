@@ -12,10 +12,12 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
 
+    url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
+    url(r'^denetim/(?P<pk>\d+)$', views.denetim_detay, name='denetim_detay'),
+
 
 #-------------------------------------------------------------------------------------------------
     # grup urlleri aşağıda....
-
 
     url(r'^grup/$', views.GrupListView.as_view(), name='grup'),
     url(r'^grup/(?P<pk>\d+)$', views.GrupDetailView.as_view(), name='grup-detail'),

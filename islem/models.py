@@ -28,46 +28,17 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-
-
-class denetim(models.Model):
-    denetim_adi = models.CharField(max_length=100)
-    musteri = models.ForeignKey(musteri, on_delete=models.PROTECT)
-    denetci = models.ForeignKey(User, on_delete=models.CASCADE)
-    durum = models.CharField(max_length=1)
-    yaratim_tarihi = models.DateField()
-    yaratan = models.ForeignKey(User, on_delete=models.CASCADE)
-    hedef_baslangic = models.DateField()
-    hedef_bitis = models.DateField()
-    ger_baslangic = models.DateField()
-    ger_bitis = models.DateField()
-    fiili_kapanis = models.DateField()
-    ilk_dosya = models.FileField(upload_to='yuklemeler/')
-    sonuc_dosya = models.FileField(upload_to='yuklemeler/')
-
-class gozlemci(models.Model):
-    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
-    gozlemci = models.ForeignKey(User, on_delete=models.CASCADE)
-
-class icerik(models.Model):
-    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
-    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
-    detay = models.ForeignKey(detay, on_delete=models.PROTECT)
-
-class sonuc(models.Model):
-    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
-    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
-    detay = models.ForeignKey(detay, on_delete=models.PROTECT)
-    puan = models.IntegerField()
-    aciklama = models.CharField(max_length=100)
-    foto = models.ImageFiels
-
+class musteri(models.Model):
+    musteri_adi = models.CharField(max_length=200)
+    def __str__(self):
+        return(self.musteri_adi)
 
 class tipi(models.Model):
     tipi_kodu = models.CharField(max_length=10)
     tipi_adi = models.CharField(max_length=200)
     def __str__(self):
         return(self.tipi_adi)
+
 
 class bolum(models.Model):
     bolum_kodu = models.CharField(max_length=10)
@@ -84,6 +55,51 @@ class detay(models.Model):
         return(self.detay_adi)
 
 
+
+class denetim(models.Model):
+    denetim_adi = models.CharField(max_length=100)
+    musteri = models.ForeignKey(musteri, on_delete=models.PROTECT)
+    denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE)
+    tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
+    durum = models.CharField(max_length=1)
+    yaratim_tarihi = models.DateField()
+    yaratan = models.ForeignKey(User, related_name='yaratan', on_delete=models.CASCADE)
+    hedef_baslangic = models.DateField()
+    hedef_bitis = models.DateField()
+    gerc_baslangic = models.DateField(blank=True, null=True)
+    gerc_bitis = models.DateField(blank=True, null=True)
+    fiili_kapanis = models.DateField(blank=True, null=True)
+    aciklama = models.TextField(blank=True, null=True)
+    ilk_dosya = models.FileField(upload_to='yuklemeler/', blank=True, null=True)
+    sonuc_dosya = models.FileField(upload_to='yuklemeler/', blank=True, null=True)
+    def __str__(self):
+        return(self.denetim_adi)
+
+class gozlemci(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    gozlemci = models.ForeignKey(User, on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.denetim.denetim_adi)
+
+
+
+class sonuc(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    detay = models.ForeignKey(detay, on_delete=models.PROTECT)
+    puan = models.IntegerField(blank=True, null=True)
+    aciklama = models.CharField(max_length=100, blank=True, null=True)
+    foto = models.ImageField(upload_to='cekimler/',blank=True, null=True)
+    def __str__(self):
+        return(self.denetim.denetim_adi)
+
+class sonuc_bolum(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    def __str__(self):
+        return(self.denetim.denetim_adi)
+
+
 class grup(models.Model):
     grup_adi = models.CharField(max_length=200)
     def __str__(self):
@@ -95,8 +111,3 @@ class sirket(models.Model):
     grubu = models.ForeignKey(grup, on_delete=models.PROTECT)
     def __str__(self):
         return(self.sirket_adi)
-
-class musteri(models.Model):
-    musteri_adi = models.CharField(max_length=200)
-    def __str__(self):
-        return(self.musteri_adi)
