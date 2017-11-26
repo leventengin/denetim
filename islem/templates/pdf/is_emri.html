@@ -1,0 +1,140 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="tr">
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <head>
+
+        <title></title>
+        <style type="text/css">
+
+
+            body {
+                font-family: DejaVu Sans;
+                font-weight: 200;
+                font-size: 14px;
+            }
+            .header {
+                font-size: 20px;
+                font-weight: 100;
+                text-align: center;
+                color: #007cae;
+            }
+            .title {
+                font-size: 22px;
+                font-weight: 100;
+               /* text-align: right;*/
+               padding: 10px 20px 0px 20px;
+            }
+            .title span {
+                color: #007cae;
+            }
+            .details {
+                padding: 10px 20px 0px 20px;
+                text-align: left !important;
+                /*margin-left: 40%;*/
+            }
+            .hrItem {
+                border: none;
+                height: 1px;
+                /* Set the hr color */
+                color: #333; /* old IE */
+                background-color: #fff; /* Modern Browsers */
+            }
+        </style>
+    </head>
+
+    <body>
+
+
+      <div>
+      <h4>  Denetim İş Emri Detayları </h4>
+      <p> </p> &emsp;
+          {% if dict_bol_detay %}
+              <!-- <strong>There are logs present.</strong>  -->
+              <p> </p>
+          {% else %}
+              <strong>There are nooooooooooooo logs present.</strong>
+              <p> </p>
+          {% endif %}
+
+
+
+          <table border="0">
+              <tbody>
+                  <tr>
+                      <td><b>Denetim Adı:</b></td>
+                      <td>  &emsp; {{ denetim_adi }} </td>
+                  </tr>
+                  <tr>
+                      <td><b>Denetlenen:</b></td>
+                      <td> &emsp; {{ musteri }}  </td>
+                  </tr>
+                  <tr>
+                      <td><b>Denetçi:   </b></td>
+                      <td> &emsp; {{ denetci }}  </td>
+                  </tr>
+                  <tr>
+                      <td><b>Denetim Tipi:</b></td>
+                      <td>  &emsp;  {{ tipi }} </td>
+                  </tr>
+                  <tr>
+                      <td><b>Oluşturma Tarihi:</b></td>
+                      <td> &emsp; {{ yaratim_tarihi }}  </td>
+                  </tr>
+                  <tr>
+                      <td><b>Oluşturan:   </b></td>
+                      <td> &emsp;  {{ yaratan }}  </td>
+                  </tr>
+                  <tr>
+                      <td><b>Hedef Başlangıç Tarihi:</b></td>
+                      <td> &emsp; {{ hedef_baslangic }} </td>
+                  </tr>
+                  <tr>
+                      <td><b>Hedef Bitiş Tarihi:   </b></td>
+                      <td> &emsp; {{ hedef_bitis }}  </td>
+                  </tr>
+
+              </tbody>
+          </table>
+
+
+
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+
+      <p> </p> &emsp;
+      <p> </p> &emsp;
+      <h5> <b> Denetlenecek bölüm ve detaylar: </b> <h5>
+      <p> </p> &emsp;
+      <p> </p>
+      {% for bolum, detay in dict_bol_detay.items %}
+          <tr>
+              <td> {{ bolum.bolum_kodu }} &emsp;  {{ bolum.bolum_adi }}</td>
+          </tr>
+          <p> </p>
+
+          {% for detay in detay %}
+          <tr>
+              <td> {{ detay.detay_kodu }} &emsp;   {{ detay.detay_adi }}</td>
+          </tr>
+          <p> </p>
+          {% endfor %}
+
+      {% endfor %}
+
+     </div>
+
+      <div id="footerContent">
+           {%block page_foot%}
+               Page <pdf:pagenumber>
+           {%endblock%}
+       </div>
+
+    </body>
+
+</html>

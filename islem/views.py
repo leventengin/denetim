@@ -21,6 +21,19 @@ from islem.forms import GozlemciForm
 import collections
 
 
+#-------------------------------------------------------------------------------
+from django.contrib.auth.decorators import login_required
+from django.template.loader import get_template
+from django.template import RequestContext
+from django.http import HttpResponse
+from django.conf import settings
+from weasyprint import HTML, CSS
+from django.template.loader import render_to_string
+
+
+
+
+
 
 
 
@@ -32,25 +45,65 @@ class GeneratePdf(View):
             'customer_name': 'Cooper Mann',
             'order_id': 1233434,
             }
-        pdf = render_to_pdf('pdf/invoice.html', data)
+        #pdf = render_to_pdf('pdf/invoice.html', data)
+        pdf = render_to_pdf('pdf/utf8.html')
         return HttpResponse(pdf, content_type='application/pdf')
 
 
 class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
-        template = get_template('pdf/invoice.html')
-        context = {
-            "invoice_id": 123,
-            "order_id": 1233434,
-            "customer_name": "John Cooper",
-            "amount": 1399.99,
-            "today": "Today",
-        }
-        html = template.render(context)
-        pdf = render_to_pdf('pdf/invoice.html', context)
+        denetim_no = request.session.get('denetim_no')
+        denetim_obj = denetim.objects.get(id=denetim_no)
+        print("seçilen denetim", denetim_obj)
+        denetim_adi = denetim_obj.denetim_adi
+        musteri = denetim_obj.musteri
+        denetci = denetim_obj.denetci
+        tipi = denetim_obj.tipi
+        yaratim_tarihi = denetim_obj.yaratim_tarihi
+        yaratan = denetim_obj.yaratan
+        hedef_baslangic = denetim_obj.hedef_baslangic
+        hedef_bitis = denetim_obj.hedef_bitis
+        gerc_baslangic = denetim_obj.gerc_baslangic
+        gerc_bitis = denetim_obj.gerc_bitis
+        d = collections.defaultdict(list)
+        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        for bolum in bolum_obj:
+            print("bolum list . bolum", bolum.bolum)
+            detay_obj = sonuc.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+            for detay in detay_obj:
+                print("detay list . detay", detay.bolum, detay.detay)
+                d[detay.bolum].append(detay.detay)
+        print("***********************")
+        print(d)
+        d.default_factory = None
+        dict_bol_detay = dict(d)
+        print("************************")
+        print(dict_bol_detay)
+        context = {'dict_bol_detay':dict_bol_detay,
+                    'denetim_adi': denetim_adi,
+                    'musteri' : musteri,
+                    'denetci' : denetci,
+                    'tipi' : tipi,
+                    'yaratim_tarihi' : yaratim_tarihi,
+                    'yaratan' : yaratan,
+                    'hedef_baslangic' : hedef_baslangic,
+                    'hedef_bitis' : hedef_bitis,
+                    }
+        template = get_template('pdf/is_emri.html')
+        html = template.render(context).encode("UTF-8")
+        page = HTML(string=html, encoding='utf-8').write_pdf()
+        response = HttpResponse(page, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="report_example.pdf"'
+        return response
+
+
+
+
+"""
+        pdf = render_to_pdf('pdf/is_emri.html', context)
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
-            filename = "Invoice_%s.pdf" %("12341231")
+            filename = "Denetim_Dosyası_%s.pdf" %("12341231")
             content = "inline; filename='%s'" %(filename)
             download = request.GET.get("download")
             if download:
@@ -59,6 +112,29 @@ class GeneratePDF(View):
             return response
         return HttpResponse("Not found")
 
+"""
+
+#-------------------------------------------------------------------------------
+
+
+
+@login_required
+def report_example(request):
+    denetim_obj = denetim.objects.all().order_by('denetim_adi')
+    #varModel = Model.objects.all()
+    template = get_template('pdf/weasyprint.html')
+    context = {}
+    context = {'denetim_obj': denetim_obj, }
+    html = template.render(context).encode("UTF-8")
+    page = HTML(string=html, encoding='utf-8').write_pdf()
+    response = HttpResponse(page, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report_example.pdf"'
+    return response
+
+
+
+
+#------------------------------------------------------------------------------
 
 def eposta_gonder(request):
     subject = 'konusu bu'
@@ -122,6 +198,9 @@ def index(request):
 @login_required
 def denetim_detay(request, pk=None):
 
+    request.session['denetim_no'] = pk
+    request.session.modified = True
+
     denetim_obj = denetim.objects.get(id=pk)
     print("seçilen denetim", denetim_obj)
     denetim_adi = denetim_obj.denetim_adi
@@ -145,10 +224,19 @@ def denetim_detay(request, pk=None):
     print("***********************")
     print(d)
     d.default_factory = None
-    bol_detay = dict(d)
+    dict_bol_detay = dict(d)
     print("************************")
-    print(bol_detay)
-    context = {'bol_detay':bol_detay}
+    print(dict_bol_detay)
+    context = {'dict_bol_detay':dict_bol_detay,
+               'denetim_adi': denetim_adi,
+               'musteri' : musteri,
+               'denetci' : denetci,
+               'tipi' : tipi,
+               'yaratim_tarihi' : yaratim_tarihi,
+               'yaratan' : yaratan,
+               'hedef_baslangic' : hedef_baslangic,
+               'hedef_bitis' : hedef_bitis,
+               }
     return render(request, 'ana_menu_2.html', context )
 
 
@@ -563,4 +651,60 @@ class MusteriListView(LoginRequiredMixin,generic.ListView):
 class MusteriDetailView(LoginRequiredMixin,generic.DetailView):
     model = musteri
 
+
+
 #--------------------------------------------------------------
+
+# -*- coding: utf-8 -*-
+from .models import denetim
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+from django.http import HttpResponse
+
+
+
+# -*- coding: utf-8 -*-
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+from django.template import Context
+
+
+def generate_pdf(request):
+    """Generate pdf."""
+    # Model data
+    denetim_obj = denetim.objects.all().order_by('denetim_adi')
+
+    # Rendered
+    html_string = render_to_string('pdf/weasyprint.html', {'denetim_obj': denetim_obj}).encode('utf-8')
+    html = HTML(string=html_string)
+
+    result = html.write_pdf()
+
+    # Creating http response
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = 'inline; filename=list_people.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output = open(output.name, 'r')
+        response.write(output.read())
+
+    return response
+
+
+
+
+
+#-------------------------------------------------------------------------------
+
+def xyz(request):
+    denetim_obj = denetim.objects.all().order_by('denetim_adi')
+    #content = unicode(content)
+    #denetim_obj = str(denetim_obj)
+    return render(request, 'islem/xyz.html', {'denetim_obj': denetim_obj} )

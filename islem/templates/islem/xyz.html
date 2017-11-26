@@ -1,0 +1,47 @@
+
+<html>
+ <head>
+   <title>Test Weasyprint</title>
+   <style>
+     h1 {
+       text-align: center;
+     }
+
+     table {
+       border: 1px solid;
+       margin: 0 auto;
+       width: 70%;
+     }
+
+     td, th {
+       text-align: center;
+       border: 1px solid;
+     }
+   </style>
+ </head>
+ <body>
+   <h1>   denetim listesi </h1>
+
+     <a href="/pdf2"> PDF Oluştur </a>
+
+
+   <table>
+     <thead>
+       <tr>
+         <th> adı </th>
+         <th> müşteri </th>
+         <th> tipi </th>
+       </tr>
+     </thead>
+     <tbody>
+       {% for denetim in denetim_obj %}
+         <tr>
+           <td>{{ denetim.denetim_adi }}</td>
+           <td>{{ denetim.musteri }}</td>
+           <td>{{ denetim.tipi }}</td>
+         </tr>
+       {% endfor %}
+     </tbody>
+   </table>
+ </body>
+</html>

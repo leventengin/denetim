@@ -14,8 +14,8 @@ urlpatterns = [
 
     url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
     url(r'^denetim/(?P<pk>\d+)$', views.denetim_detay, name='denetim_detay'),
-
-
+    #url(r'^denetim/(?P<pk>\d+)/pdf/$', views.GeneratePDF.as_view(), name='GeneratePDF'),
+    url(r'^denetim/(?P<pk>\d+)/pdf/$', views.generate_pdf, name='generate_pdf'),
 #-------------------------------------------------------------------------------------------------
     # grup urlleri aşağıda....
 
