@@ -16,6 +16,15 @@ urlpatterns = [
     url(r'^denetim/(?P<pk>\d+)$', views.denetim_detay, name='denetim_detay'),
     #url(r'^denetim/(?P<pk>\d+)/pdf/$', views.GeneratePDF.as_view(), name='GeneratePDF'),
     url(r'^denetim/(?P<pk>\d+)/pdf/$', views.generate_pdf, name='generate_pdf'),
+    url(r'^baslat/$', views.denetim_baslat, name='denetim_baslat'),
+    url(r'^baslat/kesin/$', views.denetim_baslat_kesin, name='denetim_baslat_kesin'),
+    url(r'^baslat/devam/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
+    url(r'^baslat/devam/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
+    url(r'^baslat/devam/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
+    url(r'^baslat/devam/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
+
+
+
 #-------------------------------------------------------------------------------------------------
     # grup urlleri aşağıda....
 

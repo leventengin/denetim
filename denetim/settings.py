@@ -153,9 +153,9 @@ USE_TZ = True
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
-
+MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/giris/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

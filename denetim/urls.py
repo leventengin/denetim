@@ -29,6 +29,7 @@ urlpatterns = [
     #url(r'^pdf2/', views.get_report, name='get_report'),
     url(r'^pdf2/', views.report_example, name='report_example'),
     url(r'^xyz/', views.xyz, name='xyz'),
+    url(r'^abc/', views.kamera, name='kamera'),
     url(r'^eposta/', views.eposta_gonder, name='eposta_gonder'),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url('^searchableselect/', include('searchableselect.urls')),

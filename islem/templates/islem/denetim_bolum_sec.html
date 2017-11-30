@@ -1,0 +1,140 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<style>
+
+select>option:hover
+{
+    color: white;
+    cursor: pointer;
+}
+
+</style>
+
+
+
+
+
+
+<h4>Denetim Bolüm Seç </h4>
+
+
+
+<script>
+  function changeCLR() {
+      $('#id_bolum').css('background-color', 'blue');
+  }
+</script>
+
+
+<script>
+  function change_bolum() {
+      var selected = document.getElementById("id_bolum").value;
+      alert("selected");
+      console.log(selected);
+      $.ajax({
+        url : "secilen_bolumu_kaydet/",
+        type : "GET",
+        dataType: "text",
+        data : {
+          'selected' : selected,
+        },
+        success: function() {
+            alert(" secilen bölüm başarıyla kaydedildi..");
+            /*window.location.reload(); */
+            },
+        failure: function() {
+            alert("hata... seçilen bölümün kaydedilmesi...");
+            }
+        });  /* ajax kapa...*/
+      /* window.location.reload(); */
+  }
+</script>
+
+
+<script>
+  function baslat_json() {
+      var selected = document.getElementById("id_bolum").value;
+      var deger = document.getElementById("id_bolum").innerText;
+      alert("başlatma json...", deger);
+      console.log(selected);
+
+      if (selected == "")
+           { alert(" bölüm  seçmelisiniz...."); }
+      else {
+        $.ajax({
+          url : "detay_islemleri_baslat/",
+          type : "GET",
+          dataType: "text",
+          data : {
+            'selected' : selected,
+          },
+          success: function() {
+              alert(" detay işlemleri başlatma başarılı..");
+              window.location = 'denetim_detay_islemleri/';
+              /*window.location.reload(); */
+              },
+          failure: function() {
+              alert(" detay işlemleri başlatma hata...");
+              }
+          });  /* ajax kapa...*/
+        }
+  }
+</script>
+
+
+<script>
+    $( ".baslat_json" ).baslat_json();
+</script>
+
+<script>
+    $( ".change_bolum" ).change_bolum();
+</script>
+
+<script>
+    $( ".changeCLR" ).changeCLR();
+</script>
+
+
+
+<script>
+    $(document).ready(function(){
+            $("#id_bolum").change(function(){
+                /* alert ( "js bölüm seç çalıştı..."); */
+                /* changeCLR(); */
+                change_bolum();
+             });   /*  change  kapanıyor ...  */
+         });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+
+
+<p> </p>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <!-- <input type="submit" value="kaydet" />
+    <button type="button" onclick="baslat_json()">Tamam</button>  -->
+</form>
+
+
+<form>
+  <input type="button" value="Tamam" onclick="baslat_json()">
+</form>
+
+
+
+
+
+{% endblock %}

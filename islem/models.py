@@ -90,14 +90,16 @@ class sonuc(models.Model):
     puan = models.IntegerField(blank=True, null=True)
     aciklama = models.CharField(max_length=100, blank=True, null=True)
     foto = models.ImageField(upload_to='cekimler/',blank=True, null=True)
+    tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     def __str__(self):
         return(self.denetim.denetim_adi)
 
 class sonuc_bolum(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     def __str__(self):
-        return(self.denetim.denetim_adi)
+        return(self.bolum.bolum_adi)
 
 
 class grup(models.Model):

@@ -1,0 +1,101 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<style>
+
+select>option:hover
+{
+    color: white;
+    cursor: pointer;
+}
+
+</style>
+
+
+
+
+
+
+<h4>Denetim Detay İşlemleri </h4>
+
+
+
+<script>
+  function changeCLR() {
+      $('#id_bolum').css('background-color', 'blue');
+  }
+</script>
+
+
+<script>
+    $( ".changeCLR" ).changeCLR();
+</script>
+
+
+<!--
+<script>
+    $(document).ready(function(){
+           /* $("#id_bolum").change(function(){ */
+                alert ( "hadi  şimdi...garanti var mı çalıştı...");
+                changeCLR();
+           /*  });   /*  change  kapanıyor ...  */
+         });  /* document ready  kapanıyor */
+</script>
+-->
+
+            <p> </p>
+            <p> </p>
+
+
+            <table border="0">
+                <tbody>
+                    <tr>
+                        <td><b>Denetim No..:</b></td>
+                        <td>  &emsp;      {{ detay.denetim }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Bolüm.....:</b></td>
+                        <td> &emsp;     {{ detay.bolum }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Detay Adı.........:   </b></td>
+                        <td> &emsp;     {{ detay.detay }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+
+
+<p> </p>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <!-- <input type="submit" value="kaydet" />  -->
+
+</form>
+
+
+<input type="file" accept="image/*">
+
+
+<form>
+  <input type="button" value="Tamam" onclick="baslat_json()">
+</form>
+
+
+
+
+
+
+
+{% endblock %}

@@ -6,8 +6,25 @@
 {% block content %}
 
   <a href="/pdf1"> PDF Oluştur </a>
-
+  <p> </p>
   <a href="/xyz"> PDF öncesi.... </a>
+  <p> </p>
+
+  {% if durum == "B" %}
+      <a href="/islem/baslat"> Denetim başlat..... </a>
+      <p> </p>
+  {% else %}
+      <a href="/islem/baslat/devam"> Denetim devam ettir..... </a>
+        <p> </p>
+      <a href="/islem/baslat/bolumler_tekrar"> Denetlenen bolumler tekrar..... </a>
+        <p> </p>
+
+  {% endif %}
+
+
+  <a href="/abc"> Camera..... </a>
+  <p> </p>
+
 
     <h4>  Denetim İş Emri Detayları </h4>
     <p> </p> &emsp;
