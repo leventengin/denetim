@@ -17,7 +17,7 @@ from .models import grup, sirket, musteri, tipi, bolum, detay
 from .models import Profile, denetim, gozlemci, sonuc, sonuc_bolum
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
-from islem.forms import GozlemciForm, BolumSecForm, DetayForm
+from islem.forms import GozlemciForm, BolumSecForm, DetayForm, SonucForm, DenetimSecForm
 import collections
 
 
@@ -178,7 +178,7 @@ def index(request):
     print("kullanıcı", kullanici)
 
     if kullanici.denetci == "E":
-        acik_denetimler = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="Y")
+        acik_denetimler = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
         acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
         secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user)
         return render(request, 'ana_menu.html',
@@ -187,30 +187,27 @@ def index(request):
             },
         )
     else:
-        return render(request, 'ana_menu_2.html',)
+        #return render(request, 'ana_menu_2.html',)
+        num_tipi=tipi.objects.all().count()
+        num_bolum=bolum.objects.all().count()
+        num_detay=detay.objects.all().count()
 
+        num_grup=grup.objects.all().count()
+        num_sirket=sirket.objects.all().count()
+        num_musteri=musteri.objects.count()
 
-"""
-    num_tipi=tipi.objects.all().count()
-    num_bolum=bolum.objects.all().count()
-    num_detay=detay.objects.all().count()
+        return render(request, 'ana_menu_2.html',
+            context={
+                'num_tipi':num_tipi,
+                'num_bolum':num_bolum,
+                'num_detay':num_detay,
 
-    num_grup=grup.objects.all().count()
-    num_sirket=sirket.objects.all().count()
-    num_musteri=musteri.objects.count()
+                'num_grup': num_grup,
+                'num_sirket': num_sirket,
+                'num_musteri': num_musteri,
+                },
+            )
 
-    return render(request, 'ana_menu.html',
-        context={
-        'num_tipi':num_tipi,
-        'num_bolum':num_bolum,
-        'num_detay':num_detay,
-
-        'num_grup': num_grup,
-        'num_sirket': num_sirket,
-        'num_musteri': num_musteri,
-        },
-    )
-"""
 
 
 #------------------------------------------------------------------------------
@@ -408,6 +405,8 @@ def detay_islemleri_baslat(request, pk=None):
 #--------------------------------------------------------------------------------
 
 
+
+
 @login_required
 def denetim_detay_islemleri(request, pk=None):
 
@@ -423,19 +422,56 @@ def denetim_detay_islemleri(request, pk=None):
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = DetayForm(request.POST or None)
         print("buraya mı geldi...  denetim_detay işlemleri...POST")
+        bir = sonuc.objects.filter(denetim=denetim_no)
+        iki = bir.filter(bolum=secili_bolum)
+        bulunan = iki.get(detay=secili_detay)
+        #bulunan = get_object_or_404(sonuc, detay=secili_detay)
+        form = SonucForm(request.POST or None, request.FILES or None, instance=bulunan)
+
         if form.is_valid():
-            bolum = request.POST.get('bolum', "")
-            print ("bolum", bolum)
-            request.session["secili_bolum"] = bolum
-            detaylar = sonuc.objects.filter(denetim=denetim_no).filter(bolum=bolum)
-            for detay in detaylar:
-                detay.tamam = "H"
-            form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
-            return render(request, 'islem/denetim_detay_islemleri.html')
+            print("neyse ki valid..bin...ext...")
+            edit = form.save(commit=False)
+            edit.save()
+            print("neden kaydetmiyor.................")
+            # bir sonraki................
+            # için  işlem yap................
+            ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
+            print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
+            detaylar = ilk_detaylar.filter(bolum=secili_bolum)
+            print("detaylar.. denetim detay işişlemleri..:", detaylar)
+            secili_detay_obj = detaylar.filter(tamam="H")
+            print("seçili detaylar tamam H olanlar...", secili_detay_obj)
+
+            if not secili_detay_obj:
+                messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı....')
+                return redirect('denetim_bolum_sec')
+
+            secili_obj = secili_detay_obj.first()
+            secili_detay = secili_obj.detay.id
+            print("secili - detay.... bakalım  doğru mu...", secili_detay)
+            request.session['secili_detay'] = secili_detay
+            form = SonucForm()
+            context = { 'form': form,
+                        'secili_obj' : secili_obj,
+                        }
+            return render(request, 'islem/denetim_detay_islemleri.html', context)
+
+            #kaydetme_obj = sonuc(id=bulunan.id,
+            #                     denetim_id = denetim_no,
+            #                     bolum_id = secili_bolum,
+            #                     detay_id = secili_detay,
+            #                     sayi = sayi,
+            #                     foto = foto,
+            #                     tamam = "E")
+            #kaydetme_obj.save()
+            #form = SonucForm()
+            #messages.success(request, 'Başarıyla kaydetti....')
+            ##return redirect('denetim_detay_islemleri')
+            #return render(request, 'islem/denetim_detay_islemleri.html')
 
         else:
+            print("ne oldu be kardeşim...........")
             return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
     # if a GET (or any other method) we'll create a blank form
@@ -450,18 +486,75 @@ def denetim_detay_islemleri(request, pk=None):
         if not secili_detay_obj:
             messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı....')
             return redirect('denetim_bolum_sec')
+        secili_obj = secili_detay_obj.first()
+        secili_detay = secili_obj.detay.id
+        print("secili - detay.... bakalım  doğru mu...", secili_detay)
+        request.session['secili_detay'] = secili_detay
+        form = SonucForm()
+        context = { 'form': form,
+                    'secili_obj' : secili_obj,
+                    }
+        return render(request, 'islem/denetim_detay_islemleri.html', context)
 
+
+"""
         for detay in secili_detay_obj:
             secili_detay = detay.detay.id
             print("secili - detay.... bakalım  doğru mu...", secili_detay)
             request.session['secili_detay'] = secili_detay
-            form = DetayForm()
+            form = SonucForm()
             context = { 'form': form,
                         'detay' : detay,
                         }
             return render(request, 'islem/denetim_detay_islemleri.html', context)
 
         return redirect('denetim_bolum_sec')
+"""
+#------------------------------------------------------
+# gözlemci seçimi ile ilgili bölümler.....
+#-----------------------------------------------------
+
+@login_required
+def sonuc_denetim_sec(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        #denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        #denetim_obj = denetim_obj_ilk.filter(denetci=request.user)
+        print("post içinden form yüklemeden önce...............")
+        denetci=request.user
+        form = DenetimSecForm(request.POST, denetci=denetci)
+        # check whether it's valid:
+        if form.is_valid():
+            denetim_no = request.POST.get('denetim_no', "")
+            print ("denetim seçim yapılmış...", denetim_no)
+            request.session['secilen_denetim'] = denetim_no
+            sonuc_list = sonuc.objects.filter(denetim=denetim_no).order_by('bolum')
+            denetimin_adi = sonuc_list.first().denetim
+            return render(request, 'islem/sonuc_list.html', {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi})
+        else:
+            #form = DenetimSecForm()
+            return render(request, 'islem/ana_menu.html',)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        denetim_obj = denetim_obj_ilk.filter(denetci=request.user)
+        #if denetim_obj:
+        print("get çalıştı..................")
+        denetci=request.user
+        form = DenetimSecForm(denetci=denetci)
+        return render(request, 'islem/sonuc_denetim_form.html', {'form': form,})
+
+
+
+
+
+
+
+
+
+
 
 #--------------------------------------------------------------------------------
 
@@ -819,6 +912,18 @@ class MusteriDelete(LoginRequiredMixin,DeleteView):
     success_url = reverse_lazy('musteri')
 
 
+#--------------------------------------------------------------
+class SonucUpdate(LoginRequiredMixin,UpdateView):
+    model = sonuc
+    fields = '__all__'
+    success_url = "/islem/sonuc/"
+
+class SonucListView(LoginRequiredMixin,generic.ListView):
+    model = sonuc
+    paginate_by = 20
+
+class SonucDetailView(LoginRequiredMixin,generic.DetailView):
+    model = sonuc
 
 
 #------------------------------------------------------------

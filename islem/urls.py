@@ -79,6 +79,12 @@ urlpatterns = [
     url(r'^detay/(?P<pk>\d+)/delete/kesin/$', views.detay_sil_kesin, name='detay_sil_kesin'),
 
 #---------------------------------------------------------------------------------------------------
+    # sonuç urlleri aşağıda....
+    #url(r'^sonuc/$', views.SonucListView.as_view(), name='sonuc'),
+    url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
+    url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetailView.as_view(), name='sonuc-detail'),
+    url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
+
 
 
 

@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, musteri, tipi, bolum, detay
-from islem.models import sonuc_bolum
+from islem.models import sonuc_bolum, denetim
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User
 #from __future__ import unicode_literals
@@ -11,11 +11,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from datetime import datetime
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-
+from django.db.models import Q
 from bootstrap_datepicker.widgets import DatePicker
 import datetime
 from datetime import date
-
+from django.contrib.auth.models import User
+from flask import request
 from django.core import serializers
 from django.contrib.postgres.search import SearchVector
 from django.views.generic import FormView
@@ -47,13 +48,45 @@ class GozlemciForm(forms.Form):
 #            'gozlemci': SearchableSelect(model='islem.gozlemci', search_field='gozlemci')
 #        }
 
+from django import forms
+from .models import sonuc
+
+class SonucForm(forms.ModelForm):
+    class Meta:
+        model = sonuc
+        fields = ('sayi', 'foto', )
+        widgets = {
+            'sayi': forms.RadioSelect,
+        }
+
+
+
 
 
 class DetayForm(forms.Form):
     puan = forms.ChoiceField(label='Seçim....:', widget=forms.RadioSelect, choices=PUAN)
-    foto = forms.ImageField(widget=forms.HiddenInput())
+    foto = forms.ImageField()
+    def clean(self):
+        print(" clean self detay form..................")
+        cleaned_data = super(DetayForm, self).clean()
+        cc_puan = cleaned_data.get("puan")
+        cc_foto = cleaned_data.get("foto")
+        print ("puan...önemli...:", cc_puan)
+        if not cc_puan:
+            raise forms.ValidationError(" puan seçili değil.... ")
+        if not cc_foto:
+            raise forms.ValidationError(" foto seçili değil.... ")
 
 
+class DenetimSecForm(forms.Form):
+    denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    def __init__(self, *args, **kwargs):
+        denetci = kwargs.pop("denetci")
+        super(DenetimSecForm, self).__init__(*args, **kwargs)
+        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
+        self.fields['denetim_no'].queryset = denetim_obj
+        print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
 
 
 """

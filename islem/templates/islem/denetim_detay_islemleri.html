@@ -5,36 +5,62 @@
 {% block content %}
 
 
-<style>
 
-select>option:hover
-{
-    color: white;
-    cursor: pointer;
-}
+<script>
 
-</style>
+  function baslat_json() {
+      // var puan = document.getElementById("id_puan").value;
 
 
+      alert("başlatma json...");
+      //console.log(puan);
+      // gender (required)
+      var puan_check = $('input:radio[name = puan ]:checked').val();
+      if ( !puan_check ) {
+          alert("lütfen puan giriniz...");
+          return false;
+        }
 
+      var resim = document.getElementById("yukle-resim").value;
+      if (resim == "")
+             { alert("resim yüklenmemiş....");
+               return false;
+               }
+          else {
+            alert("neden burada");
+            $.ajax({
+              url : "detay_kaydet/",
+              type : "GET",
+              dataType: "text",
+              data : {
+                'puan_check' : puan_check,
+                'resim' : resim,
+              },
+              success: function() {
+                  alert(" detay kaydetme başarılı..");
+                  window.location = '';
+                  /*window.location.reload(); */
+                  },
+              failure: function() {
+                  alert(" detay kaydetmede hata...");
+                  }
+              });  /* ajax kapa...*/
 
+          }
+      }
 
-
-<h4>Denetim Detay İşlemleri </h4>
+  </script>
 
 
 
 <script>
-  function changeCLR() {
-      $('#id_bolum').css('background-color', 'blue');
-  }
+    $( ".baslat_json" ).baslat_json();
 </script>
 
 
-<script>
-    $( ".changeCLR" ).changeCLR();
-</script>
 
+
+<h5> <b> Denetim Detay İşlemleri </b> </h5>
 
 <!--
 <script>
@@ -55,43 +81,85 @@ select>option:hover
                 <tbody>
                     <tr>
                         <td><b>Denetim No..:</b></td>
-                        <td>  &emsp;      {{ detay.denetim }}</td>
+                        <td>  &emsp;      {{ secili_obj.denetim }}</td>
                     </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+
                     <tr>
                         <td><b>Bolüm.....:</b></td>
-                        <td> &emsp;     {{ detay.bolum }}</td>
+                        <td> &emsp;     {{ secili_obj.bolum }}</td>
                     </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+
                     <tr>
                         <td><b>Detay Adı.........:   </b></td>
-                        <td> &emsp;     {{ detay.detay }}</td>
+                        <td> &emsp;     {{ secili_obj.detay }}</td>
                     </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+
                 </tbody>
             </table>
 
+            <p> </p>
+            <p> </p>
+            <p> </p>
+            <p> </p>
 
 
 
 <p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
 
-<form action="" method="POST">
+
+<form method='POST' action="" enctype='multipart/form-data'>
     {% csrf_token %}
     {{ form.errors }}
     {{ form.non_field_errors }}
     <table>
     {{ form.as_table }}
     </table>
-    <!-- <input type="submit" value="kaydet" />  -->
-
+    <input type="submit" class='btn btn-default' value="kaydet" />
 </form>
 
 
-<input type="file" accept="image/*">
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
 
 
+<!-- <input type="file" accept="image/*"  id="resim-yukle">  -->
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+
+<!--
 <form>
-  <input type="button" value="Tamam" onclick="baslat_json()">
+  <input  type="submit" value="Tamam" onclick="baslat_json()">
 </form>
-
+-->
 
 
 

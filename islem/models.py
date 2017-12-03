@@ -11,6 +11,15 @@ EVETHAYIR = (
 ('H', 'Hayır'),
 )
 
+PUAN = (
+('A', 'Çok İyi'),
+('B', 'İyi'),
+('C', 'Orta'),
+('D', 'Kötü'),
+)
+
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR)
@@ -82,15 +91,23 @@ class gozlemci(models.Model):
         return(self.denetim.denetim_adi)
 
 
+def upload_location(instance, filename):
+    return "%s%s" %(instance.id, filename)
 
 class sonuc(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     detay = models.ForeignKey(detay, on_delete=models.PROTECT)
-    puan = models.IntegerField(blank=True, null=True)
+    sayi = models.CharField(max_length=1, choices=PUAN, default=None)
     aciklama = models.CharField(max_length=100, blank=True, null=True)
-    foto = models.ImageField(upload_to='cekimler/',blank=True, null=True)
+    foto = models.ImageField(upload_to='upload_location/',blank=True, null=True, height_field="height_field", width_field="width_field")
+    #foto = models.ImageField(upload_to='cekimler',blank=True, null=True, height_field="height_field", width_field="width_field")
+    #foto = models.ImageField(upload_to='cekimler/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
+    height_field = models.IntegerField(default=0)
+    width_field = models.IntegerField(default=0)
     tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    updated = models.DateTimeField(auto_now=True, auto_now_add=False)
+    timestamp = models.DateTimeField(default=datetime.now())
     def __str__(self):
         return(self.denetim.denetim_adi)
 

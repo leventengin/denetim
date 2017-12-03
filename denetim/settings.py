@@ -150,12 +150,19 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static"),
+                      #'/var/www/static/',
+]
+
+#PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
+
 LOGIN_REDIRECT_URL = '/giris/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

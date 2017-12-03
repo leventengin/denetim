@@ -1,0 +1,1 @@
+/home/levent/nata/sanalnata/lib/python3.5/site-packages/jquery/static/js/jquery.js
