@@ -5,13 +5,17 @@
     <h3>Sonuç Listesi</h3>
     <p> </p>
     <h4> Seçili Denetim...:&emsp; {{ denetimin_adi}} </h4>
+    <p> </p>
+    <h5> Durumu...........:&emsp; {{ denetimin_durumu}} </h5>
+
 
     {% if sonuc_list %}
     <ul>
       {% for sonuc in sonuc_list %}
       <li>
-          <a href="{{sonuc.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-              &emsp;       ({{sonuc.id}}) -
+      <!--    <a href="{{sonuc.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>  -->
+
+              &emsp;       {{sonuc.detay.detay_kodu}} -
               &emsp;       <a>{{ sonuc.bolum }}</a> -
               &emsp;       <a href="{{sonuc.id}}">{{ sonuc.detay }}</a>
         <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->

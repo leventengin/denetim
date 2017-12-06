@@ -178,7 +178,7 @@ def index(request):
     print("kullanıcı", kullanici)
 
     if kullanici.denetci == "E":
-        acik_denetimler = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        acik_denetimler = denetim.objects.filter(durum="B")
         acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
         secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user)
         return render(request, 'ana_menu.html',
@@ -196,7 +196,7 @@ def index(request):
         num_sirket=sirket.objects.all().count()
         num_musteri=musteri.objects.count()
 
-        return render(request, 'ana_menu_2.html',
+        return render(request, 'ana_menu_eski.html',
             context={
                 'num_tipi':num_tipi,
                 'num_bolum':num_bolum,
@@ -208,10 +208,26 @@ def index(request):
                 },
             )
 
+#------------------------------------------------------------------------------
+
+"""
+@login_required
+def index_ilk(request):
+    kisi = request.user
+    print("kisi", kisi)
+    kullanici = Profile.objects.get(user=kisi)
+    print("kullanıcı", kullanici)
+#    return redirect('denetim_bolum_sec' )
+"""
+
 
 
 #------------------------------------------------------------------------------
 
+# hazırlanmış olan denetimin detayını veren ekran
+# buradan pdf e dönüştürülüp kaydedilebiliyor...
+# denetim hiç başlamamışsa buradan başlıyor
+# eğer başlamışsa işlem devam ettirilebiliyor yada bölümler tekrar işlenebiliyor..
 
 @login_required
 def denetim_detay(request, pk=None):
@@ -289,20 +305,168 @@ def denetim_baslat(request, pk=None):
 
 #--------------------------------------------------------------------------------
 
+# denetimi başlatmaya karar verildiğinde durumu C yapıyor, B den C ye
+
 @login_required
 def denetim_baslat_kesin(request, pk=None):
 
     denetim_no = request.session.get('denetim_no')
+    request.session['devam_tekrar'] = "devam"
     denetim_obj = denetim.objects.get(id=denetim_no)
     print("seçilen denetim kesin ...", denetim_obj)
-    denetim_obj.durum = "Y"
+    denetim_obj.durum = "C"
     denetim_obj.save()
     return redirect('denetim_bolum_sec' )
 
 
 
+#--------------------------------------------------------------------
+# denetimine devam edilen denetimleri listeler
+# buradan denetime devam edilebilir, bölümler tekrar denetlenebilir, denetim tamamlanabilir
+
+
+@login_required
+def devam_liste(request, pk=None):
+    kisi = request.user
+    print("kisi", kisi)
+    kullanici = Profile.objects.get(user=kisi)
+    print("kullanıcı", kullanici)
+
+    devameden_denetimler = denetim.objects.filter(durum="C")
+    devameden_denetimler_sirali = devameden_denetimler.order_by('hedef_baslangic')
+    secili_denetimler = devameden_denetimler_sirali.filter(denetci=request.user)
+
+    if secili_denetimler:
+        for denetim_iki in secili_denetimler:
+            devam_varmi = False
+            tekrar_varmi = False
+            tamamla_varmi = True
+            sonuclar = sonuc_bolum.objects.filter(denetim=denetim_iki.id)
+            for sonuc in sonuclar:
+                if sonuc.tamam == "H":
+                    tamamla_varmi = False
+                    devam_varmi = True
+                else:
+                    tekrar_varmi = True
+            denetim_iki.devam_mi = devam_varmi
+            denetim_iki.tekrar_mi = tekrar_varmi
+            denetim_iki.tamamla_mi = tamamla_varmi
+            denetim_iki.save()
+
+    return render(request, 'islem/devameden_denetimler.html',
+        context={
+        'secili_denetimler': secili_denetimler,
+        },
+    )
+
+
+
+#--------------------------------------------------------------------
+# denetimine devam için denetimi belirle ve  bölüm seçme işlemini başlat
+
+
+@login_required
+def denetim_devam_islemleri(request, pk=None):
+    kisi = request.user
+    print("kisi", kisi)
+    denetim_obj = denetim.objects.get(id=pk)
+    denetim_no = denetim_obj.id
+    print("denetim no ", denetim_no)
+    request.session['denetim_no'] = denetim_no
+    request.session['devam_tekrar'] = "devam"
+
+    return redirect('denetim_bolum_sec' )
+
+#--------------------------------------------------------------------
+#  tekrar edilecek bölüm seçme işlemini başlat
+
+
+@login_required
+def denetim_tekrar_islemleri(request, pk=None):
+    kisi = request.user
+    print("kisi", kisi)
+    denetim_obj = denetim.objects.get(id=pk)
+    denetim_no = denetim_obj.id
+    print("denetim no ", denetim_no)
+    request.session['denetim_no'] = denetim_no
+
+    numarasi = denetim_obj.id
+    denetim_adi = denetim_obj.denetim_adi
+    context = {'denetim_adi': denetim_adi,
+                'numarasi' : numarasi,
+                }
+    return render(request, 'islem/denetim_tekrarla_sor.html', context )
+
+
+
+
+
 #--------------------------------------------------------------------------------
 
+# denetim artık tamamlanıyor C - D yapılıyor....
+
+@login_required
+def denetim_tekrarla_kesin(request, pk=None):
+
+    denetim_no = request.session.get('denetim_no')
+    request.session['devam_tekrar'] = "tekrar"
+    denetim_obj = denetim.objects.get(id=denetim_no)
+    print("seçilen denetim kesin ...", denetim_obj)
+
+    return redirect('denetim_bolum_sec' )
+
+
+#--------------------------------------------------------------------
+#  denetimi tamamlama işlemleri önce sor sonra tamamla
+
+
+@login_required
+def denetim_tamamla(request, pk=None):
+
+    denetim_no = request.session.get('denetim_no')
+    denetim_obj = denetim.objects.get(id=pk)
+    print("seçilen denetim", denetim_obj)
+
+    ilk_obje = sonuc_bolum.objects.filter(denetim=denetim_no)
+    kontrol_degiskeni = True
+    for obje in ilk_obje:
+        if obje.tamam == "H":
+            kontrol_degiskeni = False
+
+    if kontrol_degiskeni:
+        numarasi = denetim_obj.id
+        denetim_adi = denetim_obj.denetim_adi
+        context = {'denetim_adi': denetim_adi,
+                   'numarasi' : numarasi,
+                }
+        return render(request, 'islem/denetim_tamamla_sor.html', context )
+
+    else:
+        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        return redirect('devam_liste')
+
+
+
+#--------------------------------------------------------------------------------
+
+# denetim artık tamamlanıyor C - D yapılıyor....
+
+@login_required
+def denetim_tamamla_kesin(request, pk=None):
+
+    denetim_no = request.session.get('denetim_no')
+    denetim_obj = denetim.objects.get(id=pk)
+    print("seçilen denetim kesin ...", denetim_obj)
+    denetim_obj.durum = "D"
+    denetim_obj.save()
+    return redirect('devam_liste' )
+
+
+
+#--------------------------------------------------------------------------------
+
+# bölümü seç ve detay işlemlerini başlat....
+# seçilen bölümde detay var mı diye kontrol ediyor, aslında önceki tamam - js bunu kontrol ediyor
 
 @login_required
 def denetim_bolum_sec(request, pk=None):
@@ -318,8 +482,9 @@ def denetim_bolum_sec(request, pk=None):
             print ("bolum", bolum)
             request.session["secili_bolum"] = bolum
             detaylar = sonuc.objects.filter(denetim=denetim_no).filter(bolum=bolum)
-            for detay in detaylar:
-                detay.tamam = "H"
+            if not detaylar:
+                messages.success(request, 'Seçili bölümde bölüm detayı yok....')
+                return redirect('denetim_baslat')
             form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
             return render(request, 'islem/denetim_detay_islemleri.html')
 
@@ -330,12 +495,26 @@ def denetim_bolum_sec(request, pk=None):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = BolumSecForm(denetim_no=denetim_no)
+        devam_tekrar = request.session.get('devam_tekrar')
+        print("denetim bölüm seç içinden devam - tekrar..", devam_tekrar)
+        bitir = True
+        if devam_tekrar == "devam":
+            kontrol_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+            for kont in kontrol_obj:
+                if kont.tamam == "H":
+                    bitir = False
+            if bitir:
+                messages.success(request, 'Bölüm işlemleri tamamlanmış....')
+                return redirect('index')
+
+        form = BolumSecForm(denetim_no=denetim_no, devam_tekrar=devam_tekrar)
         return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
 
 
 #--------------------------------------------------------------------------
+# js içinden işlem yapılacak bölümü seçiyor....
+# seçilen bölümü oturum değişkenine yazıyor
 
 def secilen_bolumu_kaydet(request):
     print("seçilen bölümü kaydet ......")
@@ -361,8 +540,9 @@ def secilen_bolumu_kaydet(request):
 
 #--------------------------------------------------------------------------------
 
-
-
+# js içinden tamam butonu ile çalışıyor...
+# bölüm seçildiğinde bu bölümde detay var mı diye bakıp
+# sonrasında bu bölümdeki tüm detaylar H yapıp detayları sifirlıyor...
 
 @login_required
 def detay_islemleri_baslat(request, pk=None):
@@ -388,23 +568,15 @@ def detay_islemleri_baslat(request, pk=None):
         return HttpResponse(response_data, content_type='application/json')
 
 
-"""
-        secili_detay_obj = detaylar.first()
-        secili_detay = secili_detay_obj.detay.id
-        print("ilk - secili - detay.... bakalım  doğru mu...", secili_detay)
-        request.session['secili_detay'] = secili_detay
-        form = DetayForm()
-        context = { 'form': form,
-                    'denetim_no' : denetim_no,
-                    'secili_bolum' : secili_bolum,
-                    'secili_detay' : secili_detay,
-                    }
-        return render(request, 'islem/denetim_detay_islemleri.html', context)
-"""
 
 #--------------------------------------------------------------------------------
 
+# denetim esnasında sahada işlemin yapıldığı yer....
+# bölümü seçiyor, sonrasında sırayla gelen detaylara cevap veriyor...
+# sonunda bölüm tamamlanıyor ve tekrar bölüm seçe geliniyor...
+# bölümler tamamlandıysa denetimi kapatmak istiyor musunuz diye soruyor...
 
+# tamamladığı denetimleri tekrar değiştirmek istiyorsa da olmalı..???????
 
 
 @login_required
@@ -431,9 +603,12 @@ def denetim_detay_islemleri(request, pk=None):
 
         if form.is_valid():
             print("neyse ki valid..bin...ext...")
+            # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
             edit = form.save(commit=False)
+            edit.tamam = "E"
             edit.save()
-            print("neden kaydetmiyor.................")
+            print("kaydetmiş olması lazım.................")
+
             # bir sonraki................
             # için  işlem yap................
             ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
@@ -444,8 +619,20 @@ def denetim_detay_islemleri(request, pk=None):
             print("seçili detaylar tamam H olanlar...", secili_detay_obj)
 
             if not secili_detay_obj:
-                messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı....')
-                return redirect('denetim_bolum_sec')
+                # sonuc_bolum dosyasında tamamlandıyı E yap bölüm bitmiş olsun....
+                ilk_sonuc_bolum = sonuc_bolum.objects.filter(denetim=denetim_no)
+                print("sonuc bölüm ilk....", ilk_sonuc_bolum)
+                sec_bolum = get_object_or_404(ilk_sonuc_bolum, bolum=secili_bolum)
+                print(" seçili bölüm sonuc_bolum içinden ", sec_bolum)
+                sec_bolum.tamam = "E"
+                sec_bolum.save()
+                devam_tekrar = request.session.get('devam_tekrar')
+                if devam_tekrar == "devam":
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    return redirect('denetim_bolum_sec')
+                else:
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    return redirect('devam_liste')
 
             secili_obj = secili_detay_obj.first()
             secili_detay = secili_obj.detay.id
@@ -457,22 +644,12 @@ def denetim_detay_islemleri(request, pk=None):
                         }
             return render(request, 'islem/denetim_detay_islemleri.html', context)
 
-            #kaydetme_obj = sonuc(id=bulunan.id,
-            #                     denetim_id = denetim_no,
-            #                     bolum_id = secili_bolum,
-            #                     detay_id = secili_detay,
-            #                     sayi = sayi,
-            #                     foto = foto,
-            #                     tamam = "E")
-            #kaydetme_obj.save()
-            #form = SonucForm()
-            #messages.success(request, 'Başarıyla kaydetti....')
-            ##return redirect('denetim_detay_islemleri')
-            #return render(request, 'islem/denetim_detay_islemleri.html')
 
         else:
             print("ne oldu be kardeşim...........")
-            return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
+            messages.success(request, ' form hatası - tekrar deneyin....')
+            return redirect('devam_liste')
+            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -497,21 +674,11 @@ def denetim_detay_islemleri(request, pk=None):
         return render(request, 'islem/denetim_detay_islemleri.html', context)
 
 
-"""
-        for detay in secili_detay_obj:
-            secili_detay = detay.detay.id
-            print("secili - detay.... bakalım  doğru mu...", secili_detay)
-            request.session['secili_detay'] = secili_detay
-            form = SonucForm()
-            context = { 'form': form,
-                        'detay' : detay,
-                        }
-            return render(request, 'islem/denetim_detay_islemleri.html', context)
 
-        return redirect('denetim_bolum_sec')
-"""
+
 #------------------------------------------------------
-# gözlemci seçimi ile ilgili bölümler.....
+#  tamamlanmış denetimlerin sonuçlarını görmek için öncelikle tamamlanmış denetimleri seç
+#  şu an için devam eden denetimleri de gözlemliyor....B ve C durumu...fakat sadece D lere bakacak...
 #-----------------------------------------------------
 
 @login_required
@@ -531,17 +698,20 @@ def sonuc_denetim_sec(request, pk=None):
             request.session['secilen_denetim'] = denetim_no
             sonuc_list = sonuc.objects.filter(denetim=denetim_no).order_by('bolum')
             denetimin_adi = sonuc_list.first().denetim
-            return render(request, 'islem/sonuc_list.html', {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi})
+            denetimin_durumu = sonuc_list.first().denetim.durum
+            context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
+            return render(request, 'islem/sonuc_list.html', context)
         else:
             #form = DenetimSecForm()
             return render(request, 'islem/ana_menu.html',)
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
-        denetim_obj = denetim_obj_ilk.filter(denetci=request.user)
+        #denetim_obj_ilk = denetim.objects.filter(durum="C") | denetim.objects.filter(durum="D")
+        # buradan C kalkacak sadece D kalacak..............
+        #denetim_obj = denetim_obj_ilk.filter(denetci=request.user)
         #if denetim_obj:
-        print("get çalıştı..................")
+        #print("get çalıştı..................", denetim_obj)
         denetci=request.user
         form = DenetimSecForm(denetci=denetci)
         return render(request, 'islem/sonuc_denetim_form.html', {'form': form,})

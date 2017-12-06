@@ -1,0 +1,26 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!--  buraya if konulacak ...-->
+
+
+      <h3>Denetim bölüm tekrarla</h3>
+
+      <p>Denetim bölüm işlemlerini tekrarlamak istediğinizden emin misiniz ? </p>
+
+      <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tekrarla_kesin' pk=numarasi %}'">Evet tekrarla</button>
+
+<!--
+      <form action="kesin/" method="POST">
+              {% csrf_token %}
+          <input type="submit" value="Evet tekrarla" />
+      </form>
+-->
+
+
+
+
+{% endblock %}

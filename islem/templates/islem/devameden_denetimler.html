@@ -1,0 +1,41 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <h4>Devam eden denetimler </h4>
+
+    {% if secili_denetimler %}
+    <ul>
+
+      {% for denetim in secili_denetimler %}
+        <li>
+          <h5> {{ denetim.denetim_adi }} </h5>
+
+          {% if denetim.devam_mi %}
+          <p> </p>&emsp;
+          <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_devam_islemleri' pk=denetim.id %}'">Denetim devam</button>
+          {% endif %}
+
+          {% if denetim.tekrar_mi %}
+          <p> </p>&emsp;
+          <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tekrar_islemleri' pk=denetim.id %}'">Bölüm tekrar</button>
+          {% endif %}
+
+          {% if denetim.tamamla_mi %}  
+          <p> </p>&emsp;
+          <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla' pk=denetim.id %}'">Denetim tamamla</button>
+          {% endif %}
+
+          <p> </p>&emsp;
+        </li>
+        {% endfor %}
+        <p> </p>
+      </ul>
+    {% else %}
+      <p>Devam eden denetim yok ....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

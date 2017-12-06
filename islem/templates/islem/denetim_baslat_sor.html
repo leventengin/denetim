@@ -5,27 +5,39 @@
 
 
 
-      <h1>Denetim Başlatma</h1>
+      <h3>Denetim Başlatma</h3>
 
-      <p>Bu denetimi başlatmak istediğinizden emin misiniz ???: </p>
-
-      <p>  <b> Denetim Adı: </b>   &emsp;   {{ denetim_adi }}</p>
-
-      <p>   <b>  Müşteri: </b>  &emsp;   {{ musteri }}</p>
-
-      <p>  <b> Hedef Başlangıç: </b>   &emsp;   {{ hedef_baslangic }}</p>
-
-      <p>   <b>  Hedef Bitiş: </b>  &emsp;   {{ hedef_bitis }}</p>
+      <p>Bu denetimi başlatmak istediğinizden emin misiniz ? </p>
 
 
+      <table border="0">
+          <tbody>
+              <tr>
+                  <td><b>Denetim Adı:</b></td>
+                  <td>  &emsp; {{ denetim_adi }} </td>
+              </tr>
+              <tr>
+                  <td><b>Müşteri:</b></td>
+                  <td> &emsp; {{ musteri }}  </td>
+              </tr>
+              <tr>
+                  <td><b>Hadef Başlangıç:   </b></td>
+                  <td> &emsp; {{ hedef_baslangic }}  </td>
+              </tr>
+              <tr>
+                  <td><b>Hedef Bitiş:</b></td>
+                  <td>  &emsp;  {{ hedef_bitis }} </td>
+              </tr>
 
-      <form action="" method="POST">
-        {% csrf_token %}
-      <!--<input type="submit" action="demirbas_sil_kesin" value="Evet, sil.." /> -->
 
-      <!-- <a href="giris/demirbas/{{ sil_id }}/kesin"> Evet sil... </a>  -->
+          </tbody>
+      </table>
 
-      <a href="kesin"> Evet başlat... </a>
-      </form>
+      <p> </p> &emsp;
+      <p> </p> &emsp;
+
+
+      <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'denetim_baslat_kesin' %}'">Evet başlat</button>
+
 
 {% endblock %}

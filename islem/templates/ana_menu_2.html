@@ -5,26 +5,22 @@
 
 {% block content %}
 
-  <a href="/pdf1"> PDF Oluştur </a>
-  <p> </p>
+
+<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'GeneratePDF' %}'">PDF Oluştur</button>
+
+<!--
   <a href="/xyz"> PDF öncesi.... </a>
   <p> </p>
+-->
 
-  {% if durum == "B" %}
-      <a href="/islem/baslat"> Denetim başlat..... </a>
-      <p> </p>
-  {% else %}
-      <a href="/islem/baslat/devam"> Denetim devam ettir..... </a>
-        <p> </p>
-      <a href="/islem/baslat/bolumler_tekrar"> Denetlenen bolumler tekrar..... </a>
-        <p> </p>
+<p> </p>
+<p> </p>
+   {% if durum == "B" %}
+   <button type="button" class="btn btn-md"  onclick="window.location.href='{% url 'denetim_baslat' %}'">Denetim Başlat</button>
 
-  {% endif %}
+   {% endif %}
 
-
-  <a href="/abc"> Camera..... </a>
-  <p> </p>
-
+    <p> </p> &emsp;
 
     <h4>  Denetim İş Emri Detayları </h4>
     <p> </p> &emsp;
@@ -73,31 +69,9 @@
                     <td> &emsp; {{ hedef_bitis }}  </td>
                 </tr>
 
-
-
-
-
-
-
             </tbody>
         </table>
 
-
-
-
-
-
-
-
-
-
-
- <p> </p>
-    <p> </p>
-    <p> </p>
-   <p> </p>
- <p> </p>
-   <p> </p>
 
     <p> </p> &emsp;
     <p> </p> &emsp;

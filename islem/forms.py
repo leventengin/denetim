@@ -50,7 +50,8 @@ class GozlemciForm(forms.Form):
 
 from django import forms
 from .models import sonuc
-
+# esas işin döndüğü yer foto yüklüyor................
+#
 class SonucForm(forms.ModelForm):
     class Meta:
         model = sonuc
@@ -58,24 +59,47 @@ class SonucForm(forms.ModelForm):
         widgets = {
             'sayi': forms.RadioSelect,
         }
+"""
+# bir işe yaramadı js ile çözüldü.....
+    def clean(self):
+        print(" clean self detay form..................")
+        cleaned_data = super(SonucForm, self).clean()
+        cc_sayi = self.cleaned_data.get("sayi")
+        image_file = self.cleaned_data.get("foto")
+        print ("puan...önemli...:", cc_sayi)
+        if not cc_sayi:
+            raise forms.ValidationError(" puan seçili değil.... ")
+        if not image_file:
+            raise forms.ValidationError(" foto seçili değil.... ")
+        if not image_file.name.endswith(".jpg"):
+            raise forms.ValidationError("  Sadece .jpg yüklenmektedir")
+"""
 
 
 
-
-
+# artık anlamı yok modelform olan sonucform çalışıyor...........
 class DetayForm(forms.Form):
     puan = forms.ChoiceField(label='Seçim....:', widget=forms.RadioSelect, choices=PUAN)
     foto = forms.ImageField()
     def clean(self):
         print(" clean self detay form..................")
         cleaned_data = super(DetayForm, self).clean()
-        cc_puan = cleaned_data.get("puan")
-        cc_foto = cleaned_data.get("foto")
+        cc_puan = self.cleaned_data.get("puan")
+        image_file = self.cleaned_data.get("foto")
         print ("puan...önemli...:", cc_puan)
+
         if not cc_puan:
             raise forms.ValidationError(" puan seçili değil.... ")
-        if not cc_foto:
+
+        if not image_file:
             raise forms.ValidationError(" foto seçili değil.... ")
+
+        if not image_file.name.endswith(".jpg"):
+            raise forms.ValidationError("  Sadece .jpg yüklenmektedir")
+
+
+
+
 
 
 class DenetimSecForm(forms.Form):
@@ -83,7 +107,7 @@ class DenetimSecForm(forms.Form):
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DenetimSecForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        denetim_obj_ilk = denetim.objects.filter(durum="C") | denetim.objects.filter(durum="D")
         denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
         self.fields['denetim_no'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
@@ -100,11 +124,14 @@ class BolumSecForm(forms.Form):
     bolum = forms.ModelChoiceField(queryset=sonuc_bolum.objects.all(), label="Bölüm Seçiniz..")
     def __init__(self, *args, **kwargs):
         denetim_no = kwargs.pop("denetim_no")
+        devam_tekrar = kwargs.pop("devam_tekrar")
         #denetim_no = request.session.get('denetim_no')
         print("initial içinden denetim_no", denetim_no)
         super(BolumSecForm, self).__init__(*args, **kwargs)
-        self.fields['bolum'].queryset = sonuc_bolum.objects.filter(denetim=denetim_no).exclude(tamam="T")
-        #self.fields['bolum'].queryset = sonuc_bolum.objects.filter(denetim=denetim_no)
+        if devam_tekrar == "devam":
+            self.fields['bolum'].queryset = sonuc_bolum.objects.filter(denetim=denetim_no).filter(tamam="H")
+        else:
+            self.fields['bolum'].queryset = sonuc_bolum.objects.filter(denetim=denetim_no).filter(tamam="E")
         print("queryset initial içinden..:", self.fields['bolum'].queryset)
 
 

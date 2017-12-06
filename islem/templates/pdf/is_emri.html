@@ -9,9 +9,19 @@
         <style type="text/css">
 
 
+            @page {
+                size: A4;
+            }
+
+            @page:right{
+              @bottom-right {
+                content: counter(page);
+              }
+            }
+
             body {
                 font-family: DejaVu Sans;
-                font-weight: 200;
+                font-weight: 150;
                 font-size: 14px;
             }
             .header {
@@ -128,13 +138,13 @@
       {% endfor %}
 
      </div>
-
+<!--
       <div id="footerContent">
            {%block page_foot%}
-               Page <pdf:pagenumber>
+               sf: <pdf:pagenumber>
            {%endblock%}
        </div>
-
+-->
     </body>
 
 </html>
