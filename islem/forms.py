@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, musteri, tipi, bolum, detay
 from islem.models import sonuc_bolum, denetim
 from django.contrib.admin.widgets import AdminDateWidget
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 #from __future__ import unicode_literals
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect

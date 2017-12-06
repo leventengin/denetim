@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save

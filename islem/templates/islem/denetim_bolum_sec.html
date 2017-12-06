@@ -32,7 +32,7 @@ select>option:hover
 <script>
   function change_bolum() {
       var selected = document.getElementById("id_bolum").value;
-      alert("selected");
+      //alert("selected");
       console.log(selected);
       $.ajax({
         url : "secilen_bolumu_kaydet/",
@@ -42,7 +42,7 @@ select>option:hover
           'selected' : selected,
         },
         success: function() {
-            alert(" secilen bölüm başarıyla kaydedildi..");
+            //alert(" secilen bölüm başarıyla kaydedildi..");
             /*window.location.reload(); */
             },
         failure: function() {
@@ -58,7 +58,7 @@ select>option:hover
   function baslat_json() {
       var selected = document.getElementById("id_bolum").value;
       var deger = document.getElementById("id_bolum").innerText;
-      alert("başlatma json...", deger);
+      //alert("başlatma json..." + deger);
       console.log(selected);
 
       if (selected == "")
@@ -72,7 +72,7 @@ select>option:hover
             'selected' : selected,
           },
           success: function() {
-              alert(" detay işlemleri başlatma başarılı..");
+              //alert(" detay işlemleri başlatma başarılı..");
               window.location = 'denetim_detay_islemleri/';
               /*window.location.reload(); */
               },

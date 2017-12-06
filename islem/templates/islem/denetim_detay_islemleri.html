@@ -10,7 +10,7 @@
 
   function baslat_json() {
 
-      alert("başlatma json...");
+      //alert("başlatma json...");
 
       var puan_check = $('input:radio[name = sayi ]:checked').val();
       if ( !puan_check ) {
@@ -23,9 +23,9 @@
                alert("resim yüklenmemiş....");
                return false;
                }
-      alert(" adres.." + resim);
+      //alert(" adres.." + resim);
       var ext = resim.substr((resim.lastIndexOf('.') + 1));
-      alert("extension..." + ext);
+      //alert("extension..." + ext);
       if ( ext == "jpeg" || ext == "jpg" || ext == "JPEG" || ext == "JPG" || ext == "png" || ext == "PNG")
           { document.getElementById("myForm").submit(); }
           else { alert(" yüklenen resim formatı yanlış...." );  }
@@ -138,35 +138,6 @@
     <input type="button" value="kaydet" onclick="baslat_json()">
 </form>
 
-
-
-
-
-
-
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-
-
-<!-- <input type="file" accept="image/*"  id="resim-yukle">  -->
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-<p> </p>
-
-<!--
-<form>
-  <input  type="submit" value="Tamam" onclick="baslat_json()">
-</form>
--->
 
 
 
