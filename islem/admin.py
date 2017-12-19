@@ -41,6 +41,8 @@ from .models import denetim
 from .models import gozlemci
 from .models import sonuc
 from .models import sonuc_bolum
+from .models import kucukresim
+from resimyukle.models import Resim
 
 
 admin.site.register(grup)
@@ -53,3 +55,5 @@ admin.site.register(denetim)
 admin.site.register(gozlemci)
 admin.site.register(sonuc)
 admin.site.register(sonuc_bolum)
+admin.site.register(Resim)
+admin.site.register(kucukresim)

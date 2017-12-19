@@ -4,40 +4,68 @@
 
 {% block content %}
 
+<!--
+<input type="file" id="select">
+<img id="preview">
+
+-->
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
+
+<!--
+<script>
+function resim_kucult()
+{   alert("resim küçült................");
+    //var resim = document.getElementById("id_foto").value;
+    ImageTools.resize(this.files[0], {
+        width: 320, // maximum width
+        height: 240 // maximum height
+    }, function(blob, didItResize) {
+        alert("did it resize" + didItResize);
+        // didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
+        document.getElementById('preview').src = window.URL.createObjectURL(blob);
+        //alert("adı ne oldu....." + document.getElementById("id_foto").value);
+        // you can also now upload this blob using an XHR.
+    });
+};
+</script>
+-->
+
 
 
 <script>
 
-  function baslat_json() {
-
-      //alert("başlatma json...");
-
+  function baslat_jquery() {
+      alert("başlat jquery...");
       var puan_check = $('input:radio[name = sayi ]:checked').val();
       if ( !puan_check ) {
           alert("lütfen puan giriniz...");
           return false;
         }
-
       var resim = document.getElementById("id_foto").value;
       if (resim == "") {
                alert("resim yüklenmemiş....");
                return false;
                }
-      //alert(" adres.." + resim);
+      alert(" adres.." + resim);
       var ext = resim.substr((resim.lastIndexOf('.') + 1));
-      //alert("extension..." + ext);
+      alert("extension..." + ext);
       if ( ext == "jpeg" || ext == "jpg" || ext == "JPEG" || ext == "JPG" || ext == "png" || ext == "PNG")
-          { document.getElementById("myForm").submit(); }
+          { //resim_kucult();
+            //document.getElementById("id_foto").value = resim;
+            alert("adı..." + document.getElementById("id_foto").value);
+            document.getElementById("myForm").submit();
+            //alert("form gönderildi ..........");
+          }
           else { alert(" yüklenen resim formatı yanlış...." );  }
-
-      }  //baslat_json....
-
+      }  //baslat_jquery....
   </script>
 
 
 
 <script>
-    $( ".baslat_json" ).baslat_json();
+    $( ".baslat_jquery" ).baslat_jquery();
 </script>
 
 
@@ -108,20 +136,116 @@
 <p> </p>
 <p> </p>
 
+
+<script>
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function(evt)
+      {
+            alert("dokuman hazır....bom bom");
+            var resim = document.getElementById('id_foto').value;
+            alert("resim adı..." + resim);
+            ImageTools.resize(this.files[0], {
+                width: 320, // maximum width
+                height: 240 // maximum height
+            }, function(blob, didItResize) {
+                alert("did it resize" + didItResize);
+                // didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
+                document.getElementById('preview').src = window.URL.createObjectURL(blob);
+                //küçülen resmi diğer form aracılığıyla gönder......
+
+
+                      var new_form = $('#small_image_form_to_upload')[0];
+                      var form_data = new FormData(new_form);
+                      form_data.append('foto_kucuk', blob, "kucuk_resim.jpg");
+
+                      for (var [key, value] of form_data.entries()) {
+                          console.log(key, value);
+                      }
+
+/*
+                      var post_data = { 'form_data': form_data,
+                                        'csrfmiddlewaretoken':"{{ csrf_token }}"
+                                       };
+*/
+                      alert("ajax öncesi............");
+
+                      alert(form_data);
+
+                      $.ajax({
+                          url: "kucuk_resim_al/",
+                          type: "POST",
+                          data: form_data,
+                          cache: false,
+                          contentType: false,
+                          processData: false,
+                          success: function(){
+                            alert("küçük resim başarı.....");
+                          },
+                          failure: function(){
+                            alert("küçük resim hata....");
+                          },
+                      });  //ajax kapa...............
+
+
+            }); //image tools...
+      };  // on change...
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+
 <!--
-<form method='POST' action="" enctype='multipart/form-data'>
+<form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
     {% csrf_token %}
     {{ form.errors }}
     {{ form.non_field_errors }}
     <table>
     {{ form.as_table }}
     </table>
-    <input type="submit" class='btn btn-default' value="kaydet" />
+    <input type="button" onclick="baslat_jquery()" value="kaydet" />
 </form>
 -->
 
 
 
+<form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    <tr>
+      <th><label for="id_sayi_0">Puan:</label></th> <td><ul id="id_sayi">
+        <li><label for="id_sayi_0"><input type="radio" name="sayi" value="A" required id="id_sayi_0" />Çok İyi</label> </li>
+        <li><label for="id_sayi_1"><input type="radio" name="sayi" value="B" required id="id_sayi_1" />İyi</label> </li>
+        <li><label for="id_sayi_2"><input type="radio" name="sayi" value="C" required id="id_sayi_2" />Orta</label> </li>
+        <li><label for="id_sayi_3"><input type="radio" name="sayi" value="D" required id="id_sayi_3" />Kötü</label></li>
+      </ul></td>
+    </tr>
+    <!-- <tr><th><label for="id_foto">Foto:</label></th><td><input type="file" name="foto" accept="image/jpeg" id="id_foto" /></td></tr> -->
+    </table>
+    <!-- <input type="button" onclick="baslat_jquery()" value="kaydet" />  -->
+</form>
+
+<form id="take_photo" enctype="multipart/form-data">
+      <label for="id_foto">Foto:</label> <input name="foto" type="file" id="id_foto" accept="image/jpeg"  />
+</form>
+<p></p>
+<p></p>
+
+<form method="POST" name="small_image_form_to_upload" enctype="multipart/form-data">
+    <input name="foto_kucuk" id="id_foto_kucuk" value="value_kucuk" />
+</form>
+<p></p>
+<p></p>
+
+<input type="button" onclick="baslat_jquery()" value="kaydet" />
+
+<p></p>
+<p></p>
+
+<!--
 <form method='POST' id="myForm" action="" enctype='multipart/form-data'>
     <input type='hidden' name='csrfmiddlewaretoken' value='H5OH2CLxk9UMvba3YHb8EMmV32NboHrbantHgaU4E5MMcrUiJHcoJ8zv2aNKPYBM' />
     <table>
@@ -135,9 +259,14 @@
     </tr>
     <tr><th><label for="id_foto">Foto:</label></th><td><input type="file" name="foto" accept="image/jpeg" id="id_foto" /></td></tr>
     </table>
+    <p> </p> &emsp;
+    <p> </p> &emsp;
     <input type="button" value="kaydet" onclick="baslat_json()">
 </form>
+-->
+RESİM.....................
 
+<img id="preview">
 
 
 

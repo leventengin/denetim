@@ -14,10 +14,10 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, musteri, tipi, bolum, detay
-from .models import Profile, denetim, gozlemci, sonuc, sonuc_bolum
+from .models import Profile, denetim, gozlemci, sonuc, sonuc_bolum, kucukresim
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
-from islem.forms import GozlemciForm, BolumSecForm, DetayForm, SonucForm, DenetimSecForm
+from islem.forms import GozlemciForm, BolumSecForm, DetayForm, SonucForm, DenetimSecForm, KucukResimForm
 import collections
 
 
@@ -577,8 +577,11 @@ def detay_islemleri_baslat(request, pk=None):
 # bölümler tamamlandıysa denetimi kapatmak istiyor musunuz diye soruyor...
 
 # tamamladığı denetimleri tekrar değiştirmek istiyorsa da olmalı..???????
+from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import render
 
 
+@csrf_protect
 @login_required
 def denetim_detay_islemleri(request, pk=None):
 
@@ -642,7 +645,7 @@ def denetim_detay_islemleri(request, pk=None):
             context = { 'form': form,
                         'secili_obj' : secili_obj,
                         }
-            return render(request, 'islem/denetim_detay_islemleri.html', context)
+            return render(request, 'islem/denetim_detay_islemleri.html', context,)
 
 
         else:
@@ -671,7 +674,7 @@ def denetim_detay_islemleri(request, pk=None):
         context = { 'form': form,
                     'secili_obj' : secili_obj,
                     }
-        return render(request, 'islem/denetim_detay_islemleri.html', context)
+        return render(request, 'islem/denetim_detay_islemleri.html', context,)
 
 
 
@@ -717,6 +720,58 @@ def sonuc_denetim_sec(request, pk=None):
         return render(request, 'islem/sonuc_denetim_form.html', {'form': form,})
 
 
+
+from django.views.decorators.csrf import csrf_exempt
+
+
+@login_required
+@csrf_exempt
+def kucuk_resim_al(request):
+    print("selam buraya geldik.... küçük resim al...")
+    response_data ={}
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        print("buraya mı geldi...küçük resim al.............POST")
+        bir = kucukresim.objects.get(id=1)
+        print("şu anki yüklü küçük resim...1...:", bir.foto_kucuk)
+        form = KucukResimForm(request.POST or None, request.FILES or None, instance=bir)
+        if form.is_valid():
+            print(" gelen resim valid......")
+            kaydet = form.save(commit=False)
+            #kaydet.foto_kucuk = request.FILES.get('form_data')
+            print(" kaydet foto küçük...", kaydet.foto_kucuk)
+            if bool(kaydet.foto_kucuk):
+                print("küçük resim dolu..............")
+            else:
+                print("küçük resim boş................")
+            kaydet.save()
+            print("kaydetmiş olması lazım.................")
+        else:
+            print("bu ibnenin nesi valid değil anlamadım ki......")
+    print ("son nokta  küçük resim al....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+"""
+
+
+    if request.method == 'GET':
+        selected = request.GET.get('selected', None)
+        js_demirbas = request.GET.get('js_demirbas', None)
+        js_ariza_adi = request.GET.get('js_ariza_adi', None)
+        js_servis = request.GET.get('js_servis', None)
+        js_aciklama = request.GET.get('js_aciklama', None)
+        print("selected...:", selected, js_demirbas, js_ariza_adi, js_servis, js_yp1, js_yp2,)
+        if selected != None:
+            request.session['ab_proje_no'] = selected
+            request.session['alt_kat'] = None
+            request.session['js_aciklama'] = js_aciklama
+            request.session.modified = True
+            print("yetti artık....neden doğru yazmıyor...:", request.session['ab_proje_no'])
+
+    print ("son nokta demirbas arıza listesi....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+"""
 
 
 

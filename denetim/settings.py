@@ -44,6 +44,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 INSTALLED_APPS = [
     'islem',
+    'resimyukle',
+    'rest_framework',
+    'resimyukle_rest',
     'bootstrap3',
     'searchableselect',
     'django.contrib.admin',
@@ -80,6 +83,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -156,11 +160,13 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static"),
                       #'/var/www/static/',
 ]
 
-#PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+STATIC_ROOT = os.path.join(PROJECT_DIR, "static_cdn")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
 
 
 LOGIN_REDIRECT_URL = '/islem/'

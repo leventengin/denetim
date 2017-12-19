@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, musteri, tipi, bolum, detay
-from islem.models import sonuc_bolum, denetim
+from islem.models import sonuc_bolum, denetim, kucukresim
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
 #from __future__ import unicode_literals
@@ -58,7 +58,20 @@ class SonucForm(forms.ModelForm):
         fields = ('sayi', 'foto', )
         widgets = {
             'sayi': forms.RadioSelect,
+            #'foto': forms.HiddenInput(),
         }
+
+"""
+    def clean(self):
+        print(" clean self detay form..................")
+        cc_sayi = self.cleaned_data.get("sayi")
+        imaj_file = self.cleaned_data.get("foto")
+        print("işte sayı ...:",  cc_sayi)
+        print("işte resim....", imaj_file)
+        if imaj_file == "":
+            print("ne lan bu.... resim yok....")
+"""
+
 """
 # bir işe yaramadı js ile çözüldü.....
     def clean(self):
@@ -75,6 +88,10 @@ class SonucForm(forms.ModelForm):
             raise forms.ValidationError("  Sadece .jpg yüklenmektedir")
 """
 
+class KucukResimForm(forms.ModelForm):
+    class Meta:
+        model = kucukresim
+        fields = ('foto_kucuk',)
 
 
 # artık anlamı yok modelform olan sonucform çalışıyor...........

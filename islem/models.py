@@ -93,6 +93,8 @@ class gozlemci(models.Model):
     def __str__(self):
         return(self.denetim.denetim_adi)
 
+class kucukresim(models.Model):
+    foto_kucuk = models.FileField(upload_to='xyz/',blank=True, null=True,)
 
 def upload_location(instance, filename):
     return "%s%s" %(instance.id, filename)

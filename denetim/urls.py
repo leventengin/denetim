@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^admin/', admin.site.urls),
+    url(r'^api/', include('resimyukle_rest.urls', namespace='api')),
     url(r'^islem/', include('islem.urls')),
     #url(r'^pdf1/', views.GeneratePdf.as_view(), name='GeneratePdf'),
     url(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
@@ -38,7 +39,7 @@ urlpatterns = [
     ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
     #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^report_builder/', include('report_builder.urls')),
