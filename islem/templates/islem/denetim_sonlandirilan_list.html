@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Sonlandırılan Denetimler Listesi</h1>
+
+    {% if denetim_list %}
+    <ul>
+      {% for denetim in denetim_list %}
+      <li>
+          <a href="{{denetim.id}}">{{ denetim.denetim_adi }}</a>
+      </li>
+      {% endfor %}
+      <p> </p>
+    </ul>
+    {% else %}
+      <p>Kayıtlı denetim yok ....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

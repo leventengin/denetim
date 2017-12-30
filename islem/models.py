@@ -4,7 +4,7 @@ from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+import requests
 
 EVETHAYIR = (
 ('E', 'Evet'),
@@ -70,8 +70,8 @@ class denetim(models.Model):
     musteri = models.ForeignKey(musteri, on_delete=models.PROTECT)
     denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE)
     tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
-    durum = models.CharField(max_length=1)
-    yaratim_tarihi = models.DateField()
+    durum = models.CharField(max_length=1, default="A")
+    yaratim_tarihi = models.DateField(_("Date"), default=datetime.today)
     yaratan = models.ForeignKey(User, related_name='yaratan', on_delete=models.CASCADE)
     hedef_baslangic = models.DateField()
     hedef_bitis = models.DateField()
@@ -82,8 +82,8 @@ class denetim(models.Model):
     devam_mi = models.BooleanField(default=False)
     tekrar_mi = models.BooleanField(default=False)
     tamamla_mi = models.BooleanField(default=False)
-    ilk_dosya = models.FileField(upload_to='yuklemeler/', blank=True, null=True)
-    sonuc_dosya = models.FileField(upload_to='yuklemeler/', blank=True, null=True)
+    ilk_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
+    sonuc_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     def __str__(self):
         return(self.denetim_adi)
 
@@ -94,7 +94,8 @@ class gozlemci(models.Model):
         return(self.denetim.denetim_adi)
 
 class kucukresim(models.Model):
-    foto_kucuk = models.FileField(upload_to='xyz/',blank=True, null=True,)
+    kullanici = models.ForeignKey(User, related_name='resim_ceken', on_delete=models.CASCADE)
+    foto_kucuk = models.ImageField(upload_to='xyz/kucukresim/',blank=True, null=True,)
 
 def upload_location(instance, filename):
     return "%s%s" %(instance.id, filename)
@@ -103,10 +104,8 @@ class sonuc(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     detay = models.ForeignKey(detay, on_delete=models.PROTECT)
-    sayi = models.CharField(max_length=1, choices=PUAN, default=None)
+    sayi = models.CharField(max_length=1, choices=PUAN, default="A")
     aciklama = models.CharField(max_length=100, blank=True, null=True)
-    #foto = models.ImageField(upload_to='upload_location/',blank=True, null=True, height_field="height_field", width_field="width_field")
-    #foto = models.ImageField(upload_to='cekimler',blank=True, null=True, height_field="height_field", width_field="width_field")
     foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
     height_field = models.IntegerField(default=0)
     width_field = models.IntegerField(default=0)

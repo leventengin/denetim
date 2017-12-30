@@ -56,19 +56,9 @@
 
     <body>
 
-
       <div>
       <h4>  Denetim İş Emri Detayları </h4>
-      <p> </p> &emsp;
-          {% if dict_bol_detay %}
-              <!-- <strong>There are logs present.</strong>  -->
-              <p> </p>
-          {% else %}
-              <strong>There are nooooooooooooo logs present.</strong>
-              <p> </p>
-          {% endif %}
-
-
+      <p> </p>
 
           <table border="0">
               <tbody>
@@ -108,19 +98,30 @@
               </tbody>
           </table>
 
-
-
+      <h5> <b> Gözlemciler: </b> <h5>
       <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-      <p> </p>
-
+      {% for gozlemci in g %}
+        <tr>
+            <td> {{ gozlemci }} </td>
+        </tr>
+      {% endfor %}
       <p> </p> &emsp;
       <p> </p> &emsp;
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      <p> </p>
+      {% if dict_bol_detay %}
+          <!-- <strong>There are logs present.</strong>  -->
+          <p> </p>
+      {% else %}
+          <strong>There are no logs present.</strong>
+          <p> </p>
+      {% endif %}
+      <p> </p>
+      <p> </p>
       <h5> <b> Denetlenecek bölüm ve detaylar: </b> <h5>
-      <p> </p> &emsp;
+      <p> </p>
       <p> </p>
       {% for bolum, detay in dict_bol_detay.items %}
           <tr>
@@ -134,7 +135,6 @@
           </tr>
           <p> </p>
           {% endfor %}
-
       {% endfor %}
 
      </div>

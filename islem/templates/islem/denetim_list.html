@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Denetim Listesi</h1>
+
+    {% if denetim_list %}
+    <ul>
+
+      {% for denetim in denetim_list %}
+      <li>
+        <a href="{{denetim.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{denetim.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;     <a href="{{denetim.id}}">{{ denetim.denetim_adi }}</a>
+        </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/denetim/create"> Denetim Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı bölüm yok ....</p>
+      <p> </p>
+      <a href="/islem/denetim/create"> Denetim Ekle </a>
+    {% endif %}
+
+{% endblock %}

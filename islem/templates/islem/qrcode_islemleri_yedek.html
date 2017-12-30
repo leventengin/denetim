@@ -1,0 +1,62 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}qcode-decoder-master/build/qcode-decoder.min.js"></script>
+
+
+<h3> <b> QRCode Okuma - Test </b> </h3>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<script  type="text/javascript">
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function()
+      {
+            alert("dokuman hazır....");
+            //var resim = document.getElementById('id_foto').value;
+            //alert("resim adı..." + resim);
+            //document.getElementById('preview').src = document.getElementById('id_foto').src
+            //alert("tanıma başladı.......");
+            var imaj = document.getElementById("id_foto");
+            //var qr = new QCodeDecoder();
+            alert("işlem öncesi..." + imaj);
+            QCodeDecoder().decodeFromImage(imaj, function (err, result) {
+                //if (err) { alert("hatalı lütfen tekrar deneyin...!!!"); }
+                alert("result" + result);
+                console.log(result);
+                //document.getElementById("sonuc").value = result;
+              });  //qr sonucu.............
+      };  // on change...
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+<form id="take_photo" enctype="multipart/form-data">
+      <label for="id_foto">Yükle:</label> <input name="foto" type="file" id="id_foto" accept="image/jpeg"  />
+</form>
+<p></p>
+<p></p>
+<!--
+<input type="button" onclick="tani()" value="tanı.." />
+-->
+<p></p>
+<p></p>
+Değer...:
+<p></p>
+<p></p>
+<input id="sonuc" value="" readonly />
+
+
+
+
+
+{% endblock %}

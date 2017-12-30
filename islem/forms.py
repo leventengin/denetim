@@ -25,6 +25,9 @@ import datetime
 from datetime import date, datetime
 from django.template.loader import render_to_string
 import requests
+from django.core.exceptions import ValidationError
+from django import forms
+from .models import sonuc
 
 PUAN = (
 ('A', 'Çok İyi'),
@@ -39,17 +42,26 @@ PUAN = (
 class GozlemciForm(forms.Form):
     kisi = forms.ModelMultipleChoiceField(queryset=Profile.objects.filter(denetim_takipcisi="E"), widget=forms.SelectMultiple(), required=False)
 
+class IlkBolumForm(forms.Form):
+    bolum = forms.ModelMultipleChoiceField(queryset=bolum.objects.all(), widget=forms.CheckboxSelectMultiple(), required=False)
+    def __init__(self, *args, **kwargs):
+        denetim_tipi = kwargs.pop("denetim_tipi")
+        super(IlkBolumForm, self).__init__(*args, **kwargs)
+        print("form init içinden denetim tipi", denetim_tipi)
+        self.fields['bolum'].queryset = bolum.objects.filter(tipi=denetim_tipi)
+        print("queryset initial içinden..:", self.fields['bolum'].queryset)
 
-#class gozlemciForm(forms.ModelForm):
-#    class Meta:
-#        model = gozlemci
-#        exclude = (denetim)
-#        widgets = {
-#            'gozlemci': SearchableSelect(model='islem.gozlemci', search_field='gozlemci')
-#        }
+class IlkDetayForm(forms.Form):
+    detay = forms.ModelMultipleChoiceField(queryset=detay.objects.all(), widget=forms.CheckboxSelectMultiple(), required=False)
+    def __init__(self, *args, **kwargs):
+        bolum_no = kwargs.pop("bolum_no")
+        super(IlkDetayForm, self).__init__(*args, **kwargs)
+        print("form init içinden bölüm no", bolum_no)
+        self.fields['detay'].queryset = detay.objects.filter(bolum=bolum_no)
+        print("queryset initial içinden..:", self.fields['detay'].queryset)
 
-from django import forms
-from .models import sonuc
+
+
 # esas işin döndüğü yer foto yüklüyor................
 #
 class SonucForm(forms.ModelForm):
@@ -61,32 +73,53 @@ class SonucForm(forms.ModelForm):
             #'foto': forms.HiddenInput(),
         }
 
-"""
-    def clean(self):
-        print(" clean self detay form..................")
-        cc_sayi = self.cleaned_data.get("sayi")
-        imaj_file = self.cleaned_data.get("foto")
-        print("işte sayı ...:",  cc_sayi)
-        print("işte resim....", imaj_file)
-        if imaj_file == "":
-            print("ne lan bu.... resim yok....")
-"""
 
-"""
-# bir işe yaramadı js ile çözüldü.....
+class DenetimForm(forms.ModelForm):
+    class Meta:
+        model = denetim
+        fields = ('denetim_adi', 'musteri', 'denetci', 'tipi', 'hedef_baslangic', 'hedef_bitis', 'aciklama')
     def clean(self):
-        print(" clean self detay form..................")
-        cleaned_data = super(SonucForm, self).clean()
-        cc_sayi = self.cleaned_data.get("sayi")
-        image_file = self.cleaned_data.get("foto")
-        print ("puan...önemli...:", cc_sayi)
-        if not cc_sayi:
-            raise forms.ValidationError(" puan seçili değil.... ")
-        if not image_file:
-            raise forms.ValidationError(" foto seçili değil.... ")
-        if not image_file.name.endswith(".jpg"):
-            raise forms.ValidationError("  Sadece .jpg yüklenmektedir")
-"""
+        print(" clean denetim form................")
+        cleaned_data = super(DenetimForm, self).clean()
+        cc_hedef_baslangic = self.cleaned_data.get("hedef_baslangic")
+        cc_hedef_bitis = self.cleaned_data.get("hedef_bitis")
+        print("hedef başlangıç...:", cc_hedef_baslangic)
+        print("hedef_bitis", cc_hedef_bitis)
+        #if ( cc_hedef_baslangic > cc_hedef_bitis ):
+        #    raise ValidationError(" tarih sıralaması yanlış...")
+
+
+
+class Denetim_BForm(forms.Form):
+    denetim_adi = forms.CharField()
+    musteri = forms.ModelChoiceField(label='Müşteri..:', queryset=musteri.objects.all())
+    denetci = forms.ModelChoiceField(label='Denetçi..:', queryset=Profile.objects.filter(denetci="E"))
+    tipi = forms.ModelChoiceField(label='Tipi..:', queryset=tipi.objects.all())
+    hedef_baslangic = forms.DateField(label='Hedef başlangıç...:', widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+    hedef_bitis = forms.DateField(label='Hedef bitiş...:', widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+    aciklama = forms.CharField(label='Açıklama', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}),)
+
+    def clean(self):
+        cleaned_data = super(Denetim_BForm, self).clean()
+        cc_hedef_baslangic = cleaned_data.get("hedef_baslangic")
+        cc_hedef_bitis = cleaned_data.get("hedef_bitis")
+        print("hedef başlangıç...:", cc_hedef_baslangic)
+        print("hedef_bitis", cc_hedef_bitis)
+        #if cc_hedef_baslangic == None:
+        #     raise forms.ValidationError(
+        #          " denetim başlangıç tarihi girmelisiniz.... ")
+        if (cc_hedef_baslangic != None ) and (cc_hedef_baslangic < date.today()):
+            raise forms.ValidationError(
+                    " denetim başlangıcı için ileri bir tarih girmelisiniz.... ")
+        #if cc_hedef_bitis == None:
+        #    raise forms.ValidationError(
+        #            " denetim bitiş tarihi girmelisiniz.... ")
+        if (cc_hedef_bitis != None ) and (cc_hedef_bitis < date.today()):
+            raise forms.ValidationError(
+                    " denetim bitişi için ileri bir tarih girmelisiniz.... ")
+        if (cc_hedef_baslangic != None ) and (cc_hedef_bitis != None ) and (cc_hedef_baslangic > cc_hedef_bitis):
+            raise forms.ValidationError(" tarih sıralaması yanlış...")
+
 
 class KucukResimForm(forms.ModelForm):
     class Meta:
@@ -115,10 +148,52 @@ class DetayForm(forms.Form):
             raise forms.ValidationError("  Sadece .jpg yüklenmektedir")
 
 
+#ilk bölümde detay işlemleri öncesinde denetim ve bölüm seçen form js ile...
+
+class IkiliSecForm(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    bolum = forms.ModelChoiceField(queryset=sonuc_bolum.objects.all(), label="Bölüm Seçiniz..")
+    def __init__(self, *args, **kwargs):
+        kullanan = kwargs.pop("kullanan")
+        denetim_no = kwargs.pop("denetim_no")
+        super(IkiliSecForm, self).__init__(*args, **kwargs)
+        print("form init içinden kullanan", kullanan)
+        print("form init içinden denetim_no", denetim_no)
+        denetim_obj_ilk = denetim.objects.filter(durum="A")
+        denetim_obj = denetim_obj_ilk.filter(yaratan=kullanan)
+        self.fields['denetim'].queryset = denetim_obj
+        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        print("form init içinden bölüm objesi seçilenler", bolum_obj)
+        self.fields['bolum'].queryset = bolum_obj
+
+    def clean(self):
+        cleaned_data = super(IkiliSecForm, self).clean()
+        cc_denetim = cleaned_data.get("denetim")
+        cc_bolum = cleaned_data.get("bolum")
+        print("denetim...:", cc_denetim)
+        print("bolum....", cc_bolum)
+
+        if ((cc_denetim == None ) or (cc_bolum==None)):
+            raise forms.ValidationError(
+                    " eksik veri var.... ")
 
 
 
+# ilk bölümde denetim oluşturuken kullanılan form....
+class IlkDenetimSecForm(forms.Form):
+    denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    def __init__(self, *args, **kwargs):
+        kullanan = kwargs.pop("kullanan")
+        durum = kwargs.pop("durum")
+        super(IlkDenetimSecForm, self).__init__(*args, **kwargs)
+        print("form init içinden kullanan", kullanan)
+        denetim_obj_ilk = denetim.objects.filter(durum=durum)
+        denetim_obj = denetim_obj_ilk.filter(yaratan=kullanan)
+        self.fields['denetim_no'].queryset = denetim_obj
+        print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
 
+
+# ikinci kısımda canlı denetimde kullanılan form
 class DenetimSecForm(forms.Form):
     denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
     def __init__(self, *args, **kwargs):
@@ -142,7 +217,7 @@ class BolumSecForm(forms.Form):
     def __init__(self, *args, **kwargs):
         denetim_no = kwargs.pop("denetim_no")
         devam_tekrar = kwargs.pop("devam_tekrar")
-        #denetim_no = request.session.get('denetim_no')
+        #denetim_no = request.session    gizli = forms.CharField(required=False, initial=None)
         print("initial içinden denetim_no", denetim_no)
         super(BolumSecForm, self).__init__(*args, **kwargs)
         if devam_tekrar == "devam":

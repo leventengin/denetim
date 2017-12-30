@@ -1,0 +1,52 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Datepicker - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+$( function() {
+$.datepicker.regional['tr'] = {
+  monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+  monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+  'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+  weekHeader: 'Hf', weekStatus: '',
+  dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+  dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+  dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+  dateFormat: 'yy-mm-dd', firstDay: 1,
+  prevText: 'Önce',
+  nextText: 'Sonra',
+  isRTL: false};
+$.datepicker.setDefaults($.datepicker.regional['tr']);
+$( ".datepicker" ).datepicker()
+} );
+</script>
+
+<h4> Denetim  </h4>
+
+<p> </p>
+
+<form action="" method="POST">
+    {% csrf_token %}
+<!--    {{ form.errors }}  -->
+<!--    {{ form.non_field_errors }} -->
+    <table>
+    {{ form.as_table }}
+    {{ form.field_errors }}
+    </table>
+    <input type="submit" value="kaydet" />
+
+</form>
+
+
+
+{% endblock %}

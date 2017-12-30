@@ -1,0 +1,16 @@
+{{% extends "base_generic.html" %}
+
+{% block content %}
+  <h4>Gözlemcilerin Seçimi</h4>
+  <p> </p>
+  <p> </p>
+  <p> </p>
+  <p> </p>
+  <form action="" method="post">
+      {% csrf_token %}
+      {{ form.as_table }}
+      <input type="submit" value="Seç" />
+  </form>
+
+
+{% endblock %}

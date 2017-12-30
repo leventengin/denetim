@@ -1,0 +1,101 @@
+
+
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<!doctype html>
+<html lang="tr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Datepicker - Default functionality</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+
+  <script>
+    function densecFunction() {
+        var response = '';
+        var selected = document.getElementById("id_denetim").value;
+        alert("selected" + selected)
+        console.log(selected);
+        $.ajax({
+          url : "denetim_bolum_js/",
+          type : "GET",
+          dataType: "text",
+          data : {
+            'selected' : selected,
+           },
+          success: function() {
+              alert("bölüm seçimi başarılı...");
+              window.location.reload();
+              },
+          failure: function() {
+              alert("hata var....veri aktarılamadı...");
+              }
+          });  /* ajax kapa...*/
+
+    }
+  </script>
+
+  <script>
+      $( ".densecFunction" ).densecFunction()
+      } );
+  </script>
+
+</head>
+
+
+
+<body>
+
+<script>
+      $(document).ready(function(){
+             $("#id_denetim").change(function(){
+                  alert ( "hadi  şimdi...demsec çalıştı...");
+                  densecFunction();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+<h4>  Denetim ve Bölüm Seçimi  </h4>
+
+<p> </p>
+
+<!--
+<form  action="" method="post" novalidate>
+        {% csrf_token %}
+        <table border="0" class="fkenar">
+          {{ form }}
+        </table>
+        <input type="submit" value="gir" />
+</form>
+-->
+
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="seç" />
+
+</form>
+
+
+
+</body>
+
+
+</html>
+{% endblock %}

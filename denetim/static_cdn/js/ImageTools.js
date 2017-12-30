@@ -1,5 +1,7 @@
 'use strict';
-alert ("nedir buuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+
+alert (" hey leonid.............");
+
 if (typeof exports === "undefined") {
     var exports = {};
 }
@@ -49,8 +51,8 @@ var ImageTools = (function () {
             if (typeof maxDimensions === 'function') {
                 callback = maxDimensions;
                 maxDimensions = {
-                    width: 640,
-                    height: 480
+                    width: 800,
+                    height: 600
                 };
             }
 
@@ -76,7 +78,7 @@ var ImageTools = (function () {
                 var height = image.height;
                 var isTooLarge = false;
 
-                if (width > height && width > maxDimensions.width) {
+                if (width >= height && width > maxDimensions.width) {
                     // width is the largest dimension, and it's too big.
                     height *= maxDimensions.width / width;
                     width = maxDimensions.width;
@@ -100,6 +102,8 @@ var ImageTools = (function () {
                 canvas.height = height;
 
                 var ctx = canvas.getContext('2d');
+		            ctx.imageSmoothingEnabled = true;
+		            ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(image, 0, 0, width, height);
 
                 if (hasToBlobSupport) {
@@ -141,7 +145,7 @@ var ImageTools = (function () {
             if (hasBlobConstructor) {
                 blob = new Blob([hasArrayBufferViewSupport ? intArray : arrayBuffer], { type: mimeString });
             } else {
-                var bb = new BlobBuilder();
+                var bb = new Blob();
                 bb.append(arrayBuffer);
                 blob = bb.getBlob(mimeString);
             }

@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
 
-    url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
+    #url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
     url(r'^denetim/(?P<pk>\d+)$', views.denetim_detay, name='denetim_detay'),
     #url(r'^denetim/(?P<pk>\d+)/pdf/$', views.GeneratePDF.as_view(), name='GeneratePDF'),
     url(r'^denetim/(?P<pk>\d+)/pdf/$', views.generate_pdf, name='generate_pdf'),
@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^tamamla/(?P<pk>\d+)$', views.denetim_tamamla, name='denetim_tamamla'),
     url(r'^tamamla/(?P<pk>\d+)/kesin/$', views.denetim_tamamla_kesin, name='denetim_tamamla_kesin'),
     url(r'^devam_liste/$', views.devam_liste, name='devam_liste'),
+    url(r'^qrcode/$', views.qrcode_tara, name='qrcode_tara'),
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
@@ -95,8 +96,30 @@ urlpatterns = [
     url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetailView.as_view(), name='sonuc-detail'),
     url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
-
-
-
+#---------------------------------------------------------------------------------------------------
+#   denetim urlleri .............................
+    #url(r'^denetim/olustur/$', views.denetim_olustur, name='denetim_olustur'),
+    url(r'^denetim/$', views.DenetimListView.as_view(), name='denetim'),
+    url(r'^denetim/(?P<pk>\d+)$', views.DenetimDetailView.as_view(), name='denetim-detail'),
+    url(r'^denetim/isemrisonrasi/$', views.isemrisonrasi_sec, name='isemrisonrasi_sec'),
+    url(r'^denetim/isemrisonrasi/devam/$', views.isemrisonrasi_devam, name='isemrisonrasi_devam'),
+    url(r'^denetim/sonlandirilan/$', views.sonlandirilan_sec, name='sonlandirilan_sec'),
+    url(r'^denetim/sonlandirilan/devam/$', views.sonlandirilan_devam, name='sonlandirilan_devam'),
+    url(r'^denetim/create/$', views.denetim_create, name='denetim_create'),
+    url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
+    url(r'^denetim/(?P<pk>\d+)/delete/$', views.denetim_sil, name='denetim_sil'),
+    url(r'^denetim/(?P<pk>\d+)/delete/kesin/$', views.denetim_sil_kesin, name='denetim_sil_kesin'),
+#   diğer denetim oluşturma işlemleri..................
+    url(r'^denetim/gozlemcisec/$', views.gozlemci_denetim_sec, name='gozlemci_denetim_sec'),
+    url(r'^denetim/gozlemcisec/devam/$', views.gozlemci_sec_devam, name='gozlemci_sec_devam'),
+    url(r'^denetim/bolumsec/$', views.bolum_denetim_sec, name='bolum_denetim_sec'),
+    url(r'^denetim/bolumsec/devam/$', views.bolum_sec_devam, name='bolum_sec_devam'),
+    url(r'^denetim/detaysec/$', views.detay_denetim_sec, name='detay_denetim_sec'),
+    url(r'^denetim/detaysec/devam/$', views.detay_sec_devam, name='detay_sec_devam'),
+    url(r'^denetim/detaysec/denetim_bolum_js/$', views.denetim_bolum_js, name='denetim_bolum_js'),
+    url(r'^denetim/isemriolustur/$', views.isemri_denetim_sec, name='isemri_denetim_sec'),
+    url(r'^denetim/isemriolustur/devam/$', views.isemri_olustur_devam, name='isemri_olustur_devam'),
+    url(r'^denetim/isemri/$', views.isemri_yarat, name='isemri_yarat'),
+    #url(r'^denetim/goster/$', views.denetim_goster, name='denetim_goster'),
 
     ]

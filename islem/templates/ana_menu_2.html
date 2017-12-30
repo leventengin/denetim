@@ -7,31 +7,16 @@
 
 
 <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'GeneratePDF' %}'">PDF Oluştur</button>
-
-<!--
-  <a href="/xyz"> PDF öncesi.... </a>
-  <p> </p>
--->
-
 <p> </p>
 <p> </p>
-   {% if durum == "B" %}
-   <button type="button" class="btn btn-md"  onclick="window.location.href='{% url 'denetim_baslat' %}'">Denetim Başlat</button>
-
-   {% endif %}
+{% if durum == "B" %}
+<button type="button" class="btn btn-md"  onclick="window.location.href='{% url 'denetim_baslat' %}'">Denetim Başlat</button>
+{% endif %}
 
     <p> </p> &emsp;
 
     <h4>  Denetim İş Emri Detayları </h4>
     <p> </p> &emsp;
-        {% if dict_bol_detay %}
-            <!-- <strong>There are logs present.</strong>  -->
-            <p> </p>
-        {% else %}
-            <strong>There are nooooooooooooo logs present.</strong>
-            <p> </p>
-        {% endif %}
-
 
 
         <table border="0">
@@ -71,6 +56,28 @@
 
             </tbody>
         </table>
+        <p> </p> &emsp;
+        <p> </p> &emsp;
+        <h5> <b> Gözlemciler: </b> <h5>
+        <p> </p> 
+
+
+        {% for gozlemci in g %}
+        <tr>
+            <td> {{ gozlemci }} </td>
+        </tr>
+        <p> </p>
+        {% endfor %}
+
+
+
+      {% if dict_bol_detay %}
+            <!-- <strong>There are logs present.</strong>  -->
+            <p> </p>
+      {% else %}
+            <strong>There are no logs present.</strong>
+            <p> </p>
+      {% endif %}
 
 
     <p> </p> &emsp;

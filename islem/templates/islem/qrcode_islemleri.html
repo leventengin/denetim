@@ -1,0 +1,92 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}qcode-decoder-master/build/qcode-decoder.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
+
+
+<h3> <b> QRCode Okuma - Test </b> </h3>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<script>
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function(evt)
+      {
+            alert("dokuman hazır....bom bom");
+              ImageTools.resize(this.files[0], {
+                width: 320, // maximum width
+                height: 240 // maximum height
+            }, function(blob, didItResize) {
+                alert("did it resize" + didItResize);
+                // didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
+                document.getElementById('preview').src = window.URL.createObjectURL(blob);
+              }); //image tools...
+      };  // on change...
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+
+
+<script  type="text/javascript">
+function tani() {
+  alert("tanımaya hazır....");
+  //var resim = document.getElementById('id_foto').value;
+  //alert("resim adı..." + resim);
+  //document.getElementById('preview').src = document.getElementById('id_foto').src
+  //alert("tanıma başladı.......");
+  var imaj = document.getElementById("preview").src;
+  //var qr = new QCodeDecoder();
+  alert("işlem öncesi..." + imaj);
+  QCodeDecoder().decodeFromImage(imaj, function (err, result) {
+      //if (err) { alert("hatalı lütfen tekrar deneyin...!!!"); }
+      alert("sonuç....." + result);
+      console.log(result);
+      document.getElementById("sonuc").value = result;
+      //document.getElementById("sonuc").value = result;
+    });  //qr sonucu.............
+}
+</script>
+
+
+
+
+
+<form id="take_photo" enctype="multipart/form-data">
+      <label for="id_foto">Yükle:</label> <input name="foto" type="file" id="id_foto" accept="image/jpeg"  />
+</form>
+<p></p>
+<p></p>
+
+<input type="button" onclick="tani()" value="tanı.." />
+
+<p></p>
+<p></p>
+Değer...:
+<p></p>
+<p></p>
+<input id="sonuc" value="" readonly />
+<p></p>
+<p></p>
+
+RESİM.....................
+<p></p>
+<p></p>
+
+<img id="preview">
+
+
+
+
+
+
+{% endblock %}

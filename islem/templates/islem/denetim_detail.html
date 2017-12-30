@@ -1,0 +1,27 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h4>Oluşturulan Denetimler Sayfası</h4>
+  <p> </p>
+  <p> </p>
+
+
+<table border="0">
+    <tbody>
+        <tr>
+            <td><b>Denetim Tipi....:</b></td>
+            <td>  &emsp;      {{ bolum.tipi }}</td>
+        </tr>
+        <tr>
+            <td><b>Bölüm Kodu.....:</b></td>
+            <td> &emsp;     {{ bolum.bolum_kodu }}</td>
+        </tr>
+        <tr>
+            <td><b>Bölüm Adı.........:   </b></td>
+            <td> &emsp;     {{ bolum.bolum_adi }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}
