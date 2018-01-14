@@ -3,6 +3,10 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+    <style>
+      .button_clr {background-color: #f44336;} /* Red */
+    </style>
+
 
     <h4>Devam eden denetimler </h4>
 
@@ -12,7 +16,10 @@
       {% for denetim in secili_denetimler %}
         <li>
           <h5> {{ denetim.denetim_adi }} </h5>
-
+<!--
+          <p> </p>&emsp;
+          <button type="button" class="btn btn-sm button_clr"  onclick="window.location.href='{% url 'acil_bildirim' pk=denetim.id %}'">Acil Bildirim</button>
+-->
           {% if denetim.devam_mi %}
           <p> </p>&emsp;
           <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_devam_islemleri' pk=denetim.id %}'">Denetim devam</button>
@@ -23,7 +30,7 @@
           <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tekrar_islemleri' pk=denetim.id %}'">Bölüm tekrar</button>
           {% endif %}
 
-          {% if denetim.tamamla_mi %}  
+          {% if denetim.tamamla_mi %}
           <p> </p>&emsp;
           <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla' pk=denetim.id %}'">Denetim tamamla</button>
           {% endif %}

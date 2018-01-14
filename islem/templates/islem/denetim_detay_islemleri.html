@@ -168,7 +168,7 @@ $(document).ready(function()
     {% csrf_token %}
     {{ form.errors }}
     {{ form.non_field_errors }}
-    <table>
+    <table>print(settings.STATIC_ROOT)
     <tr>
       <th><label for="id_sayi_0">Puan:</label></th> <td><ul id="id_sayi">
         <li><label for="id_sayi_0"><input type="radio" name="sayi" value="A" required id="id_sayi_0" />Çok İyi</label> </li>

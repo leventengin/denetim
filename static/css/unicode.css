@@ -1,1 +1,28 @@
-/home/levent/nata/denetim/islem/static/css/unicode.css
+
+@font-face {
+	font-family: DejaVuSans;
+	src: url('/home/levent/nata/denetim/islem/static/css/CODE2000.TTF');
+}
+
+/*
+@font-face {
+	font-family: arialuni;
+	font-weight: bold;
+	src: url("font/CODE2000.TTF")
+}
+@font-face {
+	font-family: arialuni;
+	font-style: italic;
+	src: url("font/CODE2000.TTF")
+}
+@font-face {
+	font-family: arialuni;
+	font-weight: bold;
+	font-style: italic;
+	src: url("font/CODE2000.TTF")
+}
+*/
+
+html {
+    font-family: CODE2000.TTF;
+}

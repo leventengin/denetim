@@ -1,0 +1,38 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% load static %}
+
+<head>
+  {{ form.media.css }}
+  <style type="text/css">
+    select {width: 200px;}
+  </style>
+</head>
+
+<body>
+<h4> Deneme Select2 </h4>
+<p> </p>
+
+<form method="post" action="">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value="gönder.."/>
+</form>
+
+<!--
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+-->
+
+<script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+  window.onerror = function (msg) { $("body").attr("JSError", msg); }
+</script>
+{{ form.media.js }}
+</body>
+
+
+{% endblock %}

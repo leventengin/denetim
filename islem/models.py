@@ -11,6 +11,10 @@ EVETHAYIR = (
 ('H', 'Hayır'),
 )
 
+ACIKKAPANDI = (
+('A', 'Açık'),
+('K', 'Kapandı'),
+)
 PUAN = (
 ('A', 'Çok İyi'),
 ('B', 'İyi'),
@@ -122,7 +126,18 @@ class sonuc_bolum(models.Model):
     def __str__(self):
         return(self.bolum.bolum_adi)
 
+class acil(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    konu = models.CharField(max_length=100)
+    aciklama = models.TextField()
+    sonuc = models.TextField()
+    acik_kapandi = models.CharField(max_length=1, choices=ACIKKAPANDI, default="A")
+    updated = models.DateTimeField(auto_now=True, auto_now_add=False)
+    timestamp = models.DateTimeField(default=datetime.now())
+    def __str__(self):
+        return(self.denetim.denetim_adi)
 
+    
 class grup(models.Model):
     grup_adi = models.CharField(max_length=200)
     def __str__(self):

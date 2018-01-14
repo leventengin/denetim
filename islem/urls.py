@@ -7,6 +7,26 @@ from django.utils.translation import gettext as _
 from rest_framework import routers, serializers, viewsets
 # from django.contrib.auth import views
 from django.conf.urls import include
+from django.contrib.admin.widgets import FilteredSelectMultiple
+
+from functools import reduce
+from itertools import chain
+from pickle import PicklingError
+
+from django import forms
+from django.core import signing
+from django.db.models import Q
+from django.forms.models import ModelChoiceIterator
+from django.urls import reverse
+from django.utils.translation import get_language
+from django_select2.forms import (
+    HeavySelect2MultipleWidget, HeavySelect2Widget, ModelSelect2MultipleWidget,
+    ModelSelect2TagWidget, ModelSelect2Widget, Select2MultipleWidget,
+    Select2Widget
+)
+
+
+
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -22,8 +42,10 @@ urlpatterns = [
     url(r'^tekrar/(?P<pk>\d+)$', views.denetim_tekrar_islemleri, name='denetim_tekrar_islemleri'),
     url(r'^tekrar/(?P<pk>\d+)/kesin/$', views.denetim_tekrarla_kesin, name='denetim_tekrarla_kesin'),
     url(r'^tamamla/(?P<pk>\d+)$', views.denetim_tamamla, name='denetim_tamamla'),
+    url(r'^acilbildirim/(?P<pk>\d+)$', views.acil_bildirim, name='acil_bildirim'),
     url(r'^tamamla/(?P<pk>\d+)/kesin/$', views.denetim_tamamla_kesin, name='denetim_tamamla_kesin'),
     url(r'^devam_liste/$', views.devam_liste, name='devam_liste'),
+    url(r'^acil_devam_sec/$', views.acil_devam_sec, name='acil_devam_sec'),
     url(r'^qrcode/$', views.qrcode_tara, name='qrcode_tara'),
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
@@ -94,7 +116,7 @@ urlpatterns = [
     #url(r'^sonuc/$', views.SonucListView.as_view(), name='sonuc'),
     url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
     url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetailView.as_view(), name='sonuc-detail'),
-    url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
+    #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
 #---------------------------------------------------------------------------------------------------
 #   denetim urlleri .............................
@@ -103,8 +125,17 @@ urlpatterns = [
     url(r'^denetim/(?P<pk>\d+)$', views.DenetimDetailView.as_view(), name='denetim-detail'),
     url(r'^denetim/isemrisonrasi/$', views.isemrisonrasi_sec, name='isemrisonrasi_sec'),
     url(r'^denetim/isemrisonrasi/devam/$', views.isemrisonrasi_devam, name='isemrisonrasi_devam'),
+    url(r'^denetim/isemrisonrasi/denetimiptal/$', views.denetim_iptal, name='denetim_iptal'),
+    url(r'^denetim/isemrisonrasi/denetimiptal/devam/$', views.denetim_iptal_devam, name='denetim_iptal_devam'),
+    url(r'^denetim/isemrisonrasi/denetcidegistir/$', views.denetci_degistir, name='denetci_degistir'),
+    url(r'^denetim/isemrisonrasi/tarihdegistir/$', views.tarih_degistir, name='tarih_degistir'),
+    #deneme alttaki.................
+    url(r'^denetim/isemrisonrasi/deneme_filteredselectmultiple/$', views.deneme_filteredselectmultiple, name='deneme_filteredselectmultiple'),
+    url(r'^denetim/baslanmislar/$', views.baslanmislar_sec, name='baslanmislar_sec'),
+    url(r'^denetim/baslanmislar/devam/$', views.baslanmislar_devam, name='baslanmislar_devam'),
     url(r'^denetim/sonlandirilan/$', views.sonlandirilan_sec, name='sonlandirilan_sec'),
     url(r'^denetim/sonlandirilan/devam/$', views.sonlandirilan_devam, name='sonlandirilan_devam'),
+    url(r'^denetim/sonlandirilan/devam/(?P<pk>\d+)$', views.sonlandirilan_ilerle, name='sonlandirilan_ilerle'),
     url(r'^denetim/create/$', views.denetim_create, name='denetim_create'),
     url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
     url(r'^denetim/(?P<pk>\d+)/delete/$', views.denetim_sil, name='denetim_sil'),
