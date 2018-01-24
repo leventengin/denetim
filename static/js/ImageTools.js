@@ -1,6 +1,6 @@
 'use strict';
 
-alert (" hey leonid.............");
+//alert (" hey leonid.............");
 
 if (typeof exports === "undefined") {
     var exports = {};

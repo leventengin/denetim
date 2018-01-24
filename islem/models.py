@@ -137,7 +137,7 @@ class acil(models.Model):
     def __str__(self):
         return(self.denetim.denetim_adi)
 
-    
+
 class grup(models.Model):
     grup_adi = models.CharField(max_length=200)
     def __str__(self):

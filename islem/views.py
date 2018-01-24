@@ -407,10 +407,59 @@ def acil_devam_sec(request, pk=None):
         form = AcilAcForm(request.POST, denetci=denetci)
         print("buraya mı geldi acil aç form...")
         if form.is_valid():
+            dd_denetim = request.POST.get('denetim', "")
+            print ("denetim ", dd_denetim)
+            dd_konu = request.POST.get('konu', "")
+            print ("konu", dd_konu)
+            dd_aciklama = request.POST.get('aciklama', "")
+            print ("aciklama", dd_aciklama)
             # veri tabanına yazıyor
-            # mailleri at...
+            acil_obj, created = acil.objects.get_or_create(denetim=dd_denetim)
 
-            return render(request, 'islem/acil_devam_sec.html')
+            if created:
+                # means you have created a new db objects
+                print("id", acil_obj.id)
+                print("denetim", acil_obj.denetim)
+                kaydetme_obj = acil(denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
+                kaydetme_obj.save()
+            else:
+                # just refers to the existing one
+                print("id", acil_obj.id)
+                print("denetim", acil_obj.denetim)
+                kaydetme_obj = acil(id=acil_obj.id, denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
+                kaydetme_obj.save()
+
+
+            denetim_no = acil_obj.denetim
+            denetim_obj = denetim.objects.get(id=denetim_no)
+            denetci = denetim_obj.denetci
+            gozlemci_obj = gozlemci.objects.filter(denetim=denetim_no)
+            #email işlemi.................
+            connection = mail.get_connection()
+            connection.open()
+            email1 = mail.EmailMessage(
+                dd_konu,
+                dd_aciklama,
+                settings.EMAIL_HOST_USER,
+                [denetci.email],
+                connection=connection,
+                )
+            email1.send() # Send the email
+
+            for gozlem in gozlemci_obj:
+                email2 = mail.EmailMessage(
+                dd_konu,
+                dd_aciklama,
+                settings.EMAIL_HOST_USER,
+                [gozlem.gozlemci.email],
+                connection=connection,
+                )
+            email2.send() # Send the email
+            connection.close()
+            # email işlemi sonu.....................
+
+            messages.success(request, 'Acil bildirimi gönderildi.......')
+            return redirect('index')
         else:
             return render(request, 'islem/acil_devam_sec.html', {'form': form,})
 
@@ -1341,8 +1390,8 @@ def isemri_yarat(request, pk=None):
     connection.close()
     # email işlemi sonu.....................
 
-    #denetim_obj.durum = "B"
-    #denetim_obj.save()
+    denetim_obj.durum = "B"
+    denetim_obj.save()
     messages.success(request, 'Başarıyla oluşturuldu....')
     return redirect('index')
 

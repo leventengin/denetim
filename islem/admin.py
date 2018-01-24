@@ -42,6 +42,7 @@ from .models import gozlemci
 from .models import sonuc
 from .models import sonuc_bolum
 from .models import kucukresim
+from .models import acil
 from resimyukle.models import Resim
 
 
@@ -57,3 +58,4 @@ admin.site.register(sonuc)
 admin.site.register(sonuc_bolum)
 admin.site.register(Resim)
 admin.site.register(kucukresim)
+admin.site.register(acil)

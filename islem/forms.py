@@ -123,10 +123,10 @@ class DenetimForm(forms.ModelForm):
         #    raise ValidationError(" tarih sıralaması yanlış...")
 
 
-class AcilAcForm(forms.ModelForm):
-    class Meta:
-        model = acil
-        fields = ('denetim', 'konu', 'aciklama')
+class AcilAcForm(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    konu = forms.CharField()
+    aciklama = forms.CharField(label='Açıklama', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}),)
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(AcilAcForm, self).__init__(*args, **kwargs)
@@ -135,12 +135,16 @@ class AcilAcForm(forms.ModelForm):
         self.fields['denetim'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim'].queryset)
 
-
-
-class AcilKapaForm(forms.ModelForm):
-    class Meta:
-        model = acil
-        fields = ('denetim', 'sonuc')
+class AcilKapaForm(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    sonuc = forms.CharField(label='Sonuç', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}),)
+    def __init__(self, *args, **kwargs):
+        denetci = kwargs.pop("denetci")
+        super(AcilAcForm, self).__init__(*args, **kwargs)
+        denetim_obj_ilk = denetim.objects.filter(durum="C")
+        denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
+        self.fields['denetim'].queryset = denetim_obj
+        print("queryset initial içinden..:", self.fields['denetim'].queryset)
 
 
 
