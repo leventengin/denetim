@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Proje Listesi</h3>
+
+    {% if proje_list %}
+    <ul>
+
+      {% for proje in proje_list %}
+      <li>
+        <a href="{{proje.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{proje.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{proje.id}})    <a href="{{proje.id}}">{{ proje.proje_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/proje/create"> Proje Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı proje yok ....</p>
+      <p> </p>
+      <a href="/islem/proje/create"> Proje Ekle </a>
+    {% endif %}
+
+{% endblock %}

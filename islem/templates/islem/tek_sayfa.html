@@ -1,0 +1,171 @@
+
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery UI Datepicker - Default functionality</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<style type="text/css">
+    label {
+        font-weight: normal  !important;
+    }
+</style>
+
+<!--
+label {
+    font-weight: normal !important;
+}
+-->
+
+
+<script>
+$( function() {
+$.datepicker.regional['tr'] = {
+  monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+  monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+  'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+  weekHeader: 'Hf', weekStatus: '',
+  dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+  dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+  dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+  dateFormat: 'yy-mm-dd', firstDay: 1,
+  prevText: 'Önce',
+  nextText: 'Sonra',
+  isRTL: false};
+$.datepicker.setDefaults($.datepicker.regional['tr']);
+$( ".datepicker" ).datepicker()
+} );
+</script>
+
+
+<!--
+$("#aSelect").click(function(){
+    var selectedValues = [];
+    $("#lstSelect :selected").each(function(){
+        selectedValues.push($(this).val());
+    });
+    alert(selectedValues);
+    return false;
+});
+-->
+
+  <script>
+    function detaysecFunction() {
+        var response = '';
+        var liste = [];
+        /* liste = document.getElementById("id_bolum").value; */
+        $.ajaxSettings.traditional = true;
+        $("#id_bolum :selected").each(function(){
+            liste.push($(this).val());
+        });
+
+        alert(" liste..." + liste)
+        console.log(liste);
+        $.ajax({
+          url : "detaylarsec_bolum_js/",
+          type : "GET",
+          dataType: "text",
+          data : {
+            liste : liste,
+           },
+          success: function() {
+              alert("bölüm seçimi başarılı...");
+              /* window.location.reload(); */
+              },
+          failure: function() {
+              alert("hata var....veri aktarılamadı...");
+              }
+          });  /* ajax kapa...*/
+
+    }
+  </script>
+
+  <script>
+      $( ".detaysecFunction" ).detaysecFunction()
+      } );
+  </script>
+
+</head>
+
+
+
+<body>
+
+<script>
+      $(document).ready(function(){
+             $("#id_bolum").change(function(){
+                  alert ( "...bolum detay seç çalıştı...");
+                  detaysecFunction();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+<h4>Denetim Sayfası </h4>
+
+
+
+    <p> </br> </p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+        {{ form_1.errors }}
+        {{ form_1.non_field_errors }}
+          <table>
+          {{ form_1.as_table }}
+          </table>
+      <!--    <input type="submit" value="seç" /> -->
+     </form>
+
+     <p> </p>
+
+       <form action="" method="POST">
+         {% csrf_token %}
+         {{ form_2.errors }}
+         {{ form_2.non_field_errors }}
+           <table>
+           {{ form_2.as_table }}
+           </table>
+      <!--     <input type="submit" value="seç" />  -->
+      </form>
+
+
+<p> </br> </p>
+<p> </br> </p>
+Detaylar/Sorular:
+<p> </br> </p>
+
+
+    <form action="" method="POST">
+      {% csrf_token %}
+      {{ form_3.errors }}
+      {{ form_3.non_field_errors }}
+        <table>
+        {{ form_3.as_table }}
+        </table>
+        <input type="submit" value="seç" />
+   </form>
+
+
+<!--
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+-->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+{{ form_1.media }}
+
+
+
+{% endblock %}

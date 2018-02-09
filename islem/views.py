@@ -13,14 +13,15 @@ from django.contrib import messages
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import grup, sirket, musteri, tipi, bolum, detay, acil
-from .models import Profile, denetim, gozlemci, sonuc, sonuc_bolum, kucukresim
+from .models import grup, sirket, proje, tipi, bolum, detay, acil
+from .models import Profile, denetim, sonuc, sonuc_bolum, kucukresim
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
-from islem.forms import GozlemciForm, BolumSecForm, DetayForm, SonucForm, DenetimSecForm
-from islem.forms import Denetim_BForm, DenetimForm, IlkBolumForm, IlkDetayForm, IkiliSecForm
+from islem.forms import BolumSecForm, DetayForm, SonucForm, DenetimSecForm
+from islem.forms import DenetimForm, Denetim_BForm, IlkBolumForm, IlkDetayForm, IkiliSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YeniDenetciSecForm, YeniTarihForm
-from islem.forms import MyForm, MusteriSecForm, AcilAcForm, AcilKapaForm, AcilDenetimSecForm
+from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm
+from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
@@ -45,11 +46,10 @@ from django.urls import reverse
 from django.utils.translation import get_language
 
 import json
-from django_select2.forms import (
-    HeavySelect2MultipleWidget, HeavySelect2Widget, ModelSelect2MultipleWidget,
-    ModelSelect2TagWidget, ModelSelect2Widget, Select2MultipleWidget,
-    Select2Widget
-)
+import requests
+
+
+
 
 
 
@@ -219,7 +219,7 @@ def index(request):
 
         num_grup=grup.objects.all().count()
         num_sirket=sirket.objects.all().count()
-        num_musteri=musteri.objects.count()
+        num_proje=proje.objects.count()
 
         return render(request, 'ana_menu_eski.html',
             context={
@@ -229,7 +229,7 @@ def index(request):
 
                 'num_grup': num_grup,
                 'num_sirket': num_sirket,
-                'num_musteri': num_musteri,
+                'num_proje': num_proje,
                 },
             )
 
@@ -408,29 +408,31 @@ def acil_devam_sec(request, pk=None):
         print("buraya mı geldi acil aç form...")
         if form.is_valid():
             dd_denetim = request.POST.get('denetim', "")
-            print ("denetim ", dd_denetim)
+            dd_denetim_2 = int(dd_denetim)
+            print ("denetim ", dd_denetim_2)
             dd_konu = request.POST.get('konu', "")
             print ("konu", dd_konu)
             dd_aciklama = request.POST.get('aciklama', "")
             print ("aciklama", dd_aciklama)
             # veri tabanına yazıyor
-            acil_obj, created = acil.objects.get_or_create(denetim=dd_denetim)
+            acil_obj, created = acil.objects.get_or_create(denetim_id=dd_denetim_2)
 
             if created:
                 # means you have created a new db objects
-                print("id", acil_obj.id)
+                print("id  bir", acil_obj.id)
                 print("denetim", acil_obj.denetim)
                 kaydetme_obj = acil(denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
             else:
                 # just refers to the existing one
-                print("id", acil_obj.id)
+                print("id  iki", acil_obj.id)
                 print("denetim", acil_obj.denetim)
                 kaydetme_obj = acil(id=acil_obj.id, denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
 
 
-            denetim_no = acil_obj.denetim
+            denetim_no = acil_obj.denetim.id
+            print("denetim no...", denetim_no)
             denetim_obj = denetim.objects.get(id=denetim_no)
             denetci = denetim_obj.denetci
             gozlemci_obj = gozlemci.objects.filter(denetim=denetim_no)
@@ -683,6 +685,99 @@ def secilen_bolumu_kaydet(request):
         else:
             print("selected none  .....  neler oluyor !!!!!")
     return HttpResponse(response_data, content_type='application/json')
+
+
+
+
+@login_required
+def teksayfa_yarat(request, pk=None):
+
+    # if this is a POST request we need to process the form data
+    #denetim_no = request.session.get('denetim_no')
+    #secili_bolum = request.session.get('secili_bolum')
+    #secili_detay = request.session.get('secili_detay')
+    #print("denetim detay işlemleri...................")
+    #print("denetim_no", denetim_no)
+    #print("secili_bolum", secili_bolum)
+    #print("secili_detay", secili_detay)
+
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        print("buraya mı geldi...  tek sayfa ...POST")
+        bir = sonuc.objects.filter(denetim=denetim_no)
+        iki = bir.filter(bolum=secili_bolum)
+        bulunan = iki.get(detay=secili_detay)
+        #bulunan = get_object_or_404(sonuc, detay=secili_detay)
+        form = SonucForm(request.POST or None, request.FILES or None, instance=bulunan)
+
+        if form.is_valid():
+            print("neyse ki valid..bin...ext...")
+            # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
+            edit = form.save(commit=False)
+            edit.tamam = "E"
+            resim_obj = kucukresim.objects.get(kullanici=request.user.id)
+            kucuk_resim = resim_obj.foto_kucuk
+            edit.foto = kucuk_resim
+            edit.save()
+            print("kaydetmiş olması lazım.................")
+
+            # bir sonraki................
+            # için  işlem yap................
+            ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
+            print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
+            detaylar = ilk_detaylar.filter(bolum=secili_bolum)
+            print("detaylar.. denetim detay işişlemleri..:", detaylar)
+            secili_detay_obj = detaylar.filter(tamam="H")
+            print("seçili detaylar tamam H olanlar...", secili_detay_obj)
+
+            if not secili_detay_obj:
+                # sonuc_bolum dosyasında tamamlandıyı E yap bölüm bitmiş olsun....
+                ilk_sonuc_bolum = sonuc_bolum.objects.filter(denetim=denetim_no)
+                print("sonuc bölüm ilk....", ilk_sonuc_bolum)
+                sec_bolum = get_object_or_404(ilk_sonuc_bolum, bolum=secili_bolum)
+                print(" seçili bölüm sonuc_bolum içinden ", sec_bolum)
+                sec_bolum.tamam = "E"
+                sec_bolum.save()
+                devam_tekrar = request.session.get('devam_tekrar')
+                if devam_tekrar == "devam":
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    return redirect('denetim_bolum_sec')
+                else:
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    return redirect('devam_liste')
+
+            secili_obj = secili_detay_obj.first()
+            secili_detay = secili_obj.detay.id
+            print("secili - detay.... bakalım  doğru mu...", secili_detay)
+            request.session['secili_detay'] = secili_detay
+            form = SonucForm()
+            context = { 'form': form,
+                        'secili_obj' : secili_obj,
+                        }
+            return render(request, 'islem/denetim_detay_islemleri.html', context,)
+
+
+        else:
+            print("ne oldu be kardeşim...........")
+            messages.success(request, ' form hatası - tekrar deneyin....')
+            return redirect('devam_liste')
+            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+
+        bolum_listesi = request.session.get('bolum_listesi', None)
+        print("bolüm listesi....", bolum_listesi)
+        form_1 = DenetimForm()
+        form_2 = IlkBolumForm()
+        form_3 = IlkDetayForm(bolum_listesi=bolum_listesi)
+        context = { 'form_1': form_1,
+                    'form_2': form_2,
+                    'form_3': form_3,
+                    }
+        return render(request, 'islem/tek_sayfa.html', context,)
+
 
 
 
@@ -1270,7 +1365,7 @@ def isemri_denetim_sec(request, pk=None):
 
 
 #-------------------------------------------------------------------------------
-from .models import gozlemci
+
 
 @login_required
 def isemri_olustur_devam(request, pk=None):
@@ -1986,8 +2081,24 @@ def denetim_bolum_js(request, pk=None):
     response_data ={}
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
-        print("selected...:", selected,)
+        print("selected...:", selected)
         request.session['detay_icin_bolum'] = selected
+    print ("son nokta denetim bölüm js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+#--------------------------------------------------------------------
+
+
+def detaylarsec_bolum_js(request, pk=None):
+    print("selam buraya geldik...detaylarseç bölüm js")
+    print("User.id.....:", request.user.id)
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        selected_list = request.GET.getlist('liste')
+        #selected_list = request.GET['liste']
+        print("selected list...:", selected_list, "adedi", len(selected_list))
+        request.session['bolum_listesi'] = selected_list
     print ("son nokta denetim bölüm js.....", response_data)
     return HttpResponse(response_data, content_type='application/json')
 
@@ -2180,30 +2291,30 @@ def sirket_sil_kesin(request, pk=None):
 #------------------------------------------------------
 
 @login_required
-def musteri_sil(request, pk=None):
-    print("musteri sildeki pk:", pk)
-    object = get_object_or_404(musteri, pk=pk)
-    sil_musteri = object.musteri_adi
+def proje_sil(request, pk=None):
+    print("proje sildeki pk:", pk)
+    object = get_object_or_404(proje, pk=pk)
+    sil_proje = object.proje_adi
     sil_id = object.id
-    print("sil_musteri", sil_musteri)
+    print("sil_proje", sil_proje)
     print("sil_id", sil_id)
-    args = {'sil_id': sil_id, 'sil_musteri': sil_musteri, 'pk': pk,}
-    return render(request, 'islem/musteri_sil_soru.html', args)
+    args = {'sil_id': sil_id, 'sil_proje': sil_proje, 'pk': pk,}
+    return render(request, 'islem/proje_sil_soru.html', args)
 
 
 @login_required
-def musteri_sil_kesin(request, pk=None):
-    print("musteri sil kesindeki pk:", pk)
-    object = get_object_or_404(musteri, pk=pk)
+def proje_sil_kesin(request, pk=None):
+    print("proje sil kesindeki pk:", pk)
+    object = get_object_or_404(proje, pk=pk)
     try:
         object.delete()
     except ProtectedError:
         error_message = "bağlantılı veri var,  silinemez...!!"
         #return JsonResponse(error_message, safe=False)
         messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('musteri')
+        return redirect('proje')
     messages.success(request, 'Başarıyla silindi....')
-    return redirect('musteri')
+    return redirect('proje')
 
 
 #  .............................................................
@@ -2370,24 +2481,24 @@ class SirketDelete(LoginRequiredMixin,DeleteView):
 
 # musteri yaratma, güncelleme, silme ...
 
-class MusteriCreate(LoginRequiredMixin,CreateView):
-    model = musteri
+class ProjeCreate(LoginRequiredMixin,CreateView):
+    model = proje
     fields = '__all__'
-    success_url = "/islem/musteri/create/"
+    success_url = "/islem/proje/create/"
 
-class MusteriUpdate(LoginRequiredMixin,UpdateView):
-    model = musteri
+class ProjeUpdate(LoginRequiredMixin,UpdateView):
+    model = proje
     fields = '__all__'
-    success_url = "/islem/musteri/"
+    success_url = "/islem/proje/"
 
-class MusteriDelete(LoginRequiredMixin,DeleteView):
-    model = musteri
-    success_url = reverse_lazy('musteri')
+class ProjeDelete(LoginRequiredMixin,DeleteView):
+    model = proje
+    success_url = reverse_lazy('proje')
 
 
 #--------------------------------------------------------------
 
-#????????????????????????????????????????????????????????????
+
 
 
 class SonucUpdate(LoginRequiredMixin,UpdateView):
@@ -2451,11 +2562,11 @@ class SirketDetailView(LoginRequiredMixin,generic.DetailView):
 
 #------------------------------------------------------------
 
-class MusteriListView(LoginRequiredMixin,generic.ListView):
-    model = musteri
+class ProjeListView(LoginRequiredMixin,generic.ListView):
+    model = proje
 
-class MusteriDetailView(LoginRequiredMixin,generic.DetailView):
-    model = musteri
+class ProjeDetailView(LoginRequiredMixin,generic.DetailView):
+    model = proje
 
 #------------------------------------------------------------
 
@@ -2531,6 +2642,161 @@ def generate_pdf(request):
 
     return response
 
+
+
+#-------------------------------------------------------------------------------
+
+from dal import autocomplete
+from django.conf.urls import url
+from .models import denetim
+
+
+class denetimautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return denetim.objects.none()
+        qs = denetim.objects.all()
+        if self.q:
+            qs = qs.filter(denetim_adi__icontains=self.q)
+        return qs
+
+
+@login_required
+def deneme_denetim(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Denetim_Deneme_Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            messages.success(request, 'Başarıyla oldu bu iş....')
+            return redirect('deneme_denetim')
+        else:
+            #messages.success(request, 'Formda uygunsuzluk var....')
+            #return redirect('denetim_create')
+            return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = Denetim_Deneme_Form()
+        return render(request, 'islem/denetim_deneme_form.html', {'form': form,})
+
+
+
+class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return sonuc_bolum.objects.none()
+        qs = sonuc_bolum.objects.all()
+
+        denetim_deneme  = self.forwarded.get('denetim_deneme', None)
+        print("denetim deneme...:", denetim_deneme)
+        if denetim_deneme:
+            qs = qs.filter(denetim=denetim_deneme)
+        print("qs....", qs)
+        if self.q:
+            qs = qs.filter(bolum__icontains=self.q)
+        return qs
+
+
+
+@login_required
+def deneme_sonucbolum(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Ikili_Deneme_Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            messages.success(request, 'Başarıyla oldu bu iş....')
+            return redirect('deneme_sonucbolum')
+        else:
+            #messages.success(request, 'Formda uygunsuzluk var....')
+            #return redirect('denetim_create')
+            return render(request, 'islem/denetim_deneme_form_iki.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = Ikili_Deneme_Form()
+        return render(request, 'islem/denetim_deneme_form_iki.html', {'form': form,})
+
+
+
+class takipciautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        #if not self.request.user.is_authenticated():
+            #return sonuc_bolum.objects.none()
+
+        #qs = Profile.objects.filter(denetim_takipcisi="E")
+        qs = User.objects.all()
+        print("null olmasın şimdi...:", qs)
+        if self.q:
+            qs = qs.filter(user__username__icontains=self.q)
+        return qs
+
+
+class bolumautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return bolum.objects.none()
+        #bolum_tipi = request.session.get('bolum_tipi')
+        bolum_tipi  = self.forwarded.get('tipi', None)
+        print("bolüm tipi...", bolum_tipi)
+        #qs = bolum.objects.all()
+        if bolum_tipi:
+            qs = bolum.objects.filter(tipi=bolum_tipi)
+        print("qs filtre öncesi..", qs)
+        if self.q:
+            qs = qs.filter(bolum_adi__icontains=self.q)
+        return qs
+
+class detayautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return detay.objects.none()
+        qs = detay.objects.all()
+        if self.q:
+            qs = qs.filter(detay_adi__icontains=self.q)
+        return qs
+
+
+class tipiautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return detay.objects.none()
+        qs = tipi.objects.all()
+        if self.q:
+            qs = qs.filter(tipi_adi__icontains=self.q)
+        return qs
+
+
+class projeautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return proje.objects.none()
+        qs = proje.objects.all()
+        if self.q:
+            qs = qs.filter(proje_adi__icontains=self.q)
+        return qs
+
+class denetciautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return user.objects.none()
+        qs = Profile.objects.filter(denetci="E")
+        if self.q:
+            qs = qs.filter(user__username__icontains=self.q)
+        return qs
 
 
 

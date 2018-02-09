@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<h4>Denetim Seç </h4>
+
+
+
+
+<p> </p>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="seç" />
+
+</form>
+
+
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+
+{{ form.media }}
+
+
+{% endblock %}

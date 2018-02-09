@@ -1,10 +1,15 @@
 {% extends "base_generic.html" %}
+{% load static %}
 
 {% block content %}
 
-<h4>  Müşteri </h4>
 
-<p> </p> 
+<h4>Denetim - Bölüm Seç </h4>
+
+
+
+
+<p> </p>
 
 <form action="" method="POST">
     {% csrf_token %}
@@ -13,10 +18,14 @@
     <table>
     {{ form.as_table }}
     </table>
-    <input type="submit" value="kaydet" />
+    <input type="submit" value="seç" />
 
 </form>
 
+
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+
+{{ form.media }}
 
 
 {% endblock %}

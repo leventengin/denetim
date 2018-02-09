@@ -19,17 +19,27 @@ from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
 from django.urls import reverse
 from django.utils.translation import get_language
-from django_select2.forms import (
-    HeavySelect2MultipleWidget, HeavySelect2Widget, ModelSelect2MultipleWidget,
-    ModelSelect2TagWidget, ModelSelect2Widget, Select2MultipleWidget,
-    Select2Widget
-)
+
+from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete, denetciautocomplete
+from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, projeautocomplete
 
 
 
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    # dal denemesi için..................
+    url(r'^denetim-autocomplete/$', denetimautocomplete.as_view(),name='denetim-autocomplete',),
+    url(r'^sonucbolum-autocomplete/$', sonucbolumautocomplete.as_view(),name='sonucbolum-autocomplete',),
+    url(r'^takipci-autocomplete/$', takipciautocomplete.as_view(),name='takipci-autocomplete',),
+    url(r'^bolum-autocomplete/$', bolumautocomplete.as_view(),name='bolum-autocomplete',),
+    url(r'^detay-autocomplete/$', detayautocomplete.as_view(),name='detay-autocomplete',),
+    url(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
+    url(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
+    url(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
+
+
+
 
 
     #url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
@@ -60,6 +70,10 @@ urlpatterns = [
 
 #-------------------------------------------------------------------------------------------------
     # grup urlleri aşağıda....
+    url(r'^deneme/$', views.deneme_denetim, name='deneme_denetim'),
+    url(r'^deneme_iki/$', views.deneme_sonucbolum, name='deneme_sonucbolum'),
+
+
 
     url(r'^grup/$', views.GrupListView.as_view(), name='grup'),
     url(r'^grup/(?P<pk>\d+)$', views.GrupDetailView.as_view(), name='grup-detail'),
@@ -77,13 +91,13 @@ urlpatterns = [
     url(r'^sirket/(?P<pk>\d+)/delete/$', views.sirket_sil, name='sirket_sil'),
     url(r'^sirket/(?P<pk>\d+)/delete/kesin/$', views.sirket_sil_kesin, name='sirket_sil_kesin'),
 
-    # müşteri urlleri aşağıda....
-    url(r'^musteri/$', views.MusteriListView.as_view(), name='musteri'),
-    url(r'^musteri/(?P<pk>\d+)$', views.MusteriDetailView.as_view(), name='musteri-detail'),
-    url(r'^musteri/create/$', views.MusteriCreate.as_view(), name='musteri_create'),
-    url(r'^musteri/(?P<pk>\d+)/update/$', views.MusteriUpdate.as_view(), name='musteri_update'),
-    url(r'^musteri/(?P<pk>\d+)/delete/$', views.musteri_sil, name='musteri_sil'),
-    url(r'^musteri/(?P<pk>\d+)/delete/kesin/$', views.musteri_sil_kesin, name='musteri_sil_kesin'),
+    # proje urlleri aşağıda....
+    url(r'^proje/$', views.ProjeListView.as_view(), name='proje'),
+    url(r'^proje/(?P<pk>\d+)$', views.ProjeDetailView.as_view(), name='proje-detail'),
+    url(r'^proje/create/$', views.ProjeCreate.as_view(), name='proje_create'),
+    url(r'^proje/(?P<pk>\d+)/update/$', views.ProjeUpdate.as_view(), name='proje_update'),
+    url(r'^proje/(?P<pk>\d+)/delete/$', views.proje_sil, name='proje_sil'),
+    url(r'^proje/(?P<pk>\d+)/delete/kesin/$', views.proje_sil_kesin, name='proje_sil_kesin'),
 
 #-------------------------------------------------------------------------------------------------
 
@@ -148,9 +162,12 @@ urlpatterns = [
     url(r'^denetim/detaysec/$', views.detay_denetim_sec, name='detay_denetim_sec'),
     url(r'^denetim/detaysec/devam/$', views.detay_sec_devam, name='detay_sec_devam'),
     url(r'^denetim/detaysec/denetim_bolum_js/$', views.denetim_bolum_js, name='denetim_bolum_js'),
+    url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
     url(r'^denetim/isemriolustur/$', views.isemri_denetim_sec, name='isemri_denetim_sec'),
     url(r'^denetim/isemriolustur/devam/$', views.isemri_olustur_devam, name='isemri_olustur_devam'),
     url(r'^denetim/isemri/$', views.isemri_yarat, name='isemri_yarat'),
+    url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
+
     #url(r'^denetim/goster/$', views.denetim_goster, name='denetim_goster'),
 
     ]

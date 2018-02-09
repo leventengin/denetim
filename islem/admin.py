@@ -33,12 +33,12 @@ admin.site.register(User, CustomUserAdmin)
 
 from .models import grup
 from .models import sirket
-from .models import musteri
+from .models import proje
 from .models import tipi
 from .models import bolum
 from .models import detay
 from .models import denetim
-from .models import gozlemci
+#from .models import gozlemci
 from .models import sonuc
 from .models import sonuc_bolum
 from .models import kucukresim
@@ -48,12 +48,12 @@ from resimyukle.models import Resim
 
 admin.site.register(grup)
 admin.site.register(sirket)
-admin.site.register(musteri)
+admin.site.register(proje)
 admin.site.register(tipi)
 admin.site.register(bolum)
 admin.site.register(detay)
 admin.site.register(denetim)
-admin.site.register(gozlemci)
+#admin.site.register(gozlemci)
 admin.site.register(sonuc)
 admin.site.register(sonuc_bolum)
 admin.site.register(Resim)
