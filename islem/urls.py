@@ -72,6 +72,7 @@ urlpatterns = [
     # grup urlleri aşağıda....
     url(r'^deneme/$', views.deneme_denetim, name='deneme_denetim'),
     url(r'^deneme_iki/$', views.deneme_sonucbolum, name='deneme_sonucbolum'),
+    url(r'^deneme_uc/$', views.deneme_nebu, name='deneme_nebu'),
 
 
 
@@ -129,7 +130,7 @@ urlpatterns = [
     # sonuç urlleri aşağıda....
     #url(r'^sonuc/$', views.SonucListView.as_view(), name='sonuc'),
     url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
-    url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetailView.as_view(), name='sonuc-detail'),
+    url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
 #---------------------------------------------------------------------------------------------------
@@ -162,11 +163,18 @@ urlpatterns = [
     url(r'^denetim/detaysec/$', views.detay_denetim_sec, name='detay_denetim_sec'),
     url(r'^denetim/detaysec/devam/$', views.detay_sec_devam, name='detay_sec_devam'),
     url(r'^denetim/detaysec/denetim_bolum_js/$', views.denetim_bolum_js, name='denetim_bolum_js'),
-    url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
     url(r'^denetim/isemriolustur/$', views.isemri_denetim_sec, name='isemri_denetim_sec'),
     url(r'^denetim/isemriolustur/devam/$', views.isemri_olustur_devam, name='isemri_olustur_devam'),
     url(r'^denetim/isemri/$', views.isemri_yarat, name='isemri_yarat'),
     url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
+    url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
+    url(r'^denetim/teksayfa_yarat/tipisec_bolum_js/$', views.tipisec_bolum_js, name='tipisec_bolum_js'),
+    url(r'^denetim/teksayfa_duzenle/$', views.teksayfa_duzenle, name='teksayfa_duzenle'),
+    url(r'^denetim/teksayfa_duzenle_devam/$', views.teksayfa_duzenle_devam, name='teksayfa_duzenle_devam'),
+    url(r'^denetim/teksayfa_duzenle_devam/detaylarsec_bolum_js_2/$', views.detaylarsec_bolum_js_2, name='detaylarsec_bolum_js_2'),
+    url(r'^denetim/teksayfa_duzenle_devam/tipisec_bolum_js_2/$', views.tipisec_bolum_js_2, name='tipisec_bolum_js_2'),
+    url(r'^denetim/teksayfa_sil/$', views.teksayfa_sil, name='teksayfa_sil'),
+    url(r'^denetim/teksayfa_sil_kesin/$', views.teksayfa_sil, name='teksayfa_sil_kesin'),
 
     #url(r'^denetim/goster/$', views.denetim_goster, name='denetim_goster'),
 

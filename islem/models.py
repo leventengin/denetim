@@ -22,7 +22,7 @@ DENETCIPROJE = (
 ('P', 'Proje'),
 )
 
-RUTINMI = (
+RUTINPLANLI = (
 ('R', 'Rutin'),
 ('P', 'Planlı'),
 )
@@ -106,7 +106,8 @@ class proje(models.Model):
 class denetim(models.Model):
     denetim_adi = models.CharField(max_length=100)
     proje = models.ForeignKey(proje, on_delete=models.PROTECT)
-    denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE)
+    rutin_planli = models.CharField(max_length=1, choices=RUTINPLANLI)
+    denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE, null=True)
     tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
     durum = models.CharField(max_length=1, default="A")
     yaratim_tarihi = models.DateField(_("Date"), default=datetime.today)
@@ -120,8 +121,7 @@ class denetim(models.Model):
     devam_mi = models.BooleanField(default=False)
     tekrar_mi = models.BooleanField(default=False)
     tamamla_mi = models.BooleanField(default=False)
-    takipci_many = models.ManyToManyField(User)
-    rutin_mi = models.CharField(max_length=1, choices=RUTINMI)
+
     ilk_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     sonuc_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     def __str__(self):
@@ -136,7 +136,7 @@ class kucukresim(models.Model):
 def upload_location(instance, filename):
     return "%s%s" %(instance.id, filename)
 
-class sonuc(models.Model):
+class sonuc_detay(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     detay = models.ForeignKey(detay, on_delete=models.PROTECT)
@@ -159,6 +159,12 @@ class sonuc_bolum(models.Model):
     def __str__(self):
         return(self.bolum.bolum_adi)
 
+class sonuc_takipci(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    takipci = models.ForeignKey(User, related_name='takipci', on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.takipci.username)
+
 class acil(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     konu = models.CharField(max_length=100)
@@ -169,3 +175,6 @@ class acil(models.Model):
     timestamp = models.DateTimeField(default=datetime.now())
     def __str__(self):
         return(self.denetim.denetim_adi)
+
+class isaretler(models.Model):
+    bolum_listesi_flag = models.BooleanField(default=True)

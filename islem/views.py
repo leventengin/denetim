@@ -13,15 +13,15 @@ from django.contrib import messages
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import grup, sirket, proje, tipi, bolum, detay, acil
-from .models import Profile, denetim, sonuc, sonuc_bolum, kucukresim
+from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler
+from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, DetayForm, SonucForm, DenetimSecForm
 from islem.forms import DenetimForm, Denetim_BForm, IlkBolumForm, IlkDetayForm, IkiliSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YeniDenetciSecForm, YeniTarihForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm
-from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form
+from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
@@ -47,6 +47,11 @@ from django.utils.translation import get_language
 
 import json
 import requests
+
+#from django.template import Context
+from django.template.loader import render_to_string, get_template
+from django.core.mail import EmailMessage
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -93,7 +98,7 @@ class GeneratePDF(View):
         bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
         for bolum in bolum_obj:
             print("bolum list . bolum", bolum.bolum)
-            detay_obj = sonuc.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+            detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
             for detay in detay_obj:
                 print("detay list . detay", detay.bolum, detay.detay)
                 d[detay.bolum].append(detay.detay)
@@ -184,7 +189,7 @@ def upload_file(request):
     if request.method == 'POST':
         form = SonucForm(request.POST, request.FILES)
         if form.is_valid():
-            instance = sonuc(foto=request.FILES['file'])
+            instance = sonuc_detay(foto=request.FILES['file'])
             instance.save()
             return HttpResponseRedirect('/success/url/')
     else:
@@ -284,7 +289,7 @@ def denetim_detay(request, pk=None):
     bolum_obj = sonuc_bolum.objects.filter(denetim=pk)
     for bolum in bolum_obj:
         print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc.objects.filter(denetim=pk, bolum=bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=pk, bolum=bolum.bolum)
         for detay in detay_obj:
             print("detay list . detay", detay.bolum, detay.detay)
             d[detay.bolum].append(detay.detay)
@@ -633,7 +638,7 @@ def denetim_bolum_sec(request, pk=None):
             bolum = request.POST.get('bolum', "")
             print ("bolum", bolum)
             request.session["secili_bolum"] = bolum
-            detaylar = sonuc.objects.filter(denetim=denetim_no).filter(bolum=bolum)
+            detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum)
             if not detaylar:
                 messages.success(request, 'Seçili bölümde bölüm detayı yok....')
                 return redirect('denetim_baslat')
@@ -692,91 +697,961 @@ def secilen_bolumu_kaydet(request):
 @login_required
 def teksayfa_yarat(request, pk=None):
 
-    # if this is a POST request we need to process the form data
-    #denetim_no = request.session.get('denetim_no')
-    #secili_bolum = request.session.get('secili_bolum')
-    #secili_detay = request.session.get('secili_detay')
-    #print("denetim detay işlemleri...................")
-    #print("denetim_no", denetim_no)
-    #print("secili_bolum", secili_bolum)
-    #print("secili_detay", secili_detay)
-
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         print("buraya mı geldi...  tek sayfa ...POST")
-        bir = sonuc.objects.filter(denetim=denetim_no)
-        iki = bir.filter(bolum=secili_bolum)
-        bulunan = iki.get(detay=secili_detay)
-        #bulunan = get_object_or_404(sonuc, detay=secili_detay)
-        form = SonucForm(request.POST or None, request.FILES or None, instance=bulunan)
+        bolum_listesi = request.session.get('js_bolumler', None)
+        init_param = False
+        print("bölüm listesi - tek sayfa yarat POST içinden..", bolum_listesi)
+        print("init param - tek sayfa POST içinden", init_param)
+        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi, init_param=init_param )
+        #form_2 = IlkBolumForm(request.POST or None, prefix="form_2")
+        #form_3 = IlkDetayForm(request.POST or None, bolum_listesi=bolum_listesi, prefix="form_3")
+        print(request.POST)
 
         if form.is_valid():
             print("neyse ki valid..bin...ext...")
-            # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
-            edit = form.save(commit=False)
-            edit.tamam = "E"
-            resim_obj = kucukresim.objects.get(kullanici=request.user.id)
-            kucuk_resim = resim_obj.foto_kucuk
-            edit.foto = kucuk_resim
-            edit.save()
-            print("kaydetmiş olması lazım.................")
+            dd_denetim_adi = request.POST.get('denetim_adi', "")
+            dd_proje =  request.POST.get('proje', "")
+            dd_denetci = request.POST.get('denetci', "")
+            dd_tipi =  request.POST.get('tipi', "")
+            dd_takipciler = request.POST.getlist('takipciler', "")
+            dd_hedef_baslangic =  request.POST.get('hedef_baslangic', "")
+            dd_hedef_bitis = request.POST.get('hedef_bitis', "")
+            dd_aciklama =  request.POST.get('aciklama', "")
+            dd_bolum = request.POST.getlist('bolum', "")
+            dd_detay = request.POST.getlist('detay', "")
 
-            # bir sonraki................
-            # için  işlem yap................
-            ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
-            print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
-            detaylar = ilk_detaylar.filter(bolum=secili_bolum)
-            print("detaylar.. denetim detay işişlemleri..:", detaylar)
-            secili_detay_obj = detaylar.filter(tamam="H")
-            print("seçili detaylar tamam H olanlar...", secili_detay_obj)
+            print("denetim adı", dd_denetim_adi)
+            print("proje", dd_proje)
+            print("denetci", dd_denetci)
+            print("tipi", dd_tipi)
+            print("takipciler", dd_takipciler)
+            print("hedef_baslangic", dd_hedef_baslangic)
+            print("hedef_bitis", dd_hedef_bitis)
+            print("açıklama", dd_aciklama)
+            print("bolum", dd_bolum)
+            print("detay", dd_detay)
 
-            if not secili_detay_obj:
-                # sonuc_bolum dosyasında tamamlandıyı E yap bölüm bitmiş olsun....
-                ilk_sonuc_bolum = sonuc_bolum.objects.filter(denetim=denetim_no)
-                print("sonuc bölüm ilk....", ilk_sonuc_bolum)
-                sec_bolum = get_object_or_404(ilk_sonuc_bolum, bolum=secili_bolum)
-                print(" seçili bölüm sonuc_bolum içinden ", sec_bolum)
-                sec_bolum.tamam = "E"
-                sec_bolum.save()
-                devam_tekrar = request.session.get('devam_tekrar')
-                if devam_tekrar == "devam":
-                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
-                    return redirect('denetim_bolum_sec')
-                else:
-                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
-                    return redirect('devam_liste')
+            kaydetme_obj = denetim(denetim_adi=dd_denetim_adi,
+                                   proje_id=dd_proje,
+                                   denetci_id=dd_denetci,
+                                   tipi_id=dd_tipi,
+                                   hedef_baslangic=dd_hedef_baslangic,
+                                   hedef_bitis=dd_hedef_bitis,
+                                   aciklama=dd_aciklama,
+                                   yaratan=request.user
+                                   )
+            kaydetme_obj.save()
 
-            secili_obj = secili_detay_obj.first()
-            secili_detay = secili_obj.detay.id
-            print("secili - detay.... bakalım  doğru mu...", secili_detay)
-            request.session['secili_detay'] = secili_detay
-            form = SonucForm()
-            context = { 'form': form,
-                        'secili_obj' : secili_obj,
-                        }
-            return render(request, 'islem/denetim_detay_islemleri.html', context,)
+            denetim_obj = denetim.objects.last()
+            print("son no. denetim.", denetim_obj.id, "denetim adı", denetim_obj.denetim_adi)
+            denetim_no = denetim_obj.id
 
+            i = 0
+            while i < len(dd_takipciler):
+                print("takipciler..", dd_takipciler[i])
+                kaydetme_obj = sonuc_takipci(denetim_id=denetim_no,
+                                             takipci_id=dd_takipciler[i]
+                                             )
+                kaydetme_obj.save()
+                i = i + 1
+
+            i = 0
+            while i < len(dd_bolum):
+                print("bolüm listesi..:", dd_bolum[i])
+                kaydetme_obj = sonuc_bolum(denetim_id=denetim_no,
+                                           bolum_id=dd_bolum[i]
+                                           )
+                kaydetme_obj.save()
+                bolum_no = int(dd_bolum[i])
+                print("son no. bolum .", bolum_no)
+
+                j = 0
+                while j < len(dd_detay):
+                    detay_no = int(dd_detay[j])
+                    print("işte detay no...", detay_no)
+                    kaydet_obj = sonuc_detay(denetim_id=denetim_no,
+                                                bolum_id=bolum_no,
+                                                detay_id=detay_no
+                                                )
+                    kaydet_obj.save()
+                    j = j + 1
+
+                i = i + 1
+
+            #--------------------------------------------------------------
+            # EMAIL işlemleri-----------------------------------------------
+            #---------------------------------------------------------------
+
+            connection = mail.get_connection()
+            connection.open()
+
+            adi = denetim_obj.denetci.get_full_name()
+            denetim_id = denetim_obj.id
+            denetim_adi = denetim_obj.denetim_adi
+            baslangic = denetim_obj.hedef_baslangic
+            bitis = denetim_obj.hedef_bitis
+
+            subject = "Denetci olarak atandınız"
+            to = [denetim_obj.denetci.email]
+            from_email = settings.EMAIL_HOST_USER
+            ctx = {
+                'adi': adi,
+                'denetim_adi': denetim_adi,
+                'baslangic': baslangic,
+                'bitis': bitis
+                }
+            message = get_template('islem/emt_denetci_oldun.html').render(ctx)
+            msg = EmailMessage(subject, message, to=to, from_email=from_email)
+            msg.content_subtype = 'html'
+            msg.send()
+
+            takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
+
+            for takipci in takipci_obj:
+                adi = takipci.takipci.get_full_name()
+                subject = "Takipçi olarak atandınız"
+                to = [takipci.takipci.email]
+                from_email = settings.EMAIL_HOST_USER
+                ctx = {
+                    'adi': adi,
+                    'denetim_adi': denetim_adi,
+                    'baslangic': baslangic,
+                    'bitis': bitis
+                    }
+                message = get_template('islem/emt_takipci_oldun.html').render(ctx)
+                msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                msg.content_subtype = 'html'
+                msg.send()
+
+            connection.close()
+
+            # EMAIL sonu...................................................
+
+
+            form = DenetimForm(bolum_listesi=[], init_param=True)
+            #form_2 = IlkBolumForm(prefix="form_2")
+            #form_3 = IlkDetayForm(bolum_listesi=[], prefix="form_3")
+            context = { 'form': form,}
+            messages.success(request, 'denetim başarıyla kaydedildi......')
+            return render(request, 'islem/tek_sayfa.html', context,)
 
         else:
             print("ne oldu be kardeşim...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
-            return redirect('devam_liste')
+            return redirect('teksayfa_yarat')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
     # if a GET (or any other method) we'll create a blank form
     else:
+        js_denetim_adi = request.session.get('js_denetim_adi', None)
+        js_proje = request.session.get('js_proje', None)
+        js_denetci = request.session.get('js_denetci', None)
+        js_tipi = request.session.get('js_tipi', None)
+        js_takipciler = request.session.get('js_takipciler', None)
+        js_hedef_baslangic = request.session.get('js_hedef_baslangic', None)
+        js_hedef_bitis = request.session.get('js_hedef_bitis', None)
+        js_aciklama = request.session.get('js_aciklama', None)
+        js_bolumler = request.session.get('js_bolumler', None)
+        bolum_listesi = js_bolumler
+        init_param = True
+        form = DenetimForm(bolum_listesi=bolum_listesi, init_param=init_param)
+        #form_2 = IlkBolumForm()
+        #form_3 = IlkDetayForm(bolum_listesi=bolum_listesi)
+        form.fields["denetim_adi"].initial = js_denetim_adi
+        form.fields["proje"].initial = js_proje
+        form.fields["denetci"].initial = js_denetci
+        form.fields["tipi"].initial = js_tipi
+        form.fields["takipciler"].initial = js_takipciler
+        form.fields["hedef_baslangic"].initial = js_hedef_baslangic
+        form.fields["hedef_bitis"].initial = js_hedef_bitis
+        form.fields["aciklama"].initial = js_aciklama
+        form.fields["bolum"].initial = js_bolumler
 
-        bolum_listesi = request.session.get('bolum_listesi', None)
-        print("bolüm listesi....", bolum_listesi)
-        form_1 = DenetimForm()
-        form_2 = IlkBolumForm()
-        form_3 = IlkDetayForm(bolum_listesi=bolum_listesi)
-        context = { 'form_1': form_1,
-                    'form_2': form_2,
-                    'form_3': form_3,
-                    }
+        context = { 'form': form, }
         return render(request, 'islem/tek_sayfa.html', context,)
+
+
+
+#--------------------------------------------------------------------
+
+
+def detaylarsec_bolum_js(request, pk=None):
+    print("selam buraya geldik...detaylarseç bölüm js")
+    print("User.id.....:", request.user.id)
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        js_bolumler = request.GET.getlist('js_bolumler')
+        js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_proje = request.GET.get('js_proje')
+        js_denetci = request.GET.get('js_denetci')
+        js_tipi = request.GET.get('js_tipi')
+        js_takipciler = request.GET.getlist('js_takipciler')
+        js_hedef_baslangic = request.GET.get('js_hedef_baslangic')
+        js_hedef_bitis = request.GET.get('js_hedef_bitis')
+        js_aciklama = request.GET.get('js_aciklama')
+        request.session['js_bolumler'] = js_bolumler
+        request.session['js_denetim_adi'] = js_denetim_adi
+        request.session['js_proje'] = js_proje
+        request.session['js_denetci'] = js_denetci
+        request.session['js_tipi'] = js_tipi
+        request.session['js_takipciler'] = js_takipciler
+        request.session['js_hedef_baslangic'] = js_hedef_baslangic
+        request.session['js_hedef_bitis'] = js_hedef_bitis
+        request.session['js_aciklama'] = js_aciklama
+    print ("son nokta denetim bölüm js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+
+
+#--------------------------------------------------------------------
+
+
+def tipisec_bolum_js(request, pk=None):
+    print("selam buraya geldik...tipiseç bölüm js")
+    print("User.id.....:", request.user.id)
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        js_bolumler = request.GET.getlist('js_bolumler')
+        js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_proje = request.GET.get('js_proje')
+        js_denetci = request.GET.get('js_denetci')
+        js_tipi = request.GET.get('js_tipi')
+        js_takipciler = request.GET.getlist('js_takipciler')
+        js_hedef_baslangic = request.GET.get('js_hedef_baslangic')
+        js_hedef_bitis = request.GET.get('js_hedef_bitis')
+        js_aciklama = request.GET.get('js_aciklama')
+        js_bolumler = []
+        request.session['js_bolumler'] = js_bolumler
+        request.session['js_denetim_adi'] = js_denetim_adi
+        request.session['js_proje'] = js_proje
+        request.session['js_denetci'] = js_denetci
+        request.session['js_tipi'] = js_tipi
+        request.session['js_takipciler'] = js_takipciler
+        request.session['js_hedef_baslangic'] = js_hedef_baslangic
+        request.session['js_hedef_bitis'] = js_hedef_bitis
+        request.session['js_aciklama'] = js_aciklama
+    print ("son nokta denetim bölüm js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+#-----------------------------------------------------------------------------------
+
+
+@login_required
+def teksayfa_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Denetim_Deneme_Form(request.POST)
+
+        if form.is_valid():
+            print("bu form valid")
+        else:
+            print(" bu form is NOT VALID... nesi var kardeşim...")
+        # check whether it's valid:
+        if form.is_valid():
+            denetim_no = request.POST.get('denetim', "")
+            print(" tek sayfa düzenleden denetim no...", denetim_no)
+            request.session['teksayfa_duzenle_denetim_no'] = denetim_no
+
+            print("denetim ", denetim_no)
+            denetim_obj = denetim.objects.get(id=denetim_no)
+            #denetim_no = denetim_obj.id
+            print("denetim objesi..", denetim_obj, "denetim no..", denetim_no)
+
+
+            bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+            print("bölümler objesi...", bolumler_obj)
+            takipciler_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+            print("takipçiler objesi...", takipciler_obj)
+            detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no)
+            print("detaylar objesi...", detaylar_obj)
+
+            js_denetim_no = denetim_obj.id
+            js_denetim_adi = denetim_obj.denetim_adi
+            js_proje = denetim_obj.proje.id
+            js_denetci = denetim_obj.denetci.id
+            js_tipi = denetim_obj.tipi.id
+            js_hedef_baslangic = denetim_obj.hedef_baslangic
+            js_hedef_bitis = denetim_obj.hedef_bitis
+            js_aciklama = denetim_obj.aciklama
+
+            print("denetim no", js_denetim_no)
+            print("denetim adi", js_denetim_adi)
+            print("proje", js_proje)
+            print("denetci", js_denetci)
+            print("tipi", js_tipi)
+            print("hedef başlangıç", js_hedef_baslangic)
+            print("hedef bitiş", js_hedef_bitis)
+            print("aciklama", js_aciklama)
+
+
+            bolumler = []
+            i = 0
+            for bolum in bolumler_obj:
+                bolumler.append(bolum.bolum.id)
+                i = i + 1
+            print("bölümler...", bolumler)
+            takipciler = []
+            i = 0
+            for takipci in takipciler_obj:
+                takipciler.append(takipci.takipci.id)
+                i = i + 1
+
+            print("takipciler", takipciler)
+
+            detaylar = []
+            i = 0
+            for detay in detaylar_obj:
+                detaylar.append(detay.detay.id)
+                i = i + 1
+
+            print("detaylar", detaylar)
+
+            js_bolumler = bolumler
+            js_takipciler = takipciler
+            js_detaylar = detaylar
+            bolum_listesi = js_bolumler
+            str_baslangic = str(js_hedef_baslangic)
+            str_bitis = str(js_hedef_bitis)
+            print("str başlangıç...", str_baslangic)
+            print("str bitis", str_bitis)
+
+            print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+            #request.session['bolum_listesi'] = bolum_listesi
+            request.session['duz_js_pk_no'] = denetim_no
+            request.session['duz_js_bolumler'] = js_bolumler
+            request.session['duz_js_denetim_adi'] = js_denetim_adi
+            request.session['duz_js_proje'] = js_proje
+            request.session['duz_js_denetci'] = js_denetci
+            request.session['duz_js_tipi'] = js_tipi
+            request.session['duz_js_takipciler'] = js_takipciler
+            #request.session['js_hedef_baslangic'] = js_hedef_baslangic
+            #request.session['js_hedef_bitis'] = js_hedef_bitis
+            request.session['duz_js_hedef_baslangic'] = str_baslangic
+            request.session['duz_js_hedef_bitis'] = str_bitis
+            request.session['duz_js_aciklama'] = js_aciklama
+            request.session['duz_js_detaylar'] = js_detaylar
+            print("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+            return redirect('teksayfa_duzenle_devam')
+        else:
+            #messages.success(request, 'Formda uygunsuzluk var....')
+            #return redirect('denetim_create')
+            denetim_no = request.POST.get('denetim', "")
+            print(" tek sayfa düzenleden denetim no.AMA NOT VALID.....", denetim_no)
+            return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = Denetim_Deneme_Form()
+        return render(request, 'islem/denetim_deneme_form.html', {'form': form,})
+
+#--------------------------------------------------------------------------------
+
+
+@login_required
+def teksayfa_duzenle_devam(request, pk=None):
+    denetim_no = request.session.get('teksayfa_duzenle_denetim_no')
+    print("tek sayfa düzenle devam içinden denetim no...", denetim_no)
+
+    if request.method == "POST":
+        bolum_listesi = request.session.get('duz_js_bolumler', None)
+        print("bölüm listesi...", bolum_listesi)
+        init_param = False
+        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi, init_param=init_param)
+
+        if form.is_valid():
+            print(" form is valid..")
+        else:
+            print("form is NOT valid")
+
+        if form.is_valid():
+            print("neyse ki valid..tek sayfa düzenle devam .. artık düzenleyip  kaydediyor...")
+            dd_pk_no = request.POST.get('pk_no', "")
+            dd_denetim_adi = request.POST.get('denetim_adi', "")
+            dd_proje =  request.POST.get('proje', "")
+            dd_denetci = request.POST.get('denetci', "")
+            dd_tipi =  request.POST.get('tipi', "")
+            dd_takipciler = request.POST.getlist('takipciler', "")
+            dd_hedef_baslangic =  request.POST.get('hedef_baslangic', "")
+            dd_hedef_bitis = request.POST.get('hedef_bitis', "")
+            dd_aciklama =  request.POST.get('aciklama', "")
+            dd_bolum = request.POST.getlist('bolum', "")
+            dd_detay = request.POST.getlist('detay', "")
+
+            print("pk no", dd_pk_no)
+            print("denetim adı", dd_denetim_adi)
+            print("proje", dd_proje)
+            print("denetci", dd_denetci)
+            print("tipi", dd_tipi)
+            print("takipciler", dd_takipciler)
+            print("hedef_baslangic", dd_hedef_baslangic)
+            print("hedef_bitis", dd_hedef_bitis)
+            print("açıklama", dd_aciklama)
+            print("bolum", dd_bolum)
+            print("detay", dd_detay)
+
+            # mailler için eski objeler alınıyor....
+
+            eskidenetim_obj = denetim.objects.get(id=dd_pk_no)
+            eski_denetci = eskidenetim_obj.denetci
+            eski_denetci_adi = eskidenetim_obj.denetci.get_full_name()
+            eski_hbaslangic = eskidenetim_obj.hedef_baslangic
+            eski_hbitis = eskidenetim_obj.hedef_bitis
+
+            eski_takipciler_obj = sonuc_takipci.objects.filter(denetim=dd_pk_no)
+            eski_takipci_list = []
+            for takipci in eski_takipciler_obj:
+                eski_takipci_list.append(takipci.takipci)
+
+            eski_bolum_obj = sonuc_bolum.objects.filter(denetim=dd_pk_no)
+            eski_bolum_list = []
+            for bolum in eski_bolum_obj:
+                eski_bolum_list.append(bolum.bolum)
+
+
+
+            kaydetme_obj = denetim(id=dd_pk_no,
+                                   denetim_adi=dd_denetim_adi,
+                                   proje_id=dd_proje,
+                                   denetci_id=dd_denetci,
+                                   tipi_id=dd_tipi,
+                                   hedef_baslangic=dd_hedef_baslangic,
+                                   hedef_bitis=dd_hedef_bitis,
+                                   aciklama=dd_aciklama,
+                                   yaratan=request.user
+                                   )
+            kaydetme_obj.save()
+
+            denetim_obj = denetim.objects.get(id=dd_pk_no)
+            print("son no. denetim.", denetim_obj.id, "denetim adı", denetim_obj.denetim_adi)
+            denetim_no = denetim_obj.id
+
+            try:
+                silme_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+            except ObjectDoesNotExist:
+                silme_obj = None
+
+            if silme_obj:
+                silme_obj.delete()
+
+            i = 0
+            while i < len(dd_takipciler):
+                print("takipciler..", dd_takipciler[i])
+                kaydetme_obj = sonuc_takipci(denetim_id=dd_pk_no,
+                                             takipci_id=dd_takipciler[i]
+                                             )
+                kaydetme_obj.save()
+                i = i + 1
+
+            try:
+                silme_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+            except ObjectDoesNotExist:
+                silme_obj = None
+
+            if silme_obj:
+                silme_obj.delete()
+
+
+            try:
+                silme_obj = sonuc_detay.objects.filter(denetim=denetim_no)
+            except ObjectDoesNotExist:
+                silme_obj = None
+
+            if silme_obj:
+                silme_obj.delete()
+
+
+
+            i = 0
+            while i < len(dd_bolum):
+                print("bolüm listesi..:", dd_bolum[i])
+                kaydetme_obj = sonuc_bolum(denetim_id=denetim_no,
+                                           bolum_id=dd_bolum[i]
+                                           )
+                kaydetme_obj.save()
+                bolum_no = int(dd_bolum[i])
+                print("son no. bolum .", bolum_no)
+
+                j = 0
+                while j < len(dd_detay):
+                    detay_no = int(dd_detay[j])
+                    print("işte detay no...", detay_no)
+                    kaydet_obj = sonuc_detay(denetim_id=denetim_no,
+                                                bolum_id=bolum_no,
+                                                detay_id=detay_no
+                                                )
+                    kaydet_obj.save()
+                    j = j + 1
+
+                i = i + 1
+
+            ######################################################
+            #MAILLER ATILACAK.....................
+            ######################################################
+
+            connection = mail.get_connection()
+            connection.open()
+
+            denetci_adi = denetim_obj.denetci.get_full_name()
+            denetim_id = denetim_obj.id
+            denetim_adi = denetim_obj.denetim_adi
+            baslangic = denetim_obj.hedef_baslangic
+            bitis = denetim_obj.hedef_bitis
+            denetci = denetim_obj.denetci
+
+            takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
+            takipci_list = []
+            for takipci in takipci_obj:
+                takipci_list.append(takipci.takipci)
+
+            bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_id)
+            bolum_list = []
+            for bolum in bolum_obj:
+                bolum_list.append(bolum.bolum)
+
+
+
+            if not (denetci == eski_denetci):
+
+                adi = denetci_adi
+                subject = "Denetim tarihlerinde değişiklikler "
+                to = [denetim_obj.denetci.email]
+                from_email = settings.EMAIL_HOST_USER
+                ctx = {
+                    'adi': adi,
+                    'denetim_adi': denetim_adi,
+                    'baslangic': baslangic,
+                    'bitis' : bitis
+                    }
+                message = get_template('islem/emt_denetci_oldun.html').render(ctx)
+                msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                msg.content_subtype = 'html'
+                msg.send()
+
+
+                adi = eski_denetci_adi
+                subject = "Denetim tarihlerinde değişiklikler "
+                to = [denetim_obj.denetci.email]
+                from_email = settings.EMAIL_HOST_USER
+                ctx = {
+                    'adi': adi,
+                    'denetim_adi': denetim_adi,
+                    'baslangic': baslangic,
+                    'bitis' : bitis
+                    }
+                message = get_template('islem/emt_denetci_iptal.html').render(ctx)
+                msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                msg.content_subtype = 'html'
+                msg.send()
+
+
+            if not (eski_takipci_list == takipci_list):
+
+                eski_set = set(eski_takipci_list)
+                yeni_set = set(takipci_list)
+                ortak = eski_set.intersection(yeni_set)
+                cikan = list(eski_set - ortak)
+                giren = list(yeni_set - ortak)
+
+                print("çıkan", cikan)
+                print("giren", giren)
+
+                for cikan_no in cikan:
+                    cikan_obj = User.objects.get(id=cikan_no)
+                    adi = cikan_obj.get_full_name
+                    subject = "Takipçiliğiniz kaldırıldı"
+                    to = [cikan_obj.email]
+                    from_email = settings.EMAIL_HOST_USER
+                    ctx = {
+                        'adi': adi,
+                        'denetim_adi': denetim_adi
+                        }
+                    message = get_template('islem/emt_takipci_iptal.html').render(ctx)
+                    msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                    msg.content_subtype = 'html'
+                    msg.send()
+
+                for giren_no in giren:
+                    giren_obj = User.objects.get(id=giren_no)
+                    adi = giren_obj.get_full_name
+                    subject = "Takipçi olarak atandınız"
+                    to = [giren_obj.email]
+                    from_email = settings.EMAIL_HOST_USER
+                    ctx = {
+                        'adi': adi,
+                        'denetim_adi': denetim_adi,
+                        'baslangic': baslangic,
+                        'bitis': bitis
+                        }
+                    message = get_template('islem/emt_takipci_oldun.html').render(ctx)
+                    msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                    msg.content_subtype = 'html'
+                    msg.send()
+
+
+            if not ((baslangic == eski_hbaslangic) and (bitis == eski_hbitis)):
+
+                adi = denetci_adi
+                subject = "Denetim tarihlerinde değişiklikler "
+                to = [denetim_obj.denetci.email]
+                from_email = settings.EMAIL_HOST_USER
+                ctx = {
+                    'adi': adi,
+                    'denetim_adi': denetim_adi,
+                    'baslangic': baslangic,
+                    'bitis' : bitis
+                    }
+                message = get_template('islem/emt_tarih_degisti.html').render(ctx)
+                msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                msg.content_subtype = 'html'
+                msg.send()
+
+                takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
+
+                for takipci in takipci_obj:
+                    adi = takipci.takipci.get_full_name()
+                    subject = "Denetim tarihlerinde değişiklikler"
+                    to = [takipci.takipci.email]
+                    from_email = settings.EMAIL_HOST_USER
+                    ctx = {
+                        'adi': adi,
+                        'denetim_adi': denetim_adi,
+                        'baslangic': baslangic,
+                        'bitis' : bitis
+                        }
+                    message = get_template('islem/emt_tarih_degisti.html').render(ctx)
+                    msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                    msg.content_subtype = 'html'
+                    msg.send()
+
+            if not (eski_bolum_list == bolum_list):
+
+                adi = denetci_adi
+                subject = "Denetim bölümlerinde değişiklikler "
+                to = [denetim_obj.denetci.email]
+                from_email = settings.EMAIL_HOST_USER
+                ctx = {
+                    'adi': adi,
+                    'denetim_adi': denetim_adi,
+                    'baslangic': baslangic
+                    }
+                message = get_template('islem/emt_bolum_degisti.html').render(ctx)
+                msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                msg.content_subtype = 'html'
+                msg.send()
+
+                takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
+
+                for takipci in takipci_obj:
+                    adi = takipci.takipci.get_full_name()
+                    subject = "Denetim bölümlerinde değişiklikler"
+                    to = [takipci.takipci.email]
+                    from_email = settings.EMAIL_HOST_USER
+                    ctx = {
+                        'adi': adi,
+                        'denetim_adi': denetim_adi,
+                        'baslangic': baslangic
+                        }
+                    message = get_template('islem/emt_bolum_degisti.html').render(ctx)
+                    msg = EmailMessage(subject, message, to=to, from_email=from_email)
+                    msg.content_subtype = 'html'
+                    msg.send()
+
+            connection.close()
+            #-----------------------------------------------------------------
+            # EMAIL işlemleri tamamlandı.......................................
+
+            messages.success(request, 'denetim başarıyla kaydedildi......')
+            #return render(request, 'islem/tek_sayfa.html', context,)
+            return redirect('index')
+        else:
+            print("ne oldu be kardeşim...........")
+            messages.success(request, ' form hatası - tekrar deneyin....')
+            return redirect('teksayfa_duzenle_devam')
+            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
+
+
+    else:
+        print("get get get get get get ..................................")
+
+        # yanlış mantık....
+        # formda ne varsa onu alması lazım...
+        # yanlış çalışır eğer önce denetçi değişir sonra bölümler değişirse...
+        # yaratma ile aynı mantıkta olmalı....
+        # yani bir kere yükle ...veri tabanından
+        # sonra ne değişiklik varsa devam et....
+
+        # yukarıda veri tabanından yükleyecek burada ise bölümler js den gelecek ve
+        # buna göre yükleme yapacak seçerek, diğerleri de  js den gelecek....
+        # sadece detayları özel olarak sececek....
+        # kaydetme isini posta bırakarak....
+
+
+        #request.session['teksayfa_duzenle_denetim_no'] = denetim_no
+
+
+        js_denetim_no = request.session.get('duz_js_pk_no', None)
+        js_denetim_adi = request.session.get('duz_js_denetim_adi', None)
+        js_proje = request.session.get('duz_js_proje', None)
+        js_denetci = request.session.get('duz_js_denetci', None)
+        js_tipi = request.session.get('duz_js_tipi', None)
+        js_takipciler = request.session.get('duz_js_takipciler', None)
+        js_hedef_baslangic = request.session.get('duz_js_hedef_baslangic', None)
+        js_hedef_bitis = request.session.get('duz_js_hedef_bitis', None)
+        js_aciklama = request.session.get('duz_js_aciklama', None)
+        js_bolumler = request.session.get('duz_js_bolumler', None)
+        js_detaylar = request.session.get('duz_js_detaylar', None)
+        print("denetim no", js_denetim_no)
+        print("denetim adi", js_denetim_adi)
+        print("proje", js_proje)
+        print("denetci", js_denetci)
+        print("tipi", js_tipi)
+        print("hedef başlangıç", js_hedef_baslangic)
+        print("hedef bitiş", js_hedef_bitis)
+        print("aciklama", js_aciklama)
+
+        bolum_listesi = js_bolumler
+        init_param = True
+        form = DenetimForm(bolum_listesi=bolum_listesi, init_param=init_param)
+        #form_2 = IlkBolumForm()
+        #form_3 = IlkDetayForm(bolum_listesi=bolum_listesi)
+        form.fields["pk_no"].initial = js_denetim_no
+        form.fields["denetim_adi"].initial = js_denetim_adi
+        form.fields["proje"].initial = js_proje
+        form.fields["denetci"].initial = js_denetci
+        form.fields["tipi"].initial = js_tipi
+        form.fields["takipciler"].initial = js_takipciler
+        form.fields["hedef_baslangic"].initial = js_hedef_baslangic
+        form.fields["hedef_bitis"].initial = js_hedef_bitis
+        form.fields["aciklama"].initial = js_aciklama
+        form.fields["bolum"].initial = js_bolumler
+        form.fields["detay"].initial = js_detaylar
+        context = { 'form': form, }
+        return render(request, 'islem/tek_sayfa_duzenle.html', context,)
+
+
+#---------------------------------------------------------------------------------------
+
+
+def detaylarsec_bolum_js_2(request, pk=None):
+    print("selam buraya geldik...detaylarseç 222222 bölüm js")
+    print("User.id.....:", request.user.id)
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        denetim_no = request.GET.get('js_pk_no')
+        js_bolumler = request.GET.getlist('js_bolumler')
+        js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_proje = request.GET.get('js_proje')
+        js_denetci = request.GET.get('js_denetci')
+        js_tipi = request.GET.get('js_tipi')
+        js_takipciler = request.GET.getlist('js_takipciler')
+        js_hedef_baslangic = request.GET.get('js_hedef_baslangic')
+        js_hedef_bitis = request.GET.get('js_hedef_bitis')
+        js_aciklama = request.GET.get('js_aciklama')
+
+        # bölümlerin eskilerini silip yenilerini yazıyor mutlaka...
+        # sonra da sayfa yeniden yükleniyor, böylece deyatlar istendiği gibi geliyor...
+        # ama save etmeden bile bölüm ve detaylarda değişiklik yapılmış oluyor....
+        # bu anlamda doğru değil....
+        # düşünmek lazım....
+        # yazmaması lazım.....sadece parametre aktarmalı....
+        #---------------------------------
+
+        request.session['duz_js_pk_no'] = denetim_no
+        request.session['duz_js_bolumler'] = js_bolumler
+        request.session['duz_js_denetim_adi'] = js_denetim_adi
+        request.session['duz_js_proje'] = js_proje
+        request.session['duz_js_denetci'] = js_denetci
+        request.session['duz_js_tipi'] = js_tipi
+        request.session['duz_js_takipciler'] = js_takipciler
+        request.session['duz_js_hedef_baslangic'] = js_hedef_baslangic
+        request.session['duz_js_hedef_bitis'] = js_hedef_bitis
+        request.session['duz_js_aciklama'] = js_aciklama
+
+    print ("son nokta denetim bölüm js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+
+#---------------------------------------------------------------------------------------
+
+def tipisec_bolum_js_2(request, pk=None):
+    print("selam buraya geldik...tipiseç 222222 bölüm js")
+    print("User.id.....:", request.user.id)
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        denetim_no = request.GET.get('js_pk_no')
+        js_bolumler = request.GET.getlist('js_bolumler')
+        js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_proje = request.GET.get('js_proje')
+        js_denetci = request.GET.get('js_denetci')
+        js_tipi = request.GET.get('js_tipi')
+        js_takipciler = request.GET.getlist('js_takipciler')
+        js_hedef_baslangic = request.GET.get('js_hedef_baslangic')
+        js_hedef_bitis = request.GET.get('js_hedef_bitis')
+        js_aciklama = request.GET.get('js_aciklama')
+        js_bolumler = []
+
+        request.session['bolum_listesi'] = bolum_listesi
+        request.session['duz_js_bolumler'] = js_bolumler
+        request.session['duz_js_denetim_adi'] = js_denetim_adi
+        request.session['duz_js_proje'] = js_proje
+        request.session['duz_js_denetci'] = js_denetci
+        request.session['duz_js_tipi'] = js_tipi
+        request.session['duz_js_takipciler'] = js_takipciler
+        request.session['duz_js_hedef_baslangic'] = js_hedef_baslangic
+        request.session['duz_js_hedef_bitis'] = js_hedef_bitis
+        request.session['duz_js_aciklama'] = js_aciklama
+        request.session['duz_js_pk_no'] = denetim_no
+
+    print ("son nokta denetim bölüm js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+
+#---------------------------------------------------------------------
+
+@login_required
+def teksayfa_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Denetim_Deneme_Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            denetim_no = request.POST.get('denetim', "")
+            print(" tek sayfa silden denetim no...", denetim_no)
+            request.session['teksayfa_sil_denetim_no'] = denetim_no
+
+            denetim_obj = denetim.objects.get(id=denetim_no)
+            print("seçilen denetim", denetim_obj)
+            denetim_adi = denetim_obj.denetim_adi
+            proje = denetim_obj.proje
+            denetci = denetim_obj.denetci
+            tipi = denetim_obj.tipi
+            yaratim_tarihi = denetim_obj.yaratim_tarihi
+            yaratan = denetim_obj.yaratan
+            hedef_baslangic = denetim_obj.hedef_baslangic
+            hedef_bitis = denetim_obj.hedef_bitis
+            gerc_baslangic = denetim_obj.gerc_baslangic
+            gerc_bitis = denetim_obj.gerc_bitis
+            durum = denetim_obj.durum
+            takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+            print("takipci objesi...", takipci_obj)
+            i = 0
+            takipciler = []
+            for takipci in takipci_obj:
+                takipciler.append(takipci.takipci)
+                i = i + 1
+            print("takipciler listesi..", takipciler)
+            d = collections.defaultdict(list)
+            bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+            for bolum in bolum_obj:
+                print("bolum list . bolum", bolum.bolum)
+                detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+                for detay in detay_obj:
+                    print("detay list . detay", detay.bolum, detay.detay)
+                    d[detay.bolum].append(detay.detay)
+            print("***********************")
+            print(d)
+            d.default_factory = None
+            dict_bol_detay = dict(d)
+            print("************************")
+            print(dict_bol_detay)
+            context = {'dict_bol_detay':dict_bol_detay,
+                        'takipciler': takipciler,
+                        'denetim_adi': denetim_adi,
+                        'proje' : proje,
+                        'denetci' : denetci,
+                        'tipi' : tipi,
+                        'yaratim_tarihi' : yaratim_tarihi,
+                        'yaratan' : yaratan,
+                        'hedef_baslangic' : hedef_baslangic,
+                        'hedef_bitis' : hedef_bitis,
+                        'durum' : durum,
+                        }
+            return render(request, 'islem/teksayfa_sil_soru.html', context )
+
+
+        else:
+            #messages.success(request, 'Formda uygunsuzluk var....')
+            #return redirect('denetim_create')
+            return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = Denetim_Deneme_Form()
+        return render(request, 'islem/denetim_deneme_form.html', {'form': form,})
+
+
+
+@login_required
+def teksayfa_sil_kesin(request, pk=None):
+    denetim_no = request.session.get('teksayfa_sil_denetim_no')
+    print("denetim sil kesindeki  denetim no:", denetim_no)
+    object = denetim.objects.get(id=denetim_no)
+    object.durum = "X"
+    object.save()
+#********************************************************
+#....  ilgili kişilere e-posta gönder.....................
+#.........................................................
+    denetim_obj = denetim.objects.get(id=denetim_no)
+
+    connection = mail.get_connection()
+    connection.open()
+
+    adi = denetim_obj.denetci.get_full_name()
+    denetim_id = denetim_obj.id
+    denetim_adi = denetim_obj.denetim_adi
+    baslangic = denetim_obj.hedef_baslangic
+    bitis = denetim_obj.hedef_bitis
+
+    subject = "Denetim iptal edildi"
+    to = [denetim_obj.denetci.email]
+    from_email = settings.EMAIL_HOST_USER
+    ctx = {
+        'adi': adi,
+        'denetim_adi': denetim_adi,
+        'baslangic': baslangic
+        }
+    message = get_template('islem/emt_denetim_iptal.html').render(ctx)
+    msg = EmailMessage(subject, message, to=to, from_email=from_email)
+    msg.content_subtype = 'html'
+    msg.send()
+
+    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
+
+    for takipci in takipci_obj:
+        adi = takipci.takipci.get_full_name()
+        subject = "Denetim iptal edildi"
+        to = [takipci.takipci.email]
+        from_email = settings.EMAIL_HOST_USER
+        ctx = {
+            'adi': adi,
+            'denetim_adi': denetim_adi,
+            'baslangic': baslangic
+            }
+        message = get_template('islem/emt_denetim_iptal.html').render(ctx)
+        msg = EmailMessage(subject, message, to=to, from_email=from_email)
+        msg.content_subtype = 'html'
+        msg.send()
+
+    connection.close()
+
+    messages.success(request, 'Başarıyla silindi....')
+    return redirect('index')
+
+
+
+
+
 
 
 
@@ -799,7 +1674,7 @@ def detay_islemleri_baslat(request, pk=None):
         # selected = request.GET.get('selected', None)
         print("denetim no...:", denetim_no )
         print("secili bolum...", secili_bolum)
-        ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
+        ilk_detaylar = sonuc_detay.objects.filter(denetim=denetim_no)
         print("ilk detaylar..:", ilk_detaylar)
         detaylar = ilk_detaylar.filter(bolum=secili_bolum)
         print("detaylar..:", detaylar)
@@ -843,7 +1718,7 @@ def denetim_detay_islemleri(request, pk=None):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         print("buraya mı geldi...  denetim_detay işlemleri...POST")
-        bir = sonuc.objects.filter(denetim=denetim_no)
+        bir = sonuc_detay.objects.filter(denetim=denetim_no)
         iki = bir.filter(bolum=secili_bolum)
         bulunan = iki.get(detay=secili_detay)
         #bulunan = get_object_or_404(sonuc, detay=secili_detay)
@@ -862,7 +1737,7 @@ def denetim_detay_islemleri(request, pk=None):
 
             # bir sonraki................
             # için  işlem yap................
-            ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
+            ilk_detaylar = sonuc_detay.objects.filter(denetim=denetim_no)
             print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
             detaylar = ilk_detaylar.filter(bolum=secili_bolum)
             print("detaylar.. denetim detay işişlemleri..:", detaylar)
@@ -904,7 +1779,7 @@ def denetim_detay_islemleri(request, pk=None):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        ilk_detaylar = sonuc.objects.filter(denetim=denetim_no)
+        ilk_detaylar = sonuc_detay.objects.filter(denetim=denetim_no)
         print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
         detaylar = ilk_detaylar.filter(bolum=secili_bolum)
         print("detaylar.. denetim detay işişlemleri..:", detaylar)
@@ -947,7 +1822,7 @@ def sonuc_denetim_sec(request, pk=None):
             denetim_no = request.POST.get('denetim_no', "")
             print ("denetim seçim yapılmış...", denetim_no)
             request.session['secilen_denetim'] = denetim_no
-            sonuc_list = sonuc.objects.filter(denetim=denetim_no).order_by('bolum')
+            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
             denetimin_adi = sonuc_list.first().denetim
             denetimin_durumu = sonuc_list.first().denetim.durum
             context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
@@ -1211,7 +2086,7 @@ def bolum_sec_devam(request, pk=None):
             i = 0
             while i < len(silme_list):
                 print(silme_list[i])
-                detay_sil_obj = sonuc.objects.filter(denetim_id=denetim_no).filter(bolum=silme_list[i])
+                detay_sil_obj = sonuc_detay.objects.filter(denetim_id=denetim_no).filter(bolum=silme_list[i])
                 detay_sil_obj.delete()
                 i = i + 1
             # sonra bastan kaydet....sonuc bölüm dosyasındaki denetim kayıtlarını...
@@ -1299,7 +2174,7 @@ def detay_sec_devam(request, pk=None):
             print ("detay_list...:", detay_list, len(detay_list))
 
             if len(detay_list)!=0:
-                silme_obj = sonuc.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+                silme_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
                 silme_obj.delete()
 
             i = 0
@@ -1307,7 +2182,7 @@ def detay_sec_devam(request, pk=None):
                 print("detay-list-i", detay_list[i])
                 detay_no = int(detay_list[i])
                 print("işte detay no...", detay_no)
-                kaydetme_obj = sonuc(denetim_id=denetim_no,
+                kaydetme_obj = sonuc_detay(denetim_id=denetim_no,
                                      bolum_id=bolum_no,
                                      detay_id=detay_no,
                                      )
@@ -1374,7 +2249,7 @@ def isemri_olustur_devam(request, pk=None):
     #gozlemci = ""
     bol_varmi = sonuc_bolum.objects.filter(denetim=denetim_no)
     print("bölümler", bol_varmi)
-    det_varmi = sonuc.objects.filter(denetim=denetim_no)
+    det_varmi = sonuc_detay.objects.filter(denetim=denetim_no)
     print("detaylar", det_varmi)
     goz_varmi = gozlemci.objects.filter(denetim=denetim_no)
     print("gözlemciler", goz_varmi)
@@ -1415,7 +2290,7 @@ def isemri_olustur_devam(request, pk=None):
     bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     for bolum in bolum_obj:
         print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
         for detay in detay_obj:
             print("detay list . detay", detay.bolum, detay.detay)
             d[detay.bolum].append(detay.detay)
@@ -1536,7 +2411,7 @@ def isemrisonrasi_devam(request, pk=None):
     #gozlemci = ""
     bol_varmi = sonuc_bolum.objects.filter(denetim=denetim_no)
     print("bölümler", bol_varmi)
-    det_varmi = sonuc.objects.filter(denetim=denetim_no)
+    det_varmi = sonuc_detay.objects.filter(denetim=denetim_no)
     print("detaylar", det_varmi)
     goz_varmi = gozlemci.objects.filter(denetim=denetim_no)
     print("gözlemciler", goz_varmi)
@@ -1577,7 +2452,7 @@ def isemrisonrasi_devam(request, pk=None):
     bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     for bolum in bolum_obj:
         print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
         for detay in detay_obj:
             print("detay list . detay", detay.bolum, detay.detay)
             d[detay.bolum].append(detay.detay)
@@ -1650,7 +2525,7 @@ def baslanmislar_devam(request, pk=None):
     #gozlemci = ""
     bol_varmi = sonuc_bolum.objects.filter(denetim=denetim_no)
     print("bölümler", bol_varmi)
-    det_varmi = sonuc.objects.filter(denetim=denetim_no)
+    det_varmi = sonuc_detay.objects.filter(denetim=denetim_no)
     print("detaylar", det_varmi)
     goz_varmi = gozlemci.objects.filter(denetim=denetim_no)
     print("gözlemciler", goz_varmi)
@@ -1691,7 +2566,7 @@ def baslanmislar_devam(request, pk=None):
     bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     for bolum in bolum_obj:
         print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum)
         for detay in detay_obj:
             print("detay list . detay", detay.bolum, detay.detay)
             d[detay.bolum].append(detay.detay)
@@ -1775,7 +2650,7 @@ def sonlandirilan_devam(request, pk=None):
 def sonlandirilan_ilerle(request, pk=None):
     denetim_no = pk
     request.session['secilen_denetim'] = denetim_no
-    sonuc_list = sonuc.objects.filter(denetim=denetim_no).order_by('bolum')
+    sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
     denetimin_adi = sonuc_list.first().denetim.denetim_adi
     denetimin_durumu = sonuc_list.first().denetim.durum
     context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
@@ -2085,23 +2960,6 @@ def denetim_bolum_js(request, pk=None):
         request.session['detay_icin_bolum'] = selected
     print ("son nokta denetim bölüm js.....", response_data)
     return HttpResponse(response_data, content_type='application/json')
-
-#--------------------------------------------------------------------
-
-
-def detaylarsec_bolum_js(request, pk=None):
-    print("selam buraya geldik...detaylarseç bölüm js")
-    print("User.id.....:", request.user.id)
-    kullanan = request.user.id
-    response_data ={}
-    if request.method == 'GET':
-        selected_list = request.GET.getlist('liste')
-        #selected_list = request.GET['liste']
-        print("selected list...:", selected_list, "adedi", len(selected_list))
-        request.session['bolum_listesi'] = selected_list
-    print ("son nokta denetim bölüm js.....", response_data)
-    return HttpResponse(response_data, content_type='application/json')
-
 
 
 #---------------------------------------------------------------------
@@ -2501,19 +3359,19 @@ class ProjeDelete(LoginRequiredMixin,DeleteView):
 
 
 
-class SonucUpdate(LoginRequiredMixin,UpdateView):
-    model = sonuc
+class SonucDetayUpdate(LoginRequiredMixin,UpdateView):
+    model = sonuc_detay
     fields = '__all__'
     success_url = "/islem/sonuc/"
 
 #-----------------------------------------?????????????????????????
 
-class SonucListView(LoginRequiredMixin,generic.ListView):
-    model = sonuc
+class SonucDetayListView(LoginRequiredMixin,generic.ListView):
+    model = sonuc_detay
     paginate_by = 20
 
-class SonucDetailView(LoginRequiredMixin,generic.DetailView):
-    model = sonuc
+class SonucDetayDetailView(LoginRequiredMixin,generic.DetailView):
+    model = sonuc_detay
 
 
 #------------------------------------------------------------
@@ -2656,11 +3514,12 @@ class denetimautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return denetim.objects.none()
-        qs = denetim.objects.all()
+        #qs = denetim.objects.all()
+        qs = denetim.objects.order_by('id')
         if self.q:
             qs = qs.filter(denetim_adi__icontains=self.q)
+            print("qs filtre içinden", qs)
         return qs
-
 
 @login_required
 def deneme_denetim(request, pk=None):
@@ -2724,7 +3583,30 @@ def deneme_sonucbolum(request, pk=None):
         form = Ikili_Deneme_Form()
         return render(request, 'islem/denetim_deneme_form_iki.html', {'form': form,})
 
+#------------------------------------------------------------------------------------
 
+@login_required
+def deneme_nebu(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = NebuForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            messages.success(request, 'Başarıyla oldu bu iş....')
+            return redirect('deneme_nebu')
+        else:
+            #messages.success(request, 'Formda uygunsuzluk var....')
+            #return redirect('denetim_create')
+            return render(request, 'islem/denetim_deneme_nebu.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = NebuForm()
+        return render(request, 'islem/denetim_deneme_nebu.html', {'form': form,})
+
+#-----------------------------------------------------------------------------------------
 
 class takipciautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

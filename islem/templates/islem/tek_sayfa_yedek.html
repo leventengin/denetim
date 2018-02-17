@@ -15,12 +15,15 @@
 
 <style type="text/css">
     label {
-        font-weight: normal  !important; /* overwrites any other rules */
+        font-weight: normal  !important;
     }
-
 </style>
 
-
+<!--
+label {
+    font-weight: normal !important;
+}
+-->
 
 
 <script>
@@ -191,143 +194,22 @@ $( ".datepicker" ).datepicker()
 
     <p> </br> </p>
 
+    <form action="" method="POST">
+
+          {% csrf_token %}
+          {{ form.errors }}
+          {{ form.non_field_errors }}
+
+          <table>
+
+          {{ form.as_table }}
 
 
-            <form method="post" novalidate>
-              {% csrf_token %}
-
-              {{ form.non_field_errors }}
-
-              {{ form.source.errors }}
-              {{ form.source }}
-
-              <table border="0">
-
-                <tr>
-                    <td>
-                    {{ form.pk_no.errors }}
-                    {{ form.pk_no }}
-                  </td>
-                </tr>
+          </table>
+          <input type="submit" value="kaydet" />
 
 
-                  <tr>
-                    <th style="width: 50mm;">  {{ form.denetim_adi.label_tag }}  </th>
-                    <td>
-                      {{ form.denetim_adi.errors }}
-                      {{ form.denetim_adi }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.proje.label_tag }}</th>
-                    <td>
-                      {{ form.proje.errors }}
-                      {{ form.proje }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.denetci.label_tag }}</th>
-                    <td>
-                      {{ form.denetci.errors }}
-                      {{ form.denetci }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.tipi.label_tag }}</th>
-                    <td>
-                      {{ form.tipi.errors }}
-                      {{ form.tipi }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.takipciler.label_tag }}</th>
-                    <td>
-                      {{ form.takipciler.errors }}
-                      {{ form.takipciler }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.hedef_baslangic.label_tag }}</th>
-                    <td>
-                      {{ form.hedef_baslangic.errors }}
-                      {{ form.hedef_baslangic }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.hedef_bitis.label_tag }}</th>
-                    <td>
-                      {{ form.hedef_bitis.errors }}
-                      {{ form.hedef_bitis }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.aciklama.label_tag }}</th>
-                    <td>
-                      {{ form.aciklama.errors }}
-                      {{ form.aciklama }}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>{{ form.bolum.label_tag }}</th>
-                    <td>
-                      {{ form.bolum.errors }}
-                      {{ form.bolum }}
-
-                    </td>
-
-
-                    <tr height = 20px></tr>
-
-
-                  <tr>
-                    <th  style="font-weight:bold"> Detaylar / Sorular </th>
-                    </tr>
-
-                    <tr height = 20px></tr>
-
-
-
-                  </table>
-
-
-
-                  <table>
-
-
-                  <tr style="width: 200mm;">
-                    <td>
-                      {{ form.detay.errors }}
-                      {{ form.detay }}
-                    </td>
-                  </tr>
-
-
-
-
-              </table>
-
-              <button type="submit">Kaydet</button>
-            </form>
-
-
-
-
-
-
-
-
-
-
-
-
+    </form>
 
 
 <!--

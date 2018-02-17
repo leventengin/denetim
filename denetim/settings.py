@@ -78,6 +78,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'denetim.urls'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = 'True'
 
 TEMPLATES = [
     {
