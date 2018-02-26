@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Denetim Zonu Listesi</h3>
+
+    {% if zon_list %}
+    <ul>
+
+      {% for zon in zon_list %}
+      <li>
+        <a href="{{zon.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{zon.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{zon.id}})    <a href="{{zon.id}}">{{ zon.zon_adi }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/zon/create"> Denetim Zonu Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı denetim zonu yok ....</p>
+      <p> </p>
+      <a href="/islem/zon/create"> Denetim Zonu Ekle </a>
+    {% endif %}
+
+{% endblock %}

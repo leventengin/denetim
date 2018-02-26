@@ -30,9 +30,18 @@
                     <td>  &emsp; {{ denetim_adi }} </td>
                 </tr>
                 <tr>
-                    <td><b>Denetlenen:</b></td>
-                    <td> &emsp; {{ musteri }}  </td>
+                    <td><b>Prpje:</b></td>
+                    <td> &emsp; {{ proje }}  </td>
                 </tr>
+                <tr>
+                    <td><b>Planlı/Rutin:</b></td>
+                    {%   if rutin_planli == "P" %}
+                    <td> &emsp; Planlı  </td>
+                    {%  else %}
+                    <td> &emsp; Rutin   </td>
+                    {%  endif %}
+                </tr>
+            
                 <tr>
                     <td><b>Denetçi:   </b></td>
                     <td> &emsp; {{ denetci }}  </td>

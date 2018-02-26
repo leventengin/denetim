@@ -35,6 +35,7 @@ from .models import grup
 from .models import sirket
 from .models import proje
 from .models import tipi
+from .models import zon
 from .models import bolum
 from .models import detay
 from .models import denetim
@@ -47,10 +48,12 @@ from resimyukle.models import Resim
 from .models import isaretler
 
 
+
 admin.site.register(grup)
 admin.site.register(sirket)
 admin.site.register(proje)
 admin.site.register(tipi)
+admin.site.register(zon)
 admin.site.register(bolum)
 admin.site.register(detay)
 admin.site.register(denetim)

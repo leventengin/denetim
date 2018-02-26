@@ -116,61 +116,73 @@
 
           <div class="navbar navbar-default navbar-fixed-left">
             <ul class="nav navbar-nav">
+
+
+              {% if  user.profile.denetci == "E" %}
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Yerinde Denetim <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
-                 <li><a href="/islem">Bekleyen Denetimler</a></li>
+                 <li><a href="/islem">Bekleyen Planlı Denetimler</a></li>
+                 <li><a href="/islem">Rutin Denetim Başlat</a></li>
                  <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
                  <li><a href="/islem/acil_devam_sec"><font color="f44336">Acil Bildirim</font></a></li>
                  <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
+                 <li><a href="/islem/sonuc">Yazı Ekle</a></li>
+                 <li><a href="/islem/sonuc">Denetim Tamamla</a></li>
+                 <!--
                  <li><a href="/islem/qrcode">QRCode</a></li>
-
+                 -->
                </ul>
              </li>
+             {% endif %}
 
 
-            {% if not user.groups.all.0.name == "denetci" %}
-
+             {% if  user.profile.denetim_grup_yetkilisi == "E" %}
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetim Oluştur <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
-                <li><a href="/islem/denetim">Denetim İşlemleri</a></li>
-                <li><a href="/islem/denetim/gozlemcisec">Gözlemci Seç</a></li>
-                <li><a href="/islem/denetim/bolumsec">Bölümleri Seç</a></li>
-                <li><a href="/islem/denetim/detaysec">Detayları Seç</a></li>
-                <li><a href="/islem/denetim/isemriolustur">İşemri Oluştur</a></li>
                 <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
                 <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
                 <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
+                <li><a href="/islem/denetim">Planlı Denetim Detayları</a></li>
+                <li><a href="/islem/denetim">Rutin Denetim Detayları</a></li>
                </ul>
              </li>
+             {% endif %}
+
 
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetimler <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
-                <li><a href="/islem/denetim/isemrisonrasi">İşemri Oluşanlar</a></li>
                 <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
                 <li><a href="/islem/denetim/sonlandirilan">Sonlandırılanlar</a></li>
+                <li><a href="/islem/denetim/sonlandirilan">Denetim Raporları</a></li>
+                {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+                    <li><a href="/islem/denetim/isemrisonrasi/denetimiptal">Denetim İptal</a></li>
+                {% endif %}
                </ul>
              </li>
 
 
+             {% if  user.profile.denetim_grup_yetkilisi == "E" %}
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Tanımlar <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
                  <li><a href="/islem/tipi">Denetim Tipi</a></li>
+                 <li><a href="/islem/zon">Denetim Zonu</a></li>
                  <li><a href="/islem/bolum">Denetim Bölümü</a></li>
                  <li><a href="/islem/detay">Denetim Detayı</a></li>
                  <li class="divider"></li>
                  <li><a href="/islem/grup">Grup</a></li>
                  <li><a href="/islem/sirket">Şirket</a></li>
                  <li><a href="/islem/proje">Proje</a></li>
+                 <!--
                  <li><a href="/islem/deneme">Deneme</a></li>
                  <li><a href="/islem/deneme_iki">Deneme İki</a></li>
                  <li><a href="/islem/deneme_uc">Deneme Üç</a></li>
+               -->
                </ul>
               </li>
+            {% endif %}
 
-             {% endif %}
 
-
-            {% if user.is_staff %}
+             {% if user.is_staff %}
               <li><a href="/admin/">Yönetim</a></li>
              {% endif %}
 

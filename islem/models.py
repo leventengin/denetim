@@ -23,15 +23,44 @@ DENETCIPROJE = (
 )
 
 RUTINPLANLI = (
-('R', 'Rutin'),
 ('P', 'Planlı'),
+('R', 'Rutin'),
+('S', 'Sıralı'),
 )
 
-PUAN = (
-('A', 'Çok İyi'),
-('B', 'İyi'),
-('C', 'Orta'),
-('D', 'Kötü'),
+
+PUANLAMA_TURU = (
+('A', 'Onluk'),
+('B', 'Beşlik'),
+('C', 'İkilik'),
+)
+
+ONLUK = (
+('0', '0'),
+('1', '1'),
+('2', '2'),
+('3', '3'),
+('4', '4'),
+('5', '5'),
+('6', '6'),
+('7', '7'),
+('8', '8'),
+('9', '9'),
+('10', '10'),
+)
+
+BESLIK = (
+('0', '0'),
+('1', '1'),
+('2', '2'),
+('3', '3'),
+('4', '4'),
+('5', '5'),
+)
+
+IKILIK = (
+('0', '0'),
+('1', '1'),
 )
 
 
@@ -77,18 +106,25 @@ class tipi(models.Model):
     def __str__(self):
         return(self.tipi_adi)
 
+class zon(models.Model):
+    zon_kodu = models.CharField(max_length=10)
+    zon_adi = models.CharField(max_length=200)
+    tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
+    def __str__(self):
+        return '%s-%s' % (self.zon_kodu, self.zon_adi)
 
 class bolum(models.Model):
     bolum_kodu = models.CharField(max_length=10)
     bolum_adi = models.CharField(max_length=200)
-    tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
+    zon = models.ForeignKey(zon, on_delete=models.PROTECT, default=1)
     def __str__(self):
-        return(self.bolum_adi)
+        return '%s-%s' % (self.bolum_kodu, self.bolum_adi)
 
 class detay(models.Model):
     detay_kodu = models.CharField(max_length=5)
     detay_adi = models.CharField(max_length=200)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
+    puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")
     def __str__(self):
         return '%s-%s' % (self.detay_kodu, self.detay_adi)
         #return(self.detay_adi)
@@ -107,13 +143,14 @@ class denetim(models.Model):
     denetim_adi = models.CharField(max_length=100)
     proje = models.ForeignKey(proje, on_delete=models.PROTECT)
     rutin_planli = models.CharField(max_length=1, choices=RUTINPLANLI)
+    r_erisim = models.IntegerField(blank=True, null=True)
     denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE, null=True)
     tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
     durum = models.CharField(max_length=1, default="A")
     yaratim_tarihi = models.DateField(_("Date"), default=datetime.today)
     yaratan = models.ForeignKey(User, related_name='yaratan', on_delete=models.CASCADE)
-    hedef_baslangic = models.DateField()
-    hedef_bitis = models.DateField()
+    hedef_baslangic = models.DateField(blank=True, null=True)
+    hedef_bitis = models.DateField(blank=True, null=True)
     gerc_baslangic = models.DateField(blank=True, null=True)
     gerc_bitis = models.DateField(blank=True, null=True)
     fiili_kapanis = models.DateField(blank=True, null=True)
@@ -121,13 +158,16 @@ class denetim(models.Model):
     devam_mi = models.BooleanField(default=False)
     tekrar_mi = models.BooleanField(default=False)
     tamamla_mi = models.BooleanField(default=False)
-
     ilk_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     sonuc_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     def __str__(self):
         return(self.denetim_adi)
 
-
+class yazi(models.Model):
+    yazi = models.CharField(max_length=1500)
+    denetim = models.ForeignKey(denetim, on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.denetim)
 
 class kucukresim(models.Model):
     kullanici = models.ForeignKey(User, related_name='resim_ceken', on_delete=models.CASCADE)
@@ -140,7 +180,11 @@ class sonuc_detay(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     detay = models.ForeignKey(detay, on_delete=models.PROTECT)
-    sayi = models.CharField(max_length=1, choices=PUAN, default="A")
+    puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")
+    onluk = models.CharField(max_length=1, choices=ONLUK)
+    beslik = models.CharField(max_length=1, choices=BESLIK)
+    ikilik = models.CharField(max_length=1, choices=IKILIK)
+    puan = models.IntegerField(blank=True, null=True)
     aciklama = models.CharField(max_length=100, blank=True, null=True)
     foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
     height_field = models.IntegerField(default=0)

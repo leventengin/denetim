@@ -8,12 +8,6 @@
 
 <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'denetim_iptal' %}'">Denetim İptal</button>
 <p> </p>
-<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'denetci_degistir' %}'">Denetçi Değiştir</button>
-<p> </p>
-<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'tarih_degistir' %}'">Tarih Değiştir</button>
-<p> </p>
-<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'deneme_filteredselectmultiple' %}'">Deneme FilteredeSelectMultiple</button>
-
 <p> </p>
 <p> </p>
 
@@ -32,9 +26,18 @@
                     <td>  &emsp; {{ denetim_adi }} </td>
                 </tr>
                 <tr>
-                    <td><b>Denetlenen:</b></td>
-                    <td> &emsp; {{ musteri }}  </td>
+                    <td><b>Proje:</b></td>
+                    <td> &emsp; {{ proje }}  </td>
                 </tr>
+                <tr>
+                    <td><b>Planlı/Rutin:</b></td>
+                    {%   if rutin_planli == "P" %}
+                    <td> &emsp; Planlı  </td>
+                    {%  else %}
+                    <td> &emsp; Rutin   </td>
+                    {%  endif %}
+                </tr>
+          
                 <tr>
                     <td><b>Denetçi:   </b></td>
                     <td> &emsp; {{ denetci }}  </td>
@@ -64,11 +67,11 @@
         </table>
       <p> </p> &emsp;
 
-        <h5> <b> Gözlemciler: </b> <h5>
+        <h5> <b> Takipciler: </b> <h5>
         <p> </p>
-        {% for gozlemci in gozgoz %}
+        {% for takipci in takipciler %}
         <tr>
-            <td> {{ gozlemci }} </td>
+            <td> {{ takipci }} </td>
         </tr>
         <p> </p>
         {% endfor %}

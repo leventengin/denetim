@@ -28,6 +28,15 @@
                     <td> &emsp; {{ proje }}  </td>
                 </tr>
                 <tr>
+                    <td><b>Planlı/Rutin:</b></td>
+                    {%   if rutin_planli == "P" %}
+                    <td> &emsp; Planlı  </td>
+                    {%  else %}
+                    <td> &emsp; Rutin   </td>
+                    {%  endif %}
+                </tr>
+
+                <tr>
                     <td><b>Denetçi:   </b></td>
                     <td> &emsp; {{ denetci }}  </td>
                 </tr>
@@ -43,6 +52,8 @@
                     <td><b>Oluşturan:   </b></td>
                     <td> &emsp;  {{ yaratan }}  </td>
                 </tr>
+
+                        {%   if rutin_planli == "P" %}
                 <tr>
                     <td><b>Hedef Başlangıç Tarihi:</b></td>
                     <td> &emsp; {{ hedef_baslangic }} </td>
@@ -52,6 +63,9 @@
                     <td> &emsp; {{ hedef_bitis }}  </td>
                 </tr>
 
+                          {%  endif  %}
+
+                          
             </tbody>
         </table>
         <p> </p> &emsp;

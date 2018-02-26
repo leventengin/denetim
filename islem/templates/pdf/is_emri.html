@@ -67,8 +67,8 @@
                       <td>  &emsp; {{ denetim_adi }} </td>
                   </tr>
                   <tr>
-                      <td><b>Denetlenen:</b></td>
-                      <td> &emsp; {{ musteri }}  </td>
+                      <td><b>Proje:</b></td>
+                      <td> &emsp; {{ proje }}  </td>
                   </tr>
                   <tr>
                       <td><b>Denetçi:   </b></td>
@@ -98,11 +98,12 @@
               </tbody>
           </table>
 
-      <h5> <b> Gözlemciler: </b> <h5>
+      <h5> <b> Takipciler: </b> <h5>
       <p> </p>
-      {% for gozlemci in g %}
+      {% for takipci in takipciler %}
         <tr>
-            <td> {{ gozlemci }} </td>
+            <td> {{ takipci }} </td>
+            <p> </p>        
         </tr>
       {% endfor %}
       <p> </p> &emsp;

@@ -2,11 +2,17 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h3>>Proje Sayfası</h3>
 
-  <p><strong>Id:</strong> {{ proje.id }}</p>
+  <h3>Proje Sayfası</h3>
+
+  <p><strong>id:</strong> {{ proje.id }}</p>
   <p><strong>Adı:</strong> {{ proje.proje_adi }}</p>
+  <p><strong>Proje Yöneticisi:</strong> {{ proje.proje_yonetici }}</p>
+  <p><strong>İlgililer:</strong> </p>
 
+    {% for ilgili  in proje.ilgililer.all %}
+     <p>    &emsp;  {{ ilgili }}</p>
+    {% endfor %}
 
 
 {% endblock %}

@@ -20,8 +20,11 @@ from django.forms.models import ModelChoiceIterator
 from django.urls import reverse
 from django.utils.translation import get_language
 
-from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete, denetciautocomplete
-from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, projeautocomplete
+from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
+from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
+from .views import zonautocomplete, denetciautocomplete, projeautocomplete
+from .views import denolusturautocomplete
+
 
 
 
@@ -30,19 +33,19 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     # dal denemesi için..................
     url(r'^denetim-autocomplete/$', denetimautocomplete.as_view(),name='denetim-autocomplete',),
+    url(r'^denolustur-autocomplete/$', denolusturautocomplete.as_view(),name='denolustur-autocomplete',),
     url(r'^sonucbolum-autocomplete/$', sonucbolumautocomplete.as_view(),name='sonucbolum-autocomplete',),
     url(r'^takipci-autocomplete/$', takipciautocomplete.as_view(),name='takipci-autocomplete',),
     url(r'^bolum-autocomplete/$', bolumautocomplete.as_view(),name='bolum-autocomplete',),
     url(r'^detay-autocomplete/$', detayautocomplete.as_view(),name='detay-autocomplete',),
     url(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
+    url(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
     url(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
     url(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
 
 
-
-
-
-    #url(r'^gozlemci/$', views.gozlemci_sec, name='gozlemci_sec'),
+#  yerinde denetim ile ilgili işlemler...................
+    url(r'^denetim/$', views.DenetimListView.as_view(), name='denetim'),
     url(r'^denetim/(?P<pk>\d+)$', views.denetim_detay, name='denetim_detay'),
     #url(r'^denetim/(?P<pk>\d+)/pdf/$', views.GeneratePDF.as_view(), name='GeneratePDF'),
     url(r'^denetim/(?P<pk>\d+)/pdf/$', views.generate_pdf, name='generate_pdf'),
@@ -65,6 +68,35 @@ urlpatterns = [
     url(r'^baslat/devam/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^baslat/devam/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^baslat/devam/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
+
+
+
+#---------------------------------------------------------------------------------------------------
+#   denetim oluşturma url leri  yerinde denetimden farklı .............................
+    #
+    url(r'^denetim/isemrisonrasi/$', views.isemrisonrasi_sec, name='isemrisonrasi_sec'),
+    url(r'^denetim/isemrisonrasi/devam/$', views.isemrisonrasi_devam, name='isemrisonrasi_devam'),
+    url(r'^denetim/isemrisonrasi/denetimiptal/$', views.denetim_iptal, name='denetim_iptal'),
+    url(r'^denetim/isemrisonrasi/denetimiptal/devam/$', views.denetim_iptal_devam, name='denetim_iptal_devam'),
+    #deneme alttaki.................
+    url(r'^denetim/baslanmislar/$', views.baslanmislar_sec, name='baslanmislar_sec'),
+    url(r'^denetim/baslanmislar/devam/$', views.baslanmislar_devam, name='baslanmislar_devam'),
+    url(r'^denetim/sonlandirilan/$', views.sonlandirilan_sec, name='sonlandirilan_sec'),
+    url(r'^denetim/sonlandirilan/devam/$', views.sonlandirilan_devam, name='sonlandirilan_devam'),
+    url(r'^denetim/sonlandirilan/devam/(?P<pk>\d+)$', views.sonlandirilan_ilerle, name='sonlandirilan_ilerle'),
+    url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
+
+#   diğer denetim oluşturma işlemleri..................
+
+    url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
+    url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
+    url(r'^denetim/teksayfa_yarat/tipisec_bolum_js/$', views.tipisec_bolum_js, name='tipisec_bolum_js'),
+    url(r'^denetim/teksayfa_duzenle/$', views.teksayfa_duzenle, name='teksayfa_duzenle'),
+    url(r'^denetim/teksayfa_duzenle_devam/$', views.teksayfa_duzenle_devam, name='teksayfa_duzenle_devam'),
+    url(r'^denetim/teksayfa_duzenle_devam/detaylarsec_bolum_js_2/$', views.detaylarsec_bolum_js_2, name='detaylarsec_bolum_js_2'),
+    url(r'^denetim/teksayfa_duzenle_devam/tipisec_bolum_js_2/$', views.tipisec_bolum_js_2, name='tipisec_bolum_js_2'),
+    url(r'^denetim/teksayfa_sil/$', views.teksayfa_sil, name='teksayfa_sil'),
+    url(r'^denetim/teksayfa_sil_kesin/$', views.teksayfa_sil_kesin, name='teksayfa_sil_kesin'),
 
 
 
@@ -110,6 +142,15 @@ urlpatterns = [
     url(r'^tipi/(?P<pk>\d+)/delete/$', views.tipi_sil, name='tipi_sil'),
     url(r'^tipi/(?P<pk>\d+)/delete/kesin/$', views.tipi_sil_kesin, name='tipi_sil_kesin'),
 
+    # zon urlleri aşağıda....
+    url(r'^zon/$', views.ZonListView.as_view(), name='zon'),
+    url(r'^zon/(?P<pk>\d+)$', views.ZonDetailView.as_view(), name='zon-detail'),
+    url(r'^zon/create/$', views.ZonCreate.as_view(), name='zon_create'),
+    url(r'^zon/(?P<pk>\d+)/update/$', views.ZonUpdate.as_view(), name='zon_update'),
+    url(r'^zon/(?P<pk>\d+)/delete/$', views.zon_sil, name='zon_sil'),
+    url(r'^zon/(?P<pk>\d+)/delete/kesin/$', views.zon_sil_kesin, name='zon_sil_kesin'),
+
+
     # bolum urlleri aşağıda....
     url(r'^bolum/$', views.BolumListView.as_view(), name='bolum'),
     url(r'^bolum/(?P<pk>\d+)$', views.BolumDetailView.as_view(), name='bolum-detail'),
@@ -133,49 +174,6 @@ urlpatterns = [
     url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
-#---------------------------------------------------------------------------------------------------
-#   denetim urlleri .............................
-    #url(r'^denetim/olustur/$', views.denetim_olustur, name='denetim_olustur'),
-    url(r'^denetim/$', views.DenetimListView.as_view(), name='denetim'),
-    url(r'^denetim/(?P<pk>\d+)$', views.DenetimDetailView.as_view(), name='denetim-detail'),
-    url(r'^denetim/isemrisonrasi/$', views.isemrisonrasi_sec, name='isemrisonrasi_sec'),
-    url(r'^denetim/isemrisonrasi/devam/$', views.isemrisonrasi_devam, name='isemrisonrasi_devam'),
-    url(r'^denetim/isemrisonrasi/denetimiptal/$', views.denetim_iptal, name='denetim_iptal'),
-    url(r'^denetim/isemrisonrasi/denetimiptal/devam/$', views.denetim_iptal_devam, name='denetim_iptal_devam'),
-    url(r'^denetim/isemrisonrasi/denetcidegistir/$', views.denetci_degistir, name='denetci_degistir'),
-    url(r'^denetim/isemrisonrasi/tarihdegistir/$', views.tarih_degistir, name='tarih_degistir'),
-    #deneme alttaki.................
-    url(r'^denetim/isemrisonrasi/deneme_filteredselectmultiple/$', views.deneme_filteredselectmultiple, name='deneme_filteredselectmultiple'),
-    url(r'^denetim/baslanmislar/$', views.baslanmislar_sec, name='baslanmislar_sec'),
-    url(r'^denetim/baslanmislar/devam/$', views.baslanmislar_devam, name='baslanmislar_devam'),
-    url(r'^denetim/sonlandirilan/$', views.sonlandirilan_sec, name='sonlandirilan_sec'),
-    url(r'^denetim/sonlandirilan/devam/$', views.sonlandirilan_devam, name='sonlandirilan_devam'),
-    url(r'^denetim/sonlandirilan/devam/(?P<pk>\d+)$', views.sonlandirilan_ilerle, name='sonlandirilan_ilerle'),
-    url(r'^denetim/create/$', views.denetim_create, name='denetim_create'),
-    url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
-    url(r'^denetim/(?P<pk>\d+)/delete/$', views.denetim_sil, name='denetim_sil'),
-    url(r'^denetim/(?P<pk>\d+)/delete/kesin/$', views.denetim_sil_kesin, name='denetim_sil_kesin'),
-#   diğer denetim oluşturma işlemleri..................
-    url(r'^denetim/gozlemcisec/$', views.gozlemci_denetim_sec, name='gozlemci_denetim_sec'),
-    url(r'^denetim/gozlemcisec/devam/$', views.gozlemci_sec_devam, name='gozlemci_sec_devam'),
-    url(r'^denetim/bolumsec/$', views.bolum_denetim_sec, name='bolum_denetim_sec'),
-    url(r'^denetim/bolumsec/devam/$', views.bolum_sec_devam, name='bolum_sec_devam'),
-    url(r'^denetim/detaysec/$', views.detay_denetim_sec, name='detay_denetim_sec'),
-    url(r'^denetim/detaysec/devam/$', views.detay_sec_devam, name='detay_sec_devam'),
-    url(r'^denetim/detaysec/denetim_bolum_js/$', views.denetim_bolum_js, name='denetim_bolum_js'),
-    url(r'^denetim/isemriolustur/$', views.isemri_denetim_sec, name='isemri_denetim_sec'),
-    url(r'^denetim/isemriolustur/devam/$', views.isemri_olustur_devam, name='isemri_olustur_devam'),
-    url(r'^denetim/isemri/$', views.isemri_yarat, name='isemri_yarat'),
-    url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
-    url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
-    url(r'^denetim/teksayfa_yarat/tipisec_bolum_js/$', views.tipisec_bolum_js, name='tipisec_bolum_js'),
-    url(r'^denetim/teksayfa_duzenle/$', views.teksayfa_duzenle, name='teksayfa_duzenle'),
-    url(r'^denetim/teksayfa_duzenle_devam/$', views.teksayfa_duzenle_devam, name='teksayfa_duzenle_devam'),
-    url(r'^denetim/teksayfa_duzenle_devam/detaylarsec_bolum_js_2/$', views.detaylarsec_bolum_js_2, name='detaylarsec_bolum_js_2'),
-    url(r'^denetim/teksayfa_duzenle_devam/tipisec_bolum_js_2/$', views.tipisec_bolum_js_2, name='tipisec_bolum_js_2'),
-    url(r'^denetim/teksayfa_sil/$', views.teksayfa_sil, name='teksayfa_sil'),
-    url(r'^denetim/teksayfa_sil_kesin/$', views.teksayfa_sil, name='teksayfa_sil_kesin'),
 
-    #url(r'^denetim/goster/$', views.denetim_goster, name='denetim_goster'),
 
     ]
