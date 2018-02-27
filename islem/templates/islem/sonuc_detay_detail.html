@@ -1,0 +1,122 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h3> Sonuç Sayfası</h3>
+
+  <table border="0">
+      <tbody>
+        <!--
+          <tr>
+              <td><b>id</b></td>
+              <td>  &emsp;      {{ sonuc.id }}</td>
+          </tr>
+        -->
+          <tr>
+              <td><b>Denetim </b></td>
+              <td> &emsp;     {{ sonuc_detay.denetim }}</td>
+          </tr>
+          <tr>
+              <td><b>Bölüm adı</b></td>
+              <td> &emsp;     {{ sonuc_detay.bolum }}</td>
+          </tr>
+          <tr>
+              <td><b>Detay adı </b></td>
+              <td> &emsp;     {{ sonuc_detay.detay }}</td>
+          </tr>
+          {% if sonuc_detay.denetim_disi == "E" %}
+          <tr>
+              <td> &emsp;  Denetim dışı......</td>
+          </tr>
+          {% endif %}
+
+          {% if sonuc_detay.puanlama_turu == "A" %}
+          <tr>
+              <td><b>Puanlama türü</b></td>
+              <td> &emsp;  Onluk  </td>
+          </tr>
+          {% endif %}
+
+          {% if sonuc_detay.puanlama_turu == "A" %}
+          <tr>
+              <td><b>Puan</b></td>
+              <td> &emsp; {{ sonuc_detay.onluk }} </td>
+          </tr>
+          {% endif %}
+
+
+
+          {% if sonuc_detay.puanlama_turu == "B" %}
+          <tr>
+              <td><b>Puanlama türü</b></td>
+              <td> &emsp;  Beşlik </td>
+          </tr>
+          {% endif %}
+
+          {% if sonuc_detay.puanlama_turu == "B" %}
+          <tr>
+              <td><b>Puan</b></td>
+              <td> &emsp; {{ sonuc_detay.beslik }} </td>
+          </tr>
+          {% endif %}
+
+
+          {% if sonuc_detay.puanlama_turu == "C" %}
+          <tr>
+              <td><b>Puanlama türü</b></td>
+              <td> &emsp;  İkilik  </td>
+          </tr>
+          {% endif %}
+
+          {% if sonuc_detay.puanlama_turu == "C" %}
+          <tr>
+              <td><b>Puan</b></td>
+              <td> &emsp; {{ sonuc_detay.ikilik }} </td>
+          </tr>
+          {% endif %}
+
+
+          <tr>
+              <td><b>Düzenlenmiş puan</b></td>
+              <td>  &emsp;      {{ sonuc_detay.puan }}</td>
+          </tr>
+
+          {% if sonuc_detay.foto %}
+          <tr>
+              <td><b>Foto</b></td>
+              <td> &emsp;   <img src="{{ sonuc_detay.foto.url }}" class="img-responsive">  </td>
+          </tr>
+          {% endif %}
+<!--
+          <tr>
+              <td><b>Yükseklik.........:   </b></td>
+              <td> &emsp;     {{ sonuc.height_field }}</td>
+          </tr>
+          <tr>
+              <td><b>En..:</b></td>
+              <td>  &emsp;      {{ sonuc.width_field }}</td>
+          </tr>
+
+          <tr>
+              <td><b>Tamam   </b></td>
+              <td> &emsp;     {{ sonuc.tamam }}</td>
+          </tr>
+
+          <tr>
+              <td><b>Düzenlendi.....:</b></td>
+              <td> &emsp;     {{ sonuc.updated }}</td>
+          </tr>
+
+          <tr>
+              <td><b>Yaratıldı..:</b></td>
+              <td>  &emsp;      {{ sonuc.timestamp }}</td>
+          </tr>
+
+-->
+
+
+      </tbody>
+  </table>
+
+
+{% endblock %}

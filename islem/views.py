@@ -44,10 +44,10 @@ from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
 from django.urls import reverse
 from django.utils.translation import get_language
-
+from django.conf import settings
 import json
 import requests
-
+import os
 #from django.template import Context
 from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
@@ -250,6 +250,7 @@ def denetim_detay(request, pk=None):
     print("seçilen denetim", denetim_obj)
     denetim_adi = denetim_obj.denetim_adi
     proje = denetim_obj.proje
+    rutin_planli = denetim_obj.rutin_planli
     denetci = denetim_obj.denetci
     tipi = denetim_obj.tipi
     yaratim_tarihi = denetim_obj.yaratim_tarihi
@@ -292,6 +293,7 @@ def denetim_detay(request, pk=None):
                'takipciler': takipciler,
                'denetim_adi': denetim_adi,
                'proje' : proje,
+               'rutin_planli' : rutin_planli,
                'denetci' : denetci,
                'tipi' : tipi,
                'yaratim_tarihi' : yaratim_tarihi,
@@ -725,7 +727,7 @@ def teksayfa_yarat(request, pk=None):
         init_param = False
         print("bölüm listesi - tek sayfa yarat POST içinden..", bolum_listesi)
         print("init param - tek sayfa POST içinden", init_param)
-        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi, init_param=init_param )
+        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi)
         print(request.POST)
 
         if form.is_valid():
@@ -897,7 +899,7 @@ def teksayfa_yarat(request, pk=None):
         js_bolumler = request.session.get('js_bolumler', None)
         bolum_listesi = js_bolumler
         init_param = True
-        form = DenetimForm(bolum_listesi=bolum_listesi, init_param=init_param)
+        form = DenetimForm(bolum_listesi=bolum_listesi)
         form.fields["denetim_adi"].initial = js_denetim_adi
         form.fields["proje"].initial = js_proje
         form.fields["rp_hidden"].initial = js_rutin_planli
@@ -1031,6 +1033,7 @@ def teksayfa_duzenle(request, pk=None):
             js_denetim_no = denetim_obj.id
             js_denetim_adi = denetim_obj.denetim_adi
             js_proje = denetim_obj.proje.id
+            js_rutin_planli = denetim_obj.rutin_planli
             js_denetci = denetim_obj.denetci.id
             js_tipi = denetim_obj.tipi.id
             js_hedef_baslangic = denetim_obj.hedef_baslangic
@@ -1040,6 +1043,7 @@ def teksayfa_duzenle(request, pk=None):
             print("denetim no", js_denetim_no)
             print("denetim adi", js_denetim_adi)
             print("proje", js_proje)
+            print("rutin planlı", js_rutin_planli)
             print("denetci", js_denetci)
             print("tipi", js_tipi)
             print("hedef başlangıç", js_hedef_baslangic)
@@ -1084,6 +1088,7 @@ def teksayfa_duzenle(request, pk=None):
             request.session['duz_js_bolumler'] = js_bolumler
             request.session['duz_js_denetim_adi'] = js_denetim_adi
             request.session['duz_js_proje'] = js_proje
+            request.session['duz_js_rutin_planli'] = js_rutin_planli
             request.session['duz_js_denetci'] = js_denetci
             request.session['duz_js_tipi'] = js_tipi
             request.session['duz_js_takipciler'] = js_takipciler
@@ -1122,7 +1127,7 @@ def teksayfa_duzenle_devam(request, pk=None):
         bolum_listesi = request.session.get('duz_js_bolumler', None)
         print("bölüm listesi...", bolum_listesi)
         init_param = False
-        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi, init_param=init_param)
+        form = DenetimForm(request.POST or None, bolum_listesi=bolum_listesi)
 
         if form.is_valid():
             print(" form is valid..")
@@ -1143,6 +1148,9 @@ def teksayfa_duzenle_devam(request, pk=None):
             dd_aciklama =  request.POST.get('aciklama', "")
             dd_bolum = request.POST.getlist('bolum', "")
             dd_detay = request.POST.getlist('detay', "")
+            if dd_rutin_planli == "R":
+                dd_hedef_baslangic = "2000-01-01"
+                dd_hedef_bitis = "2000-01-01"
 
             print("pk no", dd_pk_no)
             print("denetim adı", dd_denetim_adi)
@@ -1245,7 +1253,7 @@ def teksayfa_duzenle_devam(request, pk=None):
                     detay_no = int(dd_detay[j])
                     print("işte detay no...", detay_no)
                     detayli_obj = detay.objects.get(id=detay_no)
-                    olmali_bolum = detayli_obj.bolum
+                    olmali_bolum = detayli_obj.bolum.id
                     if bolum_no == olmali_bolum:
                         kaydet_obj = sonuc_detay(denetim_id=denetim_no,
                                                     bolum_id=bolum_no,
@@ -1253,6 +1261,7 @@ def teksayfa_duzenle_devam(request, pk=None):
                                                     )
                         kaydet_obj.save()
                     j = j + 1
+
                 i = i + 1
 
             ######################################################
@@ -1497,11 +1506,12 @@ def teksayfa_duzenle_devam(request, pk=None):
         else:
             init_param = True
 
-        form = DenetimForm(bolum_listesi=bolum_listesi, init_param=init_param)
+        form = DenetimForm(bolum_listesi=bolum_listesi)
         form.fields["pk_no"].initial = js_denetim_no
         form.fields["denetim_adi"].initial = js_denetim_adi
         form.fields["proje"].initial = js_proje
         form.fields["rp_hidden"].initial = js_rutin_planli
+        print("düzeltme init içinden js rutin planlı...", js_rutin_planli)
         form.fields["denetci"].initial = js_denetci
         form.fields["tipi"].initial = js_tipi
         form.fields["takipciler"].initial = js_takipciler
@@ -1817,12 +1827,54 @@ def denetim_detay_islemleri(request, pk=None):
             print("neyse ki valid..bin...ext...")
             # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
             edit = form.save(commit=False)
-            edit.tamam = "E"
-            edit.puanlama_turu = puanlama_turu
-            resim_obj = kucukresim.objects.get(kullanici=request.user.id)
-            kucuk_resim = resim_obj.foto_kucuk
-            edit.foto = kucuk_resim
-            edit.save()
+            resim_acaba = edit.resim_varmi
+            print("resim acaba....", resim_acaba)
+
+            if edit.denetim_disi == "E":
+                edit.tamam = "E"
+                edit.foto = None
+                edit.puan = None 
+                edit.save()
+            else:
+                resim_var = False
+                if edit.resim_varmi == "E":
+                    uploaded_image_obj = kucukresim.objects.filter(kullanici=request.user.id).last()
+                    print(" upload image object", uploaded_image_obj)
+                    uploaded_image = uploaded_image_obj.foto_kucuk
+                    #edit.foto = file(uploaded_image, os.path.basename(uploaded_image.path))
+                    print("yollu.........",  os.path.basename(uploaded_image.path))
+                    print("ikinci yollu...", os.path.abspath(uploaded_image.path))
+                    str1 = os.path.abspath(uploaded_image.path)
+                    str2 = "/home/levent/nata/denetim/media_cdn/"
+                    if str2 in str1:
+                        print("içinde....")
+                        str1 = str1.replace(str2,'')
+                    print("sonuç.........", str1)
+                    #edit.foto = os.path.abspath(uploaded_image.path)
+                    edit.foto = str1
+                    uploaded_image.close()
+                    resim_var = True
+                else:
+                    edit.foto = None
+
+                if edit.puanlama_turu == "A":
+                    puan_hesap = int(edit.onluk)
+                if edit.puanlama_turu == "B":
+                    puan_hesap = int(edit.beslik)
+                    puan_hesap = puan_hesap * 2
+                if edit.puanlama_turu == "C":
+                    puan_hesap = int(edit.beslik)
+                    puan_hesap = puan_hesap * 10
+
+                edit.puan = puan_hesap
+                edit.tamam = "E"
+                edit.save()
+                # eski resimleri silip yeri temizle................
+                """
+                if resim_var:
+                    silme_obj = kucukresim.objects.filter(kullanici=request.user.id)
+                    silme_obj.delete
+                """
             print("kaydetmiş olması lazım.................")
 
             # bir sonraki................
@@ -1869,8 +1921,9 @@ def denetim_detay_islemleri(request, pk=None):
         else:
             print("ne oldu be kardeşim...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
-            return redirect('devam_liste')
+            #return redirect('devam_liste')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
+            return render(request, 'islem/denetim_detay_islemleri.html', {'form': form,})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -1922,7 +1975,7 @@ def sonuc_denetim_sec(request, pk=None):
             denetim_no = request.POST.get('denetim_no', "")
             print ("denetim seçim yapılmış...", denetim_no)
             request.session['secilen_denetim'] = denetim_no
-            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
+            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('detay')
             denetimin_adi = sonuc_list.first().denetim
             denetimin_durumu = sonuc_list.first().denetim.durum
             context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}

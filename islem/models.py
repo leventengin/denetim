@@ -171,7 +171,7 @@ class yazi(models.Model):
 
 class kucukresim(models.Model):
     kullanici = models.ForeignKey(User, related_name='resim_ceken', on_delete=models.CASCADE)
-    foto_kucuk = models.ImageField(upload_to='xyz/kucukresim/',blank=True, null=True,)
+    foto_kucuk = models.ImageField(upload_to='xyz/kucukresim/%Y/%m/%d/',blank=True, null=True,)
 
 def upload_location(instance, filename):
     return "%s%s" %(instance.id, filename)
@@ -181,12 +181,15 @@ class sonuc_detay(models.Model):
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     detay = models.ForeignKey(detay, on_delete=models.PROTECT)
     puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")
-    onluk = models.CharField(max_length=1, choices=ONLUK)
-    beslik = models.CharField(max_length=1, choices=BESLIK)
-    ikilik = models.CharField(max_length=1, choices=IKILIK)
+    onluk = models.CharField(max_length=2, choices=ONLUK, blank=True, null=True)
+    beslik = models.CharField(max_length=1, choices=BESLIK, blank=True, null=True)
+    ikilik = models.CharField(max_length=1, choices=IKILIK, blank=True, null=True)
     puan = models.IntegerField(blank=True, null=True)
+    denetim_disi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    resim_varmi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     aciklama = models.CharField(max_length=100, blank=True, null=True)
-    foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
+    #foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
+    foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True)
     height_field = models.IntegerField(default=0)
     width_field = models.IntegerField(default=0)
     tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")

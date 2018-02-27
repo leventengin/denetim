@@ -39,13 +39,13 @@
 
   function baslat_jquery() {
       //alert("başlat jquery...");
-      /*
-      var puan_check = $('input:radio[name = sayi ]:checked').val();
-      if ( !puan_check ) {
-          alert("lütfen puan giriniz...");
-          return false;
+
+
+    if ( document.getElementById("id_denetim_disi").value == "E" ) {
+          document.getElementById("myForm").submit();
         }
-      */
+    else
+      {
 
       var onluk = document.getElementById("id_onluk").value;
       var int_onluk = parseInt(onluk);
@@ -72,6 +72,7 @@
       var resim = document.getElementById("id_foto").value;
       if (resim == "") {
                //alert("resim yüklenmemiş....");
+               document.getElementById("myForm").submit();
                //return false;
                }
       //alert(" adres.." + resim);
@@ -88,7 +89,8 @@
           }
           else { alert(" yüklenen resim formatı yanlış...." );  }
         }
-      }  //baslat_jquery....
+      } //denetim dışı....
+    }  //baslat_jquery....
   </script>
 
 
@@ -110,7 +112,7 @@
             <table border="0">
                 <tbody>
                     <tr>
-                        <td><b>Denetim No..:</b></td>
+                        <td><b>Denetim Adı.:</b></td>
                         <td>  &emsp;      {{ secili_obj.denetim }}</td>
                     </tr>
                     <p> </p>
@@ -119,7 +121,7 @@
                     <p> </p>
 
                     <tr>
-                        <td><b>Bolüm.....:</b></td>
+                        <td><b>Bolüm..........:</b></td>
                         <td> &emsp;     {{ secili_obj.bolum }}</td>
                     </tr>
                     <p> </p>
@@ -128,7 +130,7 @@
                     <p> </p>
 
                     <tr>
-                        <td><b>Detay Adı.........:   </b></td>
+                        <td><b>Detay Adı......:   </b></td>
                         <td> &emsp;     {{ secili_obj.detay }}</td>
                     </tr>
                     <p> </p>
@@ -201,8 +203,7 @@ $(document).ready(function()
                             alert("küçük resim hata....");
                           },
                       });  //ajax kapa...............
-
-
+                document.getElementById('id_resim_varmi').value="E";
             }); //image tools...
       };  // on change...
 });  /* document ready  kapanıyor */
@@ -214,12 +215,11 @@ $(document).ready(function()
 
 <form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
     {% csrf_token %}
-    {{ form.errors }}
+
     {{ form.non_field_errors }}
     <table>
 
         {{form.as_table}}
-
 
     </table>
     <!-- <input type="button" onclick="baslat_jquery()" value="kaydet" />  -->

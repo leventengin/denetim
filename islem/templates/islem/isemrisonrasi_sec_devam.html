@@ -37,7 +37,7 @@
                     <td> &emsp; Rutin   </td>
                     {%  endif %}
                 </tr>
-          
+
                 <tr>
                     <td><b>Denetçi:   </b></td>
                     <td> &emsp; {{ denetci }}  </td>
@@ -92,6 +92,7 @@
 
 
     {% for bolum, detay in dict_bol_detay.items %}
+
         <tr>
             <td> {{ bolum.bolum_kodu }} &emsp;  {{ bolum.bolum_adi }}</td>
         </tr>
@@ -103,6 +104,10 @@
         </tr>
         <p> </p>
         {% endfor %}
+
+        <p> </p> 
+        <p> </p>
+
 
     {% endfor %}
 

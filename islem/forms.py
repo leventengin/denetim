@@ -46,6 +46,10 @@ from django.utils.encoding import force_text
 
 
 
+EVETHAYIR = (
+('E', 'Evet'),
+('H', 'Hayır'),
+)
 
 
 
@@ -55,6 +59,39 @@ RUTINPLANLI = (
 ('S', 'Sıralı'),
 )
 
+PUANLAMA_TURU = (
+('A', 'Onluk'),
+('B', 'Beşlik'),
+('C', 'İkilik'),
+)
+
+ONLUK = (
+('0', '0'),
+('1', '1'),
+('2', '2'),
+('3', '3'),
+('4', '4'),
+('5', '5'),
+('6', '6'),
+('7', '7'),
+('8', '8'),
+('9', '9'),
+('10', '10'),
+)
+
+BESLIK = (
+('0', '0'),
+('1', '1'),
+('2', '2'),
+('3', '3'),
+('4', '4'),
+('5', '5'),
+)
+
+IKILIK = (
+('0', '0'),
+('1', '1'),
+)
 
 
 class Denetim_Deneme_Form(forms.Form):
@@ -92,10 +129,15 @@ class ProjeSecForm(forms.Form):
 class SonucForm(forms.ModelForm):
     class Meta:
         model = sonuc_detay
-        fields = ( 'puanlama_turu', 'onluk', 'beslik', 'ikilik', )
+        fields = ( 'puanlama_turu', 'onluk', 'beslik', 'ikilik', 'denetim_disi', 'resim_varmi',)
         widgets = {
-            #'puanlama_turu' : forms.HiddenInput(),
-            #'foto': forms.HiddenInput(),
+            'resim_varmi' : forms.HiddenInput(),
+        }
+        labels = {
+            'denetim_disi' : "Denetim dışı",
+            'onluk' : "Puan",
+            'beslik': "Puan",
+            'ikilik': "Puan",
         }
     def __init__(self, *args, **kwargs):
         puanlama_turu = kwargs.pop("puanlama_turu")
@@ -112,6 +154,22 @@ class SonucForm(forms.ModelForm):
             self.fields['onluk'].widget = forms.HiddenInput()
             self.fields['beslik'].widget = forms.HiddenInput()
         self.fields['puanlama_turu'].widget = forms.HiddenInput()
+    def clean(self):
+        cleaned_data = super(SonucForm, self).clean()
+        cc_puanlama_turu = cleaned_data.get("puanlama_turu")
+        cc_onluk = cleaned_data.get("onluk")
+        cc_beslik = cleaned_data.get("beslik")
+        cc_ikilik = cleaned_data.get("ikilik")
+        cc_denetim_disi = cleaned_data.get("denetim_disi")
+        cc_resim_varmi = cleaned_data.get("resim_varmi")
+        print("cc puanlama türü...:", cc_puanlama_turu)
+        print("cc onluk", cc_onluk)
+        print("cc beslik", cc_beslik)
+        print("cc ikilik", cc_ikilik)
+        print("cc denetim dışı", cc_denetim_disi)
+        print("cc resim var mı", cc_resim_varmi)
+
+
 
 
 class AcilAcForm(forms.Form):
@@ -170,25 +228,24 @@ class DenetimForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         bolum_listesi = kwargs.pop("bolum_listesi")
-        init_param = kwargs.pop("init_param")
+        #init_param = kwargs.pop("init_param")
         #detaylar = kwargs.pop("detaylar")
         super(DenetimForm, self).__init__(*args, **kwargs)
         print("init içinden seçilen bölüm listesi", bolum_listesi)
-        print("init param...", init_param)
+        #print("init param...", init_param)
         #print("init içinden detaylar....", detaylar)
-        if init_param:
-            qs = detay.objects.none()
-            if not (bolum_listesi == None):
-                i = 0
-                print("len...", len(bolum_listesi))
-                while i < len(bolum_listesi):
-                    qx = detay.objects.filter(bolum=bolum_listesi[i])
-                    print("qx...", qx)
-                    qs = qs.union(qx)
-                    i = i+1
-            qs = qs.order_by('detay_kodu')
-            print("qs.....", qs)
-            self.fields['detay'].queryset = qs
+        qs = detay.objects.none()
+        if not (bolum_listesi == None):
+            i = 0
+            print("len...", len(bolum_listesi))
+            while i < len(bolum_listesi):
+                qx = detay.objects.filter(bolum=bolum_listesi[i])
+                print("qx...", qx)
+                qs = qs.union(qx)
+                i = i+1
+        qs = qs.order_by('detay_kodu')
+        print("qs.....", qs)
+        self.fields['detay'].queryset = qs
 
 
     def clean(self):
@@ -283,13 +340,14 @@ class IlkDenetimSecForm(forms.Form):
         #denetim_obj_ilk = denetim.objects.filter(durum=durum)
 
 
-# ikinci kısımda canlı denetimde kullanılan form
+# ikinci kısımda canlı denetimde kullanılan form, denetçi kontrollerini yapıyor....
+
 class DenetimSecForm(forms.Form):
     denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DenetimSecForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="C") | denetim.objects.filter(durum="D")
+        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
         denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
         self.fields['denetim_no'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim_no'].queryset)

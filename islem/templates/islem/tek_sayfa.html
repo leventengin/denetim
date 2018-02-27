@@ -54,15 +54,17 @@ $( ".datepicker" ).datepicker()
       if (rp_hidden == "P")
         {
           alert("p ye geldi...");
-          document.getElementById("id_hedef_baslangic").disabled = false;
-          document.getElementById("id_hedef_bitis").disabled = false;
+          document.getElementById("id_hedef_baslangic").hidden = false;
+          document.getElementById("id_hedef_bitis").hidden = false;
+          document.getElementById("id_rutin_planli_0").checked = true;
         }
 
       if (rp_hidden == "R")
         {
           alert("r ye geldi...");
-          document.getElementById("id_hedef_baslangic").disabled = true;
-          document.getElementById("id_hedef_bitis").disabled = true;
+          document.getElementById("id_hedef_baslangic").hidden = true;
+          document.getElementById("id_hedef_bitis").hidden = true;
+          document.getElementById("id_rutin_planli_1").checked = true;
         }
 
 
@@ -84,13 +86,13 @@ $( ".datepicker" ).datepicker()
 
       if (x == true)
         {
-          document.getElementById("id_hedef_baslangic").disabled = false;
-          document.getElementById("id_hedef_bitis").disabled = false;
+          document.getElementById("id_hedef_baslangic").hidden = false;
+          document.getElementById("id_hedef_bitis").hidden = false;
         }
       else
         {
-          document.getElementById("id_hedef_baslangic").disabled = true;
-          document.getElementById("id_hedef_bitis").disabled = true;
+          document.getElementById("id_hedef_baslangic").hidden = true;
+          document.getElementById("id_hedef_bitis").hidden = true;
           document.getElementById("id_hedef_baslangic").value = "";
           document.getElementById("id_hedef_bitis").value = "";
         }
