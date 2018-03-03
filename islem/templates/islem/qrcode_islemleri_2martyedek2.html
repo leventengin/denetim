@@ -1,0 +1,249 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}qcode-decoder-master/build/qcode-decoder.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
+
+
+<style>
+.inputfile {
+  /* visibility: hidden etc. wont work */
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+  color: blue;
+}
+.inputfile:focus + label {
+  /* keyboard navigation */
+  outline: 1px dotted #000;
+  outline: -webkit-focus-ring-color auto 5px;
+}
+.inputfile + label * {
+  pointer-events: none;
+}
+</style>
+
+
+
+
+<h3>  QRCode Okuma   </h3>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+
+
+<script >
+
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function(evt)
+      {
+
+
+
+
+  alert("tanımaya hazır....");
+  //var resim = document.getElementById('id_foto').value;
+  //alert("resim adı..." + resim);
+  //document.getElementById('preview').src = document.getElementById('id_foto').src
+  //alert("tanıma başladı.......");
+
+  var imaj = document.getElementById("id_foto").src;
+
+  //var qr = new QCodeDecoder();
+  //alert("işlem öncesi..." + imaj);
+  QCodeDecoder().decodeFromImage(imaj, function (err, result) {
+      //if (err) { alert("hatalı lütfen tekrar deneyin...!!!"); }
+      //alert("sonuç....." + result);
+      console.log(result);
+      //document.getElementById("sonuc").value = result;
+      // javascript ile gönder ve arkada çalıştır.....
+      //var gonder = "http://127.0.0.1:7000/islem/qrcode/"+result;
+      //alert("gönder" + gonder);
+      //window.location.href = "http://google.com";
+
+      $.ajax({
+        url : "qrcode_calistir_js/",
+        type : "GET",
+        dataType: "text",
+        data : {
+          'result' : result,
+         },
+        success: function() {
+            //alert(" qrcode işlemi başarılı...");
+            //window.location.reload();
+            window.location.href = "result";
+            },
+        failure: function() {
+            alert("veri aktarılamadı...tekrar deneyiniz...");
+            }
+        });  /* ajax kapa...*/
+        //var sonuc = String(result);
+        //var res = sonuc.valueOf();
+        //alert("sonuçççç..."+res);
+
+      });  //qr sonucu.............function_one();
+          //window.location.href = "http://google.com";
+          //var sonuc = String(result);
+          //alert("parseint sonrası..."+sonuc);
+
+          //window.location.href = "result";
+
+
+
+
+};  // on change...
+
+
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+<script>
+function waitSeconds(iMilliSeconds) {
+    var counter= 0
+        , start = new Date().getTime()
+        , end = 0;
+    while (counter < iMilliSeconds) {
+        end = new Date().getTime();
+        counter = end - start;
+    }
+}
+</script>
+
+
+
+<!--
+<script>
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function(evt)
+      {
+
+
+
+
+
+                  //tani();
+
+
+                  //waitSeconds(15000);
+
+
+
+                  //alert("tanımaya hazır....");
+                  //var resim = document.getElementById('id_foto').value;
+                  //alert("resim adı..." + resim);
+                  //document.getElementById('preview').src = document.getElementById('id_foto').src
+                  //alert("tanıma başladı.......");
+
+
+                  //var imaj = document.getElementById("preview").src;
+
+                  var imaj = document.getElementById("id_foto").src;
+
+                  //var qr = new QCodeDecoder();
+                  //alert("işlem öncesi..." + imaj);
+                  QCodeDecoder().decodeFromImage(imaj, function (err, result) {
+                      //if (err) { alert("hatalı lütfen tekrar deneyin...!!!"); }
+                      //alert("sonuç....." + result);
+                      console.log(result);
+                      //document.getElementById("sonuc").value = result;
+                      // javascript ile gönder ve arkada çalıştır.....
+                      //var gonder = "http://127.0.0.1:7000/islem/qrcode/"+result;
+                      //alert("gönder" + gonder);
+                      //window.location.href = "http://google.com";
+
+                      $.ajax({
+                        url : "qrcode_calistir_js/",
+                        type : "GET",
+                        dataType: "text",
+                        data : {
+                          'result' : result,
+                         },
+                        success: function() {
+                            //alert(" qrcode işlemi başarılı...");
+                            //window.location.reload();
+                            window.location.href = "result";
+                            },
+                        failure: function() {
+                            alert("veri aktarılamadı...tekrar deneyiniz...");
+                            }
+                        });  /* ajax kapa...*/
+                        //var sonuc = String(result);
+                        //var res = sonuc.valueOf();
+                        //alert("sonuçççç..."+res);
+
+                      });  //qr sonucu.............function_one();
+                          //window.location.href = "http://google.com";
+                          //var sonuc = String(result);
+                          //alert("parseint sonrası..."+sonuc);
+
+                          //window.location.href = "result";
+
+
+      };  // on change...
+
+
+});  /* document ready  kapanıyor */
+</script>
+
+-->
+
+
+
+<form id="take_photo" enctype="multipart/form-data">
+      <input name="foto" type="file" id="id_foto" accept="image/jpeg"  class="inputfile" />
+      <label for="id_foto"> <font color="blue" font-weight="normal"> QRCode yükle </font>  </label>
+</form>
+
+
+
+<!--
+<form id="take_photo" enctype="multipart/form-data">
+      <label for="id_foto">Yükle:</label> <input name="foto" type="file" id="id_foto" accept="image/jpeg"  />
+</form>
+<p></p>
+<p></p>
+-->
+
+
+
+
+<!--
+<input type="button" onclick="tani()" value="tanı.." />
+-->
+<p></p>
+<p></p>
+<!--
+Değer...:
+-->
+<p></p>
+<p></p>
+<!--
+<input id="sonuc" value="" readonly />
+-->
+<p></p>
+<p></p>
+<!--
+RESİM.....................
+-->
+<p></p>
+<p></p>
+
+<img id="preview">
+
+
+
+
+
+
+{% endblock %}

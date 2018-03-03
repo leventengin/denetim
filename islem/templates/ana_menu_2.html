@@ -9,9 +9,11 @@
 <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'GeneratePDF' %}'">PDF Oluştur</button>
 <p> </p>
 <p> </p>
-{% if durum == "A" %}
+    {% if durum == "A" %}
+        {% if olustur_icinden == "H" %}
 <button type="button" class="btn btn-md"  onclick="window.location.href='{% url 'denetim_baslat' %}'">Denetim Başlat</button>
-{% endif %}
+        {% endif %}
+    {% endif %}
 {% endif %}
 
     <p> </p> &emsp;

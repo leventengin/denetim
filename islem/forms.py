@@ -1,4 +1,4 @@
-
+""
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil
@@ -102,6 +102,16 @@ class Denetim_Deneme_Form(forms.Form):
         cleaned_data = super(Denetim_Deneme_Form, self).clean()
         cc_denetim = cleaned_data.get("denetim")
         print("cc denetim ..:", cc_denetim)
+
+
+
+
+class Denetim_Rutin_Baslat_Form(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(),
+                 widget=autocomplete.ModelSelect2(url='denetim-rutin-autocomplete'), required=False)
+
+
+
 
 
 class Den_Olustur_Form(forms.Form):
@@ -337,7 +347,12 @@ class IlkDenetimSecForm(forms.Form):
         print("init içinden durum...", durum)
         super(IlkDenetimSecForm, self).__init__(*args, **kwargs)
         print("form init içinden kullanan", kullanan)
+        denetim_obj_ilk = denetim.objects.filter(durum=durum)
+        denetim_obj = denetim_obj_ilk.filter(yaratan=kullanan)
         #denetim_obj_ilk = denetim.objects.filter(durum=durum)
+        print("form init içinden denetim objesi seçilenler", denetim_obj)
+        self.fields['denetim_no'].queryset = denetim_obj
+
 
 
 # ikinci kısımda canlı denetimde kullanılan form, denetçi kontrollerini yapıyor....
@@ -347,10 +362,13 @@ class DenetimSecForm(forms.Form):
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DenetimSecForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="B") | denetim.objects.filter(durum="C")
+        denetim_obj_ilk = denetim.objects.filter(durum="B")
         denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
         self.fields['denetim_no'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
+
+
+
 
 
 # ikinci kısımda canlı denetimde kullanılan form

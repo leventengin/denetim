@@ -23,7 +23,7 @@ from django.utils.translation import get_language
 from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
 from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
-from .views import denolusturautocomplete
+from .views import denolusturautocomplete, denetimrutinautocomplete
 
 
 
@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     # dal denemesi için..................
     url(r'^denetim-autocomplete/$', denetimautocomplete.as_view(),name='denetim-autocomplete',),
+    url(r'^denetim-rutin-autocomplete/$', denetimrutinautocomplete.as_view(),name='denetim-rutin-autocomplete',),
     url(r'^denolustur-autocomplete/$', denolusturautocomplete.as_view(),name='denolustur-autocomplete',),
     url(r'^sonucbolum-autocomplete/$', sonucbolumautocomplete.as_view(),name='sonucbolum-autocomplete',),
     url(r'^takipci-autocomplete/$', takipciautocomplete.as_view(),name='takipci-autocomplete',),
@@ -58,8 +59,13 @@ urlpatterns = [
     url(r'^acilbildirim/(?P<pk>\d+)$', views.acil_bildirim, name='acil_bildirim'),
     url(r'^tamamla/(?P<pk>\d+)/kesin/$', views.denetim_tamamla_kesin, name='denetim_tamamla_kesin'),
     url(r'^devam_liste/$', views.devam_liste, name='devam_liste'),
+    url(r'^rutin_baslat/$', views.rutin_baslat, name='rutin_baslat'),
+    url(r'^rutin_baslat/kesin$', views.rutin_baslat_kesin, name='rutin_baslat_kesin'),
     url(r'^acil_devam_sec/$', views.acil_devam_sec, name='acil_devam_sec'),
     url(r'^qrcode/$', views.qrcode_tara, name='qrcode_tara'),
+    url(r'^qrcode/result/$', views.qrcode_islemi_baslat, name='qrcode_islemi_baslat'),
+    #url(r'^qrcode/(?P<pk>\d+)$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
+    url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
@@ -79,22 +85,25 @@ urlpatterns = [
 
 
 #---------------------------------------------------------------------------------------------------
-#   denetim oluşturma url leri  yerinde denetimden farklı .............................
+#   denetim oluşturma url leri  eskiler .............................
     #
     url(r'^denetim/isemrisonrasi/$', views.isemrisonrasi_sec, name='isemrisonrasi_sec'),
     url(r'^denetim/isemrisonrasi/devam/$', views.isemrisonrasi_devam, name='isemrisonrasi_devam'),
     url(r'^denetim/isemrisonrasi/denetimiptal/$', views.denetim_iptal, name='denetim_iptal'),
     url(r'^denetim/isemrisonrasi/denetimiptal/devam/$', views.denetim_iptal_devam, name='denetim_iptal_devam'),
-    #deneme alttaki.................
+    url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
+
+    #yeniler raporlama ve sonraki işlemler kısmı............
     url(r'^denetim/baslanmislar/$', views.baslanmislar_sec, name='baslanmislar_sec'),
     url(r'^denetim/baslanmislar/devam/$', views.baslanmislar_devam, name='baslanmislar_devam'),
     url(r'^denetim/sonlandirilan/$', views.sonlandirilan_sec, name='sonlandirilan_sec'),
     url(r'^denetim/sonlandirilan/devam/$', views.sonlandirilan_devam, name='sonlandirilan_devam'),
     url(r'^denetim/sonlandirilan/devam/(?P<pk>\d+)$', views.sonlandirilan_ilerle, name='sonlandirilan_ilerle'),
-    url(r'^denetim/(?P<pk>\d+)/update/$', views.DenetimUpdate.as_view(), name='denetim_update'),
+    url(r'^denetim/iptal/$', views.iptal_sec, name='iptal_sec'),
+    url(r'^denetim/iptal/devam/$', views.iptal_devam, name='iptal_devam'),
+    url(r'^denetim/iptal/devam/(?P<pk>\d+)$', views.iptal_ilerle, name='iptal_ilerle'),
 
 #   diğer denetim oluşturma işlemleri..................
-
     url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
     url(r'^denetim/teksayfa_yarat/detaylarsec_bolum_js/$', views.detaylarsec_bolum_js, name='detaylarsec_bolum_js'),
     url(r'^denetim/teksayfa_yarat/tipisec_bolum_js/$', views.tipisec_bolum_js, name='tipisec_bolum_js'),

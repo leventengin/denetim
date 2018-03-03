@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Sonuç Listesi</h3>
+    <p> </p>
+    <h4> Seçili Denetim...:&emsp; {{ denetimin_adi}} </h4>
+<!--
+    <p> </p>
+    <h5> Durumu...........:&emsp; {{ denetimin_durumu}} </h5>
+-->
+
+    {% if sonuc_list %}
+    <ul>
+      {% for sonuc in sonuc_list %}
+      <li>
+
+              &emsp;       {{sonuc.detay.detay_kodu}} -
+              &emsp;       <a>{{ sonuc.bolum }}</a> -
+              &emsp;       <a href="/islem/sonuc/{{sonuc.id}}">{{ sonuc.detay }}</a>
+
+      </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Kayıtlı sonuc yok  </p>
+    {% endif %}
+
+{% endblock %}

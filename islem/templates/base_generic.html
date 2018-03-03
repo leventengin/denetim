@@ -122,15 +122,15 @@
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Yerinde Denetim <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
                  <li><a href="/islem">Bekleyen Planlı Denetimler</a></li>
-                 <li><a href="/islem">Rutin Denetim Başlat</a></li>
+                 <li><a href="/islem/rutin_baslat">Rutin Denetim Başlat</a></li>
                  <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
                  <li><a href="/islem/acil_devam_sec"><font color="f44336">Acil Bildirim</font></a></li>
                  <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
                  <li><a href="/islem/sonuc">Yazı Ekle</a></li>
                  <li><a href="/islem/sonuc">Denetim Tamamla</a></li>
-                 <!--
+
                  <li><a href="/islem/qrcode">QRCode</a></li>
-                 -->
+
                </ul>
              </li>
              {% endif %}
@@ -142,8 +142,7 @@
                 <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
                 <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
                 <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
-                <li><a href="/islem/denetim">Planlı Denetim Detayları</a></li>
-                <li><a href="/islem/denetim">Rutin Denetim Detayları</a></li>
+                <li><a href="/islem/denetim">Denetim Detayları</a></li>
                </ul>
              </li>
              {% endif %}
@@ -155,7 +154,7 @@
                 <li><a href="/islem/denetim/sonlandirilan">Sonlandırılanlar</a></li>
                 <li><a href="/islem/denetim/sonlandirilan">Denetim Raporları</a></li>
                 {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-                    <li><a href="/islem/denetim/isemrisonrasi/denetimiptal">Denetim İptal</a></li>
+                    <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
                 {% endif %}
                </ul>
              </li>

@@ -11,13 +11,173 @@
       <p>Denetimi tamamlamak istediğinizden emin misiniz ? </p>
 
 
-      <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla_kesin' pk=numarasi %}'">Evet tamamla</button>
+      <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla_kesin' pk=pk %}'">Evet tamamla</button>
 
-<!--
-      <form action="kesin" method="POST">
-              {% csrf_token %}
-          <input type="submit" value="Evet tamamla" />
-      </form>
+
+
+          <p> </p> &emsp;
+
+          <h4>  Denetim  Raporu </h4>
+          <p> </p> &emsp;
+
+
+              <table border="0">
+                  <tbody>
+                      <tr>
+                          <td><b>Denetim Adı:</b></td>
+                          <td>  &emsp; {{ denetim_adi }} </td>
+                      </tr>
+                      <tr>
+                          <td><b>Proje:</b></td>
+                          <td> &emsp; {{ proje }}  </td>
+                      </tr>
+                      <tr>
+                          <td><b>Planlı/Rutin:</b></td>
+                          {%   if rutin_planli == "P" %}
+                          <td> &emsp; Planlı  </td>
+                          {%  else %}
+                          <td> &emsp; Rutin   </td>
+                          {%  endif %}
+                      </tr>
+
+                      <tr>
+                          <td><b>Denetçi:   </b></td>
+                          <td> &emsp; {{ denetci }}  </td>
+                      </tr>
+                      <tr>
+                          <td><b>Denetim Tipi:</b></td>
+                          <td>  &emsp;  {{ tipi }} </td>
+                      </tr>
+                      <tr>
+                          <td><b>Oluşturma Tarihi:</b></td>
+                          <td> &emsp; {{ yaratim_tarihi }}  </td>
+                      </tr>
+                      <tr>
+                          <td><b>Oluşturan:   </b></td>
+                          <td> &emsp;  {{ yaratan }}  </td>
+                      </tr>
+
+
+                      <tr>
+                          <td><b>Toplam soru adedi:</b></td>
+                          <td> &emsp; {{ soru_adedi }} </td>
+                      </tr>
+                      <tr>
+                          <td><b>Denetim dışı soru adedi:   </b></td>
+                          <td> &emsp; {{ dd_adedi }}  </td>
+                      </tr>
+
+                      <tr>
+                          <td><b>Net soru adedi:</b></td>
+                          <td> &emsp; {{ net_adet }} </td>
+                      </tr>
+                      <tr>
+                          <td><b>Toplam alınan puan:   </b></td>
+                          <td> &emsp; {{ toplam_puan }}  </td>
+                      </tr>
+
+                      <tr>
+                          <td><b>Denetim Puanı:   </b></td>
+                          <td> &emsp; {{ ortalama_puan |floatformat:2 }}  </td>
+                      </tr>
+
+                  </tbody>
+              </table>
+
+  <!--
+              <p> </p> &emsp;
+              <p> </p> &emsp;
+              <h5> <b> Takipçiler: </b> <h5>
+              <p> </p>
+
+
+              {% for takipci in takipciler %}
+              <tr>
+                  <td> {{ takipci }} </td>
+              </tr>
+              <p> </p>
+              {% endfor %}
 -->
+
+
+            {% if dict_bol_detay %}
+                  <!-- <strong>There are logs present.</strong>  -->
+                  <p> </p>
+            {% else %}
+                  <strong>There are no logs present.</strong>
+                  <p> </p>
+            {% endif %}
+
+
+
+
+
+          <p> </p> &emsp;
+          <p> </p> &emsp;
+          <h5> <b> Bölüm ve detaylar: </b> <h5>
+          <p> </p> &emsp;
+          <p> </p>
+          {% for bolum, detay in dict_bol_detay.items %}
+              <tr>
+                  <td> {{ bolum.bolum.bolum_kodu }} &emsp;  {{ bolum.bolum.bolum_adi }}</td>
+              </tr>
+              <p> </p>
+              <tr>
+                  <td>  &emsp; &emsp; Bölüm içi soru adedi: </td>
+                  <td> &emsp; {{ bolum.soru_adedi }} </td>
+              </tr>
+              <p> </p>
+              <tr>
+                  <td>   &emsp; &emsp; Bölümdeki denetim dışı soru adedi:   </td>
+                  <td> &emsp; {{ bolum.dd_adedi }}  </td>
+              </tr>
+              <p> </p>
+              <tr>
+                  <td>  &emsp; &emsp; Bölümdeki net soru adedi: </td>
+                  <td> &emsp; {{ bolum.net_adet }} </td>
+              </tr>
+              <p> </p>
+              <tr>
+                  <td> &emsp;  &emsp; Toplam alınan puan:   </td>
+                  <td> &emsp; {{ bolum.toplam_puan }}  </td>
+              </tr>
+              <p> </p>
+              <tr>
+                  <td>  &emsp; &emsp; Bölüm Puanı:   </td>
+                  <td> &emsp; {{ bolum.ortalama_puan}}  </td>
+              </tr>
+              <p> </p>
+              <p> &emsp;   </p>
+
+
+              {% for detay in detay %}
+              <tr>
+                  <td> &emsp;  {{ detay.detay.detay_kodu }} &emsp;   {{ detay.detay.detay_adi }}   </td>
+              </tr>
+              <p> </p>
+
+              {% if detay.denetim_disi == "E" %}
+              <tr>
+                  <td> &emsp;    &emsp;  Denetim dışı </td>
+              </tr>
+              <p> </p>
+              {% endif %}
+
+              {% if detay.denetim_disi == "H" %}
+              <tr>
+                <td> &emsp;   &emsp;  Puanı:   </td>
+                <td>  &emsp;  {{ detay.puan }} </td>
+              </tr>
+              <p> </p>
+              {% endif %}
+
+              <p> </p>
+              {% endfor %}
+              <p>   &emsp;   </p>
+
+          {% endfor %}
+
+
+
 
 {% endblock %}

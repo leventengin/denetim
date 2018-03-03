@@ -6,30 +6,13 @@
 <script type="text/javascript" src="{{ STATIC_URL }}qcode-decoder-master/build/qcode-decoder.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
 
-<style>
-.inputfile {
-  /* visibility: hidden etc. wont work */
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-  color: blue;
-}
-.inputfile:focus + label {
-  /* keyboard navigation */
-  outline: 1px dotted #000;
-  outline: -webkit-focus-ring-color auto 5px;
-}
-.inputfile + label * {
-  pointer-events: none;
-}
-</style>
 
+<h3> <b> QRCode Okuma  </b> </h3>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
 
-<h3>  QRCode Okuma   </h3>
-<p> &emsp;   </p>
 
 
 <script>
@@ -37,24 +20,17 @@ $(document).ready(function()
 {
       document.getElementById('id_foto').onchange = function(evt)
       {
-            //alert("dokuman hazır....bom bom");
+            alert("dokuman hazır....bom bom");
               ImageTools.resize(this.files[0], {
                 width: 320, // maximum width
                 height: 240 // maximum height
                   }, function(blob, didItResize) {
-                //alert("did it resize" + didItResize);
-                //didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
+                alert("did it resize" + didItResize);
+                /didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
                 document.getElementById('preview').src = window.URL.createObjectURL(blob);
               }); //image tools....
 
-
-
-              //tani();
-
-
       };  // on change...
-
-
 
 
 });  /* document ready  kapanıyor */
@@ -63,19 +39,13 @@ $(document).ready(function()
 
 
 
-<script>
-function loadImage() {
-    alert("Image is loaded");
-}
-</script>
 
 
 
 
 <script  type="text/javascript">
-
 function tani() {
-  //alert("tanımaya hazır....");
+  alert("tanımaya hazır....");
   //var resim = document.getElementById('id_foto').value;
   //alert("resim adı..." + resim);
   //document.getElementById('preview').src = document.getElementById('id_foto').src
@@ -103,7 +73,7 @@ function tani() {
           'result' : result,
          },
         success: function() {
-            //alert(" qrcode işlemi başarılı...");
+            alert(" qrcode işlemi başarılı...");
             //window.location.reload();
             window.location.href = "result";
             },
@@ -122,8 +92,6 @@ function tani() {
 
           //window.location.href = "result";
 }
-
-
 </script>
 
 
@@ -132,15 +100,13 @@ function tani() {
 
 
 <form id="take_photo" enctype="multipart/form-data">
-      <label for="id_foto"> <font color="blue" font-weight="normal"> QRCode yükle </font>  </label>
-      <input name="foto" type="file" id="id_foto" accept="image/jpeg" class="inputfile" />
+      <label for="id_foto">Yükle:</label> <input name="foto" type="file" id="id_foto" accept="image/jpeg"  />
 </form>
 <p></p>
 <p></p>
 
-<!--
+
 <input type="button" onclick="tani()" value="tanı.." />
--->
 
 <p></p>
 <p></p>
@@ -149,9 +115,7 @@ Değer...:
 -->
 <p></p>
 <p></p>
-<!--
 <input id="sonuc" value="" readonly />
--->
 <p></p>
 <p></p>
 
@@ -159,7 +123,7 @@ Değer...:
 <p></p>
 <p></p>
 
-<img id="preview" style="display: none;" onload="tani()"   >
+<img id="preview">
 
 
 

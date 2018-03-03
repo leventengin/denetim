@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import requests
 from gm2m import GM2MField
+from decimal import Decimal
 
 EVETHAYIR = (
 ('E', 'Evet'),
@@ -155,9 +156,17 @@ class denetim(models.Model):
     gerc_bitis = models.DateField(blank=True, null=True)
     fiili_kapanis = models.DateField(blank=True, null=True)
     aciklama = models.TextField(blank=True, null=True)
+    rutindenetci = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    yazi_varmi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    rapor_yazi = models.TextField(blank=True, null=True)
     devam_mi = models.BooleanField(default=False)
     tekrar_mi = models.BooleanField(default=False)
     tamamla_mi = models.BooleanField(default=False)
+    soru_adedi = models.IntegerField(default=0)
+    dd_adedi = models.IntegerField(default=0)
+    net_adet = models.IntegerField(default=0)
+    toplam_puan = models.IntegerField(default=0)
+    ortalama_puan = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))    
     ilk_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     sonuc_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     def __str__(self):
@@ -203,6 +212,11 @@ class sonuc_bolum(models.Model):
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     rutindenetci = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    soru_adedi = models.IntegerField(default=0)
+    dd_adedi = models.IntegerField(default=0)
+    net_adet = models.IntegerField(default=0)
+    toplam_puan = models.IntegerField(default=0)
+    ortalama_puan = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     def __str__(self):
         return(self.bolum.bolum_adi)
 

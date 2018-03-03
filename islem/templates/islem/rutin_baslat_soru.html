@@ -1,0 +1,27 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!--  buraya if konulacak ...-->
+
+
+      <h3>Rutin denetim başlat</h3>
+
+      <p>Bu denetimi başlatmak istediğinizden emin misiniz ? </p>
+
+      <p>  <b> Numarası: </b>   &emsp;   {{ secili_denetim.id }}</p>
+
+      <p>   <b>  Denetim adı: </b>  &emsp;   {{ secili_denetim.denetim_adi }}</p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+      <!--<input type="submit" action="demirbas_sil_kesin" value="Evet, sil.." /> -->
+
+      <!-- <a href="giris/demirbas/{{ sil_id }}/kesin"> Evet sil... </a>  -->
+
+      <a href="kesin"> Evet başlat... </a>
+      </form>
+
+{% endblock %}
