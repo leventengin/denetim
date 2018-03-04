@@ -46,14 +46,14 @@ $( ".datepicker" ).datepicker()
 
 <script>
   function ilk_Func() {
-      alert("buraya da geldi.....ilk func .........");
+      //alert("buraya da geldi.....ilk func .........");
 
       var rp_hidden = document.getElementById("id_rp_hidden").value;
-      alert("rp hidden..."+rp_hidden);
+      //alert("rp hidden..."+rp_hidden);
 
       if (rp_hidden == "P")
         {
-          alert("p ye geldi...");
+          //alert("p ye geldi...");
           document.getElementById("id_hedef_baslangic").hidden = false;
           document.getElementById("id_hedef_bitis").hidden = false;
           document.getElementById("id_rutin_planli_0").checked = true;
@@ -61,7 +61,7 @@ $( ".datepicker" ).datepicker()
 
       if (rp_hidden == "R")
         {
-          alert("r ye geldi...");
+          //alert("r ye geldi...");
           document.getElementById("id_hedef_baslangic").hidden = true;
           document.getElementById("id_hedef_bitis").hidden = true;
           document.getElementById("id_rutin_planli_1").checked = true;
@@ -75,13 +75,13 @@ $( ".datepicker" ).datepicker()
 
 <script>
   function rutinplanli_Function() {
-      alert("buraya da geldi.....rutin / planlı .........");
+      //alert("buraya da geldi.....rutin / planlı .........");
 
       var x = document.getElementById("id_rutin_planli_0").checked;
       var y = document.getElementById("id_rutin_planli_1").checked;
 
-      alert ("p mi..."+x);
-      alert ("r mi..."+y)
+      //alert ("p mi..."+x);
+      //alert ("r mi..."+y)
 
 
       if (x == true)
@@ -104,13 +104,13 @@ $( ".datepicker" ).datepicker()
 
 <script>
   function gonder_Func() {
-      alert("buraya da geldi.  gönder func..........");
+      //alert("buraya da geldi.  gönder func..........");
 
       var x = document.getElementById("id_rutin_planli_0").checked;
       var y = document.getElementById("id_rutin_planli_1").checked;
 
-      alert ("p mi..."+x);
-      alert ("r mi..."+y)
+      //alert ("p mi..."+x);
+      //alert ("r mi..."+y)
 
       if (x == false && y == false)
                 {
@@ -119,11 +119,11 @@ $( ".datepicker" ).datepicker()
                 }
 
       var todayDate = new Date().toISOString().slice(0,10);
-      alert("today date...."+todayDate);
+      //alert("today date...."+todayDate);
       var tar_baslangic = document.getElementById("id_hedef_baslangic").value;
-      alert("hedef başlangıç..."+tar_baslangic)
+      //alert("hedef başlangıç..."+tar_baslangic)
       var tar_bitis = document.getElementById("id_hedef_bitis").value;
-      alert("hedef bitiş..."+tar_bitis)
+      //alert("hedef bitiş..."+tar_bitis)
 
       if ( x == True)
       {
@@ -146,7 +146,7 @@ $( ".datepicker" ).datepicker()
             }
         }
 
-      alert("kontrol sonu..................!!!!")
+      //alert("kontrol sonu..................!!!!")
 
   }
 </script>
@@ -173,14 +173,14 @@ $( ".datepicker" ).datepicker()
       var y = document.getElementById("id_rutin_planli_1").checked;
       if (x == true)
           { var js_rutin_planli = "P";
-             alert(" js rutin planlı ...p  "+js_rutin_planli);
+             //alert(" js rutin planlı ...p  "+js_rutin_planli);
            }
       else { if (y == true)
               { var js_rutin_planli = "R";
-                alert(" js rutin planlı...r "+js_rutin_planli);
+                //alert(" js rutin planlı...r "+js_rutin_planli);
               }
             else { var js_rutin_planli ="";
-                    alert(" js rutin planlı...boş "+js_rutin_planli);
+                    //alert(" js rutin planlı...boş "+js_rutin_planli);
             }}
       var js_denetci = document.getElementById("id_denetci").value;
       var js_tipi = document.getElementById("id_tipi").value;
@@ -188,8 +188,8 @@ $( ".datepicker" ).datepicker()
       var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
       var js_aciklama = document.getElementById("id_aciklama").value;
 
-      alert(" bölümler..." + js_bolumler);
-      alert("js rutin planlı ..."+js_rutin_planli);
+      //alert(" bölümler..." + js_bolumler);
+      //alert("js rutin planlı ..."+js_rutin_planli);
       console.log(js_bolumler);
       $.ajax({
         url : "tipisec_bolum_js/",
@@ -208,7 +208,7 @@ $( ".datepicker" ).datepicker()
           'js_aciklama' : js_aciklama,
          },
         success: function() {
-            alert("tipi seçimi başarılı...");
+            //alert("tipi seçimi başarılı...");
             window.location.reload();
             },
         failure: function() {
@@ -240,14 +240,14 @@ $( ".datepicker" ).datepicker()
         var y = document.getElementById("id_rutin_planli_1").checked;
         if (x == true)
             { var js_rutin_planli = "P";
-               alert(" js rutin planlı ...p  "+js_rutin_planli);
+               //alert(" js rutin planlı ...p  "+js_rutin_planli);
              }
         else { if (y == true)
                 { var js_rutin_planli = "R";
-                  alert(" js rutin planlı...r "+js_rutin_planli);
+                  //alert(" js rutin planlı...r "+js_rutin_planli);
                 }
               else { var js_rutin_planli ="";
-                      alert(" js rutin planlı...boş "+js_rutin_planli);
+                      //alert(" js rutin planlı...boş "+js_rutin_planli);
               }}
         var js_denetci = document.getElementById("id_denetci").value;
         var js_tipi = document.getElementById("id_tipi").value;
@@ -255,7 +255,7 @@ $( ".datepicker" ).datepicker()
         var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
         var js_aciklama = document.getElementById("id_aciklama").value;
 
-        alert(" bölümler..." + js_bolumler);
+        //alert(" bölümler..." + js_bolumler);
         console.log(js_bolumler);
         $.ajax({
           url : "detaylarsec_bolum_js/",
@@ -274,7 +274,7 @@ $( ".datepicker" ).datepicker()
             'js_aciklama' : js_aciklama,
            },
           success: function() {
-              alert("bölüm seçimi başarılı...");
+              //alert("bölüm seçimi başarılı...");
               window.location.reload();
               },
           failure: function() {
@@ -315,7 +315,7 @@ $( ".datepicker" ).datepicker()
 <script>
       $(document).ready(function(){
              $("#id_bolum").change(function(){
-                  alert ( "...bolum detay seç çalıştı...");
+                  //alert ( "...bolum detay seç çalıştı...");
                   detaysecFunction();
              });   /*  change  kapanıyor ...  */
            });  /* document ready  kapanıyor */
@@ -325,7 +325,7 @@ $( ".datepicker" ).datepicker()
 <script>
       $(document).ready(function(){
              $("#id_tipi").change(function(){
-                  alert ( "...tipi seç çalıştı...");
+                  //alert ( "...tipi seç çalıştı...");
                   tipisecFunction();
              });   /*  change  kapanıyor ...  */
            });  /* document ready  kapanıyor */
@@ -335,7 +335,7 @@ $( ".datepicker" ).datepicker()
 <script>
       $(document).ready(function(){
              $("#id_rutin_planli").change(function(){
-                  alert ( "...rutin - planlı çalıştı...");
+                  //alert ( "...rutin - planlı çalıştı...");
                   rutinplanli_Function();
              });   /*  change  kapanıyor ...  */
            });  /* document ready  kapanıyor */
@@ -344,7 +344,7 @@ $( ".datepicker" ).datepicker()
 
 <script>
       $(document).ready(function(){
-                  alert ( "...ilk func ...çalıştı...");
+                  //alert ( "...ilk func ...çalıştı...");
                   ilk_Func();
            });  /* document ready  kapanıyor */
 </script>
@@ -542,3 +542,4 @@ $( ".datepicker" ).datepicker()
 
 
 {% endblock %}
+

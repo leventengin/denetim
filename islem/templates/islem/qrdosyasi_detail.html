@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h4>Qrcode Tanım Sayfası</h4>
+
+  <p> </p>
+  <p> </p>
+
+
+  <table border="0">
+      <tbody>
+          <tr>
+              <td><b> QRCode..:</b></td>
+              <td>  &emsp;      {{ qrdosyasi.qr_deger }}</td>
+          </tr>
+          <tr>
+              <td><b>Denetim.....:</b></td>
+              <td> &emsp;     {{ qrdosyasi.denetim }}</td>
+          </tr>
+      </tbody>
+  </table>
+
+
+
+
+{% endblock %}

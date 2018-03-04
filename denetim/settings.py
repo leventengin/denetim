@@ -29,7 +29,8 @@ ALLOWED_HOSTS = []
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'hijyenakademisi.smtp@gmail.com'
-EMAIL_HOST_PASSWORD = 'hijyensmtpakademi'
+#EMAIL_HOST_PASSWORD = 'hijyensmtpakademi'
+EMAIL_HOST_PASSWORD = 'silamonad126'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

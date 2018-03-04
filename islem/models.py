@@ -166,7 +166,7 @@ class denetim(models.Model):
     dd_adedi = models.IntegerField(default=0)
     net_adet = models.IntegerField(default=0)
     toplam_puan = models.IntegerField(default=0)
-    ortalama_puan = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))    
+    ortalama_puan = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     ilk_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     sonuc_dosya = models.FileField(upload_to='raporlar/', blank=True, null=True)
     def __str__(self):
@@ -177,6 +177,13 @@ class yazi(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.CASCADE)
     def __str__(self):
         return(self.denetim)
+
+class qrdosyasi(models.Model):
+    qr_deger = models.CharField(max_length=50)
+    denetim = models.ForeignKey(denetim, on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.qr_deger)
+
 
 class kucukresim(models.Model):
     kullanici = models.ForeignKey(User, related_name='resim_ceken', on_delete=models.CASCADE)

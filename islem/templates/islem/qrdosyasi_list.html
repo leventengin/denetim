@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <h3>QRCode Listesi</h3>
+
+    {% if qrdosyasi_list %}
+    <ul>
+
+      {% for qrcode in qrdosyasi_list %}
+      <li>
+        <a href="{{qrcode.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{qrcode.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{qrcode.qr_deger}})    <a href="{{qrcode.id}}">{{ qrcode.denetim }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/qrdosyasi/create"> QRCode Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı qrcode yok ....</p>
+      <p> </p>
+      <a href="/islem/qrdosyasi/create"> QRCode Ekle </a>
+    {% endif %}
+
+{% endblock %}

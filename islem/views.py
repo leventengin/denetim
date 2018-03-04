@@ -14,13 +14,13 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon
-from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci
+from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm
-from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm
+from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -594,6 +594,7 @@ def rutin_baslat_kesin(request, pk=None):
 
     request.session['devam_tekrar'] = "devam"
     request.session['denetim_no'] = yeni_denetim_no
+
     return redirect('denetim_bolum_sec' )
 
 
@@ -2407,6 +2408,44 @@ def qrcode_islemi_baslat(request, pk=None):
 
 
 @login_required
+def cagir1(request, pk=None):
+    print("selam buraya geldik...cagir1")
+    context = {}
+    return render(request, 'islem/ug_login.html', context )
+
+
+
+@login_required
+def cagir2(request, pk=None):
+    print("selam buraya geldik...cagir1")
+    context = {}
+    return render(request, 'islem/ug_index.html', context )
+
+
+
+@login_required
+def cagir3(request, pk=None):
+    print("selam buraya geldik...cagir1")
+    context = {}
+    return render(request, 'islem/ug_denetim.html', context )
+
+
+@login_required
+def cagir4(request, pk=None):
+    print("selam buraya geldik...cagir1")
+    context = {}
+    return render(request, 'islem/ug_olustur.html', context )
+
+
+
+
+
+
+
+#--------------------------------------------------------------------------------
+
+
+@login_required
 @transaction.atomic
 def update_profile(request):
     if request.method == 'POST':
@@ -2835,6 +2874,53 @@ def denetim_iptal_devam(request, pk=None):
     messages.success(request, 'Denetim iptal edildi....')
     return redirect('index' )
 
+#---------------------------------------------------------------------------------
+
+
+@login_required
+def qrdosyasi_create(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Qrcode_Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            denetim = request.POST.get('denetim', "")
+            qrcode = request.POST.get('qrcode', "")
+            print ("denetim....", denetim)
+            print("qrcode...", qrcode)
+            request.session['denetim_qrcode'] = denetim
+            request.session['qrdosyasi_qrcode'] = qrcode
+
+            qr_obj = qrdosyasi.objects.filter(qr_deger=qrcode).first()
+
+            if qr_obj:
+                messages.success(request, 'QRCode zaten tanımlı....')
+                return redirect('qrdosyasi_create')
+            else:
+                kaydetme_obj = qrdosyasi(qr_deger=qrcode, denetim_id=denetim)
+                kaydetme_obj.save()
+                messages.success(request, 'Başarıyla kaydetti....')
+                return redirect('qrdosyasi_create')
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('qrdosyasi_create')
+            #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = Qrcode_Form()
+        return render(request, 'islem/qrdosyasi_form.html', {'form': form,})
+
+
+
+
+
+
+
+
 
 #--------------------------------------------------------------------------------
 
@@ -3204,6 +3290,26 @@ class ProjeDelete(LoginRequiredMixin,DeleteView):
     success_url = reverse_lazy('proje')
 
 
+#-------------------------------------------------------
+
+# qrdosyasi yaratma, güncelleme, silme ...
+
+class QrdosyasiCreate(LoginRequiredMixin,CreateView):
+    model = qrdosyasi
+    fields = '__all__'
+    success_url = "/islem/qrdosyasi/create/"
+
+class QrdosyasiUpdate(LoginRequiredMixin,UpdateView):
+    model = qrdosyasi
+    fields = '__all__'
+    success_url = "/islem/qrdosyasi/"
+
+class QrdosyasiDelete(LoginRequiredMixin,DeleteView):
+    model = qrdosyasi
+    success_url = reverse_lazy('qrdosyasi')
+
+
+
 #--------------------------------------------------------------
 
 
@@ -3211,6 +3317,7 @@ class SonucDetayUpdate(LoginRequiredMixin,UpdateView):
     model = sonuc_detay
     fields = '__all__'
     success_url = "/islem/sonuc/"
+
 
 #-----------------------------------------?????????????????????????
 
@@ -3226,7 +3333,7 @@ class SonucDetayDetailView(LoginRequiredMixin,generic.DetailView):
 
 class TipiListView(LoginRequiredMixin,generic.ListView):
     model = tipi
-    #paginate_by = 20
+    paginate_by = 20
 
 class TipiDetailView(LoginRequiredMixin,generic.DetailView):
     model = tipi
@@ -3235,7 +3342,7 @@ class TipiDetailView(LoginRequiredMixin,generic.DetailView):
 
 class ZonListView(LoginRequiredMixin,generic.ListView):
     model = zon
-    #paginate_by = 20
+    paginate_by = 20
 
 class ZonDetailView(LoginRequiredMixin,generic.DetailView):
     model = zon
@@ -3245,7 +3352,7 @@ class ZonDetailView(LoginRequiredMixin,generic.DetailView):
 
 class BolumListView(LoginRequiredMixin,generic.ListView):
     model = bolum
-    #paginate_by = 20
+    paginate_by = 20
 
 class BolumDetailView(LoginRequiredMixin,generic.DetailView):
     model = bolum
@@ -3254,6 +3361,7 @@ class BolumDetailView(LoginRequiredMixin,generic.DetailView):
 
 class DetayListView(LoginRequiredMixin,generic.ListView):
     model = detay
+    paginate_by = 20
 
 class DetayDetailView(LoginRequiredMixin,generic.DetailView):
     model = detay
@@ -3262,7 +3370,7 @@ class DetayDetailView(LoginRequiredMixin,generic.DetailView):
 
 class GrupListView(LoginRequiredMixin,generic.ListView):
     model = grup
-    #paginate_by = 20
+    paginate_by = 20
 
 class GrupDetailView(LoginRequiredMixin,generic.DetailView):
     model = grup
@@ -3271,15 +3379,28 @@ class GrupDetailView(LoginRequiredMixin,generic.DetailView):
 
 class SirketListView(LoginRequiredMixin,generic.ListView):
     model = sirket
-    #paginate_by = 20
+    paginate_by = 20
 
 class SirketDetailView(LoginRequiredMixin,generic.DetailView):
     model = sirket
+
+
+#---------------------------------------------------------
+
+class QrdosyasiListView(LoginRequiredMixin,generic.ListView):
+    model = qrdosyasi
+    paginate_by = 20
+
+class QrdosyasiDetailView(LoginRequiredMixin,generic.DetailView):
+    model = qrdosyasi
+
+
 
 #------------------------------------------------------------
 
 class ProjeListView(LoginRequiredMixin,generic.ListView):
     model = proje
+    paginate_by = 20
 
 class ProjeDetailView(LoginRequiredMixin,generic.DetailView):
     model = proje
@@ -3315,6 +3436,9 @@ class Denetim_3DetailView(LoginRequiredMixin,generic.DetailView):
     queryset = denetim.objects.filter(durum="C")
 
 #--------------------------------------------------------------
+
+
+
 
 # -*- coding: utf-8 -*-
 from .models import denetim
@@ -3408,6 +3532,21 @@ class denolusturautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(denetim_adi__icontains=self.q)
             print("qs filtre içinden", qs)
         return qs
+
+
+class rutindenetimautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return denetim.objects.none()
+        #qs = denetim.objects.all()
+        #qs = denetim.objects.order_by('id').filter(durum="A").filter(yaratan=request.user)
+        qs = denetim.objects.order_by('id').filter(rutin_planli="R")
+        if self.q:
+            qs = qs.filter(denetim_adi__icontains=self.q)
+            print("qs filtre içinden", qs)
+        return qs
+
 
 
 

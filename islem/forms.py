@@ -120,6 +120,13 @@ class Den_Olustur_Form(forms.Form):
 
 
 
+class Qrcode_Form(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(),
+                 widget=autocomplete.ModelSelect2(url='rutindenetim-autocomplete'), required=False)
+    qrcode = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '40'}))
+
+
+
 class Ikili_Deneme_Form(forms.Form):
     denetim_deneme = forms.ModelChoiceField(queryset=denetim.objects.all(),
          widget=autocomplete.ModelSelect2(url='denetim-autocomplete'), required=False)

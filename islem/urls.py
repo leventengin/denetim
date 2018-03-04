@@ -23,7 +23,7 @@ from django.utils.translation import get_language
 from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
 from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
-from .views import denolusturautocomplete, denetimrutinautocomplete
+from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 
 
 
@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
     url(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
     url(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
+    url(r'^rutindenetim-autocomplete/$', rutindenetimautocomplete.as_view(),name='rutindenetim-autocomplete',),
 
 
 #  yerinde denetim ile ilgili işlemler...................
@@ -184,6 +185,18 @@ urlpatterns = [
     url(r'^detay/(?P<pk>\d+)/delete/kesin/$', views.detay_sil_kesin, name='detay_sil_kesin'),
 
 
+    # qrcode urlleri aşağıda....""
+    url(r'^qrdosyasi/$', views.QrdosyasiListView.as_view(), name='qrdosyasi'),
+    url(r'^qrdosyasi/(?P<pk>\d+)$', views.QrdosyasiDetailView.as_view(), name='qrdosyasi-detail'),
+    url(r'^qrdosyasi/create/$', views.qrdosyasi_create, name='qrdosyasi_create'),
+    #url(r'^qrdosyasi/(?P<pk>\d+)/update/$', views.qrdosyasi_update, name='qrdosyasi_update'),
+    #url(r'^qrdosyasi/(?P<pk>\d+)/delete/$', views.qrdosyasi_sil, name='qrdosyasi_sil'),
+    #url(r'^qrdosyasi/(?P<pk>\d+)/delete/kesin/$', views.qrdosyasi_sil_kesin, name='qrdosyasi_sil_kesin'),
+
+    url(r'^cagir1/$', views.cagir1, name='cagir1'),
+    url(r'^cagir2/$', views.cagir2, name='cagir2'),
+    url(r'^cagir3/$', views.cagir3, name='cagir3'),
+    url(r'^cagir4/$', views.cagir4, name='cagir4'),
 
 
     ]
