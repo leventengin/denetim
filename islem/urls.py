@@ -189,9 +189,9 @@ urlpatterns = [
     url(r'^qrdosyasi/$', views.QrdosyasiListView.as_view(), name='qrdosyasi'),
     url(r'^qrdosyasi/(?P<pk>\d+)$', views.QrdosyasiDetailView.as_view(), name='qrdosyasi-detail'),
     url(r'^qrdosyasi/create/$', views.qrdosyasi_create, name='qrdosyasi_create'),
-    #url(r'^qrdosyasi/(?P<pk>\d+)/update/$', views.qrdosyasi_update, name='qrdosyasi_update'),
-    #url(r'^qrdosyasi/(?P<pk>\d+)/delete/$', views.qrdosyasi_sil, name='qrdosyasi_sil'),
-    #url(r'^qrdosyasi/(?P<pk>\d+)/delete/kesin/$', views.qrdosyasi_sil_kesin, name='qrdosyasi_sil_kesin'),
+    url(r'^qrdosyasi/(?P<pk>\d+)/update/$', views.qrdosyasi_update, name='qrdosyasi_update'),
+    url(r'^qrdosyasi/(?P<pk>\d+)/delete/$', views.qrdosyasi_sil, name='qrdosyasi_sil'),
+    url(r'^qrdosyasi/(?P<pk>\d+)/delete/kesin/$', views.qrdosyasi_sil_kesin, name='qrdosyasi_sil_kesin'),
 
     url(r'^cagir1/$', views.cagir1, name='cagir1'),
     url(r'^cagir2/$', views.cagir2, name='cagir2'),

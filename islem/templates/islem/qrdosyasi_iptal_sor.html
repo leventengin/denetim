@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+      <h3>QRCode iptal</h3>
+
+      <p>  <b> id: </b>   &emsp;   {{ numarasi }}</p>
+
+      <p>   <b>  Denetim adı: </b>  &emsp;   {{ denetim_adi }}</p>
+
+      <p>   <b>  QRCode: </b>  &emsp;   {{ qrcode }}</p>
+
+
+      <p>QRCode iptal etmek istediğinizden emin misiniz ? </p>
+
+
+      <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'qrdosyasi_sil_kesin' pk=numarasi %}'">Evet </button>
+
+
+
+{% endblock %}

@@ -2918,11 +2918,83 @@ def qrdosyasi_create(request, pk=None):
 
 
 
+#---------------------------------------------------------------------------------
 
 
+@login_required
+def qrdosyasi_update(request, pk=None):
+    # if this is a POST request we need to process the form data
+    qrdosyasi_no = pk
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = Qrcode_Form(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            denetim = request.POST.get('denetim', "")
+            qrcode = request.POST.get('qrcode', "")
+            print ("denetim....", denetim)
+            print("qrcode...", qrcode)
+            request.session['denetim_qrcode'] = denetim
+            request.session['qrdosyasi_qrcode'] = qrcode
+            kaydetme_obj = qrdosyasi(id=pk, qr_deger=qrcode, denetim_id=denetim)
+            kaydetme_obj.save()
+            messages.success(request, 'Başarıyla düzenledi....')
+            return redirect('qrdosyasi_update')
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('qrdosyasi_update')
+            #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        qr_obj = qrdosyasi.objects.get(id=qrdosyasi_no)
+        form = Qrcode_Form()
+        form.fields["denetim"].initial = qr_obj.denetim
+        form.fields["qrcode"].initial = qr_obj.qr_deger
+        return render(request, 'islem/qrdosyasi_form2.html', {'form': form,})
+
+
+
+
+
+#------------------------------------------------------------------
+#  denetimi tamamlama işlemleri önce sor sonra tamamla
+
+@login_required
+def qrdosyasi_sil(request, pk=None):
+
+    qrdosyasi_obj = qrdosyasi.objects.get(id=pk)
+    print("seçilen qrdosyasi", qrdosyasi_obj)
+    numarasi = qrdosyasi_obj.id
+    denetim_adi = qrdosyasi_obj.denetim
+    qrcode = qrdosyasi_obj.qr_deger
+    context = {'denetim_adi': denetim_adi,
+               'numarasi' : numarasi,
+               'qrcode' : qrcode,
+              }
+    return render(request, 'islem/qrdosyasi_iptal_sor.html', context )
 
 
 #--------------------------------------------------------------------------------
+
+# denetim iptal ediliyor Y yapılıyor....
+
+@login_required
+def qrdosyasi_sil_kesin(request, pk=None):
+
+    qrdosyasi_obj = qrdosyasi.objects.get(id=pk)
+    print("seçilen qrdosyasi", qrdosyasi_obj)
+
+    qrdosyasi_obj.delete()
+    messages.success(request, 'QRCode iptal edildi....')
+    return redirect('qrdosyasi')
+    #return render(request, 'islem/tipi_sil_soru.html', args)
+
+#---------------------------------------------------------------------------------
+
 
 
 @login_required
