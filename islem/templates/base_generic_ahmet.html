@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ STATIC_URL }}images/logo/favicon.png">
+    <title>EasyCheck&#169;</title>
+    <link href="{{ STATIC_URL }}style/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}style/style.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}style/blue.css" id="theme" rel="stylesheet">
+	  <link href="{{ STATIC_URL }}style/tablesaw.css" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+
+<body class="fix-header fix-sidebar card-no-border">
+
+
+<div id="main-wrapper">
+
+<header class="topbar">
+<nav class="navbar top-navbar navbar-expand-md navbar-light">
+
+<div class="navbar-header">
+<a class="navbar-brand" href="{% url 'index' %}">
+<b>
+<img src="{{ STATIC_URL }}images/logo/logo-icon.png" alt="EasyCheck&#169;" class="dark-logo" />
+<img src="{{ STATIC_URL }}images/logo/logo-light-icon.png" alt="EasyCheck&#169;" class="light-logo" />
+</b>
+<span>
+<img src="{{ STATIC_URL }}images/logo/logo-text.png" alt="EasyCheck&#169;" class="dark-logo" />
+<img src="{{ STATIC_URL }}images/logo/logo-light-text.png" class="light-logo" alt="EasyCheck&#169;" />
+</span>
+</a>
+
+</div>
+
+<div class="navbar-collapse">
+<ul class="navbar-nav mr-auto mt-md-0">
+  <li class="nav-item"><img height="40" style="margin-top:10px;margin-left:10px;" src="{{ STATIC_URL }}images/user/dgr.png" alt="dgr"/></li>
+<li class="nav-item"> <a class="nav-link nav-toggler hidden-md-up text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="mdi mdi-menu"></i></a> </li>
+<li class="nav-item m-l-10"> <a class="nav-link sidebartoggler hidden-sm-down text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="ti-menu"></i></a> </li>
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="mdi mdi-message"></i>
+<div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
+</a>
+
+<div class="dropdown-menu mailbox animated slideInUp">
+<ul>
+<li><div class="drop-title">GÖREV UYARILARI</div></li>
+
+<li>
+<div class="message-center">
+<a href="#">
+<div class="btn btn-danger btn-circle"><i class="fa fa-comment"></i></div>
+<div class="mail-contnet">
+<h5>Ahmet Akküp</h5>
+<span class="mail-desc">Haydarpaşa Garı Temizlik Denetlemesi</span>
+<span class="time">12.02.2018</span>
+</div>
+</a>
+</div>
+</li>
+
+<li>
+<a class="nav-link text-center" href="javascript:void(0);"> <strong>Bütün Görevler</strong> <i class="fa fa-angle-right"></i> </a>
+</li>
+</ul>
+</div>
+</li>
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" id="2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="mdi mdi-email"></i>
+<div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
+</a>
+
+<div class="dropdown-menu mailbox animated slideInUp" aria-labelledby="2">
+<ul>
+<li><div class="drop-title">3 yeni mesajınız var!</div></li>
+<li>
+<div class="message-center">
+
+<a href="#">
+<div class="user-img"> <img src="{{ STATIC_URL }}images/user/ahmetakkup.jpg" alt="ahmet akküp" class="img-circle">
+<span class="profile-status online pull-right"></span>
+</div>
+<div class="mail-contnet">
+<h5>Ahmet Akküp</h5> <span class="mail-desc">Beni hemen ara Admin!</span> <span class="time">11:00 AM</span> </div>
+</a>
+
+<a href="#">
+<div class="user-img"> <img src="{{ STATIC_URL }}images/user/ahmetakkup.jpg" alt="ahmetakkup" class="img-circle">
+<span class="profile-status busy pull-right"></span>
+</div>
+<div class="mail-contnet">
+<h5>Ahmet Akküp</h5> <span class="mail-desc">Ne var ki 1 saatlik iş :)</span> <span class="time">10:50 AM</span> </div>
+</a>
+
+<a href="#">
+<div class="user-img"> <img src="{{ STATIC_URL }}images/user/ahmetakkup.jpg" alt="ahmetakkup" class="img-circle">
+<span class="profile-status away pull-right"></span>
+</div>
+<div class="mail-contnet">
+<h5>Ahmet Akküp</h5> <span class="mail-desc">O kaddar easy ki sorma :)</span> <span class="time">9:08 AM</span> </div>
+</a>
+
+</div>
+</li>
+<li>
+<a class="nav-link text-center" href="javascript:void(0);"> <strong>Bütün Mesajlar</strong> <i class="fa fa-angle-right"></i> </a>
+</li>
+</ul>
+</div>
+</li>
+
+</ul>
+
+<ul class="navbar-nav my-lg-0">
+
+<li class="nav-item hidden-sm-down search-box"> <a class="nav-link hidden-sm-down text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="ti-search"></i></a>
+<form class="app-search"><input type="text" class="form-control" placeholder="denetim falan aranabilir..."> <a class="srh-btn"><i class="ti-close"></i></a> </form>
+</li>
+
+<li class="nav-item dropdown">
+<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<img src="{{ STATIC_URL }}images/user/ahmetakkup.jpg" alt="{{user.get_full_name}}" class="profile-pic" /></a>
+
+<div class="dropdown-menu dropdown-menu-right scale-up">
+                                <ul class="dropdown-user">
+                                    <li>
+                                        <div class="dw-user-box">
+                                            <div class="u-img"><img src="{{ STATIC_URL }}images/user/ahmetakkup.jpg" alt="ahmetakkup"></div>
+                                            <div class="u-text">
+                                                <h4>{{ user.get_full_name }}</h4>
+                                                <p class="text-muted">{{ user.email }}</p>
+                                        </div>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#"><i class="ti-user"></i> Profilim</a></li>
+                                    <li><a href="#"><i class="ti-wallet"></i> Görevlerim</a></li>
+                                    <li><a href="#"><i class="ti-email"></i> Mesajlarım</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#"><i class="ti-settings"></i> Ayarlarım</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{% url 'logout'%}?next={{request.path}}"><i class="fa fa-power-off"></i> Çıkış</a></li>
+
+
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+
+
+
+
+
+
+        <aside class="left-sidebar">
+            <div class="scroll-sidebar">
+
+
+
+
+
+                <nav class="sidebar-nav">
+                    <ul id="sidebarnav">
+
+                    {% if  user.profile.denetci == "E" %}
+                      <li class="nav-devider"></li>
+                      <li class="nav-small-cap">YERİNDE DENETİM</li>
+    						          <li> <a class="waves-effect waves-dark" href="/islem" >
+                            <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu">Bekleyen Denetimler</span></a></li>
+                          <li> <a class="waves-effect waves-dark" href="/islem/rutin_baslat" >
+                            <i class="mdi mdi-city"></i><span class="hide-menu">Rutin Başlat</span></a></li>
+    	                    <li> <a class="waves-effect waves-dark" href="/islem/devam_liste" >
+                            <i class="mdi mdi-clipboard-text"></i><span class="hide-menu">Devam Edenler</span></a></li>
+                          <li> <a class="waves-effect waves-dark" href="/islem/acil_devam_sec" >
+                              <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu"><font color="f44336">Acil Bildirim</font></span></a></li>
+                          <li> <a class="waves-effect waves-dark" href="/islem/sonuc" >
+                              <i class="mdi mdi-city"></i><span class="hide-menu">Denetim Sonuçları </span></a></li>
+                        <!--
+                          <li> <a class="waves-effect waves-dark" href="#" >
+                                <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu"> Yazı Ekle</span></a></li>
+                          <li> <a class="waves-effect waves-dark" href="#" >
+                                <i class="mdi mdi-city"></i><span class="hide-menu">Denetim Tamamla</span></a></li>
+                         -->
+                     {% endif %}
+
+                        <li class="nav-devider"></li>
+                        <li class="nav-small-cap">DENETİM İŞLEMLERİ</li>
+                        {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+                        <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="mdi mdi-checkbox-marked-circle-outline"></i><span class="hide-menu">Denetim Oluştur</span></a>
+                                <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
+                                <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
+								                <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
+                                <li><a href="/islem/denetim">Denetim Detayları</a></li>
+                        </li>
+                        {% endif %}
+
+						           <li> <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="mdi mdi-brightness-7"></i><span class="hide-menu">Raporlar</span></a>
+
+                                <li><a href="/islem/denetim/baslanmislar">Başlanmışlar</a></li>
+                                <!--
+                                <li><a href="/islem/denetim/sonlandirilan">Sonlandırılanlar</a></li>
+                                -->
+								                <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
+                               {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+                                <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
+                               {% endif %}
+
+                        </li>
+
+
+                {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+                <li class="nav-devider"></li>
+                <li class="nav-small-cap">TANIMLAR</li>
+						          <li> <a class="waves-effect waves-dark" href="/islem/tipi" >
+                        <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu">Denetim Tipi</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/zon" >
+                        <i class="mdi mdi-city"></i><span class="hide-menu">Denetim Zonu</span></a></li>
+	                    <li> <a class="waves-effect waves-dark" href="/islem/bolum" >
+                        <i class="mdi mdi-clipboard-text"></i><span class="hide-menu">Denetim Bölümü</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/detay" >
+                          <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu">Denetim Detayı</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/grup" >
+                          <i class="mdi mdi-city"></i><span class="hide-menu">Grup</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/sirket" >
+                          <i class="mdi mdi-clipboard-text"></i><span class="hide-menu">Şirket</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/proje" >
+                            <i class="mdi mdi-chemical-weapon"></i><span class="hide-menu">Proje</span></a></li>
+                      <li> <a class="waves-effect waves-dark" href="/islem/qrdosyasi" >
+                            <i class="mdi mdi-city"></i><span class="hide-menu">QRCode</span></a></li>
+                 {% endif %}
+
+                  {% if user.is_staff %}
+                      <li> <a class="waves-effect waves-dark" href="/admin/" >
+                            <i class="mdi mdi-clipboard-text"></i><span class="hide-menu">Yönetim</span></a></li>
+                  {% endif %}
+
+              </ul>
+
+            </nav>
+          </div>
+        </aside>
+
+
+
+        <div class="page-wrapper">
+              <div class="row page-titles">
+                <div class="col-md-5 align-self-center">
+                    <h3 class="text-themecolor">EasyCheck&#169;</h3>
+                </div>
+                <div class="col-md-7 align-self-center">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'logout'%}?next={{request.path}}">Çıkış</a></li>
+                        <li class="breadcrumb-item active">EasyCheck&#169;</li>
+                    </ol>
+                </div>
+
+            </div>
+
+
+            <!--
+            <div class="container-fluid">
+            -->
+
+
+
+         {% block content %} {% endblock %}
+
+
+           {% block pagination %}
+             {% if is_paginated %}
+             <div class="pagination">
+               <span class="page-links">
+                 {% if page_obj.has_previous %}
+                     <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                 {% endif %}
+                 <span class="page-current">
+                     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                 </span>
+                 {% if page_obj.has_next %}
+                     <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                 {% endif %}
+                  </span>
+                    </div>
+                      {% endif %}
+                {% endblock %}
+
+
+       </div>
+<!--
+</div>
+-->
+
+<!--
+<script src="{{ STATIC_URL }}script/jquery.min.js"></script>
+-->
+<!--
+<script src="{{ STATIC_URL }}script/popper.min.js"></script>
+<script src="{{ STATIC_URL }}script/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}script/jquery.slimscroll.js"></script>
+<script src="{{ STATIC_URL }}script/waves.js"></script>
+<script src="{{ STATIC_URL }}script/sidebarmenu.js"></script>
+<script src="{{ STATIC_URL }}script/sticky-kit.min.js"></script>
+<script src="{{ STATIC_URL }}script/custom.min.js"></script>
+<script src="{{ STATIC_URL }}script/jquery.sparkline.min.js"></script>
+<script src="{{ STATIC_URL }}script/raphael-min.js"></script>
+<script src="{{ STATIC_URL }}script/morris.min.js"></script>
+<script src="{{ STATIC_URL }}script/dashboard1.js"></script>
+<script src="{{ STATIC_URL }}script/jQuery.style.switcher.js"></script>
+-->
+
+</body>
+
+</html>

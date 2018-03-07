@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4>Sonlandirilan Denetim Listesi</h4>
+      <p> </p>
+    <h5>Proje..:  {{proje_obj.proje_adi}} </h5>
+      <p> </p>
+    {% if raporlar_denetim_obj %}
+    <ul>
+
+      {% for denetim in raporlar_denetim_obj %}
+      <li>
+         <a href="{{denetim.id}}">{{ denetim.denetim_adi }}</a>
+      </li>
+      {% endfor %}
+      <p> </p>
+    </ul>
+    {% else %}
+      <p>Kayıtlı denetim yok ....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

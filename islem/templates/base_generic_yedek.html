@@ -40,20 +40,6 @@
   color : #FF0000;
   text-decoration : underline;
   }
-
-  .jumbotron {
-    padding: 0.5em 0.6em;
-    h1 {
-        font-size: 2em;
-    }
-    p {
-        font-size: 1.2em;
-        .btn {
-            padding: 0.5em;
-        }
-    }
-   }
-
   </style>
 
 
@@ -71,54 +57,21 @@
   </script>
 
 
+
+
+
 </head>
 
 <body>
-
-  ​<div class="container">
-    <div class="jumbotron"  style="background-color:transparent !blue;">
-
-
-
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">
-            <a href="{% url 'index' %}"> <img src="{{ STATIC_URL }}images/logo/logo-icon.png"
-                                        alt="EasyCheck&#169;" class="dark-logo" />
-                            <img src="{{ STATIC_URL }}images/logo/logo-text.png"
-                                        alt="EasyCheck&#169;" class="dark-logo" />
-                        </a>
-          </div>
-        <div class="col-md-4"> <h2> Denetim Sistemi <h2> </div>
-
-        <div class="col-md-3">{{ user.get_full_name }}</div>
-
-        <div class="col-md-1">
-          <p> <a class="btn btn-default btn-sm" href="{% url 'logout'%}?next={{request.path}}" >
-                <span class="glyphicon glyphicon-log-out"></span> Çıkış
-              </a>
-            </p>
-         </div>
-        </div>
-
-
-
-
-
-    </div>
-    </div>
-
-
 
   <div class="container-fluid">
 
   <!--  <div class="row">  -->
 
 
-<!--
     <div class="row">
           {% block siderow %}
-
+    <!--        <ul class="ustalan-nav">  -->
               <div class="col-md-2">
                 <ul class="ustalan-nav">
                   <li><a href="{% url 'index' %}">Ana Sayfa </a></li>
@@ -150,10 +103,10 @@
                 {% endif %}
                   </ul>
               </div>
-
+    <!--        </ul>    -->
           {% endblock %}
         </div>
--->
+
 
 
     <div class="row">
@@ -165,19 +118,9 @@
             <ul class="nav navbar-nav">
 
 
-<!--
-              <a href="#">
-              <div > <img style="width:10em; height:5em;"  src="{{ STATIC_URL }}images/user/dgr.png" alt="DGR">
-
-              </div>
-              </a>
--->
-
-
               {% if  user.profile.denetci == "E" %}
-              <!--
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Yerinde Denetim <span class="caret"></span></a>
-             -->
+               <ul class="dropdown-menu" role="menu">
                  <li><a href="/islem">Bekleyen Planlı Denetimler</a></li>
                  <li><a href="/islem/rutin_baslat">Rutin Denetim Başlat</a></li>
                  <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
@@ -188,36 +131,31 @@
 
                  <li><a href="/islem/qrcode">QRCode</a></li>
 
-                 <!--
+               </ul>
              </li>
-           -->
              {% endif %}
 
 
              {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetim Oluştur <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
+               <ul class="dropdown-menu" role="menu">
                 <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
                 <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
                 <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
                 <li><a href="/islem/denetim">Denetim Detayları</a></li>
-              </ul>
+               </ul>
              </li>
-
              {% endif %}
 
 
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetimler <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
                 <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
-                <!--
                 <li><a href="/islem/denetim/sonlandirilan">Sonlandırılanlar</a></li>
                 <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
                 {% if  user.profile.denetim_grup_yetkilisi == "E" %}
                     <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
                 {% endif %}
-              -->
                </ul>
              </li>
 
@@ -234,12 +172,11 @@
                  <li><a href="/islem/sirket">Şirket</a></li>
                  <li><a href="/islem/proje">Proje</a></li>
                  <li><a href="/islem/qrdosyasi">QRCode</a></li>
-                 <!--
                  <li><a href="/islem/cagir1">ilk html</a></li>
                  <li><a href="/islem/cagir2">ikinci html</a></li>
                  <li><a href="/islem/cagir3">üçüncü html</a></li>
                  <li><a href="/islem/cagir4">dördüncü html</a></li>
-               -->
+
 
 
                  <!--

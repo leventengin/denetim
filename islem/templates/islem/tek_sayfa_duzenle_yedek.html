@@ -1,4 +1,3 @@
-
 {% extends "base_generic.html" %}
 {% load static %}
 
@@ -15,15 +14,12 @@
 
 <style type="text/css">
     label {
-        font-weight: normal  !important;
+        font-weight: normal  !important; /* overwrites any other rules */
     }
+
 </style>
 
-<!--
-label {
-    font-weight: normal !important;
-}
--->
+
 
 
 <script>
@@ -46,6 +42,27 @@ $( ".datepicker" ).datepicker()
 } );
 </script>
 
+<script>
+  function rutinplanli_Function() {
+      var response = '';
+      var js_rutin_planli = document.getElementById("id_rutin_planli").value;
+      alert(" rutin - planlı..." + js_rutin_planli);
+      console.log(js_rutin_planli);
+      if (js_rutin_planli == "P")
+      {
+        document.getElementById("id_hedef_baslangic").disabled = false;
+        document.getElementById("id_hedef_bitis").disabled = false;
+      }
+      else
+      {
+        document.getElementById("id_hedef_baslangic").disabled = true;
+        document.getElementById("id_hedef_bitis").disabled = true;
+        document.getElementById("id_hedef_baslangic").value = "";
+        document.getElementById("id_hedef_bitis").value = "";
+      }
+  }
+</script>
+
 
 <script>
   function tipisecFunction() {
@@ -62,17 +79,17 @@ $( ".datepicker" ).datepicker()
       });
       var js_denetim_adi = document.getElementById("id_denetim_adi").value;
       var js_proje = document.getElementById("id_proje").value;
+      var js_rutin_planli = document.getElementById("id_rutin_planli").value;
       var js_denetci = document.getElementById("id_denetci").value;
       var js_tipi = document.getElementById("id_tipi").value;
       var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
       var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
       var js_aciklama = document.getElementById("id_aciklama").value;
-      var js_pk_no = document.getElementById("id_pk_no").value;
 
       alert(" bölümler..." + js_bolumler);
       console.log(js_bolumler);
       $.ajax({
-        url : "tipisec_bolum_js_2/",
+        url : "tipisec_bolum_js/",
         type : "GET",
         dataType: "text",
         data : {
@@ -80,15 +97,15 @@ $( ".datepicker" ).datepicker()
           'js_takipciler' : js_takipciler,
           'js_denetim_adi' : js_denetim_adi,
           'js_proje' : js_proje,
+          'js_rutin_planli' : js_rutin_planli,
           'js_denetci' : js_denetci,
           'js_tipi' : js_tipi,
           'js_hedef_baslangic' : js_hedef_baslangic,
           'js_hedef_bitis' : js_hedef_bitis,
           'js_aciklama' : js_aciklama,
-          'js_pk_no' : js_pk_no,
          },
         success: function() {
-            alert("bölüm seçimi başarılı...");
+            alert("tipi seçimi başarılı...");
             window.location.reload();
             },
         failure: function() {
@@ -98,6 +115,7 @@ $( ".datepicker" ).datepicker()
 
   }
 </script>
+
 
 
   <script>
@@ -115,17 +133,17 @@ $( ".datepicker" ).datepicker()
         });
         var js_denetim_adi = document.getElementById("id_denetim_adi").value;
         var js_proje = document.getElementById("id_proje").value;
+        var js_rutin_planli = document.getElementById("id_rutin_planli").value;
         var js_denetci = document.getElementById("id_denetci").value;
         var js_tipi = document.getElementById("id_tipi").value;
         var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
         var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
         var js_aciklama = document.getElementById("id_aciklama").value;
-        var js_pk_no = document.getElementById("id_pk_no").value;
 
         alert(" bölümler..." + js_bolumler);
         console.log(js_bolumler);
         $.ajax({
-          url : "detaylarsec_bolum_js_2/",
+          url : "detaylarsec_bolum_js/",
           type : "GET",
           dataType: "text",
           data : {
@@ -133,12 +151,12 @@ $( ".datepicker" ).datepicker()
             'js_takipciler' : js_takipciler,
             'js_denetim_adi' : js_denetim_adi,
             'js_proje' : js_proje,
+            'js_rutin_planli' : js_rutin_planli,
             'js_denetci' : js_denetci,
             'js_tipi' : js_tipi,
             'js_hedef_baslangic' : js_hedef_baslangic,
             'js_hedef_bitis' : js_hedef_bitis,
             'js_aciklama' : js_aciklama,
-            'js_pk_no' : js_pk_no,
            },
           success: function() {
               alert("bölüm seçimi başarılı...");
@@ -152,20 +170,24 @@ $( ".datepicker" ).datepicker()
     }
   </script>
 
+    <script>
+        $( ".rutinplanli_Function" ).rutinplanli_Function()
+        } );
+    </script>
 
-  <script>
-      $( ".detaysecFunction" ).detaysecFunction()
-      } );
-  </script>
 
   <script>
       $( ".tipisecFunction" ).tipisecFunction()
       } );
   </script>
 
+
+  <script>
+      $( ".detaysecFunction" ).detaysecFunction()
+      } );
+  </script>
+
 </head>
-
-
 
 <body>
 
@@ -178,6 +200,7 @@ $( ".datepicker" ).datepicker()
            });  /* document ready  kapanıyor */
 </script>
 
+
 <script>
       $(document).ready(function(){
              $("#id_tipi").change(function(){
@@ -188,137 +211,184 @@ $( ".datepicker" ).datepicker()
 </script>
 
 
+<script>
+      $(document).ready(function(){
+             $("#id_rutin_planli").change(function(){
+                  alert ( "...rutin - planlı çalıştı...");
+                  rutinplanli_Function();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
 
-<h4>Denetim Düzenleme Sayfası </h4>
+
+<script>
+      $(document).ready(function(){
+                  alert ( "...rutin - planlı çalıştı...");
+                  rutinplanli_Function();
+           });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+<h4>Denetim Oluşturma Sayfası </h4>
 
 
 
     <p> </br> </p>
 
 
-    <form method="post" novalidate>
-      {% csrf_token %}
 
-      {{ form.non_field_errors }}
+            <form method="post" novalidate>
+              {% csrf_token %}
 
-      {{ form.source.errors }}
-      {{ form.source }}
+              {{ form.non_field_errors }}
 
-      <table border="0">
+              {{ form.source.errors }}
+              {{ form.source }}
 
-        <tr>
-            <td>
-            {{ form.pk_no.errors }}
-            {{ form.pk_no }}
-          </td>
-        </tr>
+              <table border="0">
 
-
-          <tr>
-            <th style="width: 50mm;">  {{ form.denetim_adi.label_tag }}  </th>
-            <td>
-              {{ form.denetim_adi.errors }}
-              {{ form.denetim_adi }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.proje.label_tag }}</th>
-            <td>
-              {{ form.proje.errors }}
-              {{ form.proje }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.denetci.label_tag }}</th>
-            <td>
-              {{ form.denetci.errors }}
-              {{ form.denetci }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.tipi.label_tag }}</th>
-            <td>
-              {{ form.tipi.errors }}
-              {{ form.tipi }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.takipciler.label_tag }}</th>
-            <td>
-              {{ form.takipciler.errors }}
-              {{ form.takipciler }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.hedef_baslangic.label_tag }}</th>
-            <td>
-              {{ form.hedef_baslangic.errors }}
-              {{ form.hedef_baslangic }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.hedef_bitis.label_tag }}</th>
-            <td>
-              {{ form.hedef_bitis.errors }}
-              {{ form.hedef_bitis }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.aciklama.label_tag }}</th>
-            <td>
-              {{ form.aciklama.errors }}
-              {{ form.aciklama }}
-            </td>
-          </tr>
-
-          <tr>
-            <th>{{ form.bolum.label_tag }}</th>
-            <td>
-              {{ form.bolum.errors }}
-              {{ form.bolum }}
-
-            </td>
+                <tr>
+                    <td>
+                    {{ form.pk_no.errors }}
+                    {{ form.pk_no }}
+                  </td>
+                </tr>
 
 
-            <tr height = 20px></tr>
+                  <tr>
+                    <th style="width: 50mm;">  {{ form.denetim_adi.label_tag }}  </th>
+                    <td>
+                      {{ form.denetim_adi.errors }}
+                      {{ form.denetim_adi }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.proje.label_tag }}</th>
+                    <td>
+                      {{ form.proje.errors }}
+                      {{ form.proje }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.rutin_planli.label_tag }}</th>
+                    <td>
+                      {{ form.rutin_planli.errors }}
+                      {{ form.rutin_planli }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.denetci.label_tag }}</th>
+                    <td>
+                      {{ form.denetci.errors }}
+                      {{ form.denetci }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.tipi.label_tag }}</th>
+                    <td>
+                      {{ form.tipi.errors }}
+                      {{ form.tipi }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.takipciler.label_tag }}</th>
+                    <td>
+                      {{ form.takipciler.errors }}
+                      {{ form.takipciler }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.hedef_baslangic.label_tag }}</th>
+                    <td>
+                      {{ form.hedef_baslangic.errors }}
+                      {{ form.hedef_baslangic }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.hedef_bitis.label_tag }}</th>
+                    <td>
+                      {{ form.hedef_bitis.errors }}
+                      {{ form.hedef_bitis }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.aciklama.label_tag }}</th>
+                    <td>
+                      {{ form.aciklama.errors }}
+                      {{ form.aciklama }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.zon.label_tag }}</th>
+                    <td>
+                      {{ form.zon.errors }}
+                      {{ form.zon }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.bolum.label_tag }}</th>
+                    <td>
+                      {{ form.bolum.errors }}
+                      {{ form.bolum }}
+
+                    </td>
+                  </tr>
+
+                    <tr height = 20px></tr>
 
 
-          <tr>
-            <th  style="font-weight:bold"> Detaylar / Sorular </th>
-            </tr>
+                  <tr>
+                    <th  style="font-weight:bold"> Detaylar / Sorular </th>
+                    </tr>
 
-            <tr height = 20px></tr>
-
-
-
-          </table>
+                    <tr height = 20px></tr>
 
 
 
-          <table>
-
-
-          <tr style="width: 200mm;">
-            <td>
-              {{ form.detay.errors }}
-              {{ form.detay }}
-            </td>
-          </tr>
+                  </table>
 
 
 
+                  <table>
 
-      </table>
 
-      <button type="submit">Kaydet</button>
-    </form>
+                  <tr style="width: 200mm;">
+                    <td>
+                      {{ form.detay.errors }}
+                      {{ form.detay }}
+                    </td>
+                  </tr>
+
+
+
+
+              </table>
+
+              <button type="submit">Kaydet</button>
+            </form>
+
+
+
+
+
+
+
+
+
+
 
 
 

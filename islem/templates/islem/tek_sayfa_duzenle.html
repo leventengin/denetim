@@ -1,5 +1,4 @@
-
-{% extends "base_generic.html" %}
+{{% extends "base_generic.html" %}
 {% load static %}
 
 {% block content %}
@@ -17,7 +16,6 @@
     label {
         font-weight: normal  !important; /* overwrites any other rules */
     }
-
 </style>
 
 
@@ -47,10 +45,8 @@ $( ".datepicker" ).datepicker()
 <script>
   function ilk_Func() {
       //alert("buraya da geldi.....ilk func .........");
-
       var rp_hidden = document.getElementById("id_rp_hidden").value;
       //alert("rp hidden..."+rp_hidden);
-
       if (rp_hidden == "P")
         {
           //alert("p ye geldi...");
@@ -58,7 +54,6 @@ $( ".datepicker" ).datepicker()
           document.getElementById("id_hedef_bitis").hidden = false;
           document.getElementById("id_rutin_planli_0").checked = true;
         }
-
       if (rp_hidden == "R")
         {
           //alert("r ye geldi...");
@@ -66,9 +61,6 @@ $( ".datepicker" ).datepicker()
           document.getElementById("id_hedef_bitis").hidden = true;
           document.getElementById("id_rutin_planli_1").checked = true;
         }
-
-
-
   }
 </script>
 
@@ -76,14 +68,10 @@ $( ".datepicker" ).datepicker()
 <script>
   function rutinplanli_Function() {
       //alert("buraya da geldi.....rutin / planlı .........");
-
       var x = document.getElementById("id_rutin_planli_0").checked;
       var y = document.getElementById("id_rutin_planli_1").checked;
-
       //alert ("p mi..."+x);
       //alert ("r mi..."+y)
-
-
       if (x == true)
         {
           document.getElementById("id_hedef_baslangic").hidden = false;
@@ -96,8 +84,6 @@ $( ".datepicker" ).datepicker()
           document.getElementById("id_hedef_baslangic").value = "";
           document.getElementById("id_hedef_bitis").value = "";
         }
-
-
   }
 </script>
 
@@ -105,26 +91,21 @@ $( ".datepicker" ).datepicker()
 <script>
   function gonder_Func() {
       //alert("buraya da geldi.  gönder func..........");
-
       var x = document.getElementById("id_rutin_planli_0").checked;
       var y = document.getElementById("id_rutin_planli_1").checked;
-
       //alert ("p mi..."+x);
       //alert ("r mi..."+y)
-
       if (x == false && y == false)
                 {
                   alert("planlı yada rutin denetim olduğu seçilmemiş !!!");
                   return false;
                 }
-
       var todayDate = new Date().toISOString().slice(0,10);
       //alert("today date...."+todayDate);
       var tar_baslangic = document.getElementById("id_hedef_baslangic").value;
       //alert("hedef başlangıç..."+tar_baslangic)
       var tar_bitis = document.getElementById("id_hedef_bitis").value;
       //alert("hedef bitiş..."+tar_bitis)
-
       if ( x == True)
       {
         if (todayDate > tar_baslangic)
@@ -132,22 +113,18 @@ $( ".datepicker" ).datepicker()
               alert("başlangıç tarihi bugünden geride...!");
               return false;
             }
-
         if (todayDate > tar_bitis)
             {
               alert("bitiş tarihi bugünden geride...!");
               return false;
             }
-
         if (tar_baslangic > tar_bitis)
             {
               alert("tarih sıralaması yanlış...!");
               return false;
             }
         }
-
       //alert("kontrol sonu..................!!!!")
-
   }
 </script>
 
@@ -173,14 +150,14 @@ $( ".datepicker" ).datepicker()
       var y = document.getElementById("id_rutin_planli_1").checked;
       if (x == true)
           { var js_rutin_planli = "P";
-             alert(" js rutin planlı ...p  "+js_rutin_planli);
+             //alert(" js rutin planlı ...p  "+js_rutin_planli);
            }
       else { if (y == true)
               { var js_rutin_planli = "R";
-                alert(" js rutin planlı...r "+js_rutin_planli);
+                //alert(" js rutin planlı...r "+js_rutin_planli);
               }
             else { var js_rutin_planli ="";
-                    alert(" js rutin planlı...boş "+js_rutin_planli);
+                    //alert(" js rutin planlı...boş "+js_rutin_planli);
             }}
       var js_denetci = document.getElementById("id_denetci").value;
       var js_tipi = document.getElementById("id_tipi").value;
@@ -188,7 +165,6 @@ $( ".datepicker" ).datepicker()
       var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
       var js_aciklama = document.getElementById("id_aciklama").value;
       var js_pk_no = document.getElementById("id_pk_no").value;
-
       //alert(" bölümler..." + js_bolumler);
       //alert("js rutin planlı ..."+js_rutin_planli);
       console.log(js_bolumler);
@@ -217,7 +193,6 @@ $( ".datepicker" ).datepicker()
             alert("hata var....veri aktarılamadı...");
             }
         });  /* ajax kapa...*/
-
   }
 </script>
 
@@ -257,7 +232,6 @@ $( ".datepicker" ).datepicker()
         var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
         var js_aciklama = document.getElementById("id_aciklama").value;
         var js_pk_no = document.getElementById("id_pk_no").value;
-
         //alert(" bölümler..." + js_bolumler);
         console.log(js_bolumler);
         $.ajax({
@@ -285,7 +259,6 @@ $( ".datepicker" ).datepicker()
               alert("hata var....veri aktarılamadı...");
               }
           });  /* ajax kapa...*/
-
     }
   </script>
 

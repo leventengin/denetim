@@ -461,7 +461,7 @@ def rutin_baslat_kesin(request, pk=None):
     sayi = 1
     sayi_chr = "{0:0=2d}".format(sayi)
     print("sayi_chr...", sayi_chr)
-    dd_denetim_sonad = dd_denetim_yeni_adi + "/" + sayi_chr
+    dd_denetim_sonad = dd_denetim_yeni_adi + "-" + sayi_chr
     print(" son denetim ad...", dd_denetim_sonad)
     yok_mu = True
     while yok_mu:
@@ -473,7 +473,7 @@ def rutin_baslat_kesin(request, pk=None):
             sayi = sayi + 1
             sayi_chr = "{0:0=2d}".format(sayi)
             print("sayi chr...", sayi_chr)
-            dd_denetim_sonad = dd_denetim_yeni_adi + "/" + sayi_chr
+            dd_denetim_sonad = dd_denetim_yeni_adi + "-" + sayi_chr
             print(" son denetim ad...", dd_denetim_sonad)
 
 
@@ -794,23 +794,12 @@ def denetim_tekrarla_kesin(request, pk=None):
 @login_required
 def denetim_tamamla(request, pk=None):
 
-    denetim_no = pk
-    denetim_obj = denetim.objects.get(id=denetim_no)
-    """
-    denetim_tamamla_kontrolu = request.session.get('denetim_tamamla_kontrolu')
-    print("session variable dan gelen denetim tamamlama kontrolü...", denetim_tamamlama_kontrolu)
-
-    if denetim_tamamla_kontrolu == "Tamam":
-        denetim_no = request.session.get('denetim_tamamla_no')
-        print("gelen denetim no...", denetim_no)
-        denetim_obj = denetim.objects.get(id=denetim_no)
-        request.session['denetim_tamamla_kontrolu'] = "Degil"
-    else:
-        denetim_obj = denetim.objects.get(id=pk)
-        denetim_no = pk
-
+    #denetim_no = request.session.get('denetim_no')
+    #print("session variable dan gelen denetim no...", denetim_no)
+    denetim_obj = denetim.objects.get(id=pk)
+    denetim_no = denetim_obj.id
     print("seçilen denetim", denetim_obj)
-"""
+
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
@@ -984,32 +973,6 @@ def denetim_bolum_sec(request, pk=None):
 
     # if this is a POST request we need to process the form data
     denetim_no = request.session.get('denetim_no')
-    #####################yeni eklendi   6 mart..................
-    # tek bölümse bölüm sorma kontrolü.....
-    ####################################
-    """
-    bolumler = sonuc_bolum.objects.filter(denetim=denetim_no)
-    if not bolumler:
-        messages.success(request, 'Bölüm seçilmemiş....')
-        return redirect('denetim_baslat')
-    else:
-        if bolumler.count() == 1:
-            secili_obj = bolumler.first()
-            bolum = secili_obj.bolum
-            print ("bolum", bolum)
-            request.session["secili_bolum"] = bolum
-            detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum)
-            if not detaylar:
-                messages.success(request, 'Seçili bölümde bölüm detayı yok....')
-                return redirect('denetim_baslat')
-            #form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
-            form = SonucForm(puanlama_turu="")
-            print("puanlama türü boş olarak ilk adımda çalıştı ama nasıl ????????????")
-            return render(request, 'islem/denetim_detay_islemleri.html')
-    """
-
-    print("denetim bölüm seç denetim no...", denetim_no)
-
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = BolumSecForm(request.POST or None)
@@ -1028,7 +991,6 @@ def denetim_bolum_sec(request, pk=None):
             return render(request, 'islem/denetim_detay_islemleri.html')
 
         else:
-            print("valid değil bu form neden, ne var bunda...")
             return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
 
@@ -1043,12 +1005,8 @@ def denetim_bolum_sec(request, pk=None):
                 if kont.tamam == "H":
                     bitir = False
             if bitir:
-                request.session['denetim_tamamla_kontrolu'] = "Tamam"
-                request.session['denetim_tamamla_no'] = denetim_no
-                #messages.success(request, 'Bölüm işlemleri tamamlanmış....')
-                #return redirect('index')
-                return redirect('denetim_tamamla')
-
+                messages.success(request, 'Bölüm işlemleri tamamlanmış....')
+                return redirect('index')
 
         form = BolumSecForm(denetim_no=denetim_no, devam_tekrar=devam_tekrar)
         return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -1060,7 +1018,7 @@ def denetim_bolum_sec(request, pk=None):
 # seçilen bölümü oturum değişkenine yazıyor
 
 def secilen_bolumu_kaydet(request):
-    print("seçilen bölümü kaydet .  jquery içinden.....")
+    print("seçilen bölümü kaydet ......")
     response_data ={}
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
@@ -2125,7 +2083,7 @@ def teksayfa_sil_kesin(request, pk=None):
 
 @login_required
 def detay_islemleri_baslat(request, pk=None):
-    print("denetim  detay işlemleri başlat... jquery den gelen..")
+    print("denetim işlemleri başlat......")
     response_data ={}
     if request.method == 'GET':
         denetim_no = request.session.get('denetim_no')
@@ -2439,27 +2397,7 @@ def qrcode_islemi_baslat(request, pk=None):
     result = request.session.get('js_qrcode_result')
     print(" qrcode işlemi başlat içinden okunan değer....",  result)
 
-    if result == None:
-        messages.success(request, 'QRCode okunamadı....')
-        return redirect('qrcode_tara')
 
-    result2 = str(result)
-    print("result2....str olmuş ise", result2)
-    newstr = result2[-4:]
-    print("new string....", newstr)
-
-    qr_obj = qrdosyasi.objects.filter(qr_deger=newstr).first()
-
-    print("qr_obj... qrcode işlem başlat içinden...", qr_obj)
-
-    if qr_obj:
-        denetim = qr_obj.denetim
-        request.session['rutin_secili_denetim'] = denetim.id
-        print(" qrcode başlat içinden  denetim no", denetim.id)
-        return redirect('rutin_baslat_kesin')
-    else:
-        messages.success(request, 'QRCode eşleşmedi....')
-        return redirect('qrcode_tara')
 
     context = {'result' : result}
     return render(request, 'islem/qrcode_islemleri_deneme.html', context )
@@ -2818,77 +2756,6 @@ def sonlandirilan_devam(request, pk=None):
 @login_required
 def sonlandirilan_ilerle(request, pk=None):
     denetim_no = pk
-    request.session['secilen_denetim'] = denetim_no
-    sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
-    denetimin_adi = sonuc_list.first().denetim.denetim_adi
-    denetimin_durumu = sonuc_list.first().denetim.durum
-    context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
-    return render(request, 'islem/sonlandirilan_detay_list.html', context)
-
-
-
-
-#------------------------------------------------------------------------------
-# sonlandırılan denetim seçimi ile ilgili bölüm.....
-# önce denetim seçiliyor...
-
-@login_required
-def raporlar_sec(request, pk=None):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        kullanan = request.user.id
-        form = ProjeSecForm(request.POST)
-        print("denetimi seçti gözlemci seçimi için...")
-        # check whether it's valid:
-        if form.is_valid():
-            print("valid....")
-            proje = request.POST.get('proje', "")
-            print ("proje", proje)
-            request.session['secili_proje'] = proje
-            #form = GozlemciForm()
-            return redirect('raporlar_devam')
-            #return render(request, 'islem/gozlemci_sec_devam.html', {'form': form,})
-        else:
-            print(" nah valid............")
-            return render(request, 'islem/raporlar_proje_sec.html', {'form': form,})
-
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
-        kullanan = request.user.id
-        print("kullanan  ..", kullanan)
-        form = ProjeSecForm()
-        return render(request, 'islem/raporlar_proje_sec.html', {'form': form,})
-
-#-------------------------------------------------------------------------------
-
-@login_required
-def raporlar_devam(request, pk=None):
-    secili_proje = request.session.get('secili_proje')
-    #musteri_no = int(secili_musteri)
-    #print("seçili musteri...", secili_musteri, "musteri no..:", musteri_no)
-    proje_obj = proje.objects.get(id=secili_proje)
-    #sonlandirilan_denetim_obj = denetim.objects.filter(musteri=secili_musteri).filter(durum="D")
-    raporlar_denetim_obj = denetim.objects.filter(proje=secili_proje)
-    context = {'raporlar_denetim_obj':raporlar_denetim_obj,
-               'proje_obj': proje_obj,
-               }
-    return render(request, 'islem/raporlar_denetim_list.html', context )
-
-
-
-#-------------------------------------------------------------------------------
-
-@login_required
-def raporlar_ilerle(request, pk=None):
-    denetim_no = pk
-
-    #############################################
-    ####  buraya raporu getir...
-    ##############################################
-
     request.session['secilen_denetim'] = denetim_no
     sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
     denetimin_adi = sonuc_list.first().denetim.denetim_adi

@@ -32,7 +32,7 @@ select>option:hover
 <script>
   function change_bolum() {
       var selected = document.getElementById("id_bolum").value;
-      //alert("selected");
+      alert("selected - change bölüm...");
       console.log(selected);
       $.ajax({
         url : "secilen_bolumu_kaydet/",
@@ -42,7 +42,7 @@ select>option:hover
           'selected' : selected,
         },
         success: function() {
-            //alert(" secilen bölüm başarıyla kaydedildi..");
+            alert(" secilen bölüm başarıyla kaydedildi..");
             /*window.location.reload(); */
             },
         failure: function() {
@@ -63,7 +63,7 @@ select>option:hover
 
       if (selected == "")
            { alert(" bölüm  seçmelisiniz...."); }
-      else {
+      else {  //alert("selected"+selected)
         $.ajax({
           url : "detay_islemleri_baslat/",
           type : "GET",

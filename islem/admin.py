@@ -46,7 +46,7 @@ from .models import kucukresim
 from .models import acil
 from resimyukle.models import Resim
 from .models import isaretler
-
+from .models import qrdosyasi
 
 
 admin.site.register(grup)
@@ -64,3 +64,4 @@ admin.site.register(Resim)
 admin.site.register(kucukresim)
 admin.site.register(acil)
 admin.site.register(isaretler)
+admin.site.register(qrdosyasi)

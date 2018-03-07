@@ -6,40 +6,163 @@
 
 
 
-<h2>İçerik bilgisi</h2>
 
-  <p>Denetim sistemindeki kayıt listesi:</p>
+<div class="col-lg-12">
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="m-b-0"><i class="mdi mdi-checkbox-blank-circle-outline text-info"></i></h2>
+                            <h3 class="">{{ num_tipi }}</h3>
+                            <h6 class="card-subtitle">Denetim Tipi</h6></div>
+                        <div class="col-12">
+                            <div class="progress">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 24%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
-    <table border="0">
-          <tbody>
-              <tr>
-                  <td><b>Denetim Tipi..............:</b></td>
-                  <td> &emsp;     {{ num_tipi }}</td>
-              </tr>
-              <tr>
-                  <td><b>Denetim Bölümü..........:   </b></td>
-                  <td> &emsp;     {{ num_bolum }}</td>
-              </tr>
-              <tr>
-                  <td><b>Denetim Detayı......:</b></td>
-                  <td>  &emsp;      {{ num_detay }}</td>
-              </tr>
-              -------------------------------------------------
-              <tr>
-                  <td><b>Grup..............:   </b></td>
-                  <td> &emsp;     {{ num_grup }}</td>
-              </tr>
-              <tr>
-                  <td><b>Şirket.............:</b></td>
-                  <td>  &emsp;      {{ num_sirket }}</td>
-              </tr>
-              <tr>
-                  <td><b>Proje............: </b></td>
-                  <td>   &emsp;  {{ num_proje }}</td>
-              </tr>
-          </tbody>
-      </table>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="m-b-0"><i class="mdi mdi-checkbox-marked-circle-outline text-success"></i></h2>
+                            <h3 class="">{{ num_bolum }}</h3>
+                            <h6 class="card-subtitle">Denetim Bölümü</h6></div>
+                        <div class="col-12">
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 54%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2 class="m-b-0" ><i class="mdi mdi-check-circle-outline text-purple"></i></h2>
+                            <h3 class="">{{ num_detay }}</h3>
+                            <h6 class="card-subtitle">Denetim Detayı</h6></div>
+                        <div class="col-12">
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 13%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-lg-8 col-xlg-9">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex flex-wrap">
+                                    <div>
+                                        <h4 class="card-title">Denetim Analizi</h4>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <ul class="list-inline">
+                                            <li>
+                                                <h6 class="text-muted  text-info"><i class="fa fa-circle font-10 m-r-10"></i>Yeni Eklenenler</h6> </li>
+
+                    <li>
+                                                <h6 class="text-muted text-success"><i class="fa fa-circle font-10 m-r-10 "></i>Devam Edenler</h6> </li>
+                    <li>
+                                                <h6 class="text-purple"><i class="fa fa-circle font-10 m-r-10 "></i>Tamamlananlar</h6> </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div id="earning" style="height: 355px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--
+            <div class="col-lg-4 col-xlg-3">
+                <div class="card card-inverse card-info">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="m-r-20 align-self-center">
+                                <h1 class="text-white"><i class="mdi mdi-city"></i></h1></div>
+                            <div>
+                                <h3 class="card-title">Grup</h3>
+                                <h6 class="card-subtitle">Sisteme Kayıtlı Grup Bilgileri</h6> </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 align-self-center">
+                                <h2 class="font-light text-white">Kayıtlı {{ num_grup }} Grup</h2>
+                            </div>
+                            <div class="col-6 p-t-10 p-b-20 text-right">
+                                <div class="spark-count" style="height:65px"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-inverse card-success">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="m-r-20 align-self-center">
+                                <h1 class="text-white"><i class="mdi mdi-clipboard-text"></i></h1></div>
+                            <div>
+                                <h3 class="card-title">Şirket</h3>
+                                <h6 class="card-subtitle">Sisteme Kayıtlı Şirket Bilgileri</h6> </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 align-self-center">
+                                <h2 class="font-light text-white">Kayıtlı {{ num_sirket }} Şirket</h2>
+                            </div>
+                            <div class="col-6 p-t-10 p-b-20 text-right align-self-center">
+                                <div class="spark-count2" style="height:65px"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex no-block">
+                            <h4 class="card-title">Görev Uyarıları<br/><small class="text-muted">Sisteme Kayıtlı Görev Uyarıları</small></h4>
+                            <div class="ml-auto">
+                                <select class="custom-select">
+                                    <option selected="">Ocak 2018</option>
+                                    <option value="1">Şubat 2018</option>
+                                    <option value="2">Mart 2018</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+-->
+    </div>
+</div>
+<footer class="footer"> © 2018 EasyCheck&#169; - Her Hakkı Saklıdır. </footer>
+</div>
+
+
+
+
+
 
 
 
