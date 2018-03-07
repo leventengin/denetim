@@ -175,9 +175,9 @@
 
 
               {% if  user.profile.denetci == "E" %}
-              <!--
+
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Yerinde Denetim <span class="caret"></span></a>
-             -->
+                <ul class="dropdown-menu" role="menu">
                  <li><a href="/islem">Bekleyen Planlı Denetimler</a></li>
                  <li><a href="/islem/rutin_baslat">Rutin Denetim Başlat</a></li>
                  <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
@@ -188,9 +188,9 @@
 
                  <li><a href="/islem/qrcode">QRCode</a></li>
 
-                 <!--
+               </ul>
              </li>
-           -->
+
              {% endif %}
 
 
@@ -223,8 +223,10 @@
 
 
              {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+             <!--
              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Tanımlar <span class="caret"></span></a>
                <ul class="dropdown-menu" role="menu">
+               -->
                  <li><a href="/islem/tipi">Denetim Tipi</a></li>
                  <li><a href="/islem/zon">Denetim Zonu</a></li>
                  <li><a href="/islem/bolum">Denetim Bölümü</a></li>
@@ -247,8 +249,10 @@
                  <li><a href="/islem/deneme_iki">Deneme İki</a></li>
                  <li><a href="/islem/deneme_uc">Deneme Üç</a></li>
                -->
+               <!--
                </ul>
               </li>
+            -->
             {% endif %}
 
 
