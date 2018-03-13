@@ -1,299 +1,158 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head>
+    <head>
 
-  {% block title %}<title>  denetim  </title>{% endblock %}
-  {# Load the tag library #}
-  {% load bootstrap3 %}
-  {# Load CSS and JavaScript #}
-  {% bootstrap_css %}
-  {% bootstrap_javascript %}
-  {# Display django.contrib.messages as Bootstrap alerts #}
-  {% bootstrap_messages %}
-  {% load crispy_forms_tags %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <title>EZ-Check Denetim Sistemi</title>
+
+        <!-- Bootstrap CSS CDN -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <!-- Our Custom CSS -->
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'sidebar/style2.css' %}">
+        <!-- Scrollbar Custom CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
 
-  <!-- Add additional CSS in static file -->
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-
-  <!-- for bootstrap   datepicker -->
-  {% load staticfiles%}
-  <link rel="stylesheet" href="{% static 'contrib/bootstrap.css' %}">
-  <link rel="stylesheet" href="{% static 'contrib/font-awesome.min.css' %}">
-  <script src="{% static 'contrib/bootstrap.js' %}"></script>
-  <script type="text/javascript" src="{{ STATIC_URL }} /js/jquery.js">  </script>
-
-  <style>
-  a:link, a:visited, a:active {
-  color : #668B1E;
-  text-decoration : none;
-  }
-  a:hover {
-  color : #FF0000;
-  text-decoration : underline;
-  }
-
-  .jumbotron {
-    padding: 0.5em 0.6em;
-    h1 {
-        font-size: 2em;
-    }
-    p {
-        font-size: 1.2em;
-        .btn {
-            padding: 0.5em;
-        }
-    }
-   }
-
-  </style>
-
-
-  <script>
-  $("form input[name='deneme']").click(function () {
-      deneme = demirbas;
-  });
-  </script>
-
-
-  <script>
-    function sayhello(w) {
-      document.write("hello,  " + w);
-      }
-  </script>
-
+<style>
+body {
+background-color: #dee8f9;
+}
+</style>
 
 </head>
 
-<body>
 
-  ​<div class="container">
-    <div class="jumbotron"  style="background-color:transparent !blue;">
+    <body>
 
+            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+             <!-- jQuery CDN -->
+             <!--<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>-->
+             <!-- Bootstrap Js CDN -->
+             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+             <!-- jQuery Custom Scroller CDN -->
+             <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">
-            <a href="{% url 'index' %}"> <img src="{{ STATIC_URL }}images/logo/logo-icon.png"
-                                        alt="EasyCheck&#169;" class="dark-logo" />
-                            <img src="{{ STATIC_URL }}images/logo/logo-text.png"
-                                        alt="EasyCheck&#169;" class="dark-logo" />
-                        </a>
-          </div>
-        <div class="col-md-4"> <h2> Denetim Sistemi <h2> </div>
+             <script type="text/javascript">
+                 $(document).ready(function () {
+                     $("#sidebar").mCustomScrollbar({
+                         theme: "minimal"
+                     });
 
-        <div class="col-md-3">{{ user.get_full_name }}</div>
-
-        <div class="col-md-1">
-          <p> <a class="btn btn-default btn-sm" href="{% url 'logout'%}?next={{request.path}}" >
-                <span class="glyphicon glyphicon-log-out"></span> Çıkış
-              </a>
-            </p>
-         </div>
-        </div>
-
+                     $('#sidebarCollapse').on('click', function () {
+                         $('#sidebar, #content').toggleClass('active');
+                         $('.collapse.in').toggleClass('in');
+                         $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                     });
+                 });
+             </script>
 
 
 
 
-    </div>
-    </div>
 
-
-
-  <div class="container-fluid">
-
-  <!--  <div class="row">  -->
-
-
-<!--
-    <div class="row">
-          {% block siderow %}
-
-              <div class="col-md-2">
-                <ul class="ustalan-nav">
-                  <li><a href="{% url 'index' %}">Ana Sayfa </a></li>
-                </ul>
-              </div>
-
-              <div class="col-md-6">
-                    <ul class="ustalan-nav">
-                      <h2>Denetim Sistemi</h2>
-                  </ul>
-              </div>
-
-              <div class="col-md-3">
-                <ul class="ustalan-nav">
-                {% if user.is_authenticated %}
-                  <li>Kulanıcı: {{ user.get_full_name }}</li>
-                {% else %}
-                    <h5></h5>
-                {% endif %}
-                  </ul>
-              </div>
-
-              <div class="col-md-1">
-                  <ul class="ustalan-nav">
-                {% if user.is_authenticated %}
-                  <li><a href="{% url 'logout'%}?next={{request.path}}">Çıkış</a></li>
-                {% else %}
-                  <li><a href="{% url 'login'%}?next={{request.path}}">Giriş</a></li>
-                {% endif %}
-                  </ul>
-              </div>
-
-          {% endblock %}
-        </div>
--->
-
-
-    <div class="row">
-
-      <div class="col-md-2">
-          {% block sidebar %}
-
-          <div class="navbar navbar-default navbar-fixed-left">
-            <ul class="nav navbar-nav">
-
-
-<!--
-              <a href="#">
-              <div > <img style="width:10em; height:5em;"  src="{{ STATIC_URL }}images/user/dgr.png" alt="DGR">
-
-              </div>
-              </a>
--->
-
-
-              {% if  user.profile.denetci == "E" %}
-
-             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Yerinde Denetim <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                 <li><a href="/islem">Bekleyen Planlı Denetimler</a></li>
-                 <li><a href="/islem/rutin_baslat">Rutin Denetim Başlat</a></li>
-                 <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
-                 <li><a href="/islem/acil_devam_sec"><font color="f44336">Acil Bildirim</font></a></li>
-                 <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
-                 <!-- <li><a href="/islem/sonuc">Yazı Ekle</a></li>  -->
-                 <!-- <li><a href="/islem/sonuc">Denetim Tamamla</a></li>  -->
-
-                 <li><a href="/islem/qrcode">QRCode</a></li>
-
-               </ul>
-             </li>
-
-             {% endif %}
-
-
-             {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-
-             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetim Oluştur <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
-                <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
-                <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
-                <li><a href="/islem/denetim">Denetim Detayları</a></li>
-              </ul>
-             </li>
-
-             {% endif %}
-
-
-             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Denetimler <span class="caret"></span></a>
-               <ul class="dropdown-menu" role="menu">
-                <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
-                <!--
-                <li><a href="/islem/denetim/sonlandirilan">Sonlandırılanlar</a></li>
-                <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
-                {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-                    <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
-                {% endif %}
-              -->
-               </ul>
-             </li>
-
-
-             {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-             <!--
-             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Tanımlar <span class="caret"></span></a>
-               <ul class="dropdown-menu" role="menu">
-               -->
-                 <li><a href="/islem/tipi">Denetim Tipi</a></li>
-                 <li><a href="/islem/zon">Denetim Zonu</a></li>
-                 <li><a href="/islem/bolum">Denetim Bölümü</a></li>
-                 <li><a href="/islem/detay">Denetim Detayı</a></li>
-                 <li class="divider"></li>
-                 <li><a href="/islem/grup">Grup</a></li>
-                 <li><a href="/islem/sirket">Şirket</a></li>
-                 <li><a href="/islem/proje">Proje</a></li>
-                 <li><a href="/islem/qrdosyasi">QRCode</a></li>
-                 <!--
-                 <li><a href="/islem/cagir1">ilk html</a></li>
-                 <li><a href="/islem/cagir2">ikinci html</a></li>
-                 <li><a href="/islem/cagir3">üçüncü html</a></li>
-                 <li><a href="/islem/cagir4">dördüncü html</a></li>
-               -->
-
-
-                 <!--
-                 <li><a href="/islem/deneme">Deneme</a></li>
-                 <li><a href="/islem/deneme_iki">Deneme İki</a></li>
-                 <li><a href="/islem/deneme_uc">Deneme Üç</a></li>
-               -->
-               <!--
-               </ul>
-              </li>
-            -->
-            {% endif %}
-
-
-             {% if user.is_staff %}
-              <li><a href="/admin/">Yönetim</a></li>
-             {% endif %}
-
-
-            </ul>
-          </div>
-
-          {% endblock %}
-      </div>
-
-        <div class="col-md-10 ">
-
-           {% block content %}{% endblock %}
-
-
-              {% block pagination %}
-                {% if is_paginated %}
-                <div class="pagination">
-                  <span class="page-links">
-                    {% if page_obj.has_previous %}
-                        <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
-                    {% endif %}
-                    <span class="page-current">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                    </span>
-                    {% if page_obj.has_next %}
-                        <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
-                    {% endif %}
-                  </span>
+        <div class="wrapper">
+            <!-- Sidebar Holder -->
+            <nav id="sidebar">
+                <div class="sidebar-header">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-md-7">
+                        <a href="{% url 'index' %}"> <img src="{{ STATIC_URL }}images/logo/logo-light-icon.png"
+                                                    alt="EasyCheck&#169;" class="dark-logo" />
+                                        <img src="{{ STATIC_URL }}images/logo/logo-light-text.png"
+                                                    alt="EasyCheck&#169;" class="dark-logo" />
+                                    </a>
+                      </div>
+                     </div>
+                    </div>
                 </div>
-              {% endif %}
-            {% endblock %}
 
-        </div>
+                <ul class="list-unstyled components">
+                    <h4><p>Yönetim ve Denetim Sistemleri</p></h4>
+                    <li class="deactive">
+                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Yerinde Denetim</a>
+                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li><a href="/islem">Bekleyen Planlı Denetim</a></li>
+                            <li><a href="/islem/rutin_baslat">Rutin Denetim Başlatma</a></li>
+                            <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
+                            <li><a href="/islem/acil_devam_sec"><b><font color="f44336">Acil Bildirim</font></b></a></li>
+                            <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
+                            <!--
+                            <li><a href="/islem/qrcode">QR code</a></li>
+                            -->
+                        </ul>
+                    </li>
+                    <li>
+                      <a href="#pageSubmenu2" data-toggle="collapse" aria-expanded="false">Denetim Oluştur</a>
+                      <ul class="collapse list-unstyled" id="pageSubmenu2">
+                        <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
+                        <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
+                        <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
+                        <li><a href="/islem/denetim">Denetim Detayları</a></li>
+                      </ul>
+                  </li>
+                  <li>
+                    <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">Denetimler</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu3">
+                      <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
+                      <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
+                      {% if  user.profile.denetim_grup_yetkilisi == "E" %}
+                      <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
+                      {% endif %}
+                    </ul>
+                  </li>
 
-    </div>
+                  <li>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">Tanımlar</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li><a href="/islem/tipi">Denetim Tipi</a></li>
+                        <li><a href="/islem/zon">Denetim Alanı</a></li>
+                        <li><a href="/islem/bolum">Denetim Bölümü</a></li>
+                        <li><a href="/islem/detay">Denetim Detayı</a></li>
+                        <li><a href="/islem/grup">Grup</a></li>
+                        <li><a href="/islem/sirket">Şirket</a></li>
+                        <li><a href="/islem/proje">Proje</a></li>
+                        <li><a href="/islem/qrdosyasi">QRCode</a></li>
+                    </ul>
+                </li>
+               </ul>
 
-  </div>
-</body>
+
+            </nav>
+
+            <!-- Page Content Holder -->
+            <div id="content">
+
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+
+                        <div class="navbar-header">
+                            <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                                <i class="glyphicon glyphicon-align-left"></i>
+                                <span></span>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav navbar-right">
+                              <div class="col-md-5"><font color="white">{{ user.get_full_name }}</font></div>
+                                {% if user.is_staff %}
+                                <li><a href="/admin/"><font color="white">Ayarlar</font></a></li>
+                                {% endif %}
+                                <li><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+ {% block content %}{% endblock %}
+
+
+
+    </body>
 </html>

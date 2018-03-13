@@ -1,4 +1,4 @@
-{{% extends "base_generic.html" %}
+{% extends "base_generic.html" %}
 {% load static %}
 
 {% block content %}
@@ -8,9 +8,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>jQuery UI Datepicker - Default functionality</title>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
+<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+
+<!--
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+-->
 
 <style type="text/css">
     label {
@@ -136,6 +139,7 @@ $( ".datepicker" ).datepicker()
       var response = '';
       var js_bolumler = [];
       var js_takipciler = [];
+      //alert("tipiseç e geldik...");
       /* liste = document.getElementById("id_bolum").value; */
       $.ajaxSettings.traditional = true;
       $("#id_bolum :selected").each(function(){
@@ -169,7 +173,7 @@ $( ".datepicker" ).datepicker()
       //alert("js rutin planlı ..."+js_rutin_planli);
       console.log(js_bolumler);
       $.ajax({
-        url : "tipisec_bolum_js/",
+        url : "tipisec_bolum_js_2/",
         type : "GET",
         dataType: "text",
         data : {
@@ -203,6 +207,7 @@ $( ".datepicker" ).datepicker()
         var response = '';
         var js_bolumler = [];
         var js_takipciler = [];
+        //alert("detay seçin içindeyiz...");
         /* liste = document.getElementById("id_bolum").value; */
         $.ajaxSettings.traditional = true;
         $("#id_bolum :selected").each(function(){
@@ -235,7 +240,7 @@ $( ".datepicker" ).datepicker()
         //alert(" bölümler..." + js_bolumler);
         console.log(js_bolumler);
         $.ajax({
-          url : "detaylarsec_bolum_js/",
+          url : "detaylarsec_bolum_js_2/",
           type : "GET",
           dataType: "text",
           data : {
@@ -307,6 +312,8 @@ $( ".datepicker" ).datepicker()
              });   /*  change  kapanıyor ...  */
            });  /* document ready  kapanıyor */
 </script>
+
+
 
 
 <script>

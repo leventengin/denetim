@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^rutin_baslat/kesin$', views.rutin_baslat_kesin, name='rutin_baslat_kesin'),
     url(r'^acil_devam_sec/$', views.acil_devam_sec, name='acil_devam_sec'),
     url(r'^qrcode/$', views.qrcode_tara, name='qrcode_tara'),
+    url(r'^nfc_oku/(?P<pk>\d+)$', views.nfc_oku, name='nfc_oku'),    
     url(r'^qrcode/result/$', views.qrcode_islemi_baslat, name='qrcode_islemi_baslat'),
     #url(r'^qrcode/(?P<pk>\d+)$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
     url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),

@@ -27,12 +27,23 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'hijyenakademisi.smtp@gmail.com'
-#EMAIL_HOST_PASSWORD = 'hijyensmtpakademi'
 EMAIL_HOST_PASSWORD = 'silamonad126'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+"""
+EMAIL_HOST = 'smtp.3gozmedia.com'
+EMAIL_HOST_USER = 'denetim@hijyenakademisi.com'
+EMAIL_HOST_PASSWORD = '0d684cUi0'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+"""
+
+
 
 
 # using gmail you will need to unloack Captcha to enable Django, to send for you:
@@ -64,7 +75,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
     'django_select2',
-    'select2',
+#    'select2',
     'jquery',
 ]
 

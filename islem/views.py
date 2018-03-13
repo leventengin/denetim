@@ -72,6 +72,8 @@ class GeneratePdf(View):
         return HttpResponse(pdf, content_type='application/pdf')
 
 
+
+
 class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         denetim_no = request.session.get('denetim_no')
@@ -122,8 +124,155 @@ class GeneratePDF(View):
         html = template.render(context).encode("UTF-8")
         page = HTML(string=html, encoding='utf-8').write_pdf()
         response = HttpResponse(page, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="report_example.pdf"'
+        response['Content-Disposition'] = 'attachment; filename="denetim_isemri.pdf"'
         return response
+
+
+
+
+class Generate_Rapor_PDF(View):
+    def get(self, request, *args, **kwargs):
+
+
+        #denetim_no = request.session.get('denetim_no')
+        denetim_no = pk
+        denetim_obj = denetim.objects.get(id=denetim_no)
+        bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        if not(bolumler_obj):
+            messages.success(request, 'Denetime ait bölüm yok.......')
+            return redirect('index')
+
+        kontrol_degiskeni = True
+        for bolum in bolumler_obj:
+            if bolum.tamam == "H":
+                kontrol_degiskeni = False
+
+        if not(kontrol_degiskeni):
+            messages.success(request, 'Tamamlanmamış bölümler var.......')
+            return redirect('index')
+
+        #########################################################################
+        ###   RAPOR
+        #########################################################################
+
+        bolum_soru = 0
+        bolum_dd = 0
+        bolum_net = 0
+        bolum_puan = 0
+        denetim_soru = 0
+        denetim_dd = 0
+        denetim_net = 0
+        denetim_puan = 0
+        i = 0
+        for bolum in bolumler_obj:
+            bolum_no = bolum.bolum
+            detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+            print("seçilmiş olan detaylar...", detaylar_obj)
+            for detay in detaylar_obj:
+                bolum_soru = bolum_soru + 1
+                denetim_soru = denetim_soru + 1
+                if detay.denetim_disi == "E":
+                    bolum_dd = bolum_dd + 1
+                    denetim_dd = denetim_dd + 1
+                else:
+                    bolum_net = bolum_net + 1
+                    bolum_puan = bolum_puan + detay.puan
+                    denetim_net = denetim_net +1
+                    denetim_puan = denetim_puan + detay.puan
+            bolum.soru_adedi = bolum_soru
+            bolum.dd_adedi = bolum_dd
+            bolum.net_adet = bolum_net
+            bolum.toplam_puan = bolum_puan
+            ortalama_puan = bolum_puan / bolum_net
+            print("ortalama puan ...", ortalama_puan)
+            bolum.ortalama_puan = ortalama_puan
+            bolum.save()
+            print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
+            bolum_soru = 0
+            bolum_dd = 0
+            bolum_net = 0
+            bolum_puan = 0
+        denetim_obj.soru_adedi = denetim_soru
+        denetim_obj.dd_adedi = denetim_dd
+        denetim_obj.net_adet = denetim_net
+        denetim_obj.toplam_puan = denetim_puan
+        ortalama_puan = denetim_puan / denetim_net
+        print("ortalama puan ...", ortalama_puan)
+        denetim_obj.ortalama_puan = ortalama_puan
+        denetim_obj.save()
+        print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
+
+
+
+        denetim_adi = denetim_obj.denetim_adi
+        proje = denetim_obj.proje
+        rutin_planli = denetim_obj.rutin_planli
+        denetci = denetim_obj.denetci
+        tipi = denetim_obj.tipi
+        yaratim_tarihi = denetim_obj.yaratim_tarihi
+        yaratan = denetim_obj.yaratan
+        hedef_baslangic = denetim_obj.hedef_baslangic
+        hedef_bitis = denetim_obj.hedef_bitis
+        gerc_baslangic = denetim_obj.gerc_baslangic
+        gerc_bitis = denetim_obj.gerc_bitis
+        durum = denetim_obj.durum
+        rutindenetci = denetim_obj.rutindenetci
+        takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+        print("takipci objesi...", takipci_obj)
+        i = 0
+        takipciler = []
+        for takipci in takipci_obj:
+            takipciler.append(takipci.takipci)
+            i = i + 1
+        print("takipciler listesi..", takipciler)
+        d = collections.defaultdict(list)
+        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        for bolum in bolum_obj:
+            print("bolum list . bolum", bolum.bolum)
+            detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+            for detay in detay_obj:
+                print("detay list . detay", detay.bolum, detay.detay)
+                #d[detay.bolum].append(detay.detay)
+                d[bolum].append(detay)
+        print("***********************")
+        print(d)
+        d.default_factory = None
+        dict_bol_detay = dict(d)
+        print("************************")
+        print(dict_bol_detay)
+        context = {'dict_bol_detay':dict_bol_detay,
+                    'takipciler': takipciler,
+                    'denetim_adi': denetim_adi,
+                    'proje' : proje,
+                    'rutin_planli' : rutin_planli,
+                    'rutindenetci' : rutindenetci,
+                    'denetci' : denetci,
+                    'tipi' : tipi,
+                    'yaratim_tarihi' : yaratim_tarihi,
+                    'yaratan' : yaratan,
+                    'hedef_baslangic' : hedef_baslangic,
+                    'hedef_bitis' : hedef_bitis,
+                    'durum' : durum,
+                    'soru_adedi' : denetim_soru,
+                    'dd_adedi' :  denetim_dd,
+                    'net_adet' : denetim_net,
+                    'toplam_puan' : denetim_puan,
+                    'ortalama_puan' : ortalama_puan,
+                    'pk' : denetim_no,
+                    }
+        #return render(request, 'islem/teksayfa_sil_soru.html', context )
+        #return render(request, 'islem/denetim_rapor_goster.html', context )
+
+
+        template = get_template('pdf/denetim_rapor.html')
+        html = template.render(context).encode("UTF-8")
+        page = HTML(string=html, encoding='utf-8').write_pdf()
+        response = HttpResponse(page, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="denetim_raporu.pdf"'
+        return response
+
+
+
 
 
 
@@ -340,7 +489,7 @@ def denetim_baslat(request, pk=None):
 
 #--------------------------------------------------------------------------------
 
-# denetimi başlatmaya karar verildiğinde durumu C yapıyor, B den C ye
+# denetimi başlatmaya karar verildiğinde durumu B yapıyor, A den B ye
 
 @login_required
 def denetim_baslat_kesin(request, pk=None):
@@ -351,6 +500,17 @@ def denetim_baslat_kesin(request, pk=None):
     print("seçilen denetim kesin ...", denetim_obj)
     denetim_obj.durum = "B"
     denetim_obj.save()
+
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    bolum_sayi = bolumler_obj.count()
+
+    print("bolum sayı...:", bolum_sayi)
+
+    if bolum_sayi == 1:
+        request.session['bolum_atla_flag'] = True
+    else:
+        request.session['bolum_atla_flag'] = False
+
     return redirect('denetim_bolum_sec' )
 
 
@@ -368,7 +528,7 @@ def devam_liste(request, pk=None):
     print("kullanıcı", kullanici)
 
     devameden_denetimler = denetim.objects.filter(durum="B")
-    devameden_denetimler_sirali = devameden_denetimler.order_by('hedef_baslangic')
+    devameden_denetimler_sirali = devameden_denetimler.order_by('denetim_adi')
     secili_denetimler = devameden_denetimler_sirali.filter(denetci=request.user)
 
     if secili_denetimler:
@@ -454,7 +614,7 @@ def rutin_baslat_kesin(request, pk=None):
 
     bugun = datetime.now().strftime("%Y-%m-%d")
     print("bugun...", bugun)
-    dd_denetim_yeni_adi = dd_denetim_adi + "-" + str(bugun)
+    dd_denetim_yeni_adi = dd_denetim_adi + "- " + str(bugun)
     print("yeni denetim adi...", dd_denetim_yeni_adi)
 
     # bir de  yanına sayı ver.....
@@ -595,6 +755,15 @@ def rutin_baslat_kesin(request, pk=None):
     request.session['devam_tekrar'] = "devam"
     request.session['denetim_no'] = yeni_denetim_no
 
+    bolum_sayi = bolumler_obj.count()
+
+    print("bolum sayı...:", bolum_sayi)
+
+    if bolum_sayi == 1:
+        request.session['bolum_atla_flag'] = True
+    else:
+        request.session['bolum_atla_flag'] = False
+
     return redirect('denetim_bolum_sec' )
 
 
@@ -614,56 +783,56 @@ def acil_devam_sec(request, pk=None):
         print("buraya mı geldi acil aç form...")
         if form.is_valid():
             dd_denetim = request.POST.get('denetim', "")
-            dd_denetim_2 = int(dd_denetim)
-            print ("denetim ", dd_denetim_2)
+            denetim_obj = denetim.objects.get(id=dd_denetim)
+            print ("denetim ", dd_denetim)
             dd_konu = request.POST.get('konu', "")
             print ("konu", dd_konu)
             dd_aciklama = request.POST.get('aciklama', "")
             print ("aciklama", dd_aciklama)
             # veri tabanına yazıyor
-            acil_obj, created = acil.objects.get_or_create(denetim_id=dd_denetim_2)
-
-            if created:
-                # means you have created a new db objects
-                print("id  bir", acil_obj.id)
-                print("denetim", acil_obj.denetim)
-                kaydetme_obj = acil(denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
+            acil_obj = acil.objects.filter(denetim=dd_denetim)
+            #acil_obj, created = acil.objects.get_or_create(denetim=dd_denetim)
+            if not(acil_obj):
+                # means you will create a new db object
+                print("yeni acil kaydı..........")
+                kaydetme_obj = acil(denetim_id=dd_denetim, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
             else:
                 # just refers to the existing one
-                print("id  iki", acil_obj.id)
-                print("denetim", acil_obj.denetim)
-                kaydetme_obj = acil(id=acil_obj.id, denetim_id=acil_obj.denetim, konu=dd_konu, aciklama=dd_aciklama)
+                acil_obj_2 = acil_obj.first()
+                print("id  iki", acil_obj_2.id)
+                print("denetim", acil_obj_2.denetim)
+                kaydetme_obj = acil(id=acil_obj_2.id, denetim_id=acil_obj_2.denetim.id, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
 
 
-            denetim_no = acil_obj.denetim.id
-            print("denetim no...", denetim_no)
-            denetim_obj = denetim.objects.get(id=denetim_no)
+            print("denetim no...", dd_denetim)
+            denetim_obj = denetim.objects.get(id=dd_denetim)
             denetci = denetim_obj.denetci
-            takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+            takipci_obj = sonuc_takipci.objects.filter(denetim=dd_denetim)
 
-            #############---------------------------------------------
-            #email işlemi---------------------------------------------
-            #############----------------------------------------------
+            ##############################################
+            ###   email işlemi....................
+            ##############################################
 
-            connection = mail.get_connection()
-            connection.open()
 
-            adi = denetim_obj.denetci.get_full_name()
+            adi = denetim_obj.yaratan.get_full_name()
             denetim_id = denetim_obj.id
             denetim_adi = denetim_obj.denetim_adi
-            baslangic = denetim_obj.hedef_baslangic
-            bitis = denetim_obj.hedef_bitis
 
-            subject = "Denetçi tarafından acil bildirim"
-            to = [denetim_obj.denetci.email]
+            subject = "Denetci tarafından acil bildirim"
+            to = [denetim_obj.yaratan.email]
+            adi = denetim_obj.yaratan.get_full_name()
+            denetim_adi = denetim_obj.denetim_adi
+            konu = dd_konu
+            aciklama = dd_aciklama
+
             from_email = settings.EMAIL_HOST_USER
             ctx = {
                 'adi': adi,
                 'denetim_adi': denetim_adi,
-                'konu': dd_konu,
-                'aciklama': dd_aciklama
+                'konu': konu,
+                'aciklama': aciklama
                 }
             message = get_template('islem/emt_acil_bildirim.html').render(ctx)
             msg = EmailMessage(subject, message, to=to, from_email=from_email)
@@ -674,25 +843,24 @@ def acil_devam_sec(request, pk=None):
 
             for takipci in takipci_obj:
                 adi = takipci.takipci.get_full_name()
-                subject = "Denetçi tarafından acil bildirim"
+                subject = "Denetci tarafından acil bildirim"
                 to = [takipci.takipci.email]
                 from_email = settings.EMAIL_HOST_USER
                 ctx = {
                     'adi': adi,
                     'denetim_adi': denetim_adi,
-                    'konu': dd_konu,
-                    'aciklama': dd_aciklama
+                    'konu': konu,
+                    'aciklama': aciklama
                     }
                 message = get_template('islem/emt_acil_bildirim.html').render(ctx)
                 msg = EmailMessage(subject, message, to=to, from_email=from_email)
                 msg.content_subtype = 'html'
                 msg.send()
 
-            connection.close()
+            #connection.close()
 
-            # email işlemi sonu.....................
 
-            messages.success(request, 'Acil bildirimi gönderildi.......')
+            messages.success(request, 'Acil bildirim gönderildi.......')
             return redirect('index')
         else:
             return render(request, 'islem/acil_devam_sec.html', {'form': form,})
@@ -746,6 +914,16 @@ def denetim_devam_islemleri(request, pk=None):
     request.session['denetim_no'] = denetim_no
     request.session['devam_tekrar'] = "devam"
 
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    bolum_sayi = bolumler_obj.count()
+
+    print("bolum sayı...:", bolum_sayi)
+
+    if bolum_sayi == 1:
+        request.session['bolum_atla_flag'] = True
+    else:
+        request.session['bolum_atla_flag'] = False
+
     return redirect('denetim_bolum_sec' )
 
 #--------------------------------------------------------------------
@@ -784,6 +962,16 @@ def denetim_tekrarla_kesin(request, pk=None):
     denetim_obj = denetim.objects.get(id=denetim_no)
     print("seçilen denetim kesin ...", denetim_obj)
 
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    bolum_sayi = bolumler_obj.count()
+
+    print("bolum sayı...:", bolum_sayi)
+
+    if bolum_sayi == 1:
+        request.session['bolum_atla_flag'] = True
+    else:
+        request.session['bolum_atla_flag'] = False
+
     return redirect('denetim_bolum_sec' )
 
 
@@ -794,23 +982,14 @@ def denetim_tekrarla_kesin(request, pk=None):
 @login_required
 def denetim_tamamla(request, pk=None):
 
+
+    tamam_bolum_tekmi = request.session.get('tamam_bolum_tekmi')
+    if tamam_bolum_tekmi:
+        print("tekden geldiğinin işareti olsun....")
+        request.session['tamam_bolum_tekmi'] = False
+
     denetim_no = pk
     denetim_obj = denetim.objects.get(id=denetim_no)
-    """
-    denetim_tamamla_kontrolu = request.session.get('denetim_tamamla_kontrolu')
-    print("session variable dan gelen denetim tamamlama kontrolü...", denetim_tamamlama_kontrolu)
-
-    if denetim_tamamla_kontrolu == "Tamam":
-        denetim_no = request.session.get('denetim_tamamla_no')
-        print("gelen denetim no...", denetim_no)
-        denetim_obj = denetim.objects.get(id=denetim_no)
-        request.session['denetim_tamamla_kontrolu'] = "Degil"
-    else:
-        denetim_obj = denetim.objects.get(id=pk)
-        denetim_no = pk
-
-    print("seçilen denetim", denetim_obj)
-"""
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
@@ -984,29 +1163,35 @@ def denetim_bolum_sec(request, pk=None):
 
     # if this is a POST request we need to process the form data
     denetim_no = request.session.get('denetim_no')
-    #####################yeni eklendi   6 mart..................
-    # tek bölümse bölüm sorma kontrolü.....
+    print("denetim bölüm seç içinden denetim no ... req.ses. ile gelmiş...", denetim_no)
+    bolum_atla_flag = request.session.get('bolum_atla_flag')
+    print("bolum atla flag", bolum_atla_flag)
+
+    ###################################
+    # tek bölümse bölüm sorma kontrolü.....bolum atla flag....
+    # tek bölümse bölüm hazırlama işlemlerini burada yapıp doğrudan gönderiyor..
     ####################################
-    """
-    bolumler = sonuc_bolum.objects.filter(denetim=denetim_no)
-    if not bolumler:
-        messages.success(request, 'Bölüm seçilmemiş....')
-        return redirect('denetim_baslat')
-    else:
-        if bolumler.count() == 1:
-            secili_obj = bolumler.first()
-            bolum = secili_obj.bolum
-            print ("bolum", bolum)
-            request.session["secili_bolum"] = bolum
-            detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum)
-            if not detaylar:
-                messages.success(request, 'Seçili bölümde bölüm detayı yok....')
-                return redirect('denetim_baslat')
-            #form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
-            form = SonucForm(puanlama_turu="")
-            print("puanlama türü boş olarak ilk adımda çalıştı ama nasıl ????????????")
-            return render(request, 'islem/denetim_detay_islemleri.html')
-    """
+    if bolum_atla_flag:
+
+        bolum_obj = sonuc_bolum.objects.get(denetim=denetim_no)
+        bolum = bolum_obj.bolum.id
+        print ("bölüm atla içinden seçilen bolum", bolum)
+        request.session["secili_bolum"] = bolum
+        detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum).order_by('detay')
+        print("detaylar..:", detaylar)
+        if not detaylar:
+            messages.success(request, 'Seçili bölümde bölüm detayı yok....')
+            return redirect('denetim_baslat')
+
+        for detay in detaylar:
+            print("bolum id for loop içinden", detay.bolum.id, "ve detay id", detay.detay.id)
+            detay.tamam = "H"
+            detay.save()
+        ilk_detay_obj = detaylar.first()
+        request.session['secili_detay'] = ilk_detay_obj.id
+        return redirect('denetim_detay_islemleri')
+        #   tek nölümse atla işlemi sonu....................
+
 
     print("denetim bölüm seç denetim no...", denetim_no)
 
@@ -1043,11 +1228,23 @@ def denetim_bolum_sec(request, pk=None):
                 if kont.tamam == "H":
                     bitir = False
             if bitir:
-                request.session['denetim_tamamla_kontrolu'] = "Tamam"
-                request.session['denetim_tamamla_no'] = denetim_no
-                #messages.success(request, 'Bölüm işlemleri tamamlanmış....')
-                #return redirect('index')
-                return redirect('denetim_tamamla')
+                denetim_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+                bolum_sayi = denetim_obj.count()
+                if bolum_sayi == 1:
+                    request.session['tamam_bolum_tekmi'] = True
+                    request.session['denetim_tamamla_no'] = denetim_no
+                    #return redirect('denetim_tamamla')
+                    pk = denetim_no
+                    print(" tek olduğunda buraya geldi tamamlaya gidecek...", denetim_no)
+
+                    return HttpResponseRedirect(reverse('denetim_tamamla', args=(denetim_no,)))
+
+                    #return reverse('denetim_tamamla', kwargs={'pk': pk})
+                else:
+                    request.session['tamam_bolum_tekmi'] = False
+                    messages.success(request, 'Bölüm işlemleri tamamlanmış....')
+                    return redirect('index')
+                #return redirect('denetim_tamamla')
 
 
         form = BolumSecForm(denetim_no=denetim_no, devam_tekrar=devam_tekrar)
@@ -1177,6 +1374,8 @@ def teksayfa_yarat(request, pk=None):
 
                 i = i + 1
 
+
+
             #--------------------------------------------------------------
             # EMAIL işlemleri-----------------------------------------------
             #---------------------------------------------------------------
@@ -1222,9 +1421,12 @@ def teksayfa_yarat(request, pk=None):
                 msg.content_subtype = 'html'
                 msg.send()
 
+
+
             #connection.close()
 
             # EMAIL sonu...................................................
+
 
 
             #form = DenetimForm(bolum_listesi=[], init_param=True)
@@ -1283,7 +1485,7 @@ def teksayfa_yarat(request, pk=None):
         form.fields["aciklama"].initial = js_aciklama
         #form.fields["zonlar"].initial = js_zonlar
         form.fields["bolum"].initial = js_bolumler
-
+        print("buraya kadar geliyormu.............", js_tipi)
         context = { 'form': form, }
         return render(request, 'islem/tek_sayfa.html', context,)
 
@@ -1955,7 +2157,7 @@ def tipisec_bolum_js_2(request, pk=None):
         js_aciklama = request.GET.get('js_aciklama')
         js_bolumler = []
 
-        request.session['bolum_listesi'] = bolum_listesi
+        request.session['bolum_listesi'] = js_bolumler
         request.session['duz_js_bolumler'] = js_bolumler
         request.session['duz_js_denetim_adi'] = js_denetim_adi
         request.session['duz_js_proje'] = js_proje
@@ -2117,7 +2319,7 @@ def teksayfa_sil_kesin(request, pk=None):
 
 
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 # js içinden tamam butonu ile çalışıyor...
 # bölüm seçildiğinde bu bölümde detay var mı diye bakıp
@@ -2183,6 +2385,7 @@ def denetim_detay_islemleri(request, pk=None):
         bulunan = iki.get(detay=secili_detay)
         #bulunan = get_object_or_404(sonuc, detay=secili_detay)
         detay_obj = detay.objects.get(id=secili_detay)
+        print("detay obj...", detay_obj)
         puanlama_turu = detay_obj.puanlama_turu
         print(" puanlama türü...", puanlama_turu)
 
@@ -2222,13 +2425,17 @@ def denetim_detay_islemleri(request, pk=None):
                 else:
                     edit.foto = None
 
-                if edit.puanlama_turu == "A":
+                print("puanlama türü...", edit.puanlama_turu)
+                print("puanlama türü...doğrusu, ilk okunan", puanlama_turu)
+
+
+                if puanlama_turu == "A":
                     puan_hesap = int(edit.onluk)
-                if edit.puanlama_turu == "B":
+                if puanlama_turu == "B":
                     puan_hesap = int(edit.beslik)
                     puan_hesap = puan_hesap * 2
-                if edit.puanlama_turu == "C":
-                    puan_hesap = int(edit.beslik)
+                if puanlama_turu == "C":
+                    puan_hesap = int(edit.ikilik)
                     puan_hesap = puan_hesap * 10
 
                 edit.puan = puan_hesap
@@ -2262,6 +2469,7 @@ def denetim_detay_islemleri(request, pk=None):
                 devam_tekrar = request.session.get('devam_tekrar')
                 if devam_tekrar == "devam":
                     messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    request.session['bolum_atla_flag'] = False
                     return redirect('denetim_bolum_sec')
                 else:
                     messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
@@ -2301,6 +2509,7 @@ def denetim_detay_islemleri(request, pk=None):
 
         if not secili_detay_obj:
             messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı....')
+            request.session['bolum_atla_flag'] = False
             return redirect('denetim_bolum_sec')
         secili_obj = secili_detay_obj.first()
         secili_detay = secili_obj.detay.id
@@ -2434,13 +2643,26 @@ def qrcode_calistir_js(request, pk=None):
 
 
 @login_required
+def nfc_oku(request, pk=None):
+    print("selam buraya geldik...nfc_oku")
+    nfc_degeri = pk
+    print("nfc değeri...", nfc_degeri)
+    request.session['js_qrcode_result'] = nfc_degeri
+    return redirect('qrcode_islemi_baslat')
+
+
+
+#--------------------------------------------------------------------------------
+
+
+@login_required
 def qrcode_islemi_baslat(request, pk=None):
     print("selam buraya geldik...qrcode islemi baslat")
     result = request.session.get('js_qrcode_result')
     print(" qrcode işlemi başlat içinden okunan değer....",  result)
 
     if result == None:
-        messages.success(request, 'QRCode okunamadı....')
+        messages.success(request, 'Code okunamadı....')
         return redirect('qrcode_tara')
 
     result2 = str(result)
@@ -2458,7 +2680,7 @@ def qrcode_islemi_baslat(request, pk=None):
         print(" qrcode başlat içinden  denetim no", denetim.id)
         return redirect('rutin_baslat_kesin')
     else:
-        messages.success(request, 'QRCode eşleşmedi....')
+        messages.success(request, 'Code eşleşmedi....')
         return redirect('qrcode_tara')
 
     context = {'result' : result}
@@ -2832,6 +3054,11 @@ def sonlandirilan_ilerle(request, pk=None):
 # sonlandırılan denetim seçimi ile ilgili bölüm.....
 # önce denetim seçiliyor...
 
+
+
+
+
+
 @login_required
 def raporlar_sec(request, pk=None):
     # if this is a POST request we need to process the form data
@@ -2871,7 +3098,7 @@ def raporlar_devam(request, pk=None):
     #print("seçili musteri...", secili_musteri, "musteri no..:", musteri_no)
     proje_obj = proje.objects.get(id=secili_proje)
     #sonlandirilan_denetim_obj = denetim.objects.filter(musteri=secili_musteri).filter(durum="D")
-    raporlar_denetim_obj = denetim.objects.filter(proje=secili_proje)
+    raporlar_denetim_obj = denetim.objects.filter(proje=secili_proje).filter(durum="C")
     context = {'raporlar_denetim_obj':raporlar_denetim_obj,
                'proje_obj': proje_obj,
                }
@@ -2885,17 +3112,133 @@ def raporlar_devam(request, pk=None):
 def raporlar_ilerle(request, pk=None):
     denetim_no = pk
 
-    #############################################
-    ####  buraya raporu getir...
-    ##############################################
+    denetim_obj = denetim.objects.get(id=denetim_no)
 
-    request.session['secilen_denetim'] = denetim_no
-    sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
-    denetimin_adi = sonuc_list.first().denetim.denetim_adi
-    denetimin_durumu = sonuc_list.first().denetim.durum
-    context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
-    return render(request, 'islem/sonlandirilan_detay_list.html', context)
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    if not(bolumler_obj):
+        messages.success(request, 'Denetime ait bölüm yok.......')
+        return redirect('index')
 
+    kontrol_degiskeni = True
+    for bolum in bolumler_obj:
+        if bolum.tamam == "H":
+            kontrol_degiskeni = False
+
+    if not(kontrol_degiskeni):
+        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        return redirect('index')
+
+    #########################################################################
+    ###   RAPOR
+    #########################################################################
+
+    bolum_soru = 0
+    bolum_dd = 0
+    bolum_net = 0
+    bolum_puan = 0
+    denetim_soru = 0
+    denetim_dd = 0
+    denetim_net = 0
+    denetim_puan = 0
+    i = 0
+    for bolum in bolumler_obj:
+        bolum_no = bolum.bolum
+        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+        print("seçilmiş olan detaylar...", detaylar_obj)
+        for detay in detaylar_obj:
+            bolum_soru = bolum_soru + 1
+            denetim_soru = denetim_soru + 1
+            if detay.denetim_disi == "E":
+                bolum_dd = bolum_dd + 1
+                denetim_dd = denetim_dd + 1
+            else:
+                bolum_net = bolum_net + 1
+                bolum_puan = bolum_puan + detay.puan
+                denetim_net = denetim_net +1
+                denetim_puan = denetim_puan + detay.puan
+        bolum.soru_adedi = bolum_soru
+        bolum.dd_adedi = bolum_dd
+        bolum.net_adet = bolum_net
+        bolum.toplam_puan = bolum_puan
+        ortalama_puan = bolum_puan / bolum_net
+        print("ortalama puan ...", ortalama_puan)
+        bolum.ortalama_puan = ortalama_puan
+        bolum.save()
+        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
+        bolum_soru = 0
+        bolum_dd = 0
+        bolum_net = 0
+        bolum_puan = 0
+    denetim_obj.soru_adedi = denetim_soru
+    denetim_obj.dd_adedi = denetim_dd
+    denetim_obj.net_adet = denetim_net
+    denetim_obj.toplam_puan = denetim_puan
+    ortalama_puan = denetim_puan / denetim_net
+    print("ortalama puan ...", ortalama_puan)
+    denetim_obj.ortalama_puan = ortalama_puan
+    denetim_obj.save()
+    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
+
+
+
+    denetim_adi = denetim_obj.denetim_adi
+    proje = denetim_obj.proje
+    rutin_planli = denetim_obj.rutin_planli
+    denetci = denetim_obj.denetci
+    tipi = denetim_obj.tipi
+    yaratim_tarihi = denetim_obj.yaratim_tarihi
+    yaratan = denetim_obj.yaratan
+    hedef_baslangic = denetim_obj.hedef_baslangic
+    hedef_bitis = denetim_obj.hedef_bitis
+    gerc_baslangic = denetim_obj.gerc_baslangic
+    gerc_bitis = denetim_obj.gerc_bitis
+    durum = denetim_obj.durum
+    rutindenetci = denetim_obj.rutindenetci
+    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+    print("takipci objesi...", takipci_obj)
+    i = 0
+    takipciler = []
+    for takipci in takipci_obj:
+        takipciler.append(takipci.takipci)
+        i = i + 1
+    print("takipciler listesi..", takipciler)
+    d = collections.defaultdict(list)
+    bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    for bolum in bolum_obj:
+        print("bolum list . bolum", bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+        for detay in detay_obj:
+            print("detay list . detay", detay.bolum, detay.detay)
+            #d[detay.bolum].append(detay.detay)
+            d[bolum].append(detay)
+    print("***********************")
+    print(d)
+    d.default_factory = None
+    dict_bol_detay = dict(d)
+    print("************************")
+    print(dict_bol_detay)
+    context = {'dict_bol_detay':dict_bol_detay,
+                'takipciler': takipciler,
+                'denetim_adi': denetim_adi,
+                'proje' : proje,
+                'rutin_planli' : rutin_planli,
+                'rutindenetci' : rutindenetci,
+                'denetci' : denetci,
+                'tipi' : tipi,
+                'yaratim_tarihi' : yaratim_tarihi,
+                'yaratan' : yaratan,
+                'hedef_baslangic' : hedef_baslangic,
+                'hedef_bitis' : hedef_bitis,
+                'durum' : durum,
+                'soru_adedi' : denetim_soru,
+                'dd_adedi' :  denetim_dd,
+                'net_adet' : denetim_net,
+                'toplam_puan' : denetim_puan,
+                'ortalama_puan' : ortalama_puan,
+                'pk' : denetim_no,
+                }
+    #return render(request, 'islem/teksayfa_sil_soru.html', context )
+    return render(request, 'islem/denetim_rapor_goster.html', context )
 
 
 
@@ -2921,11 +3264,11 @@ def iptal_sec(request, pk=None):
             print ("proje", proje)
             request.session['secili_proje'] = proje
             #form = GozlemciForm()
-            return redirect('sonlandirilan_devam')
+            return redirect('iptal_devam')
             #return render(request, 'islem/gozlemci_sec_devam.html', {'form': form,})
         else:
             print(" nah valid............")
-            return render(request, 'islem/sonlandirilan_proje_sec.html', {'form': form,})
+            return render(request, 'islem/iptal_proje_sec.html', {'form': form,})
 
 
     # if a GET (or any other method) we'll create a blank form
@@ -2941,12 +3284,9 @@ def iptal_sec(request, pk=None):
 @login_required
 def iptal_devam(request, pk=None):
     secili_proje = request.session.get('secili_proje')
-    #musteri_no = int(secili_musteri)
-    #print("seçili musteri...", secili_musteri, "musteri no..:", musteri_no)
     proje_obj = proje.objects.get(id=secili_proje)
-    #sonlandirilan_denetim_obj = denetim.objects.filter(musteri=secili_musteri).filter(durum="D")
-    sonlandirilan_denetim_obj = denetim.objects.filter(proje=secili_proje)
-    context = {'sonlandirilan_denetim_obj':sonlandirilan_denetim_obj,
+    iptal_denetim_obj = denetim.objects.filter(proje=secili_proje).filter(durum="C")
+    context = {'iptal_denetim_obj': iptal_denetim_obj,
                'proje_obj': proje_obj,
                }
     return render(request, 'islem/iptal_denetim_list.html', context )
@@ -2959,19 +3299,133 @@ def iptal_ilerle(request, pk=None):
     denetim_no = pk
     request.session['ilk_secili_denetim'] = denetim_no
 
-    return  redirect('denetim_iptal')
+    denetim_obj = denetim.objects.get(id=denetim_no)
 
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    if not(bolumler_obj):
+        messages.success(request, 'Denetime ait bölüm yok.......')
+        return redirect('index')
 
+    kontrol_degiskeni = True
+    for bolum in bolumler_obj:
+        if bolum.tamam == "H":
+            kontrol_degiskeni = False
 
-"""
-    request.session['secilen_denetim'] = denetim_no
-    sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('bolum')
-    denetimin_adi = sonuc_list.first().denetim.denetim_adi
-    denetimin_durumu = sonuc_list.first().denetim.durum
-    context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
-    return render(request, 'islem/iptal_detay_list.html', context)
-"""
+    if not(kontrol_degiskeni):
+        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        return redirect('index')
 
+    #########################################################################
+    ###   RAPOR
+    #########################################################################
+
+    bolum_soru = 0
+    bolum_dd = 0
+    bolum_net = 0
+    bolum_puan = 0
+    denetim_soru = 0
+    denetim_dd = 0
+    denetim_net = 0
+    denetim_puan = 0
+    i = 0
+    for bolum in bolumler_obj:
+        bolum_no = bolum.bolum
+        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+        print("seçilmiş olan detaylar...", detaylar_obj)
+        for detay in detaylar_obj:
+            bolum_soru = bolum_soru + 1
+            denetim_soru = denetim_soru + 1
+            if detay.denetim_disi == "E":
+                bolum_dd = bolum_dd + 1
+                denetim_dd = denetim_dd + 1
+            else:
+                bolum_net = bolum_net + 1
+                bolum_puan = bolum_puan + detay.puan
+                denetim_net = denetim_net +1
+                denetim_puan = denetim_puan + detay.puan
+        bolum.soru_adedi = bolum_soru
+        bolum.dd_adedi = bolum_dd
+        bolum.net_adet = bolum_net
+        bolum.toplam_puan = bolum_puan
+        ortalama_puan = bolum_puan / bolum_net
+        print("ortalama puan ...", ortalama_puan)
+        bolum.ortalama_puan = ortalama_puan
+        bolum.save()
+        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
+        bolum_soru = 0
+        bolum_dd = 0
+        bolum_net = 0
+        bolum_puan = 0
+    denetim_obj.soru_adedi = denetim_soru
+    denetim_obj.dd_adedi = denetim_dd
+    denetim_obj.net_adet = denetim_net
+    denetim_obj.toplam_puan = denetim_puan
+    ortalama_puan = denetim_puan / denetim_net
+    print("ortalama puan ...", ortalama_puan)
+    denetim_obj.ortalama_puan = ortalama_puan
+    denetim_obj.save()
+    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
+
+    denetim_adi = denetim_obj.denetim_adi
+    proje = denetim_obj.proje
+    rutin_planli = denetim_obj.rutin_planli
+    denetci = denetim_obj.denetci
+    tipi = denetim_obj.tipi
+    yaratim_tarihi = denetim_obj.yaratim_tarihi
+    yaratan = denetim_obj.yaratan
+    hedef_baslangic = denetim_obj.hedef_baslangic
+    hedef_bitis = denetim_obj.hedef_bitis
+    gerc_baslangic = denetim_obj.gerc_baslangic
+    gerc_bitis = denetim_obj.gerc_bitis
+    durum = denetim_obj.durum
+    rutindenetci = denetim_obj.rutindenetci
+    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+    print("takipci objesi...", takipci_obj)
+    i = 0
+    takipciler = []
+    for takipci in takipci_obj:
+        takipciler.append(takipci.takipci)
+        i = i + 1
+    print("takipciler listesi..", takipciler)
+    d = collections.defaultdict(list)
+    bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    for bolum in bolum_obj:
+        print("bolum list . bolum", bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+        for detay in detay_obj:
+            print("detay list . detay", detay.bolum, detay.detay)
+            #d[detay.bolum].append(detay.detay)
+            d[bolum].append(detay)
+    print("***********************")
+    print(d)
+    d.default_factory = None
+    dict_bol_detay = dict(d)
+    print("************************")
+    print(dict_bol_detay)
+    context = {'dict_bol_detay':dict_bol_detay,
+                'takipciler': takipciler,
+                'denetim_adi': denetim_adi,
+                'proje' : proje,
+                'rutin_planli' : rutin_planli,
+                'rutindenetci' : rutindenetci,
+                'denetci' : denetci,
+                'tipi' : tipi,
+                'yaratim_tarihi' : yaratim_tarihi,
+                'yaratan' : yaratan,
+                'hedef_baslangic' : hedef_baslangic,
+                'hedef_bitis' : hedef_bitis,
+                'durum' : durum,
+                'soru_adedi' : denetim_soru,
+                'dd_adedi' :  denetim_dd,
+                'net_adet' : denetim_net,
+                'toplam_puan' : denetim_puan,
+                'ortalama_puan' : ortalama_puan,
+                'pk' : denetim_no,
+                }
+    #return render(request, 'islem/teksayfa_sil_soru.html', context )
+    #return render(request, 'islem/denetim_rapor_goster.html', context )
+
+    return render(request, 'islem/denetim_iptal_sor.html', context )
 
 
 
@@ -3006,6 +3460,8 @@ def denetim_iptal_devam(request, pk=None):
     denetim_obj.save()
     messages.success(request, 'Denetim iptal edildi....')
     return redirect('index' )
+
+
 
 #---------------------------------------------------------------------------------
 
@@ -3849,7 +4305,7 @@ class takipciautocomplete(autocomplete.Select2QuerySetView):
             #return sonuc_bolum.objects.none()
 
         #qs = Profile.objects.filter(denetim_takipcisi="E")
-        qs = User.objects.all()
+        qs = User.objects.all().order_by('id')
         print("null olmasın şimdi...:", qs)
         if self.q:
             qs = qs.filter(user__username__icontains=self.q)
@@ -3867,10 +4323,10 @@ class bolumautocomplete(autocomplete.Select2QuerySetView):
         #qs = bolum.objects.all()
         qs = bolum.objects.none()
         if bolum_tipi:
-            zon_obj = zon.objects.filter(tipi=bolum_tipi)
+            zon_obj = zon.objects.filter(tipi=bolum_tipi).order_by('tipi')
             for zonlar in zon_obj:
                 print("zonlar id..", zonlar.id)
-                qx = bolum.objects.filter(zon=zonlar.id)
+                qx = bolum.objects.filter(zon=zonlar.id).order_by('zon')
                 qs = qs.union(qx)
         print("qs filtre öncesi..", qs)
         if self.q:
@@ -3882,7 +4338,7 @@ class detayautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return detay.objects.none()
-        qs = detay.objects.all()
+        qs = detay.objects.all().order_by('id')
         if self.q:
             qs = qs.filter(detay_adi__icontains=self.q)
         return qs
@@ -3893,7 +4349,7 @@ class tipiautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return tipi.objects.none()
-        qs = tipi.objects.all()
+        qs = tipi.objects.all().order_by('tipi_adi')
         if self.q:
             qs = qs.filter(tipi_adi__icontains=self.q)
         return qs
@@ -3903,7 +4359,7 @@ class zonautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return zon.objects.none()
-        qs = zon.objects.all()
+        qs = zon.objects.all().order_by('zon_adi')
         if self.q:
             qs = qs.filter(zon_adi__icontains=self.q)
         return qs
@@ -3915,7 +4371,7 @@ class projeautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return proje.objects.none()
-        qs = proje.objects.all()
+        qs = proje.objects.all().order_by('proje_adi')
         if self.q:
             qs = qs.filter(proje_adi__icontains=self.q)
         return qs
@@ -3925,7 +4381,7 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return user.objects.none()
-        qs = Profile.objects.filter(denetci="E")
+        qs = Profile.objects.filter(denetci="E").order_by('user')
         if self.q:
             qs = qs.filter(user__username__icontains=self.q)
         return qs

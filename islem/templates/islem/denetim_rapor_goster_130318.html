@@ -2,72 +2,13 @@
 
 {% block content %}
 
-<style>
-
-header {
-    color: blue;
-    font-family: verdana;
-    font-size: 300%;
-
-}
-p  {
-    color: red;
-    font-family: courier;
-    font-size: 160%;
-}
-.button {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-.button2 {background-color: #008CBA;} /* Blue */
-.button3 {background-color: #f44336;} /* Red */
-.button4 {background-color: #e7e7e7; color: black;} /* Gray */
-.button5 {background-color: #555555;} /* Black */
-</style>
-
-
-<!--Load the AJAX API-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current');   // Don't need to specify chart libraries!
-      google.charts.setOnLoadCallback(drawVisualization);
-
-      function drawVisualization() {
-        var wrapper = new google.visualization.ChartWrapper({
-          chartType: 'ColumnChart',
-          dataTable: [['', 'puan',],
-                      ['',  8,]],
-          options: {'title': 'Denetim Puanı'},
-          containerId: 'vis_div'
-        });
-        wrapper.draw();
-      }
-    </script>
-
-
-
-
-<!--  buraya if konulacak ...-->
-
-
-      <header>Denetim tamamlama</header>
-
-
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
+<!--
+<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'Generate_Rapor_PDF' pk=pk %}'">PDF Oluştur</button>
+-->
 
           <p> </p> &emsp;
 
-      <h4>  <b> <p> Denetim  Raporu</p></b> </h4>
+          <h4>  Denetim  Raporu </h4>
           <p> </p> &emsp;
 
 
@@ -134,12 +75,11 @@ p  {
                   </tbody>
               </table>
 
-
   <!--
               <p> </p> &emsp;
               <p> </p> &emsp;
               <h5> <b> Takipçiler: </b> <h5>
-              <p> </p>
+              <p> </p>    url(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
 
 
               {% for takipci in takipciler %}
@@ -149,18 +89,7 @@ p  {
               <p> </p>
               {% endfor %}
 -->
-</div>
-   <div class="col-md-6">
-         <style="font-family: Arial;border: 0 none;">
-         <div id="vis_div" style="width: 200px; height: 400px;"></div>
 
-
-     </div>
-</div>
-</div>
-<div class="container">
-  <div class="row">
-<div class="col-md-6">
 
             {% if dict_bol_detay %}
                   <!-- <strong>There are logs present.</strong>  -->
@@ -176,89 +105,70 @@ p  {
 
           <p> </p> &emsp;
           <p> </p> &emsp;
-          <h4> <b> <p>Bölüm ve detaylar:</p> </b> </h4>
+          <h5> <b> Bölüm ve detaylar: </b> <h5>
           <p> </p> &emsp;
           <p> </p>
           {% for bolum, detay in dict_bol_detay.items %}
-
-          <table border="0">
-              <tbody>
               <tr>
-                  <td>&emsp; <b>{{bolum.bolum.bolum_adi }}</b></td>
+                  <td> {{ bolum.bolum.bolum_kodu }} &emsp;  {{ bolum.bolum.bolum_adi }}</td>
               </tr>
               <p> </p>
               <tr>
-                  <td>   &emsp;<b> Bölüm içi soru adedi: </b></td>
+                  <td>  &emsp; &emsp; Bölüm içi soru adedi: </td>
                   <td> &emsp; {{ bolum.soru_adedi }} </td>
               </tr>
               <p> </p>
               <tr>
-                  <td>   &emsp;<b> Bölümdeki denetim dışı soru adedi: </b>  </td>
+                  <td>   &emsp; &emsp; Bölümdeki denetim dışı soru adedi:   </td>
                   <td> &emsp; {{ bolum.dd_adedi }}  </td>
               </tr>
               <p> </p>
               <tr>
-                  <td>   &emsp;<b> Bölümdeki net soru adedi:</b> </td>
+                  <td>  &emsp; &emsp; Bölümdeki net soru adedi: </td>
                   <td> &emsp; {{ bolum.net_adet }} </td>
               </tr>
               <p> </p>
               <tr>
-                  <td>  &emsp; <b> Toplam alınan puan: </b>  </td>
+                  <td> &emsp;  &emsp; Toplam alınan puan:   </td>
                   <td> &emsp; {{ bolum.toplam_puan }}  </td>
               </tr>
-
-
               <p> </p>
               <tr>
-                  <td>   &emsp;<b> Ortalama Bölüm Puanı: </b>  </td>
+                  <td>  &emsp; &emsp; Bölüm Puanı:   </td>
                   <td> &emsp; {{ bolum.ortalama_puan}}  </td>
               </tr>
               <p> </p>
               <p> &emsp;   </p>
-            </tbody>
-          </table>
-          <p> </p> &emsp;
-          <p> </p>
 
-          <h4> <b> <p>Soru Detayları:</p> </b> </h4>
-          <p> </p> &emsp;
-          <p> </p>
+
               {% for detay in detay %}
               <tr>
-
-
-
-                  <td> &emsp;<b> {{ detay.detay.detay_adi }} </b>  </td>
-
-              {% if detay.denetim_disi == "E" %}
-
-                  <td> &emsp;    &emsp;  Denetim dışı </td>
+                  <td> &emsp;  {{ detay.detay.detay_kodu }} &emsp;   {{ detay.detay.detay_adi }}   </td>
               </tr>
-
-              {% endif %}
-
-              {% if detay.denetim_disi == "H" %}
-
-              <tr>
-                <td> <b>  Puanı: </b></td>
-              <td>   &emsp;  {{ detay.puan }} </td>
-              </tr>
-
-
               <p> </p>
-              {% endif %}
+
+                    {% if detay.denetim_disi == "E" %}
+                    <tr>
+                        <td> &emsp;    &emsp;  Denetim dışı </td>
+                    </tr>
+                    <p> </p>
+                    {% endif %}
+
+                    {% if detay.denetim_disi == "H" %}
+                    <tr>
+                      <td> &emsp;   &emsp;  Puanı:   </td>
+                      <td>  &emsp;  {{ detay.puan }} </td>
+                    </tr>
+                    <p> </p>
+                    {% endif %}
 
               <p> </p>
               {% endfor %}
               <p>   &emsp;   </p>
 
-
           {% endfor %}
-          <h4><tr><font color="f44336">Denetimi tamamlamak istediğinizden emin misiniz ?</font></tr></h4>
 
-          <button class="button button3" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla_kesin' pk=pk %}'"><h4>Evet tamamla</h4></button>
 
-</div>
-</div>
-</div>
+
+
 {% endblock %}

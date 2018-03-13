@@ -1,0 +1,25 @@
+
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+    <h4>Bekleyen denetimler </h4>
+
+    {% if secili_denetimler %}
+    <ul>
+
+      {% for denetim in secili_denetimler %}
+        <li>
+          <a href="/islem/denetim/{{denetim.id}}">{{ denetim.denetim_adi }} </a>  &emsp; <a> {{ denetim.hedef_baslangic|date:"d/m/Y" }}</a>
+        </li>
+        {% endfor %}
+        <p> </p>
+      </ul>
+    {% else %}
+      <p>Kayıtlı bekleyen denetim yok ....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

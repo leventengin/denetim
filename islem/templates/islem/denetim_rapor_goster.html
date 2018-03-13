@@ -1,7 +1,6 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-
 <style>
 
 header {
@@ -58,8 +57,7 @@ p  {
 <!--  buraya if konulacak ...-->
 
 
-      <header>Denetim tamamlama</header>
-
+  
 
       <div class="container">
         <div class="row">
@@ -254,11 +252,10 @@ p  {
 
 
           {% endfor %}
-          <h4><tr><font color="f44336">Denetimi tamamlamak istediğinizden emin misiniz ?</font></tr></h4>
-
-          <button class="button button3" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_tamamla_kesin' pk=pk %}'"><h4>Evet tamamla</h4></button>
 
 </div>
 </div>
 </div>
+
+
 {% endblock %}

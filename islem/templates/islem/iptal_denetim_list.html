@@ -1,14 +1,14 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h4>Sonlandirilan Denetim Listesi</h4>
+    <h4>Denetim Listesi</h4>
       <p> </p>
-    <h5>Müşteri..:  {{proje_obj.proje_adi}} </h5>
+    <h5>Proje..:  {{proje_obj.proje_adi}} </h5>
       <p> </p>
-    {% if sonlandirilan_denetim_obj %}
+    {% if iptal_denetim_obj %}
     <ul>
 
-      {% for denetim in sonlandirilan_denetim_obj %}
+      {% for denetim in iptal_denetim_obj %}
       <li>
          <a href="{{denetim.id}}">{{ denetim.denetim_adi }}</a>
       </li>

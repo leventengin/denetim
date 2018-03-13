@@ -196,7 +196,7 @@ class AcilAcForm(forms.Form):
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(AcilAcForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="C")
+        denetim_obj_ilk = denetim.objects.filter(durum="B")
         denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
         self.fields['denetim'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim'].queryset)
@@ -235,7 +235,7 @@ class DenetimForm(forms.Form):
                         widget=forms.TextInput(attrs={ 'class':'datepicker' }))
     hedef_bitis = forms.DateField(label='Hedef bitiş...:', required=False,
                         widget=forms.TextInput(attrs={ 'class':'datepicker' }))
-    aciklama = forms.CharField(label='Açıklama', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}),)
+    aciklama = forms.CharField(label='Açıklama', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}), required=False)
     #zonlar = forms.ModelMultipleChoiceField(queryset=zon.objects.all(), label='Zonlar............:',
     #             widget=autocomplete.ModelSelect2Multiple(url='zon-autocomplete', forward=['tipi'] ), required=False)
     bolum = forms.ModelMultipleChoiceField(queryset=bolum.objects.all(), label='Bölümler...............:',

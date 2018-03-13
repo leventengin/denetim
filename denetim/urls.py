@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^islem/', include('islem.urls')),
     #url(r'^pdf1/', views.GeneratePdf.as_view(), name='GeneratePdf'),
     url(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
+    url(r'^pdf2/(?P<pk>\d+)$', views.Generate_Rapor_PDF.as_view(), name='Generate_Rapor_PDF'),    
     #url(r'^pdf2/', views.generate_pdf, name='generate_pdf'),
     #url(r'^pdf2/', views.get_report, name='get_report'),
     url(r'^pdf2/', views.report_example, name='report_example'),

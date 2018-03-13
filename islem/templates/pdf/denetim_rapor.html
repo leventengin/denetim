@@ -1,14 +1,61 @@
-{% extends "base_generic.html" %}
-
-{% block content %}
 
 
-      <h3>Denetim iptal</h3>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="tr">
 
-      <p>Denetimi iptal etmek istediğinizden emin misiniz ? </p>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <head>
+
+        <title></title>
+        <style type="text/css">
 
 
-      <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'denetim_iptal_devam' %}'">Evet </button>
+            @page {
+                size: A4;
+            }
+
+            @page:right{
+              @bottom-right {
+                content: counter(page);
+              }
+            }
+
+            body {
+                font-family: DejaVu Sans;
+                font-weight: 150;
+                font-size: 14px;
+            }
+            .header {
+                font-size: 20px;
+                font-weight: 100;
+                text-align: center;
+                color: #007cae;
+            }
+            .title {
+                font-size: 22px;
+                font-weight: 100;
+               /* text-align: right;*/
+               padding: 10px 20px 0px 20px;
+            }
+            .title span {
+                color: #007cae;
+            }
+            .details {
+                padding: 10px 20px 0px 20px;
+                text-align: left !important;
+                /*margin-left: 40%;*/
+            }
+            .hrItem {
+                border: none;
+                height: 1px;
+                /* Set the hr color */
+                color: #333; /* old IE */
+                background-color: #fff; /* Modern Browsers */
+            }
+        </style>
+    </head>
+
+    <body>
 
       <p> </p> &emsp;
 
@@ -83,7 +130,7 @@
           <p> </p> &emsp;
           <p> </p> &emsp;
           <h5> <b> Takipçiler: </b> <h5>
-          <p> </p>    url(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
+          <p> </p>
 
 
           {% for takipci in takipciler %}
@@ -102,8 +149,6 @@
               <strong>There are no logs present.</strong>
               <p> </p>
         {% endif %}
-
-
 
 
 
@@ -151,20 +196,20 @@
           </tr>
           <p> </p>
 
-                {% if detay.denetim_disi == "E" %}
-                <tr>
-                    <td> &emsp;    &emsp;  Denetim dışı </td>
-                </tr>
-                <p> </p>
-                {% endif %}
+          {% if detay.denetim_disi == "E" %}
+          <tr>
+              <td> &emsp;    &emsp;  Denetim dışı </td>
+          </tr>
+          <p> </p>
+          {% endif %}
 
-                {% if detay.denetim_disi == "H" %}
-                <tr>
-                  <td> &emsp;   &emsp;  Puanı:   </td>
-                  <td>  &emsp;  {{ detay.puan }} </td>
-                </tr>
-                <p> </p>
-                {% endif %}
+          {% if detay.denetim_disi == "H" %}
+          <tr>
+            <td> &emsp;   &emsp;  Puanı:   </td>
+            <td>  &emsp;  {{ detay.puan }} </td>
+          </tr>
+          <p> </p>
+          {% endif %}
 
           <p> </p>
           {% endfor %}
@@ -172,8 +217,14 @@
 
       {% endfor %}
 
+      <!--
+      <div id="footerContent">
+           {%block page_foot%}
+               sf: <pdf:pagenumber>
+           {%endblock%}
+       </div>
+     -->
 
+    </body>
 
-
-
-{% endblock %}
+</html>
