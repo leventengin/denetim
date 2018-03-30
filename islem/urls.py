@@ -64,7 +64,7 @@ urlpatterns = [
     url(r'^rutin_baslat/kesin$', views.rutin_baslat_kesin, name='rutin_baslat_kesin'),
     url(r'^acil_devam_sec/$', views.acil_devam_sec, name='acil_devam_sec'),
     url(r'^qrcode/$', views.qrcode_tara, name='qrcode_tara'),
-    url(r'^nfc_oku/(?P<pk>\d+)$', views.nfc_oku, name='nfc_oku'),    
+    url(r'^nfc_oku/(?P<pk>\d+)$', views.nfc_oku, name='nfc_oku'),
     url(r'^qrcode/result/$', views.qrcode_islemi_baslat, name='qrcode_islemi_baslat'),
     #url(r'^qrcode/(?P<pk>\d+)$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
     url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
@@ -72,7 +72,8 @@ urlpatterns = [
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^bolum_sec/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
-    url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    #url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    url(r'^baslat/devam/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
     url(r'^baslat/devam/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^baslat/devam/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^baslat/devam/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
@@ -84,6 +85,18 @@ urlpatterns = [
     url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
     url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
+
+#---------------------------------------------------------------------------------------------------
+    # rest urlleri aşağıda....
+    url(r'^rest_create/$', views.rest_create, name='rest_create'),
+    url(r'^rest_list/$', views.rest_list, name='rest_list'),
+    url(r'^rest_delete/$', views.rest_delete, name='rest_delete'),
+    url(r'^rest_delete_all/$', views.rest_delete_all, name='rest_delete_all'),
+    url(r'^mac_create/$', views.mac_create, name='mac_create'),
+    url(r'^mac_list/$', views.mac_list, name='mac_list'),
+    #url(r'^mac_list/(?P<pk>\d+)/delete/$', views.mac_delete, name='mac_delete'),
+    url(r'^mac_list/(?P<pk>\d+)/update/$', views.mac_update, name='mac_update'),
+
 
 
 #---------------------------------------------------------------------------------------------------

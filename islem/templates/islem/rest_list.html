@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4>REST List</h4>
+    <p> </p>
+    {% if rest_list %}
+    <ul>
+      {% for deger in rest_list %}
+        <li>
+          <a>{{ deger }}</a>
+        </li>
+      {% endfor %}
+      <p> </p>
+    </ul>
+    {% else %}
+      <p> gelen veri yok !!!!!....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

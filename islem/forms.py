@@ -369,7 +369,7 @@ class DenetimSecForm(forms.Form):
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DenetimSecForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="B")
+        denetim_obj_ilk = denetim.objects.filter(durum="B") |  denetim.objects.filter(durum="C")
         denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
         self.fields['denetim_no'].queryset = denetim_obj
         print("queryset initial içinden..:", self.fields['denetim_no'].queryset)

@@ -27,6 +27,8 @@ RUTINPLANLI = (
 ('P', 'Planlı'),
 ('R', 'Rutin'),
 ('S', 'Sıralı'),
+('C', 'Checklist'),
+('D', 'İşlem'),
 )
 
 
@@ -85,6 +87,8 @@ class Profile(models.Model):
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT, null=True, blank=True)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR)
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR)
+    operasyon_gorevlisi = models.CharField(max_length=1, choices=EVETHAYIR)
+    profil_resmi = models.ImageField(upload_to='xyz/profile_resmi/%Y/%m/%d/',blank=True, null=True,)
     def __str__(self):
         return(self.user.username)
 
@@ -130,14 +134,50 @@ class detay(models.Model):
         return '%s-%s' % (self.detay_kodu, self.detay_adi)
         #return(self.detay_adi)
 
+"""
+class proje_tipi(models.Model):
+    p_tipi = models.CharField(max_length=200)
+    def __str__(self):
+        return(self.p_tipi)
+"""
+
 
 class proje(models.Model):
     proje_adi = models.CharField(max_length=200)
+    #p_tipi = models.ForeignKey(proje_tipi, on_delete=models.PROTECT)
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
     ilgililer = models.ManyToManyField(User, related_name='ilgililer')
     proje_yonetici = models.ForeignKey(User, related_name='yonetici',  on_delete=models.CASCADE)
     def __str__(self):
         return(self.proje_adi)
+
+
+
+class proje_alanlari(models.Model):
+    proje = models.ForeignKey(proje, on_delete=models.PROTECT)
+    alan = models.CharField(max_length=200)
+    def __str__(self):
+        return(self.alan)
+
+class yer(models.Model):
+    proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
+    yer = models.CharField(max_length=200)
+    def __str__(self):
+        return(self.yer)
+
+
+class ariza_tipi(models.Model):
+    ariza_tipi = models.CharField(max_length=200)
+    def __str__(self):
+        return(self.grup_adi)
+
+
+class ariza(models.Model):
+    ariza_tipi = models.ForeignKey(ariza_tipi, on_delete=models.PROTECT)
+    yer = models.ForeignKey(yer, on_delete=models.PROTECT)
+    tarih = models.DateField(_("Date"), default=datetime.today)
+    def __str__(self):
+        return(self.ariza)
 
 
 class denetim(models.Model):
@@ -227,11 +267,27 @@ class sonuc_bolum(models.Model):
     def __str__(self):
         return(self.bolum.bolum_adi)
 
+
 class sonuc_takipci(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
     takipci = models.ForeignKey(User, related_name='takipci', on_delete=models.CASCADE)
     def __str__(self):
         return(self.takipci.username)
+
+
+class sonuc_denetci(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    denetci = models.ForeignKey(User, related_name='sonuc_denetci', on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.denetci.username)
+
+
+class sonuc_operator(models.Model):
+    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    operator = models.ForeignKey(User, related_name='operator', on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.operator.username)
+
 
 class acil(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)

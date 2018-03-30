@@ -1236,7 +1236,7 @@ def denetim_bolum_sec(request, pk=None):
                     #return redirect('denetim_tamamla')
                     pk = denetim_no
                     print(" tek olduğunda buraya geldi tamamlaya gidecek...", denetim_no)
-
+                    print(" denetimi tamamlıyor *****  cep telefonunda problem oluyor---nedennnnnn")
                     return HttpResponseRedirect(reverse('denetim_tamamla', args=(denetim_no,)))
 
                     #return reverse('denetim_tamamla', kwargs={'pk': pk})
@@ -3818,7 +3818,7 @@ class DenetimDelete(LoginRequiredMixin,DeleteView):
 class TipiCreate(LoginRequiredMixin,CreateView):
     model = tipi
     fields = '__all__'
-    success_url = "/islem/tipi/create/"
+    success_url = "/islem/tipi/create/response.json()"
 
 class TipiUpdate(LoginRequiredMixin,UpdateView):
     model = tipi
@@ -3879,7 +3879,7 @@ class BolumDelete(LoginRequiredMixin,DeleteView):
 class DetayCreate(LoginRequiredMixin,CreateView):
     model = detay
     fields = '__all__'
-    success_url = "/islem/detay/create/"
+    success_url = "/islem/detay/creatresponse.json()e/"
 
 class DetayUpdate(LoginRequiredMixin,UpdateView):
     model = detay
@@ -4296,7 +4296,7 @@ def deneme_nebu(request, pk=None):
         form = NebuForm()
         return render(request, 'islem/denetim_deneme_nebu.html', {'form': form,})
 
-#-----------------------------------------------------------------------------------------
+#---------------------------------response.json()--------------------------------------------------------
 
 class takipciautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -4386,6 +4386,79 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(user__username__icontains=self.q)
         return qs
 
+
+
+
+from islem.services  import get_rest_list, get_mac_list
+
+def rest_list(request, pk=None):
+    rest_list = get_rest_list()
+    return render(request, 'islem/rest_list.html', {'rest_list': rest_list,})
+
+
+def rest_create(request, pk=None):
+    response = requests.post("http://127.0.0.1:7001/api/postings/",
+        json={"title":"28 mart -2","content":"28 mart ikinci ekleme"}, auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('rest_list')
+
+def rest_delete_all(request, pk=None):
+    rest_list = get_rest_list()
+    id_all = []
+    for item in rest_list:
+        print("burada item id..", item["id"])
+        id_all.append(item["id"])
+    print("işte idler...", id_all)
+    deger = id_all[0]
+    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(deger) + "/"
+    print("işte url", url)
+    response = requests.delete(url, auth=("levent", "leventlevent"))
+    return redirect('rest_list')
+
+
+def rest_delete(request, pk=None):
+    pk = 6
+    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
+    print("işte url", url)
+    response = requests.delete(url, auth=("levent", "leventlevent"))
+    #response.json()
+    return redirect('rest_list')
+
+#----------------------------------------------------------------------------------------
+
+def mac_list(request, pk=None):
+    mac_list = get_mac_list()
+    return render(request, 'islem/mac_list.html', {'mac_list': mac_list,})
+
+
+def mac_create(request, pk=None):
+    t_stamp = str(datetime.now())
+    print("okunan zaman...................", t_stamp)
+    response = requests.post("http://127.0.0.1:7001/api/postings/mac_list/",
+        json={"mac_no":123451234512345, "timestamp": t_stamp}, auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('mac_list')
+
+def mac_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7001/api/postings/mac_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "timestamp": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('mac_list')
+
+"""
+def mac_delete(request, pk=None):
+    pk = 6
+    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
+    print("işte url", url)
+    response = requests.delete(url, auth=("levent", "leventlevent"))
+    #response.json()
+    return redirect('rest_list')
+"""
 
 
 
