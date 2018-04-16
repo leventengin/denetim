@@ -38,6 +38,17 @@ PUANLAMA_TURU = (
 ('C', 'İkilik'),
 )
 
+GUNLER = (
+('Pzt', 'Pazartesi'),
+('Sal', 'Salı'),
+('Çar', 'Çarşamba'),
+('Per', 'Perşembe'),
+('Cum', 'Cuma'),
+('Cmt', 'Cumartesi'),
+('Paz', 'Pazar'),
+)
+
+
 ONLUK = (
 ('0', '0'),
 ('1', '1'),
@@ -130,6 +141,7 @@ class detay(models.Model):
     detay_adi = models.CharField(max_length=200)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")
+    sil = models.BooleanField(default=False)
     def __str__(self):
         return '%s-%s' % (self.detay_kodu, self.detay_adi)
         #return(self.detay_adi)
@@ -161,9 +173,17 @@ class proje_alanlari(models.Model):
 
 class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
-    yer = models.CharField(max_length=200)
+    yer_adi = models.CharField(max_length=200)
+    yer_mac = models.IntegerField()
     def __str__(self):
-        return(self.yer)
+        return(self.yer_mac)
+
+class plan_gun(models.Model):
+    yer = models.ForeignKey(yer, on_delete=models.PROTECT)
+    gun = models.CharField(max_length=3, choices=GUNLER)
+    zaman = models.TimeField()
+    def __str__(self):
+        return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
 
 
 class ariza_tipi(models.Model):

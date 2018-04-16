@@ -56,6 +56,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 INSTALLED_APPS = [
     'islem',
+    'notification',
     'resimyukle',
     'rest_framework',
     'resimyukle_rest',

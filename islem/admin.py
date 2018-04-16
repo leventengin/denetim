@@ -47,6 +47,7 @@ from .models import acil
 from resimyukle.models import Resim
 from .models import isaretler
 from .models import qrdosyasi
+from notification.models import Notification
 
 
 admin.site.register(grup)
@@ -65,3 +66,4 @@ admin.site.register(kucukresim)
 admin.site.register(acil)
 admin.site.register(isaretler)
 admin.site.register(qrdosyasi)
+admin.site.register(Notification)

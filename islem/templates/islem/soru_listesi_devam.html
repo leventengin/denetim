@@ -1,0 +1,42 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h3>&emsp;Bölüm Soru Listesi</h3>
+
+<p> &emsp;Denetim Tipi: <b> {{ tipi }}  </b></p>
+<p> &emsp;Denetim Zonu: <b> {{ zon.zon_adi }} </b></p>
+<p> &emsp;Denetim Bölümü: <b> {{ bolum.bolum_adi }} </b></p>
+
+
+{% if soru_list %}
+<ul>
+
+  {% for soru in soru_list %}
+  <li>
+    <a href="{{soru.id}}/sil"><span class='glyphicon glyphicon-remove'></span></a>
+    <a href="{{soru.id}}/duzenle"><span class='glyphicon glyphicon-pencil'></span></a>
+          &emsp;   ({{soru.id}})    <a href="{{soru.id}}">{{ soru.detay_adi }}</a>
+  </li>
+  {% endfor %}
+  <p> </p>
+  <p> </p>
+  <a href="yarat"> Soru Ekle </a>
+  <p> </p>
+  <p> </p>
+  <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'soru_listesi_kopyala' %}'">Soruları Aktar</button>
+  <p> </p>
+
+</ul>
+{% else %}
+  <p>Kayıtlı soru yok ....</p>
+  <p> </p>
+  <a href="yarat"> Soru Ekle </a>
+  <p>&emsp; </p>
+  <p>&emsp; </p>
+  <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'soru_listesi_kopyala' %}'">Soruları Aktar</button>
+  <p> </p>
+
+{% endif %}
+
+{% endblock %}

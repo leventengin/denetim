@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4> Notifications</h4>
+    <p> </p>
+    {% if notification_list %}
+    <ul>
+      {% for n in notification_list %}
+        <li>
+          <a href="delete/{{ n.id }}"> &emsp; {{ n.id }}  --- {{ n.title }} </a>
+        </li>
+      {% endfor %}
+      <p> </p>
+    </ul>
+    {% else %}
+      <p> gelen bildiri yok !!!!!....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

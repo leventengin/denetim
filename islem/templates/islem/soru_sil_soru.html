@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!--  buraya if konulacak ...-->
+
+
+      <h3>Denetim Sorusu/Detayı Sil</h3>
+
+      <p>Bu denetim sorusunu silmek istediğinizden emin misiniz ???: </p>
+
+      <p>   <b>  Kodu:  </b>  &emsp;   {{ soru.detay_kodu }}</p>
+      <p>   <b>  Adı:   </b>  &emsp;   {{ soru.detay_adi }}</p>
+      <p>   <b>  Bölüm: </b>  &emsp;   {{ soru.bolum }}</p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+      <!--<input type="submit" action="demirbas_sil_kesin" value="Evet, sil.." /> -->
+
+      <!-- <a href="giris/demirbas/{{ sil_id }}/kesin"> Evet sil... </a>  -->
+
+      <a href="kesin"> Evet sil... </a>
+      </form>
+
+{% endblock %}

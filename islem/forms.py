@@ -139,6 +139,13 @@ class ProjeSecForm(forms.Form):
                  widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
 
 
+class SoruListesiForm(forms.Form):
+    tipi = forms.ModelChoiceField(queryset=tipi.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_tipi-autocomplete'), required=False)
+    zon = forms.ModelChoiceField(queryset=zon.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_zon-autocomplete', forward=['tipi'] ), required=False)
+    bolum = forms.ModelChoiceField(queryset=bolum.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_bolum-autocomplete', forward=['zon'] ), required=False)
 
 
 # esas işin döndüğü yer foto yüklüyor................
@@ -185,6 +192,24 @@ class SonucForm(forms.ModelForm):
         print("cc ikilik", cc_ikilik)
         print("cc denetim dışı", cc_denetim_disi)
         print("cc resim var mı", cc_resim_varmi)
+
+
+class SoruForm(forms.Form):
+    detay_kodu = forms.CharField(label='Detay Kodu:', widget=forms.TextInput(attrs={'class':'special', 'size': '10'}))
+    detay_adi = forms.CharField(label='Detay Adı:', widget=forms.Textarea(attrs={'cols': 100, 'rows': 2}))
+    puanlama_turu = forms.ChoiceField(choices=PUANLAMA_TURU, widget=forms.Select, label="Puanlama Türü:")
+    def __init__(self, *args, **kwargs):
+        super(SoruForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(SoruForm, self).clean()
+        cc_detay_kodu = cleaned_data.get("detay_kodu")
+        cc_detay_adi = cleaned_data.get("detay_adi")
+        cc_puanlama_turu = cleaned_data.get("puanlama_turu")
+        print("cc detay kodu...", cc_detay_kodu)
+        print("cc detay adı....", cc_detay_adi)
+        print("cc puanlama türü", cc_puanlama_turu)
+
 
 
 
@@ -256,7 +281,7 @@ class DenetimForm(forms.Form):
             i = 0
             print("len...", len(bolum_listesi))
             while i < len(bolum_listesi):
-                qx = detay.objects.filter(bolum=bolum_listesi[i])
+                qx = detay.objects.filter(bolum=bolum_listesi[i]).filter(sil=False)
                 print("qx...", qx)
                 qs = qs.union(qx)
                 i = i+1

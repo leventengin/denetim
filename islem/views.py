@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.template.loader import get_template
@@ -20,10 +20,11 @@ from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm
-from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form
-from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form
+from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm
+from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from notification.models import Notification
 
 #-------------------------------------------------------------------------------
 from django.contrib.auth.decorators import login_required
@@ -3463,6 +3464,255 @@ def denetim_iptal_devam(request, pk=None):
 
 
 
+@login_required
+def soru_listesi(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SoruListesiForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            tipi_i = request.POST.get('tipi', "")
+            zon_i = request.POST.get('zon', "")
+            bolum_i = request.POST.get('bolum', "")
+            print ("tipi....", tipi_i)
+            print("zon...", zon_i)
+            print("bölüm..", bolum_i)
+            request.session['sorulist_tipi'] = tipi_i
+            request.session['sorulist_zon'] = zon_i
+            request.session['sorulist_bolum'] = bolum_i
+
+            return redirect('/islem/soru_listesi/devam/')
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('soru_listesi')
+            #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = SoruListesiForm()
+        return render(request, 'islem/soru_listesi.html', {'form': form,})
+
+
+@login_required
+def soru_listesi_devam(request, pk=None):
+    # if this is a POST request we need to process the form data
+    tipi_i = request.session.get('sorulist_tipi')
+    zon_i = request.session.get('sorulist_zon')
+    bolum_i = request.session.get('sorulist_bolum')
+    request.session['sorulist_kopyala_tipi'] = None
+    request.session['sorulist_kopyala_zon'] = None
+    request.session['sorulist_kopyala_bolum'] = None
+    #request.session['sorulist_kopyala_sorulist'] = None
+    request.session['sorulist_kopyala_flag'] = False
+    print ("tipi....", tipi_i)
+    print("zon...", zon_i)
+    print("bölüm..", bolum_i)
+    tipi_l = tipi.objects.get(id=tipi_i)
+    zon_l = zon.objects.get(id=zon_i)
+    bolum_l = bolum.objects.get(id=bolum_i)
+    soru_list = detay.objects.filter(bolum=bolum_i)
+    context = {'tipi': tipi_l,
+               'zon' : zon_l,
+               'bolum' : bolum_l,
+               'soru_list' : soru_list,
+              }
+    return render(request, 'islem/soru_listesi_devam.html', context )
+
+
+@login_required
+def soru_listesi_yarat(request, pk=None):
+    # if this is a POST request we need to process the form data
+    bolum = request.session.get('sorulist_bolum')
+    print("soru listesi yarat içinden bölüm...", bolum)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = SoruForm(request.POST)
+        print("soruform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            detay_kodu = request.POST.get('detay_kodu', "")
+            detay_adi = request.POST.get('detay_adi', "")
+            puanlama_turu = request.POST.get('puanlama_turu', "")
+            kaydetme_obj = detay(detay_kodu=detay_kodu,
+                                 detay_adi=detay_adi,
+                                 bolum_id=bolum,
+                                 puanlama_turu=puanlama_turu)
+            kaydetme_obj.save()
+            return redirect('soru_listesi_devam')
+        else:
+            print(" not valid............")
+            return render(request, 'islem/soru_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = SoruForm()
+        return render(request, 'islem/soru_form.html', {'form': form,})
+
+
+@login_required
+def soru_listesi_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    bolum = request.session.get('sorulist_bolum')
+    print("soru listesi düzenle içinden bölüm...", bolum)
+    detay_obj = detay.objects.get(id=pk)
+    print("soru listesi düzenle içinden detay obj..", detay_obj)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = SoruForm(request.POST)
+        print("soruform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            detay_kodu = request.POST.get('detay_kodu', "")
+            detay_adi = request.POST.get('detay_adi', "")
+            puanlama_turu = request.POST.get('puanlama_turu', "")
+            kaydetme_obj = detay(id=pk,
+                                 detay_kodu=detay_kodu,
+                                 detay_adi=detay_adi,
+                                 bolum_id=bolum,
+                                 puanlama_turu=puanlama_turu)
+            kaydetme_obj.save()
+            return redirect('soru_listesi_devam')
+        else:
+            print(" not valid............")
+            return render(request, 'islem/soru_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = SoruForm()
+        form.fields["detay_kodu"].initial = detay_obj.detay_kodu
+        form.fields["detay_adi"].initial = detay_obj.detay_adi
+        form.fields["puanlama_turu"].initial = detay_obj.puanlama_turu
+        return render(request, 'islem/soru_form.html', {'form': form,})
+
+
+@login_required
+def soru_listesi_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    soru_obj = detay.objects.get(id=pk)
+    print("soru listesi sil içinden detay obj..", soru_obj)
+    context = {'soru' : soru_obj,
+              }
+    return render(request, 'islem/soru_sil_soru.html', context )
+
+
+
+@login_required
+def soru_listesi_sil_kesin(request, pk=None):
+    detay_obj = detay.objects.get(id=pk)
+    print("soru listesi sil kesin içinden detay obj..", detay_obj)
+    detay_obj.delete()
+    return redirect('soru_listesi_devam')
+
+
+@login_required
+def soru_listesi_kopyala(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SoruListesiForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            tipi_i = request.POST.get('tipi', "")
+            zon_i = request.POST.get('zon', "")
+            bolum_i = request.POST.get('bolum', "")
+            print ("tipi....", tipi_i)
+            print("zon...", zon_i)
+            print("bölüm..", bolum_i)
+            request.session['sorulist_kopyala_tipi'] = tipi_i
+            request.session['sorulist_kopyala_zon'] = zon_i
+            request.session['sorulist_kopyala_bolum'] = bolum_i
+
+            return redirect('/islem/soru_listesi/devam/kopyala/kesin/')
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('soru_listesi')
+            #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        print("soru aktarım ilk get bölümü..,  soru listesi kopyala...")
+        tipi_i = request.session.get('sorulist_kopyala_tipi')
+        zon_i = request.session.get('sorulist_kopyala_zon')
+        bolum_i =  request.session.get('sorulist_kopyala_bolum')
+        print("tipi", tipi_i)
+        print("zon", zon_i)
+        print("bolum", bolum_i)
+        soru_list = detay.objects.filter(bolum=bolum_i)
+        kopya_flag = request.session.get('sorulist_kopyala_flag')
+        form = SoruListesiForm()
+        form.fields["tipi"].initial = tipi_i
+        form.fields["zon"].initial = zon_i
+        form.fields["bolum"].initial = bolum_i
+        return render(request, 'islem/soru_kopyala.html', {'form': form, 'soru_list': soru_list, 'kopya_flag': kopya_flag})
+
+
+def soru_kopyala_js(request, pk=None):
+    print("selam buraya geldik...soru kopyala js")
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        js_tipi = request.GET.getlist('js_tipi')
+        js_zon = request.GET.get('js_zon')
+        js_bolum = request.GET.get('js_bolum')
+        print("tipi-zon-bolum..", js_tipi, js_zon, js_bolum)
+        request.session['sorulist_kopyala_tipi'] = js_tipi
+        request.session['sorulist_kopyala_zon'] = js_zon
+        request.session['sorulist_kopyala_bolum'] = js_bolum
+        #detay_obj = detay.objects.filter(bolum=js_bolum)
+        kopya_flag = True
+        #request.session['sorulist_kopyala_sorulist'] = detay_obj
+        request.session['sorulist_kopyala_flag'] = kopya_flag
+        #response_data = {'soru_list': detay_obj, 'kopya_flag': kopya_flag}
+    print ("son nokta soru kopyala js.....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+
+
+@login_required
+@transaction.atomic
+def soru_listesi_kopyala_kesin(request, pk=None):
+    bolum_yaz = request.session.get('sorulist_kopyala_bolum')
+    bolum_ver = request.session.get('sorulist_bolum')
+    print("soruların yazılacağı bolum..", bolum_yaz)
+    print("soruların alınacağı bölüm", bolum_ver)
+    any_obj = detay.objects.filter(bolum=bolum_yaz)
+    print("soru listesi kopyala kesin içinden detay obj..", any_obj)
+    if any_obj:
+        for any_detay in any_obj:
+            kaydetme_obj=detay( id=any_detay.id,
+                                #detay_kodu=any_detay.detay_kodu,
+                                #detay_adi=any_detay.detay_adi,
+                                #bolum_id=any_detay.bolum,
+                                #puanlama_turu=any_detay.puanlama_turu,
+                                sil=True)
+            kaydetme_obj.save()
+    yeni_detay_obj = detay.objects.filter(bolum=bolum_ver)
+    for detaylar in yeni_detay_obj:
+        kaydetme_obj=detay(detay_kodu=detaylar.detay_kodu,
+                            detay_adi=detaylar.detay_adi,
+                            bolum_id=bolum_yaz,
+                            puanlama_turu=detaylar.puanlama_turu)
+        kaydetme_obj.save()
+    messages.success(request, 'kopyalama işlemi gerçekleştirildi....')
+    return redirect('soru_listesi')
+
+
+
+
+
 #---------------------------------------------------------------------------------
 
 
@@ -4326,12 +4576,29 @@ class bolumautocomplete(autocomplete.Select2QuerySetView):
             zon_obj = zon.objects.filter(tipi=bolum_tipi).order_by('tipi')
             for zonlar in zon_obj:
                 print("zonlar id..", zonlar.id)
-                qx = bolum.objects.filter(zon=zonlar.id).order_by('zon')
+                # burada çözmek lazım....
+                qx = bolum.objects.filter(zon=zonlar.id).order_by('zon').exclude(detay__bolum=None)
+                print("qx...", qx)
                 qs = qs.union(qx)
         print("qs filtre öncesi..", qs)
+
+        """
+        sil_x = bolum.objects.none()
+        print("sil_x boşken..", sil_x)
+        for secili_bolum in qs:
+            detay_x = detay.objects.filter(bolum=secili_bolum.id).filter(sil=False)
+            print("secili bölüm ", secili_bolum)
+            print("detay_x..", detay_x)
+            if not(detay_x):
+                print("not detay x içinde...")
+                sil_x = sil_x.union(secili_bolum)
+        print("silinecek bölümler..", sil_x)
+        """
+
         if self.q:
             qs = qs.filter(bolum_adi__icontains=self.q)
         return qs
+
 
 class detayautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -4387,6 +4654,56 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
+class list_tipiautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return user.objects.none()
+        qs = tipi.objects.all()
+        return qs
+
+
+class list_zonautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return user.objects.none()
+        qs = zon.objects.all()
+        return qs
+
+
+class list_bolumautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return user.objects.none()
+        qs = bolum.objects.all()
+        return qs
+
+
+def bildirim(request):
+    print("bildirime geldik.....")
+    response_data ={}
+    if request.method == 'GET':
+        selected = request.GET.get('selected', None)
+        print("js bildirim içinden....")
+        n = Notification.objects.filter(user=request.user.id).filter(viewed=False).values()
+        print("obje...",n)
+        n_list = list(n)
+        print("listesi...", n_list)
+        response_data = {"response_data" : n_list}
+        print("response  data...", response_data)
+        response_data = json.dumps(n_list)
+        #print("response data", response_data)
+        #return render_to_response('notification.html', {'notification_list': n})
+        #return redirect('list_notification')
+    return HttpResponse(response_data, content_type='application/json')
+
+
+def popup_notif(request):
+        n_list = Notification.objects.filter(user=request.user.id).filter(viewed=False).values()
+        print("obje...",n_list)
+        return render(request, 'popup_notif.html', {'n_list': n_list})
 
 
 from islem.services  import get_rest_list, get_mac_list
@@ -4450,6 +4767,22 @@ def mac_update(request, pk=None):
     response.json()
     return redirect('mac_list')
 
+
+def mac_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    #t_stamp = str(datetime.now())
+    #print("okunan zaman...................", t_stamp)
+    #data = str(mac_no)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('mac_list')
+
+
 """
 def mac_delete(request, pk=None):
     pk = 6
@@ -4460,7 +4793,8 @@ def mac_delete(request, pk=None):
     return redirect('rest_list')
 """
 
-
+def deneme_dropdown(request):
+    return render(request, 'notif_test.html')
 
 #-------------------------------------------------------------------------------
 

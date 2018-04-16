@@ -1,0 +1,17 @@
+
+<h4> Notifications</h4>
+<p> </p>
+{% if n_list %}
+<ul>
+  {% for n in n_list %}
+    <li>
+      <!-- <a href="notification/show/"></a>    &emsp;   -->
+      <a>({{ n.id }})</a> --- <a>{{ n.title }} </a>
+    </li>
+  {% endfor %}
+  <p> </p>
+</ul>
+{% else %}
+  <p> bildirim yok !!!!!....</p>
+  <p> </p>
+{% endif %}

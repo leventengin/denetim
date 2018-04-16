@@ -1,0 +1,107 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<script>
+  function soru_al() {
+
+      var js_tipi = document.getElementById("id_tipi").value;
+      var js_zon = document.getElementById("id_zon").value;
+      var js_bolum = document.getElementById("id_bolum").value;
+
+      alert(" tipi ..."+js_tipi + " zon..." + js_zon + " bölüm..." + js_bolum);
+
+      $.ajax({
+        url : "kopyala_js/",
+        type : "GET",
+        dataType: "text",
+        data : {
+          'js_tipi' : js_tipi,
+          'js_zon' : js_zon,
+          'js_bolum' : js_bolum,
+         },
+        success: function() {
+            //alert("tipi seçimi başarılı...");
+            window.location.reload();
+            },
+        failure: function() {
+            alert("hata var....veri aktarılamadı...");
+            }
+        });  /* ajax kapa...*/
+  }
+</script>
+
+
+
+
+<h3>Soruların aktarılacağı bölümü seçiniz...</h3>
+
+<script>
+      $(document).ready(function(){
+             $("#id_bolum").change(function(){
+                  alert ( "...soru al çalıştı...");
+                  soru_al();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <!-- <input type="submit" value="kaydet" />
+    <button type="button" onclick="baslat_json()">Tamam</button>  -->
+</form>
+
+
+<!--
+<form>
+  <input type="button" value="Tamam" onclick="baslat_json()">
+</form>
+-->
+
+
+{% if soru_list %}
+<ul>
+  Mevcut sorular...
+  {% for soru in soru_list %}
+      <li>
+         <a>({{soru.id}}) --- {{ soru.detay_adi }}</a>
+      </li>
+  {% endfor %}
+  <p> </p>
+  <p> </p>
+  <p> </p>
+
+</ul>
+{% else %}
+  <p>Kayıtlı soru yok ....</p>
+  <p> </p>
+{% endif %}
+
+{% if kopya_flag %}
+
+    {% if soru_list %}
+    <p> </p>
+    <a> Kayıtlı sorular var kopyalama işlemi yapmak istediğinizden emin misiniz, mevcut sorular silinecek...</a>
+    <p> </p>
+    {% endif %}
+
+    <p> </p>
+    <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'soru_listesi_kopyala_kesin' %}'">Soruları Kopyala</button>
+{% endif %}
+
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+{{ form.media }}
+
+{% endblock %}

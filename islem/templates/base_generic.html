@@ -1,76 +1,208 @@
 <!DOCTYPE html>
 <html lang="tr">
-    <head>
+<head>
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>EZ-Check Denetim Sistemi</title>
 
-        <title>EZ-Check Denetim Sistemi</title>
 
-        <!-- Bootstrap CSS CDN -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <!-- Our Custom CSS -->
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'sidebar/style2.css' %}">
-        <!-- Scrollbar Custom CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<!-- Bootstrap CSS CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- Our Custom CSS -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'sidebar/style2.css' %}">
+
+<!-- Scrollbar Custom CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+
+<!--  dropdown için... -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="{% static 'css/w3.css' %}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"  />
+
+
+<!-- dropdown  -->
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- jQuery CDN -->
+<!--<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>-->
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- jQuery Custom Scroller CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+
 
 
 <style>
+
 body {
 background-color: #dee8f9;
 }
+
+.navbar {
+    overflow: hidden;
+    background-color: #00ddcc;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar a {
+    float: left;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.dropdown {
+    float: left;
+    overflow: hidden;
+    height: 50px;
+
+}
+
+.dropdown .dropbtn {
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+}
+
+.navbar a:hover, .dropdown:hover .dropbtn, .dropbtn:focus {
+    background-color: red;
+}
+
+.dropdown-content {
+    /* display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1; */
+
+    /* min-height:90px; */
+    /* overflow-y :auto; */
+    overflow-x:hidden;
+    position:absolute;
+    /* width:300px; */
+    /* display: contents; */
+    display: none;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    width: 300px;
+    height: 150px;
+    overflow-y: scroll;
+    background-color: #82caff;
+
+}
+
+.dropdown-content a {
+    /*float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left; */
+
+    overflow-x:hidden;
+    position:absolute;
+    /* width:300px; */
+    /* display: contents; */
+    display: none;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    width: 300px;
+    height: 150px;
+    overflow-y: scroll;
+    background-color: #82caff;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block !important;
+}
+
+
+a.fa-bell {
+  position: relative;
+  font-size: 2em;
+  color: grey;
+  cursor: pointer;
+}
+span.fa-comment {
+  position: absolute;
+  font-size: 0.6em;
+  top: -4px;
+  color: red;
+  right: -4px;
+}
+span.num {
+  position: absolute;
+  font-size: 0.3em;
+  top: 1px;
+  color: #fff;
+  right: 2px;
+}
+
+.img_for {
+    border-radius: 50%;
+}
+
 </style>
 
 </head>
 
 
-    <body>
 
-            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<body>
 
-            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-             <!-- jQuery CDN -->
-             <!--<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>-->
-             <!-- Bootstrap Js CDN -->
-             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-             <!-- jQuery Custom Scroller CDN -->
-             <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
-             <script type="text/javascript">
-                 $(document).ready(function () {
-                     $("#sidebar").mCustomScrollbar({
-                         theme: "minimal"
-                     });
 
-                     $('#sidebarCollapse').on('click', function () {
-                         $('#sidebar, #content').toggleClass('active');
-                         $('.collapse.in').toggleClass('in');
-                         $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-                     });
-                 });
-             </script>
+<script type="text/javascript">
+   $(document).ready(function () {
+       $("#sidebar").mCustomScrollbar({
+           theme: "minimal"
+       });
+
+       $('#sidebarCollapse').on('click', function () {
+           $('#sidebar, #content').toggleClass('active');
+           $('.collapse.in').toggleClass('in');
+           $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+       });
+   });
+</script>
 
 
 
 
 
-        <div class="wrapper">
-            <!-- Sidebar Holder -->
-            <nav id="sidebar">
+<div class="wrapper">
+      <!-- Sidebar Holder -->
+      <nav id="sidebar">
                 <div class="sidebar-header">
-                  <div class="container">
+                  <!-- <div class="container">
                     <div class="row">
-                      <div class="col-md-7">
+                      <div class="col-md-4"> -->
                         <a href="{% url 'index' %}"> <img src="{{ STATIC_URL }}images/logo/logo-light-icon.png"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
                                         <img src="{{ STATIC_URL }}images/logo/logo-light-text.png"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
                                     </a>
-                      </div>
+                    <!--  </div>
                      </div>
-                    </div>
+                   </div>  -->
                 </div>
 
                 <ul class="list-unstyled components">
@@ -90,10 +222,12 @@ background-color: #dee8f9;
                             <li><a href="/islem/mac_list">Mac Listele </a></li>
                             <li><a href="/islem/mac_create">Mac Ekle</a></li>
                             <li><a href="/islem/mac_update">Mac Düzenle</a></li>
-                            <!--  <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->                      
+                            <li><a href="/islem/mac_list/find_update">Mac Bul ve Düzenle</a></li>
+                            <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
+                            <!--https://stackoverflow.com/questions/19263524/placing-an-element-to-the-right-side-with-css  <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
                             <!--
                             <li><a href="/islem/qrcode">QR code</a></li>
-                            -->
+        myDropdown                    -->
                         </ul>
                     </li>
                     <li>
@@ -102,7 +236,9 @@ background-color: #dee8f9;
                         <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
                         <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
                         <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
-                        <li><a href="/islem/denetim">Denetim Detayları</a></li>
+                        <li><a href="/islem/denetim">Denetim Detayları</a><!-- row.... --></li>
+                        <li><a href="/notification/create">bildirim yarat</a></li>
+                        <li><a href="/notification">bildirim listele</a></li>
                       </ul>
                   </li>
                   <li>
@@ -122,7 +258,8 @@ background-color: #dee8f9;
                         <li><a href="/islem/tipi">Denetim Tipi</a></li>
                         <li><a href="/islem/zon">Denetim Alanı</a></li>
                         <li><a href="/islem/bolum">Denetim Bölümü</a></li>
-                        <li><a href="/islem/detay">Denetim Detayı</a></li>
+                        <li><a href="/islem/soru_listesi">Soru Listesi</a></li>
+                        <li><a href="/islem/detay">Denetim Sorusu</a></li>
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>
@@ -134,11 +271,14 @@ background-color: #dee8f9;
 
             </nav>
 
-            <!-- Page Content Holder -->
-            <div id="content">
 
-                <nav class="navbar navbar-default">
-                    <div class="container-fluid">
+    <!-- Page Content Holder -->
+    <div id="content">
+
+            <nav class="navbar navbar-default">
+                   <div class="container-fluid">
+                      <div class="row">
+
 
                         <div class="navbar-header">
                             <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
@@ -147,20 +287,131 @@ background-color: #dee8f9;
                             </button>
                         </div>
 
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav navbar-right">
-                              <div class="col-md-5"><font color="white">{{ user.get_full_name }}</font></div>
-                                {% if user.is_staff %}
-                                <li><a href="/admin/"><font color="white">Ayarlar</font></a></li>
-                                {% endif %}
-                                <li><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></li>
-                            </ul>
+
+                        <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav navbar-right">  -->
+                              <!-- <div  class="col-lg-2" ><font color="white"><a href="#" onclick="return false;">Foto</a></font></div>  -->
+                        {% if user.profile.profil_resmi %}
+                        <div><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
+                        {% else %}
+
+                        <div><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
+                        {% endif %}
+
+                          <!--
+                             <div class="col-lg-2 dropdown" id="dialog-form" >
+                                 <a class="fa fa-bell" onclick="myFunction()">
+                                   <span class="fa fa-comment"></span>
+                                   <span class="num">2</span>
+                                 </a>
+                                 <div class="dropdown-content" id="myDropdown">
+                                   <a href="#">Link 1</a>
+                                 </div>
+                             </div>
+                           -->
+
+                     <div class="dropdown">
+                       <button class="dropbtn" onclick="myFunction()">Bildirim(<span id="mynum"></span> )
+                                      <i class="fa fa-caret-down"></i> </button>
+                       <div class="dropdown-content" id="myDropdown">
+                         <a href="#">Link 1</a>
+                       </div>
+                     </div>
+
+
+                    {% if user.is_staff %}
+                    <div><a href="/admin/"><font color="white">Ayarlar</font></a></div>
+                    {% endif %}
+                    <div><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
+                        <!--    </ul>
+                        </div>  -->
+
+                        <div class="dropdown">
+                          <button class="dropbtn" onclick="myFunction()">Dropdown <i class="fa fa-caret-down"></i> </button>
+                          <div class="dropdown-content" id="myDropdown">
+                            <a href="#">Link 1</a>
+                            <a href="#">Link 2</a>
+                            <a href="#">Link 3</a>
+                          </div>
                         </div>
+                        <button class="dropbtn" onclick="new_notif()">Uyarılar  </button>
+
+
+
                     </div>
+
+                  </div>   <!-- container fluid -->
                 </nav>
- {% block content %}{% endblock %}
+
+                {% block content %}    {% endblock %}
+
+          </div>
+  </div>
+
+
+  <script>
+  /* When the user clicks on the button,
+  toggle between hiding and showing the dropdown content */
+  function myFunction() {
+      //alert("my function...");
+      document.getElementById("myDropdown").classList.toggle("show");
+  }
+  // Close the dropdown if the user clicks outside of it
+  window.onclick = function(e) {
+    if (!e.target.matches('.dropbtn')) {
+      var myDropdown = document.getElementById("myDropdown");
+        if (myDropdown.classList.contains('show')) {
+          myDropdown.classList.remove('show');
+        }
+    }
+  }
+  </script>
 
 
 
-    </body>
+
+<script>
+  function new_notif() {
+      alert("buraya geldi ... myfunction on click...");
+      var selected = "deneme";
+      console.log(selected);
+      $.ajax({
+        url : "/bildirim/",
+        type : "GET",
+        dataType: "text",
+        contentType: 'application/json; charset=utf-8',
+        data : {
+          'selected' : selected,
+           },
+        success: function(data) {
+            alert(data);
+            var json = $.parseJSON(data);
+            alert(json.length);
+            document.getElementById("mynum").innerHTML = json.length;
+            $(myDropdown).empty();
+            for (var i=0;i<json.length;++i)
+              {
+                  //alert("fuck you...");
+                  var getdiv = document.getElementById('myDropdown');
+                  var createA = document.createElement('a');
+                  var createAText = document.createTextNode(json[i].message);
+                  //alert(createAText);
+                  createA.setAttribute('href', "http://google.com");
+                  createA.appendChild(createAText);
+                  getdiv.appendChild(createA);
+
+              }
+
+            },
+        failure: function() {
+            alert("bildirim listesi başarısız...");
+            }
+        });  /* ajax kapa...*/
+
+  }
+</script>
+
+
+
+</body>
 </html>

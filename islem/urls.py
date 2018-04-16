@@ -24,6 +24,7 @@ from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocompl
 from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
+from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
 
 
 
@@ -44,6 +45,10 @@ urlpatterns = [
     url(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
     url(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
     url(r'^rutindenetim-autocomplete/$', rutindenetimautocomplete.as_view(),name='rutindenetim-autocomplete',),
+    url(r'^list_tipi-autocomplete/$', list_tipiautocomplete.as_view(),name='list_tipi-autocomplete',),
+    url(r'^list_zon-autocomplete/$', list_zonautocomplete.as_view(),name='list_zon-autocomplete',),
+    url(r'^list_bolum-autocomplete/$', list_bolumautocomplete.as_view(),name='list_bolum-autocomplete',),
+
 
 
 #  yerinde denetim ile ilgili işlemler...................
@@ -96,6 +101,8 @@ urlpatterns = [
     url(r'^mac_list/$', views.mac_list, name='mac_list'),
     #url(r'^mac_list/(?P<pk>\d+)/delete/$', views.mac_delete, name='mac_delete'),
     url(r'^mac_list/(?P<pk>\d+)/update/$', views.mac_update, name='mac_update'),
+    url(r'^mac_list/find_update/$', views.mac_find_update, name='mac_find_update'),
+    url(r'^deneme_dropdown/$', views.deneme_dropdown, name='deneme_dropdown'),
 
 
 
@@ -187,6 +194,15 @@ urlpatterns = [
 
     # bolum urlleri aşağıda....
     url(r'^bolum/$', views.BolumListView.as_view(), name='bolum'),
+    url(r'^soru_listesi/$', views.soru_listesi, name='soru_listesi'),
+    url(r'^soru_listesi/devam/$', views.soru_listesi_devam, name='soru_listesi_devam'),
+    url(r'^soru_listesi/devam/yarat/$', views.soru_listesi_yarat, name='soru_listesi_yarat'),
+    url(r'^soru_listesi/devam/(?P<pk>\d+)/duzenle/$', views.soru_listesi_duzenle, name='soru_listesi_duzenle'),
+    url(r'^soru_listesi/devam/(?P<pk>\d+)/sil/$', views.soru_listesi_sil, name='soru_listesi_sil'),
+    url(r'^soru_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.soru_listesi_sil_kesin, name='soru_listesi_sil_kesin'),
+    url(r'^soru_listesi/devam/kopyala/$', views.soru_listesi_kopyala, name='soru_listesi_kopyala'),
+    url(r'^soru_listesi/devam/kopyala/kopyala_js/$', views.soru_kopyala_js, name='soru_kopyala_js'),
+    url(r'^soru_listesi/devam/kopyala/kesin$', views.soru_listesi_kopyala_kesin, name='soru_listesi_kopyala_kesin'),
     url(r'^bolum/(?P<pk>\d+)$', views.BolumDetailView.as_view(), name='bolum-detail'),
     url(r'^bolum/create/$', views.BolumCreate.as_view(), name='bolum_create'),
     url(r'^bolum/(?P<pk>\d+)/update/$', views.BolumUpdate.as_view(), name='bolum_update'),
