@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Proje Yer Listesi</h3>
+
+    {% if yer_list %}
+    <ul>
+
+      {% for yer in yer_list %}
+      <li>
+        <a href="{{yer.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{yer.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{yer.id}})    <a href="{{yer.id}}">{{ yer.yer_adi }}</a>
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/yer/create"> Yer Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı yer yok ....</p>
+      <p> </p>
+      <a href="/islem/yer/create"> Yer Ekle </a>
+    {% endif %}
+
+{% endblock %}

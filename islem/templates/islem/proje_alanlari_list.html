@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Proje Alanları Listesi</h3>
+
+    {% if proje_alanlari_list %}
+    <ul>
+
+      {% for proje in proje_alanlari_list %}
+      <li>
+        <a href="{{proje.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{proje.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{proje.id}}) {{ proje.proje }}  - &emsp;   <a href="{{proje.id}}">{{ proje.alan }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/projealanlari/create"> Proje Alanı Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı proje alanı yok ....</p>
+      <p> </p>
+      <a href="/islem/projealanlari/create"> Proje Alanı Ekle </a>
+    {% endif %}
+
+{% endblock %}

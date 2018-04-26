@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!--  buraya if konulacak ...-->
+
+
+      <h3>Proje Alanı Sil</h3>
+
+      <p>Bu proje alanını silmek istediğinizden emin misiniz ???: </p>
+
+      <p>  <b> id: </b>   &emsp;   {{ sil_id }}</p>
+
+      <p>   <b>  adı: </b>  &emsp;   {{ sil_proje_alani }}</p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+
+      <a href="kesin"> Evet sil... </a>
+      </form>
+
+{% endblock %}

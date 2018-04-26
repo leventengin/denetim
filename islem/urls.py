@@ -102,6 +102,12 @@ urlpatterns = [
     #url(r'^mac_list/(?P<pk>\d+)/delete/$', views.mac_delete, name='mac_delete'),
     url(r'^mac_list/(?P<pk>\d+)/update/$', views.mac_update, name='mac_update'),
     url(r'^mac_list/find_update/$', views.mac_find_update, name='mac_find_update'),
+    url(r'^memnuniyet_create/$', views.memnuniyet_create, name='memnuniyet_create'),
+    url(r'^memnuniyet_list/$', views.memnuniyet_list, name='memnuniyet_list'),
+    #url(r'^mac_list/(?P<pk>\d+)/delete/$', views.mac_delete, name='mac_delete'),
+    url(r'^memnuniyet_list/(?P<pk>\d+)/update/$', views.memnuniyet_update, name='memnuniyet_update'),
+    url(r'^memnuniyet_list/find_update/$', views.memnuniyet_find_update, name='memnuniyet_find_update'),
+
     url(r'^deneme_dropdown/$', views.deneme_dropdown, name='deneme_dropdown'),
 
 
@@ -216,6 +222,24 @@ urlpatterns = [
     url(r'^detay/(?P<pk>\d+)/update/$', views.DetayUpdate.as_view(), name='detay_update'),
     url(r'^detay/(?P<pk>\d+)/delete/$', views.detay_sil, name='detay_sil'),
     url(r'^detay/(?P<pk>\d+)/delete/kesin/$', views.detay_sil_kesin, name='detay_sil_kesin'),
+
+    # projealanlari urlleri aşağıda....
+    url(r'^projealanlari/$', views.ProjeAlanlariListView.as_view(), name='projealanlari'),
+    url(r'^projealanlari/(?P<pk>\d+)$', views.ProjeAlanlariDetailView.as_view(), name='projealanlari-detail'),
+    url(r'^projealanlari/create/$', views.ProjeAlanlariCreate.as_view(), name='projealanlari_create'),
+    url(r'^projealanlari/(?P<pk>\d+)/update/$', views.ProjeAlanlariUpdate.as_view(), name='projealanlari_update'),
+    url(r'^projealanlari/(?P<pk>\d+)/delete/$', views.projealanlari_sil, name='projealanlari_sil'),
+    url(r'^projealanlari/(?P<pk>\d+)/delete/kesin/$', views.projealanlari_sil_kesin, name='projealanlari_sil_kesin'),
+
+
+    # yer urlleri aşağıda....
+    url(r'^yer/$', views.YerListView.as_view(), name='yer'),
+    url(r'^yer/(?P<pk>\d+)$', views.yer_detay, name='yer_detay'),
+    url(r'^yer/(?P<pk>\d+)/zaman_planla/$', views.yer_zaman_planla, name='yer_zaman_planla'),
+    url(r'^yer/create/$', views.YerCreate.as_view(), name='yer_create'),
+    url(r'^yer/(?P<pk>\d+)/update/$', views.YerUpdate.as_view(), name='yer_update'),
+    url(r'^yer/(?P<pk>\d+)/delete/$', views.yer_sil, name='yer_sil'),
+    url(r'^yer/(?P<pk>\d+)/delete/kesin/$', views.yer_sil_kesin, name='yer_sil_kesin'),
 
 
     # qrcode urlleri aşağıda....""

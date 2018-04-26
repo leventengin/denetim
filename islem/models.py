@@ -169,14 +169,14 @@ class proje_alanlari(models.Model):
     proje = models.ForeignKey(proje, on_delete=models.PROTECT)
     alan = models.CharField(max_length=200)
     def __str__(self):
-        return(self.alan)
+        return '%s-%s' % (self.proje, self.alan)
 
 class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
     yer_adi = models.CharField(max_length=200)
     yer_mac = models.IntegerField()
     def __str__(self):
-        return(self.yer_mac)
+        return str(self.yer_mac)
 
 class plan_gun(models.Model):
     yer = models.ForeignKey(yer, on_delete=models.PROTECT)

@@ -46,7 +46,7 @@ background-color: #dee8f9;
 }
 
 .navbar {
-    overflow: hidden;
+    /* overflow: hidden;  */
     background-color: #00ddcc;
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -62,12 +62,12 @@ background-color: #dee8f9;
 
 .dropdown {
     float: left;
-    overflow: hidden;
-    height: 50px;
+    /* overflow: hidden; */
+    height: 150px;
 
 }
 
-.dropdown .dropbtn {
+.dropdown .dropbtn2 {
     cursor: pointer;
     font-size: 16px;
     border: none;
@@ -79,11 +79,11 @@ background-color: #dee8f9;
     margin: 0;
 }
 
-.navbar a:hover, .dropdown:hover .dropbtn, .dropbtn:focus {
+.navbar a:hover, .dropdown:hover .dropbtn2, .dropbtn2:focus {
     background-color: red;
 }
 
-.dropdown-content {
+.dropdown-content2 {
     /* display: none;
     position: absolute;
     background-color: #f9f9f9;
@@ -93,7 +93,7 @@ background-color: #dee8f9;
 
     /* min-height:90px; */
     /* overflow-y :auto; */
-    overflow-x:hidden;
+    /* overflow-x:hidden; */
     position:absolute;
     /* width:300px; */
     /* display: contents; */
@@ -106,32 +106,21 @@ background-color: #dee8f9;
 
 }
 
-.dropdown-content a {
-    /*float: none;
+.dropdown-content2 a {
+    float: none;
     color: black;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
-    text-align: left; */
-
-    overflow-x:hidden;
-    position:absolute;
-    /* width:300px; */
-    /* display: contents; */
-    display: none;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    width: 300px;
-    height: 150px;
-    overflow-y: scroll;
-    background-color: #82caff;
+    text-align: left;
 }
 
-.dropdown-content a:hover {
+.dropdown-content2 a:hover {
     background-color: #ddd;
 }
 
 .show {
-    display: block !important;
+    display: block;
 }
 
 
@@ -223,11 +212,13 @@ span.num {
                             <li><a href="/islem/mac_create">Mac Ekle</a></li>
                             <li><a href="/islem/mac_update">Mac Düzenle</a></li>
                             <li><a href="/islem/mac_list/find_update">Mac Bul ve Düzenle</a></li>
+                            <li><a href="/islem/memnuniyet_list">Memnuniyet Listele </a></li>
+                            <li><a href="/islem/memnuniyet_create">Memnuniyet Ekle</a></li>
+                            <li><a href="/islem/memnuniyet_update">Memnuniyet Düzenle</a></li>
+                            <li><a href="/islem/memnuniyet_list/find_update">Memnuniyet Bul ve Düzenle</a></li>
                             <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
-                            <!--https://stackoverflow.com/questions/19263524/placing-an-element-to-the-right-side-with-css  <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
-                            <!--
-                            <li><a href="/islem/qrcode">QR code</a></li>
-        myDropdown                    -->
+                            <!-- <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
+                            <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
                         </ul>
                     </li>
                     <li>
@@ -247,7 +238,7 @@ span.num {
                       <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
                       <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
                       {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-                      <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
+                          <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
                       {% endif %}
                     </ul>
                   </li>
@@ -263,6 +254,8 @@ span.num {
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>
+                        <li><a href="/islem/projealanlari">Proje Alanları</a></li>
+                        <li><a href="/islem/yer">Yer</a></li>
                         <li><a href="/islem/qrdosyasi">QRCode</a></li>
                     </ul>
                 </li>
@@ -280,72 +273,50 @@ span.num {
                       <div class="row">
 
 
-                        <div class="navbar-header">
-                            <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
-                                <i class="glyphicon glyphicon-align-left"></i>
-                                <span></span>
-                            </button>
-                        </div>
+                                <div class="navbar-header col-lg-1">
+                                    <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                                        <i class="glyphicon glyphicon-align-left"></i>
+                                        <span></span>
+                                    </button>
+                                </div>
 
 
-                        <!-- <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav navbar-right">  -->
-                              <!-- <div  class="col-lg-2" ><font color="white"><a href="#" onclick="return false;">Foto</a></font></div>  -->
-                        {% if user.profile.profil_resmi %}
-                        <div><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
-                        {% else %}
 
-                        <div><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
-                        {% endif %}
+                                {% if user.profile.profil_resmi %}
+                                <div class="col-lg-3"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
+                                {% else %}
+                                <div class="col-lg-3"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
+                                {% endif %}
 
-                          <!--
-                             <div class="col-lg-2 dropdown" id="dialog-form" >
-                                 <a class="fa fa-bell" onclick="myFunction()">
-                                   <span class="fa fa-comment"></span>
-                                   <span class="num">2</span>
-                                 </a>
-                                 <div class="dropdown-content" id="myDropdown">
-                                   <a href="#">Link 1</a>
-                                 </div>
+
+
+                             <div class="dropdown2 col-lg-2">
+                               <button class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)
+                                              <i class="fa fa-caret-down"></i> </button>
+                                   <div class="dropdown-content2" id="myDropdown2">
+                                     <a href="#">Link 1</a>
+                                     <a href="#">Link 2</a>
+                                   </div>
                              </div>
-                           -->
-
-                     <div class="dropdown">
-                       <button class="dropbtn" onclick="myFunction()">Bildirim(<span id="mynum"></span> )
-                                      <i class="fa fa-caret-down"></i> </button>
-                       <div class="dropdown-content" id="myDropdown">
-                         <a href="#">Link 1</a>
-                       </div>
-                     </div>
 
 
-                    {% if user.is_staff %}
-                    <div><a href="/admin/"><font color="white">Ayarlar</font></a></div>
-                    {% endif %}
-                    <div><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
-                        <!--    </ul>
-                        </div>  -->
+                            {% if user.is_staff %}
+                            <div class="col-lg-2"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
+                            {% endif %}
 
-                        <div class="dropdown">
-                          <button class="dropbtn" onclick="myFunction()">Dropdown <i class="fa fa-caret-down"></i> </button>
-                          <div class="dropdown-content" id="myDropdown">
-                            <a href="#">Link 1</a>
-                            <a href="#">Link 2</a>
-                            <a href="#">Link 3</a>
-                          </div>
-                        </div>
-                        <button class="dropbtn" onclick="new_notif()">Uyarılar  </button>
+                            <div class="col-lg-2"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
+
+                            <div class="col-lg-2"> <button class="dropbtn2" onclick="new_notif()">Uyarılar  </button>  </div>
 
 
-
-                    </div>
+                      </div>  <!-- row -->
 
                   </div>   <!-- container fluid -->
                 </nav>
 
                 {% block content %}    {% endblock %}
 
-          </div>
+          </div>  <!-- content -->
   </div>
 
 
@@ -354,17 +325,17 @@ span.num {
   toggle between hiding and showing the dropdown content */
   function myFunction() {
       //alert("my function...");
-      document.getElementById("myDropdown").classList.toggle("show");
-  }
-  // Close the dropdown if the user clicks outside of it
-  window.onclick = function(e) {
-    if (!e.target.matches('.dropbtn')) {
-      var myDropdown = document.getElementById("myDropdown");
-        if (myDropdown.classList.contains('show')) {
-          myDropdown.classList.remove('show');
+      document.getElementById("myDropdown2").classList.toggle("show");
+      }
+      // Close the dropdown if the user clicks outside of it
+      window.onclick = function(e) {
+        if (!e.target.matches('.dropbtn2')) {
+          var myDropdown = document.getElementById("myDropdown2");
+            if (myDropdown.classList.contains('show')) {
+              myDropdown.classList.remove('show');
+            }
+          }
         }
-    }
-  }
   </script>
 
 
@@ -372,7 +343,7 @@ span.num {
 
 <script>
   function new_notif() {
-      alert("buraya geldi ... myfunction on click...");
+      alert("buraya geldi ... new notif... on click...");
       var selected = "deneme";
       console.log(selected);
       $.ajax({
@@ -388,20 +359,18 @@ span.num {
             var json = $.parseJSON(data);
             alert(json.length);
             document.getElementById("mynum").innerHTML = json.length;
-            $(myDropdown).empty();
+            $(myDropdown2).empty();
             for (var i=0;i<json.length;++i)
               {
-                  //alert("fuck you...");
-                  var getdiv = document.getElementById('myDropdown');
+                  /*  alert(" maryak......");  */
+                  var getdiv = document.getElementById('myDropdown2');
                   var createA = document.createElement('a');
                   var createAText = document.createTextNode(json[i].message);
                   //alert(createAText);
                   createA.setAttribute('href', "http://google.com");
                   createA.appendChild(createAText);
                   getdiv.appendChild(createA);
-
               }
-
             },
         failure: function() {
             alert("bildirim listesi başarısız...");

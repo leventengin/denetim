@@ -3,7 +3,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.template.loader import get_template
 from islem.utils import render_to_pdf #created in step 4
-import datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -13,8 +12,9 @@ from django.contrib import messages
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon
+from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon, yer, proje_alanlari
 from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
+from .models import plan_gun
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
@@ -54,8 +54,8 @@ from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMessage
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import Decimal
-from datetime import datetime
-
+import datetime
+from datetime import  timedelta
 
 
 
@@ -3711,6 +3711,189 @@ def soru_listesi_kopyala_kesin(request, pk=None):
 
 
 
+import copy
+
+@login_required
+@transaction.atomic
+def yer_detay(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    plan_gun_obj = plan_gun.objects.filter(yer=pk)
+    print("plan gün obj..", plan_gun_obj)
+    pzt_list = []
+    sal_list = []
+    car_list = []
+    per_list = []
+    cum_list = []
+    cmt_list = []
+    paz_list = []
+    a = []
+    max_cnt = 0
+
+    if plan_gun_obj:
+        pzt_obj = plan_gun.objects.filter(gun='Pzt')
+        sal_obj = plan_gun.objects.filter(gun='Sal')
+        car_obj = plan_gun.objects.filter(gun='Çar')
+        per_obj = plan_gun.objects.filter(gun='Per')
+        cum_obj = plan_gun.objects.filter(gun='Cum')
+        cmt_obj = plan_gun.objects.filter(gun='Cmt')
+        paz_obj = plan_gun.objects.filter(gun='Paz')
+        pzt_cnt = pzt_obj.count()
+        sal_cnt = sal_obj.count()
+        car_cnt = car_obj.count()
+        per_cnt = per_obj.count()
+        cum_cnt = cum_obj.count()
+        cmt_cnt = cmt_obj.count()
+        paz_cnt = paz_obj.count()
+
+
+        print("adetler...", pzt_cnt, "-", sal_cnt, "-", car_cnt, "-", per_cnt, "-", cum_cnt, "-", cmt_cnt, "-", paz_cnt)
+
+        max_cnt = pzt_cnt
+        if sal_cnt > max_cnt:
+            max_cnt = sal_cnt
+        if car_cnt > max_cnt:
+            max_cnt = car_cnt
+        if per_cnt > max_cnt:
+            max_cnt = per_cnt
+        if cum_cnt > max_cnt:
+            max_cnt = cum_cnt
+        if cmt_cnt > max_cnt:
+            max_cnt = cmt_cnt
+        if paz_cnt > max_cnt:
+            max_cnt = paz_cnt
+
+        for pzt in pzt_obj:
+            pzt_list.append(pzt.zaman)
+        for sal in sal_obj:
+            sal_list.append(sal.zaman)
+        for car in car_obj:
+            car_list.append(car.zaman)
+        for per in per_obj:
+            per_list.append(per.zaman)
+        for cum in cum_obj:
+            cum_list.append(cum.zaman)
+        for cmt in cmt_obj:
+            cmt_list.append(cmt.zaman)
+        for paz in paz_obj:
+            paz_list.append(paz.zaman)
+
+        print("pzt list", pzt_list)
+        print("sal list", sal_list)
+        print("çar list", car_list)
+        print("per list", per_list)
+        print("cum list", cum_list)
+        print("cmt list", cmt_list)
+        print("paz list", paz_list)
+
+        print("pzt list 0", pzt_list[0])
+
+        a = []
+        row = []
+        for i in range(max_cnt):
+            print("i...", i)
+            row.append(pzt_list[i])
+            row.append(sal_list[i])
+            row.append(car_list[i])
+            row.append(per_list[i])
+            row.append(cum_list[i])
+            row.append(cmt_list[i])
+            row.append(paz_list[i])
+            print("i...", i,"row...", row)
+            a.append(row)
+            row = []
+
+        print("sonuc listesi template uygun ...", a)
+
+    print ("max count...", max_cnt)
+
+    return render(request, 'islem/yer_detail.html', {'yer': yer_obj,
+                                                     'a': a,
+                                                     'max_cnt': max_cnt})
+
+
+import time
+
+@login_required
+@transaction.atomic
+def yer_zaman_planla(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+
+
+    st_time = datetime.time(10,0,0)
+    print("st time..", st_time)
+    h = st_time.hour
+    m = st_time.minute
+    s = st_time.second
+    total_seconds = 3600*h + 60*m + s
+
+    end_time = datetime.time(22,0,0)
+    print("end time ..", end_time)
+    h = end_time.hour
+    m = end_time.minute
+    s = end_time.second
+    final_seconds = 3600*h + 60*m + s
+
+    time_delta = datetime.time(0,30,0)
+    print("time delta ..", time_delta)
+
+    while total_seconds < final_seconds:
+        n = 0
+        while n < 7:
+            if n == 0:
+                gun = 'Pzt'
+            if n == 1:
+                gun = 'Sal'
+            if n == 2:
+                gun = 'Çar'
+            if n == 3:
+                gun = 'Per'
+            if n == 4:
+                gun = 'Cum'
+            if n == 5:
+                gun = 'Cmt'
+            if n == 6:
+                gun = 'Paz'
+            print("yer obj id..", pk)
+            print("gun...", gun)
+            print("zaman ..", st_time)
+            kaydetme_obj = plan_gun(yer_id=pk,
+                                    gun=gun,
+                                    zaman=st_time,
+                                    )
+            kaydetme_obj.save()
+            n = n + 1
+
+        #h, m, s = [int(i) for i in st_time.split(':')]
+        h1 = st_time.hour
+        m1 = st_time.minute
+        s1 = st_time.second
+        total_seconds = 3600*h1 + 60*m1 + s1
+        print(" total seconds toplamadan önce", total_seconds)
+        #h, m, s = [int(i) for i in time_delta.split(':')]
+        h2 = time_delta.hour
+        m2 = time_delta.minute
+        s2 = time_delta.second
+        add_seconds = 3600*h2 + 60*m2 + s2
+        print(" add seconds toplamadan önce", add_seconds)
+        total_seconds = total_seconds + add_seconds
+        print(" total seconds toplamadan sonra", total_seconds)
+        print(" final seconds ", final_seconds)
+        #st_time = str(datetime.timedelta(seconds=total_seconds))
+        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
+        h3 = total_seconds // 3600
+        remain = total_seconds % 3600
+        m3 = remain // 60
+        s3 = remain % 60
+        st_time = datetime.time(h3,m3,s3)
+        print("new st time..", st_time)
+
+
+    messages.success(request, 'zaman planı yaratma işlemi gerçekleştirildi....')
+    return redirect('yer_detay', pk=pk)
+
+
 
 
 #---------------------------------------------------------------------------------
@@ -3953,6 +4136,62 @@ def detay_sil_kesin(request, pk=None):
     return redirect('detay')
 
 
+#------------------------------------------------------
+
+@login_required
+def projealanlari_sil(request, pk=None):
+    print("proje alanlari sildeki pk:", pk)
+    object = get_object_or_404(proje_alanlari, pk=pk)
+    sil_detay = object.alan
+    sil_id = object.id
+    print("sil_detay", sil_detay)
+    print("sil_id", sil_id)
+    args = {'sil_id': sil_id, 'sil_detay': sil_detay, 'pk': pk,}
+    return render(request, 'islem/proje_alanlari_sil_soru.html', args)
+
+
+@login_required
+def projealanlari_sil_kesin(request, pk=None):
+    print("detay sil kesindeki pk:", pk)
+    object = get_object_or_404(proje_alanlari, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        error_message = "bağlantılı veri var,  silinemez...!!"
+        #return JsonResponse(error_message, safe=False)
+        messages.success(request, 'Bağlantılı veri var silinemez.......')
+        return redirect('projealanlari')
+    messages.success(request, 'Başarıyla silindi....')
+    return redirect('projealanlari')
+
+#------------------------------------------------------
+
+@login_required
+def yer_sil(request, pk=None):
+    print("detay sildeki pk:", pk)
+    object = get_object_or_404(yer, pk=pk)
+    sil_detay = object.yer_adi
+    sil_id = object.id
+    print("sil_detay", sil_detay)
+    print("sil_id", sil_id)
+    args = {'sil_id': sil_id, 'sil_detay': sil_detay, 'pk': pk,}
+    return render(request, 'islem/yer_sil_soru.html', args)
+
+
+@login_required
+def yer_sil_kesin(request, pk=None):
+    print("yer sil kesindeki pk:", pk)
+    object = get_object_or_404(yer, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        error_message = "bağlantılı veri var,  silinemez...!!"
+        #return JsonResponse(error_message, safe=False)
+        messages.success(request, 'Bağlantılı veri var silinemez.......')
+        return redirect('yer')
+    messages.success(request, 'Başarıyla silindi....')
+    return redirect('yer')
+
 
 
 #------------------------------------------------------
@@ -4129,7 +4368,7 @@ class BolumDelete(LoginRequiredMixin,DeleteView):
 class DetayCreate(LoginRequiredMixin,CreateView):
     model = detay
     fields = '__all__'
-    success_url = "/islem/detay/creatresponse.json()e/"
+    success_url = "/islem/detay/create/"
 
 class DetayUpdate(LoginRequiredMixin,UpdateView):
     model = detay
@@ -4140,6 +4379,42 @@ class DetayDelete(LoginRequiredMixin,DeleteView):
     model = detay
     success_url = reverse_lazy('detay')
 
+
+#------------------------------------------------------
+
+# proje_alanlari yaratma, güncelleme, silme ...
+
+class ProjeAlanlariCreate(LoginRequiredMixin,CreateView):
+    model = proje_alanlari
+    fields = '__all__'
+    success_url = "/islem/projealanlari/create/"
+
+class ProjeAlanlariUpdate(LoginRequiredMixin,UpdateView):
+    model = proje_alanlari
+    fields = '__all__'
+    success_url = "/islem/projealanlari/"
+
+class ProjeAlanlariDelete(LoginRequiredMixin,DeleteView):
+    model = proje_alanlari
+    success_url = reverse_lazy('projealanlari')
+
+#------------------------------------------------------
+
+# yer yaratma, güncelleme, silme ...
+
+class YerCreate(LoginRequiredMixin,CreateView):
+    model = yer
+    fields = '__all__'
+    success_url = "/islem/yer/create/"
+
+class YerUpdate(LoginRequiredMixin,UpdateView):
+    model = yer
+    fields = '__all__'
+    success_url = "/islem/yer/"
+
+class YerDelete(LoginRequiredMixin,DeleteView):
+    model = yer
+    success_url = reverse_lazy('yer')
 
 
 #-------------------------------------------------------
@@ -4276,6 +4551,23 @@ class DetayListView(LoginRequiredMixin,generic.ListView):
 
 class DetayDetailView(LoginRequiredMixin,generic.DetailView):
     model = detay
+#-----------------------------------------------------------
+
+class ProjeAlanlariListView(LoginRequiredMixin,generic.ListView):
+    model = proje_alanlari
+    paginate_by = 20
+
+class ProjeAlanlariDetailView(LoginRequiredMixin,generic.DetailView):
+    model = proje_alanlari
+
+#-----------------------------------------------------------
+
+class YerListView(LoginRequiredMixin,generic.ListView):
+    model = yer
+    paginate_by = 20
+
+class YerDetailView(LoginRequiredMixin,generic.DetailView):
+    model = yer
 
 #--------------------------------------------------------------
 
@@ -4582,19 +4874,6 @@ class bolumautocomplete(autocomplete.Select2QuerySetView):
                 qs = qs.union(qx)
         print("qs filtre öncesi..", qs)
 
-        """
-        sil_x = bolum.objects.none()
-        print("sil_x boşken..", sil_x)
-        for secili_bolum in qs:
-            detay_x = detay.objects.filter(bolum=secili_bolum.id).filter(sil=False)
-            print("secili bölüm ", secili_bolum)
-            print("detay_x..", detay_x)
-            if not(detay_x):
-                print("not detay x içinde...")
-                sil_x = sil_x.union(secili_bolum)
-        print("silinecek bölümler..", sil_x)
-        """
-
         if self.q:
             qs = qs.filter(bolum_adi__icontains=self.q)
         return qs
@@ -4706,7 +4985,7 @@ def popup_notif(request):
         return render(request, 'popup_notif.html', {'n_list': n_list})
 
 
-from islem.services  import get_rest_list, get_mac_list
+from islem.services  import get_rest_list, get_mac_list, get_memnuniyet_list
 
 def rest_list(request, pk=None):
     rest_list = get_rest_list()
@@ -4749,7 +5028,7 @@ def mac_list(request, pk=None):
 
 
 def mac_create(request, pk=None):
-    t_stamp = str(datetime.now())
+    t_stamp = str(datetime.datetime.now())
     print("okunan zaman...................", t_stamp)
     response = requests.post("http://127.0.0.1:7001/api/postings/mac_list/",
         json={"mac_no":123451234512345, "timestamp": t_stamp}, auth=("levent", "leventlevent"))
@@ -4792,6 +5071,62 @@ def mac_delete(request, pk=None):
     #response.json()
     return redirect('rest_list')
 """
+
+#----------------------------------------------------------------------------------------
+
+def memnuniyet_list(request, pk=None):
+    memnuniyet_list = get_memnuniyet_list()
+    return render(request, 'islem/memnuniyet_list.html', {'memnuniyet_list': memnuniyet_list,})
+
+
+def memnuniyet_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman......menuniyet create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7001/api/postings/memnuniyet_list/",
+        json={"mac_no":123451234512345, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("levent", "leventlevent"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('memnuniyet_list')
+
+def memnuniyet_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7001/api/postings/memnuniyet_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('memnuniyet_list')
+
+
+def memnuniyet_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('memnuniyet_list')
+
+
+"""
+def mac_delete(request, pk=None):
+    pk = 6
+    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
+    print("işte url", url)
+    response = requests.delete(url, auth=("levent", "leventlevent"))
+    #response.json()
+    return redirect('rest_list')
+"""
+
+
 
 def deneme_dropdown(request):
     return render(request, 'notif_test.html')
