@@ -5081,11 +5081,12 @@ def memnuniyet_list(request, pk=None):
 
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
+    tipi = "1"
     vote = "1"
     reason = "1"
     print("okunan zaman......menuniyet create.............", t_stamp)
     response = requests.post("http://127.0.0.1:7001/api/postings/memnuniyet_list/",
-        json={"mac_no":123451234512345, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("levent", "leventlevent"))
+        json={"mac_no":123451234512345, "tipi": tipi, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("levent", "leventlevent"))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')

@@ -14,6 +14,7 @@ class Notification(models.Model):
     title = models.CharField(max_length=256)
     message = models.TextField()
     viewed = models.BooleanField(default=False)
+    tip = models.CharField(max_length=2, default="A")
     user = models.ForeignKey(User)
 
 

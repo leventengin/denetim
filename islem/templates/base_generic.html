@@ -42,12 +42,12 @@
 <style>
 
 body {
-background-color: #dee8f9;
+background-color: #4bf442;
 }
 
 .navbar {
     /* overflow: hidden;  */
-    background-color: #00ddcc;
+    background-color: #4286f4;
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -56,7 +56,7 @@ background-color: #dee8f9;
     font-size: 16px;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 5px 16px;
     text-decoration: none;
 }
 
@@ -79,9 +79,11 @@ background-color: #dee8f9;
     margin: 0;
 }
 
+/*
 .navbar a:hover, .dropdown:hover .dropbtn2, .dropbtn2:focus {
     background-color: red;
 }
+*/
 
 .dropdown-content2 {
     /* display: none;
@@ -290,9 +292,7 @@ span.num {
 
 
 
-                             <div class="dropdown2 col-lg-2">
-                               <button class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)
-                                              <i class="fa fa-caret-down"></i> </button>
+                             <div class="col-lg-2"><a class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
                                      <a href="#">Link 1</a>
                                      <a href="#">Link 2</a>
@@ -306,7 +306,6 @@ span.num {
 
                             <div class="col-lg-2"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
-                            <div class="col-lg-2"> <button class="dropbtn2" onclick="new_notif()">Uyarılar  </button>  </div>
 
 
                       </div>  <!-- row -->
@@ -318,6 +317,9 @@ span.num {
 
           </div>  <!-- content -->
   </div>
+
+
+
 
 
   <script>
@@ -339,11 +341,31 @@ span.num {
   </script>
 
 
+  <script>
+        $(document).ready(function(){
+                      //alert("document ready..");
+                      new_notif();
+                      myInterval();
+             });  /* document ready  kapanıyor */
+  </script>
+
 
 
 <script>
-  function new_notif() {
-      alert("buraya geldi ... new notif... on click...");
+  var myVar;
+  function myInterval() {
+      myVar = setInterval(new_notif, 30000);
+  }
+</script>
+
+
+
+
+<script>
+
+  function new_notif()
+  {
+      //alert("buraya geldi ... new notif... on click...");
       var selected = "deneme";
       console.log(selected);
       $.ajax({
@@ -355,9 +377,9 @@ span.num {
           'selected' : selected,
            },
         success: function(data) {
-            alert(data);
+            //alert(data);
             var json = $.parseJSON(data);
-            alert(json.length);
+            //alert(json.length);
             document.getElementById("mynum").innerHTML = json.length;
             $(myDropdown2).empty();
             for (var i=0;i<json.length;++i)
@@ -378,6 +400,8 @@ span.num {
         });  /* ajax kapa...*/
 
   }
+
+
 </script>
 
 
