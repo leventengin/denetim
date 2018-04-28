@@ -1,7 +1,7 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h4>Mac List</h4>
+    <h4>Memnuniyet List</h4>
     <p> </p>
     {% if memnuniyet_list %}
     <ul>
@@ -9,7 +9,8 @@
         <li>
           <a href="{{deger.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
           <a href="{{deger.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-          &emsp;   <a>({{ deger.id }})</a> -<a>{{ deger.tipi }} </a>-<a>{{ deger.mac_no }} </a>- <a>{{ deger.oy }} </a> - <a>{{ deger.sebep }} </a> - <a> {{ deger.gelen_tarih }} </a>
+          &emsp;   <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.oy }} </a> -- 
+                      <a>{{ deger.sebep }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
         </li>
       {% endfor %}
       <p> </p>

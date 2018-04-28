@@ -5076,6 +5076,7 @@ def mac_delete(request, pk=None):
 
 def memnuniyet_list(request, pk=None):
     memnuniyet_list = get_memnuniyet_list()
+    print("memnuniyet list..", memnuniyet_list)
     return render(request, 'islem/memnuniyet_list.html', {'memnuniyet_list': memnuniyet_list,})
 
 
