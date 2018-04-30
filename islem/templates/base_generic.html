@@ -42,21 +42,21 @@
 <style>
 
 body {
-background-color: #4bf442;
+background-color: #d0def4;
 }
 
 .navbar {
     /* overflow: hidden;  */
-    background-color: #4286f4;
+    background-color: #0619e2;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 .navbar a {
-    float: left;
+    float: right;
     font-size: 16px;
     color: white;
     text-align: center;
-    padding: 5px 16px;
+    padding: 5px 15px;
     text-decoration: none;
 }
 
@@ -86,16 +86,13 @@ background-color: #4bf442;
 */
 
 .dropdown-content2 {
-    /* display: none;
-    position: absolute;
+    /* display: none; */
     background-color: #f9f9f9;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1; */
-
+    z-index: 1;
     /* min-height:90px; */
     /* overflow-y :auto; */
-    /* overflow-x:hidden; */
+    overflow-x:hidden;
     position:absolute;
     /* width:300px; */
     /* display: contents; */
@@ -104,7 +101,7 @@ background-color: #4bf442;
     width: 300px;
     height: 150px;
     overflow-y: scroll;
-    background-color: #82caff;
+    /* background-color: #82caff; */
 
 }
 
@@ -285,9 +282,9 @@ span.num {
 
 
                                 {% if user.profile.profil_resmi %}
-                                <div class="col-lg-3"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
+                                <div class="col-lg-4"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
                                 {% else %}
-                                <div class="col-lg-3"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
+                                <div class="col-lg-4"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
                                 {% endif %}
 
 
@@ -299,12 +296,12 @@ span.num {
                                    </div>
                              </div>
 
+                            <div class="col-lg-3"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
                             {% if user.is_staff %}
-                            <div class="col-lg-2"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
+                            <div class="col-lg-3"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
                             {% endif %}
 
-                            <div class="col-lg-2"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
 
 
@@ -389,7 +386,7 @@ span.num {
                   var createA = document.createElement('a');
                   var createAText = document.createTextNode(json[i].message);
                   //alert(createAText);
-                  createA.setAttribute('href', "http://google.com");
+                  createA.setAttribute('href', "/notification/");
                   createA.appendChild(createAText);
                   getdiv.appendChild(createA);
               }

@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 def show_notification(request, notification_id):
     n = Notification.objects.get(id=notification_id)
-    return render_to_response('notification.html', {'notification': n})
+    return render_to_response('islem/bildirimler.html', {'notification': n})
 
 def delete_notification(request, notification_id):
     n = Notification.objects.get(id=notification_id)
@@ -28,5 +28,5 @@ def list_notification(request):
     print("list notifications ..")
     print("request user id..", request.user.id)
     #n = Notification.objects.all()
-    n = Notification.objects.filter(user=request.user.id).filter(viewed=False)
-    return render_to_response('notification.html', {'notification_list': n})
+    n = Notification.objects.filter(viewed=False)
+    return render_to_response('islem/bildirimler.html', {'notification_list': n})

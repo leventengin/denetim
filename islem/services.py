@@ -17,7 +17,7 @@ def get_mac_list():
 
 def get_memnuniyet_list():
     print("get memnuniyet list .............")
-    r = requests.get("http://127.0.0.1:7001/api/postings/memnuniyet_list", auth=("levent", "leventlevent"))
+    r = requests.get("http://127.0.0.1:7000/ws/memnuniyet_list", auth=("admin", "masanata"))
     json_data = r.json()
     print(json_data)
     return json_data

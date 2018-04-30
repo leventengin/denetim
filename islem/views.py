@@ -4966,7 +4966,7 @@ def bildirim(request):
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
         print("js bildirim içinden....")
-        n = Notification.objects.filter(user=request.user.id).filter(viewed=False).values()
+        n = Notification.objects.filter(viewed=False).values()
         print("obje...",n)
         n_list = list(n)
         print("listesi...", n_list)
@@ -4980,7 +4980,7 @@ def bildirim(request):
 
 
 def popup_notif(request):
-        n_list = Notification.objects.filter(user=request.user.id).filter(viewed=False).values()
+        n_list = Notification.objects.filter(viewed=False).values()
         print("obje...",n_list)
         return render(request, 'popup_notif.html', {'n_list': n_list})
 
@@ -5083,11 +5083,11 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    vote = "1"
-    reason = "1"
+    vote = "3"
+    reason = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7001/api/postings/memnuniyet_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("levent", "leventlevent"))
+    response = requests.post("http://127.0.0.1:7000/ws/memnuniyet_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')

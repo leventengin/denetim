@@ -57,6 +57,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 INSTALLED_APPS = [
     'islem',
     'notification',
+    'webservice',
     'resimyukle',
     'rest_framework',
     'resimyukle_rest',
@@ -64,7 +65,6 @@ INSTALLED_APPS = [
     'searchableselect',
     'dal',
     'dal_select2',
-#    'dal_select2django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,7 +76,6 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.humanize',
     'django_select2',
-#    'select2',
     'jquery',
 ]
 

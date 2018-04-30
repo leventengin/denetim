@@ -55,7 +55,7 @@ a, a:hover, a:focus {
     left: 0;
     height: 100vh;
     z-index: 999;
-    background: #4286f4;
+    background: #0619e2;
     color: #fff;
     transition: all 0.3s;
 }
@@ -66,12 +66,12 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #f4425cs;
+    background: #fc4b2f;
 }
 
 #sidebar ul.components {
     padding: 10px 0;
-    border-bottom: 1px solid ##0619e2;
+    border-bottom: 1px solid #0619e2;
 }
 
 #sidebar ul p {
