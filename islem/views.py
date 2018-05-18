@@ -14,12 +14,12 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon, yer, proje_alanlari
 from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
-from .models import plan_gun
+from .models import plan_opr_gun, plan_den_gun
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm
-from islem.forms import IlkDenetimSecForm, KucukResimForm
+from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm
 import collections
@@ -2414,7 +2414,7 @@ def denetim_detay_islemleri(request, pk=None):
                     print("yollu.........",  os.path.basename(uploaded_image.path))
                     print("ikinci yollu...", os.path.abspath(uploaded_image.path))
                     str1 = os.path.abspath(uploaded_image.path)
-                    str2 = "/home/levent/nata/denetim/media_cdn/"
+                    str2 = "/home/levent/nata/media_cdn/"
                     if str2 in str1:
                         print("içinde....")
                         str1 = str1.replace(str2,'')
@@ -2550,7 +2550,7 @@ def sonuc_denetim_sec(request, pk=None):
             denetim_no = request.POST.get('denetim_no', "")
             print ("denetim seçim yapılmış...", denetim_no)
             request.session['secilen_denetim'] = denetim_no
-            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('detay')
+            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
             denetimin_adi = sonuc_list.first().denetim
             denetimin_durumu = sonuc_list.first().denetim.durum
             context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
@@ -2571,13 +2571,167 @@ def sonuc_denetim_sec(request, pk=None):
         return render(request, 'islem/sonuc_denetim_form.html', {'form': form,})
 
 
+@login_required
+def sonuc_denetim_detay_sec(request, pk=None):
+    # if this is a POST request we need to process the form data
+    pk = pk
+    print("gelen pk...", pk)
+    denetim_no = request.session.get('secilen_denetim')
+    print("seçilen denetim...", denetim_no)
+    sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
+    secili_detay = sonuc_detay.objects.filter(id=pk).first()
+
+    for sonuc in sonuc_list:
+        print("sonuç list id leri....", sonuc.id)
+
+    prev_issue = (sonuc_list.filter(id__lt=secili_detay.id).last())
+    next_issue = (sonuc_list.filter(id__gt=secili_detay.id).first())
+    if prev_issue:
+        print("previous..", prev_issue.id)
+    if next_issue:
+        print("next...", next_issue.id)
+
+    return render(request, 'islem/sonuc_detay_yeni_detail.html', {'secili_detay': secili_detay, 'prev_issue': prev_issue, 'next_issue': next_issue})
+
+
+
+
+@login_required
+def sonuc_denetim_detay_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    pk = pk
+    print("gelen pk...", pk)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        print("buraya mı geldi...sonuç denetim detay düzenle...POST")
+        #bulunan = get_object_or_404(sonuc, detay=secili_detay)
+        detay_obj = sonuc_detay.objects.filter(id=pk).first()
+        puanlama_turu = detay_obj.puanlama_turu
+        denetim_no = detay_obj.denetim.id
+        form = SonucForm(request.POST or None, request.FILES or None, instance=detay_obj, puanlama_turu=puanlama_turu)
+
+        if form.is_valid():
+            print("neyse ki valid..bin...ext...")
+            # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
+            edit = form.save(commit=False)
+            resim_acaba = edit.resim_varmi
+            print("resim acaba....", resim_acaba)
+
+            if edit.denetim_disi == "E":
+                edit.tamam = "E"
+                edit.foto = None
+                edit.puan = None
+                edit.save()
+            else:
+                resim_var = False
+                if edit.resim_varmi == "E":
+                    uploaded_image_obj = kucukresim.objects.filter(kullanici=request.user.id).last()
+                    print(" upload image object", uploaded_image_obj)
+                    uploaded_image = uploaded_image_obj.foto_kucuk
+                    #edit.foto = file(uploaded_image, os.path.basename(uploaded_image.path))
+                    print("yollu.........",  os.path.basename(uploaded_image.path))
+                    print("ikinci yollu...", os.path.abspath(uploaded_image.path))
+                    str1 = os.path.abspath(uploaded_image.path)
+                    str2 = "/home/levent/nata/media_cdn/"
+                    if str2 in str1:
+                        print("içinde....")
+                        str1 = str1.replace(str2,'')
+                    print("sonuç.........", str1)
+                    #edit.foto = os.path.abspath(uploaded_image.path)
+                    edit.foto = str1
+                    uploaded_image.close()
+                    resim_var = True
+                else:
+                    edit.foto = None
+
+                print("puanlama türü...", edit.puanlama_turu)
+                print("puanlama türü...doğrusu, ilk okunan", puanlama_turu)
+
+
+                if puanlama_turu == "A":
+                    puan_hesap = int(edit.onluk)
+                if puanlama_turu == "B":
+                    puan_hesap = int(edit.beslik)
+                    puan_hesap = puan_hesap * 2
+                if puanlama_turu == "C":
+                    puan_hesap = int(edit.ikilik)
+                    puan_hesap = puan_hesap * 10
+
+                edit.puan = puan_hesap
+                edit.tamam = "E"
+                edit.save()
+
+            print("kaydetmiş olması lazım.................")
+            return redirect('sonuc_denetim_detay_sec', pk=pk)
+            #return render(request, 'islem/denetim_detay_islemleri.html', context,)
+
+
+        else:
+            print("ne oldu be kardeşim...........")
+            messages.success(request, ' form hatası - tekrar deneyin....')
+            #return redirect('devam_liste')
+            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
+            return render(request, 'islem/denetim_detay_duzenle.html', {'form': form,})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+
+        detay_obj = sonuc_detay.objects.filter(id=pk).first()
+        puanlama_turu = detay_obj.puanlama_turu
+        request.session['secili_detay'] = pk
+        request.session['resim_varmi'] = detay_obj.resim_varmi
+        #form = SonucForm(puanlama_turu=puanlama_turu)
+        form = SonucForm(instance=detay_obj, puanlama_turu=puanlama_turu)
+
+        context = { 'form': form,
+                    'secili_obj' : detay_obj,
+                    }
+
+        return render(request, 'islem/sonuc_detay_duzenle.html', context,)
+
+
+
+
+#--------------------------------------------------------------------------------
+from django.views.decorators.csrf import csrf_exempt
+
+
+@csrf_exempt
+@login_required
+def update_resim_varmi(request, pk=None):
+    print("selam buraya geldik...update resim var mı")
+    response_data ={}
+    if request.method == 'GET':
+        degisken = request.GET.get('degisken')
+        request.session['resim_varmi'] = degisken
+        print("  js içinden  okunan değer....",  degisken)
+        print ("  resim var mı sv nin son hali.....", request.session['resim_varmi'])
+    return HttpResponse(response_data, content_type='application/json')
+
+
+
+
+@csrf_exempt
+@login_required
+def getvalue_resim_varmi(request, pk=None):
+    print("selam buraya geldik...getvalue resim var mı")
+    response_data ={}
+    data =  request.session.get('resim_varmi')
+    print("  js içinden  okunan değer....",  data)
+    response_data = {'data': data}
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+#-----------------------------------------------------------------------------------------------
+
 
 from django.views.decorators.csrf import csrf_exempt
 
 
 @login_required
 @csrf_exempt
-def kucuk_resim_al(request):
+def kucuk_resim_al(request, pk=None):
     print("selam buraya geldik.... küçük resim al...")
     response_data ={}
     if request.method == 'POST':
@@ -2630,8 +2784,6 @@ def qrcode_calistir_js(request, pk=None):
     print("User.id.....:", request.user.id)
     #kullanan = request.user.id
     response_data ={}
-
-
     if request.method == 'GET':
         js_qrcode_result = request.GET.get('result')
         request.session['js_qrcode_result'] = js_qrcode_result
@@ -3074,7 +3226,6 @@ def raporlar_sec(request, pk=None):
             proje = request.POST.get('proje', "")
             print ("proje", proje)
             request.session['secili_proje'] = proje
-            #form = GozlemciForm()
             return redirect('raporlar_devam')
             #return render(request, 'islem/gozlemci_sec_devam.html', {'form': form,})
         else:
@@ -3242,6 +3393,66 @@ def raporlar_ilerle(request, pk=None):
     return render(request, 'islem/denetim_rapor_goster.html', context )
 
 
+
+
+#------------------------------------------------------------------------------
+# sonlandırılan denetim seçimi ile ilgili bölüm.....
+# önce denetim seçiliyor...
+
+@login_required
+def rapor_yazisi(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = YaziForm(request.POST, kullanan=kullanan)
+        print("denetimi seçti gözlemci seçimi için...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            denetim_no = request.POST.get('denetim', "")
+            yazi = request.POST.get('yazi',"")
+            print ("denetim", denetim_no)
+            print ("yazi", yazi)
+            kaydetme_obj = denetim.objects.get(id=denetim_no)
+            kaydetme_obj.rapor_yazi = yazi
+            kaydetme_obj.save()
+            return redirect('index')
+        else:
+            print(" valid değil rapor yazisi ...........")
+            return render(request, 'islem/rapor_yazisi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
+        kullanan = request.user.id
+        print("kullanan  ..", kullanan)
+        form = YaziForm(kullanan=kullanan)
+        return render(request, 'islem/rapor_yazisi.html', {'form': form,})
+
+
+#------------------------------------------------------------------------------
+# sonlandırılan denetim seçimi ile ilgili bölüm.....
+# önce denetim seçiliyor...
+
+
+@login_required
+@csrf_exempt
+def rapor_yazisi_al(request):
+    print("selam buraya geldik.... rapor yazisi al...")
+    response_data ={}
+    if request.method == 'POST':
+        js_denetim = request.POST.get('denetim')
+        print("js_denetim...", js_denetim)
+        denetim_obj = denetim.objects.get(id=js_denetim)
+        print("denetim obj", denetim_obj)
+        data = denetim_obj.rapor_yazi
+        print("gönderilecek data", data)
+        response_data = {'data': data}
+    print ("son nokta  rapor yazisi al....", response_data)
+    return HttpResponse(json.dumps(data), content_type='application/json')
+    #return HttpResponse(data, content_type='application/json')
 
 
 
@@ -3718,8 +3929,8 @@ import copy
 def yer_detay(request, pk=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
-    plan_gun_obj = plan_gun.objects.filter(yer=pk)
-    print("plan gün obj..", plan_gun_obj)
+    plan_opr_gun_obj = plan_opr_gun.objects.filter(yer=pk)
+    print("plan gün obj..", plan_opr_gun_obj)
     pzt_list = []
     sal_list = []
     car_list = []
@@ -3730,14 +3941,14 @@ def yer_detay(request, pk=None):
     a = []
     max_cnt = 0
 
-    if plan_gun_obj:
-        pzt_obj = plan_gun.objects.filter(gun='Pzt')
-        sal_obj = plan_gun.objects.filter(gun='Sal')
-        car_obj = plan_gun.objects.filter(gun='Çar')
-        per_obj = plan_gun.objects.filter(gun='Per')
-        cum_obj = plan_gun.objects.filter(gun='Cum')
-        cmt_obj = plan_gun.objects.filter(gun='Cmt')
-        paz_obj = plan_gun.objects.filter(gun='Paz')
+    if plan_opr_gun_obj:
+        pzt_obj = plan_opr_gun.objects.filter(gun='Pzt')
+        sal_obj = plan_opr_gun.objects.filter(gun='Sal')
+        car_obj = plan_opr_gun.objects.filter(gun='Çar')
+        per_obj = plan_opr_gun.objects.filter(gun='Per')
+        cum_obj = plan_opr_gun.objects.filter(gun='Cum')
+        cmt_obj = plan_opr_gun.objects.filter(gun='Cmt')
+        paz_obj = plan_opr_gun.objects.filter(gun='Paz')
         pzt_cnt = pzt_obj.count()
         sal_cnt = sal_obj.count()
         car_cnt = car_obj.count()
@@ -3807,9 +4018,105 @@ def yer_detay(request, pk=None):
 
     print ("max count...", max_cnt)
 
+
+
+    plan_den_gun_obj = plan_den_gun.objects.filter(yer=pk)
+    print("plan gün obj..", plan_opr_gun_obj)
+    pzt_list = []
+    sal_list = []
+    car_list = []
+    per_list = []
+    cum_list = []
+    cmt_list = []
+    paz_list = []
+    b = []
+    max_cnt_den = 0
+
+    if plan_den_gun_obj:
+        pzt_obj = plan_den_gun.objects.filter(gun='Pzt')
+        sal_obj = plan_den_gun.objects.filter(gun='Sal')
+        car_obj = plan_den_gun.objects.filter(gun='Çar')
+        per_obj = plan_den_gun.objects.filter(gun='Per')
+        cum_obj = plan_den_gun.objects.filter(gun='Cum')
+        cmt_obj = plan_den_gun.objects.filter(gun='Cmt')
+        paz_obj = plan_den_gun.objects.filter(gun='Paz')
+        pzt_cnt = pzt_obj.count()
+        sal_cnt = sal_obj.count()
+        car_cnt = car_obj.count()
+        per_cnt = per_obj.count()
+        cum_cnt = cum_obj.count()
+        cmt_cnt = cmt_obj.count()
+        paz_cnt = paz_obj.count()
+
+
+        print("adetler...", pzt_cnt, "-", sal_cnt, "-", car_cnt, "-", per_cnt, "-", cum_cnt, "-", cmt_cnt, "-", paz_cnt)
+
+        max_cnt_den = pzt_cnt
+        if sal_cnt > max_cnt_den:
+            max_cnt_den = sal_cnt
+        if car_cnt > max_cnt_den:
+            max_cnt_den = car_cnt
+        if per_cnt > max_cnt_den:
+            max_cnt_den = per_cnt
+        if cum_cnt > max_cnt_den:
+            max_cnt_den = cum_cnt
+        if cmt_cnt > max_cnt_den:
+            max_cnt_den = cmt_cnt
+        if paz_cnt > max_cnt_den:
+            max_cnt_den = paz_cnt
+
+        for pzt in pzt_obj:
+            pzt_list.append(pzt.zaman)
+        for sal in sal_obj:
+            sal_list.append(sal.zaman)
+        for car in car_obj:
+            car_list.append(car.zaman)
+        for per in per_obj:
+            per_list.append(per.zaman)
+        for cum in cum_obj:
+            cum_list.append(cum.zaman)
+        for cmt in cmt_obj:
+            cmt_list.append(cmt.zaman)
+        for paz in paz_obj:
+            paz_list.append(paz.zaman)
+
+        print("pzt list", pzt_list)
+        print("sal list", sal_list)
+        print("çar list", car_list)
+        print("per list", per_list)
+        print("cum list", cum_list)
+        print("cmt list", cmt_list)
+        print("paz list", paz_list)
+
+        print("pzt list 0", pzt_list[0])
+
+        b = []
+        row = []
+        for i in range(max_cnt_den):
+            print("i...", i)
+            row.append(pzt_list[i])
+            row.append(sal_list[i])
+            row.append(car_list[i])
+            row.append(per_list[i])
+            row.append(cum_list[i])
+            row.append(cmt_list[i])
+            row.append(paz_list[i])
+            print("i...", i,"row...", row)
+            b.append(row)
+            row = []
+
+        print("sonuc listesi template uygun ...", a)
+
+    print ("max count denetim..", max_cnt_den)
+
     return render(request, 'islem/yer_detail.html', {'yer': yer_obj,
                                                      'a': a,
-                                                     'max_cnt': max_cnt})
+                                                     'max_cnt': max_cnt,
+                                                     'b': b,
+                                                     'max_cnt_den': max_cnt_den})
+
+
+
 
 
 import time
@@ -3821,21 +4128,24 @@ def yer_zaman_planla(request, pk=None):
     print("yer objesi...", yer_obj)
 
 
-    st_time = datetime.time(10,0,0)
+    #st_time = datetime.time(10,0,0)
+    st_time = yer_obj.opr_basl
     print("st time..", st_time)
     h = st_time.hour
     m = st_time.minute
     s = st_time.second
     total_seconds = 3600*h + 60*m + s
 
-    end_time = datetime.time(22,0,0)
+    #end_time = datetime.time(22,0,0)
+    end_time = yer_obj.opr_son
     print("end time ..", end_time)
     h = end_time.hour
     m = end_time.minute
     s = end_time.second
     final_seconds = 3600*h + 60*m + s
 
-    time_delta = datetime.time(0,30,0)
+    #time_delta = datetime.time(0,30,0)
+    time_delta = yer_obj.opr_delta
     print("time delta ..", time_delta)
 
     while total_seconds < final_seconds:
@@ -3858,7 +4168,7 @@ def yer_zaman_planla(request, pk=None):
             print("yer obj id..", pk)
             print("gun...", gun)
             print("zaman ..", st_time)
-            kaydetme_obj = plan_gun(yer_id=pk,
+            kaydetme_obj = plan_opr_gun(yer_id=pk,
                                     gun=gun,
                                     zaman=st_time,
                                     )
@@ -3891,6 +4201,91 @@ def yer_zaman_planla(request, pk=None):
 
 
     messages.success(request, 'zaman planı yaratma işlemi gerçekleştirildi....')
+    return redirect('yer_detay', pk=pk)
+
+
+
+
+@login_required
+@transaction.atomic
+def yer_denetim_planla(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+
+
+    #st_time = datetime.time(10,0,0)
+    st_time = yer_obj.den_basl
+    print("st time..", st_time)
+    h = st_time.hour
+    m = st_time.minute
+    s = st_time.second
+    total_seconds = 3600*h + 60*m + s
+
+    #end_time = datetime.time(22,0,0)
+    end_time = yer_obj.den_son
+    print("end time ..", end_time)
+    h = end_time.hour
+    m = end_time.minute
+    s = end_time.second
+    final_seconds = 3600*h + 60*m + s
+
+    #time_delta = datetime.time(0,30,0)
+    time_delta = yer_obj.den_delta
+    print("time delta ..", time_delta)
+
+    while total_seconds < final_seconds:
+        n = 0
+        while n < 7:
+            if n == 0:
+                gun = 'Pzt'
+            if n == 1:
+                gun = 'Sal'
+            if n == 2:
+                gun = 'Çar'
+            if n == 3:
+                gun = 'Per'
+            if n == 4:
+                gun = 'Cum'
+            if n == 5:
+                gun = 'Cmt'
+            if n == 6:
+                gun = 'Paz'
+            print("yer obj id..", pk)
+            print("gun...", gun)
+            print("zaman ..", st_time)
+            kaydetme_obj = plan_den_gun(yer_id=pk,
+                                    gun=gun,
+                                    zaman=st_time,
+                                    )
+            kaydetme_obj.save()
+            n = n + 1
+
+        #h, m, s = [int(i) for i in st_time.split(':')]
+        h1 = st_time.hour
+        m1 = st_time.minute
+        s1 = st_time.second
+        total_seconds = 3600*h1 + 60*m1 + s1
+        print(" total seconds toplamadan önce", total_seconds)
+        #h, m, s = [int(i) for i in time_delta.split(':')]
+        h2 = time_delta.hour
+        m2 = time_delta.minute
+        s2 = time_delta.second
+        add_seconds = 3600*h2 + 60*m2 + s2
+        print(" add seconds toplamadan önce", add_seconds)
+        total_seconds = total_seconds + add_seconds
+        print(" total seconds toplamadan sonra", total_seconds)
+        print(" final seconds ", final_seconds)
+        #st_time = str(datetime.timedelta(seconds=total_seconds))
+        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
+        h3 = total_seconds // 3600
+        remain = total_seconds % 3600
+        m3 = remain // 60
+        s3 = remain % 60
+        st_time = datetime.time(h3,m3,s3)
+        print("new st time..", st_time)
+
+
+    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi....')
     return redirect('yer_detay', pk=pk)
 
 
@@ -4965,13 +5360,13 @@ def bildirim(request):
     response_data ={}
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
-        print("js bildirim içinden....")
+        print("js bildirim içinden zaman...", datetime.datetime.now())
         n = Notification.objects.filter(viewed=False).values()
-        print("obje...",n)
+        #print("obje...",n)
         n_list = list(n)
-        print("listesi...", n_list)
+        #print("listesi...", n_list)
         response_data = {"response_data" : n_list}
-        print("response  data...", response_data)
+        #print("response  data...", response_data)
         response_data = json.dumps(n_list)
         #print("response data", response_data)
         #return render_to_response('notification.html', {'notification_list': n})

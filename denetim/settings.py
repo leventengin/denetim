@@ -181,7 +181,7 @@ STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static"),
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, "media_cdn")
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
 
 LOGIN_REDIRECT_URL = '/islem/'
 

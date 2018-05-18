@@ -49,7 +49,8 @@ from .models import isaretler
 from .models import qrdosyasi
 from .models import yer
 from .models import proje_alanlari
-from .models import plan_gun
+from .models import plan_opr_gun
+from .models import plan_den_gun
 from notification.models import Notification
 
 
@@ -71,5 +72,6 @@ admin.site.register(isaretler)
 admin.site.register(qrdosyasi)
 admin.site.register(yer)
 admin.site.register(proje_alanlari)
-admin.site.register(plan_gun)
+admin.site.register(plan_opr_gun)
+admin.site.register(plan_den_gun)
 admin.site.register(Notification)

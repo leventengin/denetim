@@ -1,8 +1,9 @@
 
+
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h3> Sonuç Sayfası   xxx</h3>
+  <h3> Sonuç Sayfası - Yeni...</h3>
 
   <table border="0">
       <tbody>
@@ -14,79 +15,79 @@
         -->
           <tr>
               <td><b>Denetim </b></td>
-              <td> &emsp;     {{ sonuc_detay.denetim }}</td>
+              <td> &emsp;     {{ secili_detay.denetim }}</td>
           </tr>
           <tr>
               <td><b>Bölüm adı</b></td>
-              <td> &emsp;     {{ sonuc_detay.bolum }}</td>
+              <td> &emsp;     {{ secili_detay.bolum }}</td>
           </tr>
           <tr>
               <td><b>Detay adı </b></td>
-              <td> &emsp;     {{ sonuc_detay.detay }}</td>
+              <td> &emsp;     {{ secili_detay.detay }}</td>
           </tr>
-          {% if sonuc_detay.denetim_disi == "E" %}
+          {% if secili_detay.denetim_disi == "E" %}
           <tr>
               <td> &emsp;  Denetim dışı......</td>
           </tr>
           {% endif %}
 
-          {% if sonuc_detay.denetim_disi == "H" %}
+          {% if secili_detay.denetim_disi == "H" %}
 
-                {% if sonuc_detay.puanlama_turu == "A" %}
+                {% if secili_detay.puanlama_turu == "A" %}
                   <tr>
                       <td><b>Puanlama türü</b></td>
                         <td> &emsp;  Onluk  </td>
                   </tr>
                   {% endif %}
 
-                {% if sonuc_detay.puanlama_turu == "A" %}
+                {% if secili_detay.puanlama_turu == "A" %}
                 <tr>
                     <td><b>Puan</b></td>
-                    <td> &emsp; {{ sonuc_detay.onluk }} </td>
+                    <td> &emsp; {{ secili_detay.onluk }} </td>
                 </tr>
                 {% endif %}
 
 
 
-                {% if sonuc_detay.puanlama_turu == "B" %}
+                {% if secili_detay.puanlama_turu == "B" %}
                 <tr>
                     <td><b>Puanlama türü</b></td>
                     <td> &emsp;  Beşlik </td>
                 </tr>
                 {% endif %}
 
-                {% if sonuc_detay.puanlama_turu == "B" %}
+                {% if secili_detay.puanlama_turu == "B" %}
                 <tr>
                     <td><b>Puan</b></td>
-                    <td> &emsp; {{ sonuc_detay.beslik }} </td>
+                    <td> &emsp; {{ secili_detay.beslik }} </td>
                 </tr>
                 {% endif %}
 
 
-                {% if sonuc_detay.puanlama_turu == "C" %}
+                {% if secili_detay.puanlama_turu == "C" %}
                 <tr>
                     <td><b>Puanlama türü</b></td>
                     <td> &emsp;  İkilik  </td>
                 </tr>
                 {% endif %}
 
-                {% if sonuc_detay.puanlama_turu == "C" %}
+                {% if secili_detay.puanlama_turu == "C" %}
                 <tr>
                     <td><b>Puan</b></td>
-                    <td> &emsp; {{ sonuc_detay.ikilik }} </td>
+                    <td> &emsp; {{ secili_detay.ikilik }} </td>
                 </tr>
                 {% endif %}
 
 
                 <tr>
                     <td><b>Düzenlenmiş puan</b></td>
-                    <td>  &emsp;      {{ sonuc_detay.puan }}</td>
+                    <td>  &emsp;      {{ secili_detay.puan }}</td>
                 </tr>
 
-                {% if sonuc_detay.foto %}
+                {% if secili_detay.foto %}
                 <tr>
                     <td><b>Foto</b></td>
-                    <td> &emsp;   <img src="{{ sonuc_detay.foto.url }}" class="img-responsive">  </td>
+                    <td> &emsp;   <img src="{{ secili_detay.foto.url }}" class="img-responsive">  </td>
                 </tr>
                 {% endif %}
 
@@ -95,6 +96,20 @@
 
       </tbody>
   </table>
+
+  <br /> <br /> <br />
+  {% if prev_issue %}
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk=prev_issue.id %}'">Önceki </button>
+  {% endif %}
+  &emsp;
+  {% if next_issue %}
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk=next_issue.id %}'">Sonraki </button>
+  {% endif %}
+  &emsp;
+
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_duzenle' pk=secili_detay.id %}'">Düzenle </button>
+
+
 
 
 {% endblock %}

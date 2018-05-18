@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from datetime import datetime, date
+#from datetime import datetime, date
+import datetime
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -171,20 +172,34 @@ class proje_alanlari(models.Model):
     def __str__(self):
         return '%s-%s' % (self.proje, self.alan)
 
+
 class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
     yer_adi = models.CharField(max_length=200)
     yer_mac = models.IntegerField()
+    opr_basl = models.TimeField(default=datetime.time(8,0,0))
+    opr_son = models.TimeField(default=datetime.time(22,0,0))
+    opr_delta = models.TimeField(default=datetime.time(0,30,0))
+    den_basl = models.TimeField(default=datetime.time(10,0,0))
+    den_son = models.TimeField(default=datetime.time(22,0,0))
+    den_delta = models.TimeField(default=datetime.time(2,0,0))
     def __str__(self):
         return str(self.yer_mac)
 
-class plan_gun(models.Model):
+
+class plan_opr_gun(models.Model):
     yer = models.ForeignKey(yer, on_delete=models.PROTECT)
     gun = models.CharField(max_length=3, choices=GUNLER)
     zaman = models.TimeField()
     def __str__(self):
         return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
 
+class plan_den_gun(models.Model):
+    yer = models.ForeignKey(yer, on_delete=models.PROTECT)
+    gun = models.CharField(max_length=3, choices=GUNLER)
+    zaman = models.TimeField()
+    def __str__(self):
+        return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
 
 class ariza_tipi(models.Model):
     ariza_tipi = models.CharField(max_length=200)
@@ -195,7 +210,7 @@ class ariza_tipi(models.Model):
 class ariza(models.Model):
     ariza_tipi = models.ForeignKey(ariza_tipi, on_delete=models.PROTECT)
     yer = models.ForeignKey(yer, on_delete=models.PROTECT)
-    tarih = models.DateField(_("Date"), default=datetime.today)
+    tarih = models.DateField(_("Date"), default=datetime.date.today)
     def __str__(self):
         return(self.ariza)
 
@@ -208,7 +223,7 @@ class denetim(models.Model):
     denetci = models.ForeignKey(User, related_name='denetci', on_delete=models.CASCADE, null=True)
     tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
     durum = models.CharField(max_length=1, default="A")
-    yaratim_tarihi = models.DateField(_("Date"), default=datetime.today)
+    yaratim_tarihi = models.DateField(_("Date"), default=datetime.date.today)
     yaratan = models.ForeignKey(User, related_name='yaratan', on_delete=models.CASCADE)
     hedef_baslangic = models.DateField(blank=True, null=True)
     hedef_bitis = models.DateField(blank=True, null=True)
@@ -270,7 +285,7 @@ class sonuc_detay(models.Model):
     width_field = models.IntegerField(default=0)
     tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-    timestamp = models.DateTimeField(default=datetime.now())
+    timestamp = models.DateTimeField(default=datetime.datetime.now())
     def __str__(self):
         return(self.denetim.denetim_adi)
 
@@ -316,7 +331,7 @@ class acil(models.Model):
     sonuc = models.TextField()
     acik_kapandi = models.CharField(max_length=1, choices=ACIKKAPANDI, default="A")
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
-    timestamp = models.DateTimeField(default=datetime.now())
+    timestamp = models.DateTimeField(default=datetime.datetime.now())
     def __str__(self):
         return(self.denetim.denetim_adi)
 

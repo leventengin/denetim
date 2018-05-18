@@ -1,0 +1,128 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<!--
+<input type="file" id="select">
+<img id="preview">
+
+-->
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
+
+
+BASE_DIR {{ BASE_DIR }}
+PROJECT_DIR {{ PROJECT_DIR }}
+MEDIA_ROOT  {{ MEDIA_ROOT }}
+STATIC_ROOT {{ STATIC_ROOT }}
+
+
+
+<script>
+$(document).ready(function()
+{
+      document.getElementById('id_denetim').onchange = function(evt)
+      {
+            alert("rapor yazısı al............");
+            var denetim = document.getElementById('id_denetim').value;
+            alert(denetim);
+            $.ajax({
+                url: "rapor_yazisi_al/",
+                type: "POST",
+                dataType: "text",
+                //contentType: 'application/json; charset=utf-8',
+                data: {'denetim' : denetim, },
+                success: function(data){
+                  alert("gelen data...." + data);
+                  var json = $.parseJSON(data);
+                  alert(json);
+                  document.getElementById('id_yazi').value = json;
+                },
+                failure: function(){
+                  alert("rapor yazısı almada hata....");
+                },
+            });  //ajax kapa...............
+      };  // on change...
+});  /* document ready  kapanıyor */
+</script>
+
+<script>
+
+  function new_notif()
+  {
+      //alert("buraya geldi ... new notif... on click...");
+      var selected = "deneme";
+      console.log(selected);
+      $.ajax({
+        url : "/bildirim/",
+        type : "GET",
+        dataType: "text",
+        contentType: 'application/json; charset=utf-8',
+        data : {
+          'selected' : selected,
+           },
+        success: function(data) {
+            //alert(data);
+            var json = $.parseJSON(data);
+            //alert(json.length);
+            document.getElementById("mynum").innerHTML = json.length;
+            $(myDropdown2).empty();
+            for (var i=0;i<json.length;++i)
+              {
+                  /*  alert(" maryak......");  */
+                  var getdiv = document.getElementById('myDropdown2');
+                  var createA = document.createElement('a');
+                  var createAText = document.createTextNode(json[i].message);
+                  //alert(createAText);
+                  createA.setAttribute('href', "/notification/");
+                  createA.appendChild(createAText);
+                  getdiv.appendChild(createA);
+              }
+            },
+        failure: function() {
+            alert("bildirim listesi başarısız...");
+            }
+        });  /* ajax kapa...*/
+
+  }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<h5> <b> Denetim Rapor Yazisi</b> </h5>
+
+
+<form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+    <table>
+
+        {{form.as_table}}
+
+    </table>
+    <input type="submit" value="kaydet" />
+</form>
+<p></p>
+<p></p>
+
+
+
+
+
+
+
+
+{% endblock %}

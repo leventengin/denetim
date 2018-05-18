@@ -122,6 +122,11 @@ background-color: #d0def4;
     display: block;
 }
 
+.c {
+    text-align: center;
+    vertical-align: middle;
+}
+
 
 a.fa-bell {
   position: relative;
@@ -194,7 +199,7 @@ span.num {
                 </div>
 
                 <ul class="list-unstyled components">
-                    <h4><p>Yönetim ve Denetim Sistemleri</p></h4>
+                    <h4><p>Operasyon ve Denetim Sistemleri</p></h4>
                     <li class="deactive">
                         <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Yerinde Denetim</a>
                         <ul class="collapse list-unstyled" id="homeSubmenu">
@@ -203,21 +208,7 @@ span.num {
                             <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
                             <li><a href="/islem/acil_devam_sec"><b><font color="f44336">Acil Bildirim</font></b></a></li>
                             <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
-                            <li><a href="/islem/rest_create">Rest Ekle</a></li>
-                            <li><a href="/islem/rest_list">Rest Listele </a></li>
-                            <li><a href="/islem/rest_delete">Rest Sil</a></li>
-                            <li><a href="/islem/rest_delete_all">Rest Hepsi Sil</a></li>
-                            <li><a href="/islem/mac_list">Mac Listele </a></li>
-                            <li><a href="/islem/mac_create">Mac Ekle</a></li>
-                            <li><a href="/islem/mac_update">Mac Düzenle</a></li>
-                            <li><a href="/islem/mac_list/find_update">Mac Bul ve Düzenle</a></li>
-                            <li><a href="/islem/memnuniyet_list">Memnuniyet Listele </a></li>
-                            <li><a href="/islem/memnuniyet_create">Memnuniyet Ekle</a></li>
-                            <li><a href="/islem/memnuniyet_update">Memnuniyet Düzenle</a></li>
-                            <li><a href="/islem/memnuniyet_list/find_update">Memnuniyet Bul ve Düzenle</a></li>
-                            <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
-                            <!-- <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
-                            <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
+                            <li><a href="/islem/rapor_yazisi">Rapor Yazısı</a></li>
                         </ul>
                     </li>
                     <li>
@@ -227,8 +218,6 @@ span.num {
                         <li><a href="/islem/denetim/teksayfa_duzenle">Denetim Düzenle</a></li>
                         <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
                         <li><a href="/islem/denetim">Denetim Detayları</a><!-- row.... --></li>
-                        <li><a href="/notification/create">bildirim yarat</a></li>
-                        <li><a href="/notification">bildirim listele</a></li>
                       </ul>
                   </li>
                   <li>
@@ -243,8 +232,8 @@ span.num {
                   </li>
 
                   <li>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">Tanımlar</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <a href="#pageSubmenu4" data-toggle="collapse" aria-expanded="false">Tanımlar</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu4">
                         <li><a href="/islem/tipi">Denetim Tipi</a></li>
                         <li><a href="/islem/zon">Denetim Alanı</a></li>
                         <li><a href="/islem/bolum">Denetim Bölümü</a></li>
@@ -258,6 +247,31 @@ span.num {
                         <li><a href="/islem/qrdosyasi">QRCode</a></li>
                     </ul>
                 </li>
+                <li class="deactive">
+                    <a href="#homeSubmenu5" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu5">
+                        <li><a href="/islem/rest_create">Rest Ekle</a></li>
+                        <li><a href="/islem/rest_list">Rest Listele </a></li>
+                        <li><a href="/islem/rest_delete">Rest Sil</a></li>
+                        <li><a href="/islem/rest_delete_all">Rest Hepsi Sil</a></li>
+                        <li><a href="/islem/mac_list">Mac Listele </a></li>
+                        <li><a href="/islem/mac_create">Mac Ekle</a></li>
+                        <li><a href="/islem/mac_update">Mac Düzenle</a></li>
+                        <li><a href="/islem/mac_list/find_update">Mac Bul ve Düzenle</a></li>
+                        <li><a href="/islem/memnuniyet_list">Memnuniyet Listele </a></li>
+                        <li><a href="/islem/memnuniyet_create">Memnuniyet Ekle</a></li>
+                        <li><a href="/islem/memnuniyet_update">Memnuniyet Düzenle</a></li>
+                        <li><a href="/islem/memnuniyet_list/find_update">Memnuniyet Bul ve Düzenle</a></li>
+                        <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
+                        <!-- <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
+                        <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
+                        <li><a href="/notification/create">bildirim yarat</a></li>
+                        <li><a href="/notification">bildirim listele</a></li>
+                    </ul>
+                </li>
+
+
+
                </ul>
 
 
@@ -282,24 +296,24 @@ span.num {
 
 
                                 {% if user.profile.profil_resmi %}
-                                <div class="col-lg-4"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
+                                <div class="col-lg-4 c"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
                                 {% else %}
-                                <div class="col-lg-4"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
+                                <div class="col-lg-4 c"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
                                 {% endif %}
 
 
 
-                             <div class="col-lg-2"><a class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
+                             <div class="col-lg-2 c" ><a class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
                                      <a href="#">Link 1</a>
                                      <a href="#">Link 2</a>
                                    </div>
                              </div>
 
-                            <div class="col-lg-3"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
+                            <div class="col-lg-3 c"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
                             {% if user.is_staff %}
-                            <div class="col-lg-3"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
+                            <div class="col-lg-3 c"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
                             {% endif %}
 
 
@@ -342,19 +356,19 @@ span.num {
         $(document).ready(function(){
                       //alert("document ready..");
                       new_notif();
-                      myInterval();
+                      //myInterval();
              });  /* document ready  kapanıyor */
   </script>
 
 
-
+<!--  bildirimlerin her  yarım dakikada bir okunması için zaman planı
 <script>
   var myVar;
   function myInterval() {
       myVar = setInterval(new_notif, 30000);
   }
 </script>
-
+-->
 
 
 

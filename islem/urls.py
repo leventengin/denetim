@@ -88,7 +88,12 @@ urlpatterns = [
     # sonuç urlleri aşağıda....
     #url(r'^sonuc/$', views.SonucListView.as_view(), name='sonuc'),
     url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
-    url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
+    url(r'^sonuc/(?P<pk>\d+)$', views.sonuc_denetim_detay_sec, name='sonuc_denetim_detay_sec'),
+    url(r'^sonuc/(?P<pk>\d+)/duzenle/$', views.sonuc_denetim_detay_duzenle, name='sonuc_denetim_detay_duzenle'),
+    url(r'^sonuc/(?P<pk>\d+)/duzenle/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al_2'),
+    url(r'^sonuc/(?P<pk>\d+)/duzenle/update_resim_varmi/$', views.update_resim_varmi, name='update_resim_varmi'),
+    url(r'^sonuc/(?P<pk>\d+)/duzenle/getvalue_resim_varmi/$', views.getvalue_resim_varmi, name='getvalue_resim_varmi'),
+    #url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
 #---------------------------------------------------------------------------------------------------
@@ -133,6 +138,8 @@ urlpatterns = [
     url(r'^denetim/iptal/$', views.iptal_sec, name='iptal_sec'),
     url(r'^denetim/iptal/devam/$', views.iptal_devam, name='iptal_devam'),
     url(r'^denetim/iptal/devam/(?P<pk>\d+)$', views.iptal_ilerle, name='iptal_ilerle'),
+    url(r'^rapor_yazisi/$', views.rapor_yazisi, name='rapor_yazisi'),
+    url(r'^rapor_yazisi/rapor_yazisi_al/$', views.rapor_yazisi_al, name='rapor_yazisi_al'),
 
 #   diğer denetim oluşturma işlemleri..................
     url(r'^denetim/teksayfa_yarat/$', views.teksayfa_yarat, name='teksayfa_yarat'),
@@ -236,6 +243,7 @@ urlpatterns = [
     url(r'^yer/$', views.YerListView.as_view(), name='yer'),
     url(r'^yer/(?P<pk>\d+)$', views.yer_detay, name='yer_detay'),
     url(r'^yer/(?P<pk>\d+)/zaman_planla/$', views.yer_zaman_planla, name='yer_zaman_planla'),
+    url(r'^yer/(?P<pk>\d+)/denetim_planla/$', views.yer_denetim_planla, name='yer_denetim_planla'),
     url(r'^yer/create/$', views.YerCreate.as_view(), name='yer_create'),
     url(r'^yer/(?P<pk>\d+)/update/$', views.YerUpdate.as_view(), name='yer_update'),
     url(r'^yer/(?P<pk>\d+)/delete/$', views.yer_sil, name='yer_sil'),

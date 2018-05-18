@@ -134,6 +134,8 @@ class Ikili_Deneme_Form(forms.Form):
          widget=autocomplete.ModelSelect2(url='sonucbolum-autocomplete', forward=['denetim_deneme']  ), required=False)
 
 
+
+
 class ProjeSecForm(forms.Form):
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),
                  widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
@@ -192,6 +194,7 @@ class SonucForm(forms.ModelForm):
         print("cc ikilik", cc_ikilik)
         print("cc denetim dışı", cc_denetim_disi)
         print("cc resim var mı", cc_resim_varmi)
+
 
 
 class SoruForm(forms.Form):
@@ -368,6 +371,18 @@ class IkiliSecForm(forms.Form):
             raise forms.ValidationError(
                     " eksik veri var.... ")
 
+# rapor yazıları için kullanılan form
+class YaziForm(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz")
+    yazi = forms.CharField(label='Rapor Yazısı', widget=forms.Textarea(attrs={'cols': 80, 'rows': 40}),)
+    def __init__(self, *args, **kwargs):
+        kullanan = kwargs.pop("kullanan")
+        #kullanan = request.user.id
+        super(YaziForm, self).__init__(*args, **kwargs)
+        print("form init içinden kullanan", kullanan)
+        denetim_obj_ilk = denetim.objects.filter(durum="C")
+        denetim_obj = denetim_obj_ilk.filter(yaratan=kullanan)
+        self.fields['denetim'].queryset = denetim_obj
 
 
 # ilk bölümde denetim oluşturuken kullanılan form....

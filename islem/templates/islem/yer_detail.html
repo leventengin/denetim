@@ -8,7 +8,7 @@
   <p><strong>Adı:</strong> {{ yer.yer_adi }}</p>
   <p><strong>Mac#:</strong> {{ yer.yer_mac }}</p>
 
-  <h3> Operasyon Zamanları</h3>
+  <h4> Operasyon Zamanları</h4>
 
   {% if a %}
   <ul>
@@ -40,6 +40,40 @@
   {% else %}
     <p> işlem zamanları planlanmamış....</p>
     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_zaman_planla' yer.id %}'">Planla</button>
+    <p> </p>
+  {% endif %}
+
+<h4> Denetim Zamanları</h4>
+  {% if b %}
+  <ul>
+    <table style="width:100%">
+      <tr>
+        <th>Pazartesi</th>
+        <th>Salı.....</th>
+        <th>Çarşamba.</th>
+        <th>Perşembe.</th>
+        <th>Cuma.....</th>
+        <th>Cumartesi</th>
+        <th>Pazar....</th>
+      </tr>
+      {% for i in b%}
+        <tr>
+          <th  style="font-weight:normal;">{{ i.0 }} </th>
+          <th  style="font-weight:normal;">{{ i.1 }} </th>
+          <th  style="font-weight:normal;">{{ i.2 }} </th>
+          <th  style="font-weight:normal;">{{ i.3 }} </th>
+          <th  style="font-weight:normal;">{{ i.4 }} </th>
+          <th  style="font-weight:normal;">{{ i.5 }} </th>
+          <th  style="font-weight:normal;">{{ i.6 }} </th>
+        </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <p> </p>
+  </ul>
+  {% else %}
+    <p> günlük denetim zamanları planlanmamış....</p>
+    <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_denetim_planla' yer.id %}'">Planla</button>
     <p> </p>
   {% endif %}
 

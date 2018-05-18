@@ -1,0 +1,333 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<!--
+<input type="file" id="select">
+<img id="preview">
+
+-->
+
+{% load static %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
+
+<style>
+.inputfile {
+  /* visibility: hidden etc. wont work */
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+  color: blue;
+}
+.inputfile:focus + label {
+  /* keyboard navigation */
+  outline: 1px dotted #000;
+  outline: -webkit-focus-ring-color auto 5px;
+}
+.inputfile + label * {
+  pointer-events: none;
+}
+</style>
+
+
+<script>
+  function resim_kaldir() {
+
+    document.getElementById('id_resim_varmi').value="H";
+    var x = document.getElementById('preview');
+    var y = document.getElementById("resim_kaldir");
+    x.style.visibility = "hidden";
+    y.style.visibility = "hidden";
+
+    }  //resim_kaldır...
+</script>
+
+
+<script>
+  function update_resim_varmi(x) {
+    alert(" update resim var mı...");
+    var degisken = x;
+    alert("değişken..." + degisken);
+    $.ajax({
+        url: "update_resim_varmi/",
+        type: "GET",
+        dataType: "text",
+        data: {'degisken': degisken,},
+        success: function(){
+          alert("resim varmı s.v. değiştirildi.....");
+        },
+        failure: function(){
+          alert("resim var mı oturum değişkeninin değişiminde hata....");
+        },
+      });  //ajax kapa...............
+    //x.style.display = "block";
+    }  //resim_kaldır...
+</script>
+
+
+<script>
+  function getvalue_resim_varmi() {
+    //alert(" getvalue resim var mı  çalıştı...");
+    $.ajax({
+        url: "getvalue_resim_varmi/",
+        type: "GET",
+        dataType: "text",
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){
+          alert("resim varmı son mevcut değeri alındı ....." + data);
+          return data;
+        },
+        failure: function(data){
+          alert("resim var mı oturum değişkenini sorgularken hata....");
+        },
+      });  //ajax kapa...............
+    //x.style.display = "block";
+    }  //resim_kaldır...
+</script>
+
+
+<script>
+  function kaydet_jquery() {
+      //alert("başlat jquery...");
+    if ( document.getElementById("id_denetim_disi").value == "E" ) {
+          document.getElementById("myForm").submit();
+        }
+    else
+      {
+      var onluk = document.getElementById("id_onluk").value;
+      var int_onluk = parseInt(onluk);
+      //alert("onluk"+onluk);
+      //alert("int onluk"+int_onluk);
+      var beslik = document.getElementById("id_beslik").value;
+      var int_beslik = parseInt(beslik);
+      //alert("beslik"+beslik);
+      //alert("int beslik"+int_beslik);
+      var ikilik = document.getElementById("id_ikilik").value;
+      var int_ikilik = parseInt(ikilik);
+      //alert("ikilik"+ikilik);
+      //alert("int ikilik"+int_ikilik);
+      if ((isNaN(int_onluk)) && (isNaN(int_beslik)) && (isNaN(int_ikilik)))
+      {
+        alert("lütfen puan giriniz...!")
+        return false;
+      }
+      var resim = document.getElementById("id_foto").value;
+      if (resim == "") {
+               //alert("resim yüklenmemiş....");
+               document.getElementById("myForm").submit();
+               //return false;
+               }
+      //alert(" adres.." + resim);
+      else
+      {
+      var ext = resim.substr((resim.lastIndexOf('.') + 1));
+      //alert("extension..." + ext);
+      if ( ext == "jpeg" || ext == "jpg" || ext == "JPEG" || ext == "JPG" || ext == "png" || ext == "PNG")
+          { //resim_kucult();
+            //document.getElementById("id_foto").value = resim;
+            //alert("adı..." + document.getElementById("id_foto").value);
+            document.getElementById("myForm").submit();
+            //alert("form gönderildi ..........");
+          }
+          else { alert(" yüklenen resim formatı yanlış...." );  }
+        }
+      } //denetim dışı....
+    }  //kaydet_jquery....
+  </script>
+
+
+
+<script>
+    $( ".kaydet_jquery" ).kaydet_jquery();
+</script>
+
+
+
+<script>
+    $( ".resim_kaldir" ).resim_kaldir();
+</script>
+
+
+
+
+resim var mı ... {{ request.session.resim_varmi  }}
+
+<h5> <b> Denetim Detay İşlemleri </b> </h5>
+            <p> </p>
+            <p> </p>
+            <table border="0">
+                <tbody>
+                    <tr>
+                        <td><b>Denetim Adı.:</b></td>
+                        <td>  &emsp;      {{ secili_obj.denetim }}</td>
+                    </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+
+                    <tr>
+                        <td><b>Bolüm..........:</b></td>
+                        <td> &emsp;     {{ secili_obj.bolum }}</td>
+                    </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+
+                    <tr>
+                        <td><b>Detay Adı......:   </b></td>
+                        <td> &emsp;     {{ secili_obj.detay }}</td>
+                    </tr>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+
+                </tbody>
+            </table>
+
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+
+
+
+
+
+
+
+
+<script>
+$(document).ready(function()
+{
+      document.getElementById('id_foto').onchange = function(evt)
+      {
+            //alert("dokuman hazır....bom bom");
+            var resim = document.getElementById('id_foto').value;
+            //alert("resim adı..." + resim);
+            ImageTools.resize(this.files[0], {
+                width: 320, // maximum width
+                height: 240 // maximum height
+            }, function(blob, didItResize) {
+                //alert("did it resize" + didItResize);
+                // didItResize will be true if it managed to resize it, otherwise false (and will return the original file as 'blob')
+                document.getElementById('preview').src = window.URL.createObjectURL(blob);
+                //küçülen resmi diğer form aracılığıyla gönder......
+                      var new_form = $('#small_image_form_to_upload')[0];
+                      var form_data = new FormData(new_form);
+                      form_data.append('foto_kucuk', blob, "kucuk_resim.jpg");
+                      for (var [key, value] of form_data.entries()) {
+                          console.log(key, value);
+                      }
+                      $.ajax({
+                          url: "kucuk_resim_al/",
+                          type: "POST",
+                          data: form_data,
+                          cache: false,
+                          contentType: false,
+                          processData: false,
+                          success: function(){
+                            alert("küçük resim başarı.....");
+                          },
+                          failure: function(){
+                            alert("küçük resim hata....");
+                          },
+                      });  //ajax kapa...............
+                document.getElementById('id_resim_varmi').value="E";
+                var x = document.getElementById('preview');
+                var y = document.getElementById("resim_kaldir");
+                x.style.visibility = "visible";
+                y.style.visibility = "visible";
+            }); //image tools...
+      };  // on change...
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+<script>
+$(document).ready(function()
+{
+            alert("document ready resim var mı yükle.....");
+            var resim_varmi = document.getElementById('id_resim_varmi').value;
+            alert("resim var mı..." + resim_varmi);
+            sessionStorage.setItem("resim_varmi", resim_varmi);
+            alert(sessionStorage.getItem("resim_varmi"));
+
+            var x = document.getElementById('preview');
+            var y = document.getElementById('resim_kaldir');
+
+            if (resim_varmi == "E") {
+                    x.style.visibility = 'visible';
+                    y.style.visibility = 'visible';
+                } else {
+                    x.style.visibility = 'hidden';
+                    y.style.visibility = 'hidden';
+                }
+});  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+<form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+    <table>
+
+        {{form.as_table}}
+
+    </table>
+    <!-- <input type="button" onclick="kaydet_jquery()" value="kaydet" />  -->
+</form>
+<p></p>
+<p></p>
+
+
+<form id="take_photo" enctype="multipart/form-data">
+      <input name="foto" type="file" id="id_foto" accept="image/jpeg"  class="inputfile" />
+      <label for="id_foto"> <font color="blue" font-weight="normal"> Resim yükle </font>  </label>
+</form>
+
+<p></p>
+<p></p>
+
+<form method="POST" name="small_image_form_to_upload" enctype="multipart/form-data">
+    <input type="hidden" name="foto_kucuk" id="id_foto_kucuk" value="value_kucuk" />
+</form>
+
+<p></p>
+<p></p>
+<input type="button" onclick="kaydet_jquery()" value="kaydet" />
+<p></p>
+<p></p>
+
+
+{% if secili_obj.resim_varmi == "E" %}
+    <img id="preview"  src="{{ secili_obj.foto.url }}">
+{% else %}
+    <img id="preview" >
+{% endif %}
+
+
+<input id="resim_kaldir" type="button" onclick="resim_kaldir()" value="resim kaldır" />
+<p></p>
+
+
+
+{% endblock %}
