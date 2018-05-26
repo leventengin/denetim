@@ -4,6 +4,13 @@ from django.urls import reverse
 
 from rest_framework.reverse import reverse as api_reverse
 
+import datetime
+from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import requests
+
+
 # django hosts --> subdomain for reverse
 
 class BlogPost(models.Model):
@@ -43,6 +50,7 @@ class MacPost(models.Model):
         return api_reverse("api-ws:mac-rud", kwargs={'pk': self.pk}, request=request)
 
 
+
 class Memnuniyet(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
@@ -60,3 +68,134 @@ class Memnuniyet(models.Model):
 
     def get_api_url(self, request=None):
         return api_reverse("api-ws:memnuniyet-rud", kwargs={'pk': self.pk}, request=request)
+
+
+class Operasyon_Data(models.Model):
+    mac_no      = models.CharField(max_length=20)
+    tipi        = models.CharField(max_length=2)
+    rfid_no     = models.CharField(max_length=20)
+    bas_tarih   = models.CharField(max_length=30)
+    son_tarih   = models.CharField(max_length=30)
+    bild_tipi   = models.CharField(max_length=1)
+    timestamp   = models.DateTimeField()
+
+    def __str__(self):
+        return str(self.mac_no)
+
+    @property
+    def owner(self):
+        return self.mac_no
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:operasyon-rud", kwargs={'pk': self.pk}, request=request)
+
+class Denetim_Data(models.Model):
+    mac_no      = models.CharField(max_length=20)
+    tipi        = models.CharField(max_length=2)
+    rfid_no     = models.CharField(max_length=20)
+    kod         = models.CharField(max_length=8)
+    gelen_tarih = models.CharField(max_length=30)
+    timestamp   = models.DateTimeField()
+
+    def __str__(self):
+        return str(self.mac_no)
+
+    @property
+    def owner(self):
+        return self.mac_no
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:denetim-rud", kwargs={'pk': self.pk}, request=request)
+
+class Ariza_Data(models.Model):
+    mac_no      = models.CharField(max_length=20)
+    tipi        = models.CharField(max_length=2)
+    rfid_no     = models.CharField(max_length=20)
+    sebep       = models.CharField(max_length=2)
+    gelen_tarih = models.CharField(max_length=30)
+    timestamp   = models.DateTimeField()
+
+    def __str__(self):
+        return str(self.mac_no)
+
+    @property
+    def owner(self):
+        return self.mac_no
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:ariza-rud", kwargs={'pk': self.pk}, request=request)
+
+
+
+OPERASYONDIGER = (
+('O', 'Operasyon'),
+('D', 'Diğer'),
+)
+
+
+
+class rfid_dosyasi(models.Model):
+    rfid_no = models.CharField(max_length=10)
+    proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    rfid_tipi = models.CharField(max_length=1, choices=OPERASYONDIGER)
+    kullanici = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
+    adi = models.CharField(max_length=20)
+    soyadi = models.CharField(max_length=20)
+
+    def __str__(self):
+        return(self.rfid_no)
+
+    @property
+    def owner(self):
+        return self.rfid_no
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:rfid-rud", kwargs={'pk': self.pk}, request=request)
+
+
+
+@receiver(post_save, sender=rfid_dosyasi)
+def create_rfid_yeni(sender, instance, **kwargs):
+    print("receiver post save rfid...............")
+    proje = instance.proje
+    alan_obj = proje_alanlari.objects.filter(proje=proje)
+    print("projedeki alanlar....", alan_obj)
+
+    for alan in alan_obj:
+        yer_obj = yer.objects.filter(proje_alanlari=alan)
+        for yer in yer_obj:
+            rfid_degis_obj = rfid_degis.objects.filter(yer=yer)
+            if rfid_degis_obj:
+                mac_no = yer.mac_no
+                kaydetme_obj = yer_updown(id=rfid_degis_obj.id,
+                                          proje=proje,
+                                          mac_no=mac_no,
+                                          degis="E")
+                kaydetme_obj.save()
+            else:
+                kaydetme_obj = yer_updown(proje=proje,
+                                          mac_no=mac_no,
+                                          degis="E")
+                kaydetme_obj.save()
+
+
+EVETHAYIR = (
+('E', 'Evet'),
+('H', 'Hayır'),
+)
+
+
+class yer_updown(models.Model):
+    proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    mac_no = models.IntegerField()
+    degis = models.CharField(max_length=1, choices=EVETHAYIR, default="E")
+    alive_time = models.DateTimeField(blank=True, null=True)
+    def __str__(self):
+        return(self.yer)
+
+    @property
+    def owner(self):
+        return self.yer
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:yerud-rud", kwargs={'pk': self.pk}, request=request)

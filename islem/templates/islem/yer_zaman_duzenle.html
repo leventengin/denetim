@@ -1,0 +1,81 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<script>
+function newcrt() {
+  alert("newcrt ..create");
+  var gun = document.getElementById('id_gun').value;
+  alert("gun..." + gun);
+      $.ajax({
+        url : "js/",
+        type : "GET",
+        dataType: "text",
+        data : {
+          'gun' : gun,
+         },
+         success: function(){
+           alert("js gün gönderim başarı.....");
+           window.location.href='create';
+         },
+         failure: function(){
+           alert("js gün gönderim hatası....");
+         },
+        });  /* ajax kapa...*/
+}
+</script>
+
+
+
+
+    <h3>Operasyon Zamanları Düzenle</h3>
+
+    <p><strong>Yer Adı:</strong> {{ yer_adi }}</p>
+    <p> </p>
+
+    <form id="GunForm" action="" method="POST">
+        {% csrf_token %}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+
+        <table>
+        {{ form.as_table }}
+        </table>
+
+        <!-- <input type="submit" value="kaydet" />  -->
+
+    </form>
+
+    <script>
+          //$(document).ready(function(){
+                 $("#id_gun").change(function(){
+                      alert ( "...gün değişti çalıştı...");
+                      document.getElementById("GunForm").submit();
+                 });   /*  change  kapanıyor ...  */
+          //     });  /* document ready  kapanıyor */
+    </script>
+
+
+    {% if opr_gun_obj %}
+    <ul>
+      {% for opr in opr_gun_obj %}
+      <li>
+        <!-- <a href="{{opr.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a> -->
+        <a onclick='newdel()'><span class='glyphicon glyphicon-remove'></span></a>
+        <!-- <a href="{{opr.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a> -->
+        <a onclick='newupd()'><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{opr.id}})    <a href="{{opr.id}}">{{ opr.zaman }}</a>
+      </li>
+      {% endfor %}
+      <p> </p>
+      <!-- <a href="create"> Zaman Ekle </a> -->
+      <a onclick='newcrt()'> Zaman Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı zaman yok ....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

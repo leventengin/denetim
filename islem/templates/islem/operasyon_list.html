@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4>Operasyon List</h4>
+    <p> </p>
+    {% if operasyon_list %}
+    <ul>
+      {% for deger in operasyon_list %}
+        <li>
+          <a href="{{deger.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+          <a href="{{deger.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+          &emsp;   <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
+                      <a>{{ deger.bas_tarih }} </a> -- <a> {{ deger.son_tarih }} </a> --<a> {{ deger.bild_tipi }} --<a> {{ deger.timestamp }}
+        </li>
+      {% endfor %}
+      <p> </p>
+    </ul>
+    {% else %}
+      <p> gelen veri yok !!!!!....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

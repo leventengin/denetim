@@ -19,6 +19,11 @@ ACIKKAPANDI = (
 ('K', 'Kapandı'),
 )
 
+OPERASYONDIGER = (
+('O', 'Operasyon'),
+('D', 'Diğer'),
+)
+
 DENETCIPROJE = (
 ('D', 'Denetçi'),
 ('P', 'Proje'),
@@ -47,6 +52,12 @@ GUNLER = (
 ('Cum', 'Cuma'),
 ('Cmt', 'Cumartesi'),
 ('Paz', 'Pazar'),
+)
+
+OPR_KULLANICI_TIPI = (
+('Opr', 'Operasyon Elemanı'),
+('Sef', 'Alan Şefi'),
+('Pry', 'Proje Yöneticisi'),
 )
 
 
@@ -97,14 +108,21 @@ class sirket(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT, null=True, blank=True)
-    denetci = models.CharField(max_length=1, choices=EVETHAYIR)
-    denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR)
-    operasyon_gorevlisi = models.CharField(max_length=1, choices=EVETHAYIR)
+    proje = models.ForeignKey('proje', on_delete=models.PROTECT)
+    denetci = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    opr_gorev_tipi = models.CharField(max_length=3, choices=OPR_KULLANICI_TIPI, blank=True, null=True)
+    operasyon_merkezyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    isletme_projeyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     profil_resmi = models.ImageField(upload_to='xyz/profile_resmi/%Y/%m/%d/',blank=True, null=True,)
     def __str__(self):
         return(self.user.username)
 
-
+#
+# operasyon görevlisi ise ie opr_gorev_tipi tanımlı ise veya işletme proje yöneticisi ise proje girilmiş olmalı
+# işletme proje yöneticisi ise tüm projelerden seçecek, operasyon görevlisi ise kendi şirket projelerinden
+# operasyon elemanları şu andaki sistemde sadece rfid içinde isim olarak tutuluyor, sisteme user kayıtları yok
+#
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -114,6 +132,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+
 
 
 
@@ -176,7 +197,7 @@ class proje_alanlari(models.Model):
 class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
     yer_adi = models.CharField(max_length=200)
-    yer_mac = models.IntegerField()
+    mac_no = models.IntegerField()
     opr_basl = models.TimeField(default=datetime.time(8,0,0))
     opr_son = models.TimeField(default=datetime.time(22,0,0))
     opr_delta = models.TimeField(default=datetime.time(0,30,0))

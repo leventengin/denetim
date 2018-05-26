@@ -36,12 +36,19 @@
     </table>
     <br>
     <p> </p>
+    <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_zaman_duzenle' yer.id %}'">Duzenle</button>
   </ul>
   {% else %}
     <p> işlem zamanları planlanmamış....</p>
     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_zaman_planla' yer.id %}'">Planla</button>
     <p> </p>
+    <p> </p>
+    <p> </p>
+    <p> </p>
+
   {% endif %}
+  <br>
+  <br>
 
 <h4> Denetim Zamanları</h4>
   {% if b %}
@@ -70,6 +77,7 @@
     </table>
     <br>
     <p> </p>
+    <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_denetim_duzenle' yer.id %}'">Duzenle</button>
   </ul>
   {% else %}
     <p> günlük denetim zamanları planlanmamış....</p>

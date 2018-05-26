@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil
-from islem.models import sonuc_bolum, denetim, kucukresim, zon
+from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
 #from __future__ import unicode_literals
@@ -51,6 +51,15 @@ EVETHAYIR = (
 ('H', 'Hayır'),
 )
 
+GUNLER = (
+('Pzt', 'Pazartesi'),
+('Sal', 'Salı'),
+('Çar', 'Çarşamba'),
+('Per', 'Perşembe'),
+('Cum', 'Cuma'),
+('Cmt', 'Cumartesi'),
+('Paz', 'Pazar'),
+)
 
 
 RUTINPLANLI = (
@@ -213,8 +222,23 @@ class SoruForm(forms.Form):
         print("cc detay adı....", cc_detay_adi)
         print("cc puanlama türü", cc_puanlama_turu)
 
+class GunForm(forms.Form):
+    gun = forms.ChoiceField(choices=GUNLER, widget=forms.Select, label="Gün Seçiniz:")
 
+#class SaatForm(forms.Form):
+#    saat = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
 
+class SaatForm(forms.ModelForm):
+    class Meta:
+        model = plan_opr_gun
+        fields = ( 'zaman',)
+        labels = {
+            'zaman' : "Saat giriniz:",
+        }
+    def clean(self):
+        cleaned_data = super(SaatForm, self).clean()
+        cc_zaman = cleaned_data.get("zaman")
+        print("cc zaman", cc_zaman)
 
 
 class AcilAcForm(forms.Form):

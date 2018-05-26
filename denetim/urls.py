@@ -27,9 +27,9 @@ from django_select2.forms import (
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('resimyukle_rest.urls', namespace='api')),
     url(r'^islem/', include('islem.urls')),
     url(r'^notification/', include('notification.urls')),
+    #url(r'^rfid/', include('webservice.urls')),
     url(r'^ws/', include('webservice.api.urls', namespace='api-ws')),
     url(r'^bildirim/', views.bildirim, name='bildirim'),
     url(r'^popup_notif/', views.popup_notif, name='popup_notif'),

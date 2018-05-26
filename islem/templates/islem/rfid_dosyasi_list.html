@@ -1,0 +1,27 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>RFID Listesi</h3>
+
+    {% if rfid_dosyasi_list %}
+    <ul>
+
+      {% for rfid in rfid_dosyasi_list %}
+      <li>
+        <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+        <a href="{{rfid.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+              &emsp;   ({{grup.id}})    <a href="{{grup.id}}">{{ grup.rfid_no }}</a>
+        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
+      </li>
+      {% endfor %}
+      <p> </p>
+      <a href="/islem/rfid/create"> RFID Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı RFID yok ....</p>
+      <p> </p>
+      <a href="/islem/rfid/create"> RFID Ekle </a>
+    {% endif %}
+
+{% endblock %}

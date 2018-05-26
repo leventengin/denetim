@@ -20,11 +20,16 @@ from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm
-from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm
+from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
+from webservice.models import Memnuniyet, Operasyon_Data, Denetim_Data, Ariza_Data
+from webservice.models import rfid_dosyasi, yer_updown
+
+
+
 
 #-------------------------------------------------------------------------------
 from django.contrib.auth.decorators import login_required
@@ -4289,6 +4294,266 @@ def yer_denetim_planla(request, pk=None):
     return redirect('yer_detay', pk=pk)
 
 
+@login_required
+@transaction.atomic
+def yer_zaman_duzenle(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    yer_adi = yer_obj.yer_adi
+    request.session['yer_opr_duzenle_yer'] = pk
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = GunForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("günform valid....")
+            gun = request.POST.get('gun', "")
+            print("gün...", gun)
+            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
+            form = GunForm()
+            form.fields["gun"].initial = gun
+            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('yer_detay')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = GunForm()
+        gun = "Pzt"
+        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
+        form.fields["gun"].initial = gun
+        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+
+
+@login_required
+@transaction.atomic
+def yer_zaman_duzenle_js(request, pk=None):
+    print("selam buraya geldik...yer zaman duzenle js")
+    kullanan = request.user.id
+    response_data ={}
+    if request.method == 'GET':
+        js_gun = request.GET.getlist('gun')
+        print("js gun..", js_gun)
+        request.session['yer_opr_duzenle_gun'] = js_gun
+    return HttpResponse(response_data, content_type='application/json')
+
+
+
+@login_required
+def yer_zaman_duzenle_create(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    yer_adi = yer_obj.yer_adi
+    yer_gun = request.session['yer_opr_duzenle_gun']
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SaatForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("saatform valid....")
+            saat = request.POST.get('saat', "")
+            print("saat..", saat)
+            kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
+            kaydetme_obj.save()
+            messages.success(request, 'Operasyon saati kaydedildi....')
+            return redirect('yer_zaman_duzenle', pk=pk)
+        else:
+            print(" saat form valid değil !!!!!!!!!............")
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('yer_zaman_duzenle', pk=pk)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = SaatForm()
+        return render(request, 'islem/yer_zaman_duzenle_create.html', {'form': form, 'yer_adi':yer_adi, 'yer_gun': yer_gun})
+
+
+
+@login_required
+def yer_zaman_duzenle_update(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    yer_adi = yer_obj.yer_adi
+    yer_gun = request.session['yer_opr_duzenle_gun']
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SaatForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("saatform valid....")
+            saat = request.POST.get('saat', "")
+            print("saat..", saat)
+            kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
+            kaydetme_obj.save()
+            messages.success(request, 'Operasyon saati kaydedildi....')
+            return redirect('yer_zaman_duzenle', pk=pk)
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('yer_zaman_duzenle', pk=pk)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = SaatForm()
+        return render(request, 'islem/yer_zaman_duzenle_create.html', {'form': form, 'yer_adi':yer_adi, 'yer_gun': yer_gun})
+
+
+
+
+@login_required
+def yer_zaman_duzenle_delete(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    yer_adi = yer_obj.yer_adi
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = GunForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("günform valid....")
+            gun = request.POST.get('gun', "")
+            print("gün...", gun)
+            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
+            form = GunForm()
+            form.fields["gun"].initial = gun
+            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('yer_detay')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = GunForm()
+        gun = "Pzt"
+        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
+        form.fields["gun"].initial = gun
+        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+
+
+@login_required
+def yer_zaman_duzenle_kesin(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    yer_adi = yer_obj.yer_adi
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = GunForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("günform valid....")
+            gun = request.POST.get('gun', "")
+            print("gün...", gun)
+            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
+            form = GunForm()
+            form.fields["gun"].initial = gun
+            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var....')
+            return redirect('yer_detay')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = GunForm()
+        gun = "Pzt"
+        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
+        form.fields["gun"].initial = gun
+        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+
+
+
+
+@login_required
+@transaction.atomic
+def yer_denetim_duzenle(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+
+
+    #st_time = datetime.time(10,0,0)
+    st_time = yer_obj.den_basl
+    print("st time..", st_time)
+    h = st_time.hour
+    m = st_time.minute
+    s = st_time.second
+    total_seconds = 3600*h + 60*m + s
+
+    #end_time = datetime.time(22,0,0)
+    end_time = yer_obj.den_son
+    print("end time ..", end_time)
+    h = end_time.hour
+    m = end_time.minute
+    s = end_time.second
+    final_seconds = 3600*h + 60*m + s
+
+    #time_delta = datetime.time(0,30,0)
+    time_delta = yer_obj.den_delta
+    print("time delta ..", time_delta)
+
+    while total_seconds < final_seconds:
+        n = 0
+        while n < 7:
+            if n == 0:
+                gun = 'Pzt'
+            if n == 1:
+                gun = 'Sal'
+            if n == 2:
+                gun = 'Çar'
+            if n == 3:
+                gun = 'Per'
+            if n == 4:
+                gun = 'Cum'
+            if n == 5:
+                gun = 'Cmt'
+            if n == 6:
+                gun = 'Paz'
+            print("yer obj id..", pk)
+            print("gun...", gun)
+            print("zaman ..", st_time)
+            kaydetme_obj = plan_den_gun(yer_id=pk,
+                                    gun=gun,
+                                    zaman=st_time,
+                                    )
+            kaydetme_obj.save()
+            n = n + 1
+
+        #h, m, s = [int(i) for i in st_time.split(':')]
+        h1 = st_time.hour
+        m1 = st_time.minute
+        s1 = st_time.second
+        total_seconds = 3600*h1 + 60*m1 + s1
+        print(" total seconds toplamadan önce", total_seconds)
+        #h, m, s = [int(i) for i in time_delta.split(':')]
+        h2 = time_delta.hour
+        m2 = time_delta.minute
+        s2 = time_delta.second
+        add_seconds = 3600*h2 + 60*m2 + s2
+        print(" add seconds toplamadan önce", add_seconds)
+        total_seconds = total_seconds + add_seconds
+        print(" total seconds toplamadan sonra", total_seconds)
+        print(" final seconds ", final_seconds)
+        #st_time = str(datetime.timedelta(seconds=total_seconds))
+        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
+        h3 = total_seconds // 3600
+        remain = total_seconds % 3600
+        m3 = remain // 60
+        s3 = remain % 60
+        st_time = datetime.time(h3,m3,s3)
+        print("new st time..", st_time)
+
+
+    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi....')
+    return redirect('yer_detay', pk=pk)
+
+
 
 
 #---------------------------------------------------------------------------------
@@ -5380,7 +5645,10 @@ def popup_notif(request):
         return render(request, 'popup_notif.html', {'n_list': n_list})
 
 
-from islem.services  import get_rest_list, get_mac_list, get_memnuniyet_list
+
+from islem.services  import get_rest_list, get_mac_list, get_memnuniyet_list, get_rfid_list
+from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
+
 
 def rest_list(request, pk=None):
     rest_list = get_rest_list()
@@ -5478,14 +5746,16 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    vote = "3"
-    reason = "6"
+    oy = "3"
+    sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
     response = requests.post("http://127.0.0.1:7000/ws/memnuniyet_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+        json={"mac_no":123451234512345, "tipi": tipi, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
+
+
 
 def memnuniyet_update(request, pk=None):
     deger = pk
@@ -5523,7 +5793,335 @@ def mac_delete(request, pk=None):
     return redirect('rest_list')
 """
 
+#----------------------------------------------------------------------------------------------
 
+def operasyon_list(request, pk=None):
+    operasyon_list = get_operasyon_list()
+    print("operasyon list..", operasyon_list)
+    return render(request, 'islem/operasyon_list.html', {'operasyon_list': operasyon_list,})
+
+
+def operasyon_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    rfid_no = "3"
+    bild_tipi = "A"
+    print("okunan zaman......operasyon create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7000/ws/operasyon_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "bas_tarih": t_stamp, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('operasyon_list')
+
+
+
+def operasyon_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7001/api/postings/operasyon_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('operasyon_list')
+
+
+def operasyon_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('operasyon_list')
+
+
+#-----------------------------------------------------------------------------------------------
+
+
+def den_saha_list(request, pk=None):
+    denetim_list = get_denetim_saha_list()
+    print("denetim list..", denetim_list)
+    return render(request, 'islem/denetim_saha_list.html', {'denetim_saha_list': denetim_saha_list,})
+
+
+def den_saha_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    rfid_no = "3"
+    kod = "6"
+    print("okunan zaman......denetim create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7000/ws/denetim_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('denetim_saha_list')
+
+
+
+def den_saha_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7001/api/postings/denetim_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('denetim_saha_list')
+
+
+def den_saha_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('denetim_saha_list')
+
+
+#--------------------------------------------------------------------------------------------------
+
+
+def ariza_list(request, pk=None):
+    ariza_list = get_ariza_list()
+    print("ariza list..", ariza_list)
+    return render(request, 'islem/ariza_list.html', {'ariza_list': ariza_list,})
+
+
+def ariza_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    rfid_no = "3"
+    sebep = "6"
+    print("okunan zaman......menuniyet create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7000/ws/ariza_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('ariza_list')
+
+
+
+def ariza_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7001/api/postings/ariza_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('ariza_list')
+
+
+def ariza_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('ariza_list')
+
+
+
+
+#--------------------------------------------------------------------------------------------------
+# rfid dosyası
+
+def rfid_list(request, pk=None):
+    rfid_list = get_rfid_list()
+    print("rfid list..", rfid_list)
+    return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
+
+
+def rfid_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    rfid_no = "3"
+    sebep = "6"
+    print("okunan zaman......menuniyet create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7000/ws/rfid_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('ariza_list')
+
+
+
+def rfid_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7000/ws/rfid_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('rfid_list')
+
+
+def rfid_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7000/ws/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('rfid_list')
+
+
+
+#--------------------------------------------------------------------------------------------------
+
+
+def yerud_list(request, pk=None):
+    yerud_list = get_yerud_list()
+    print("yerud list..", yerud_list)
+    return render(request, 'islem/yerud_list.html', {'yerud_list': yerud_list,})
+
+
+def yerud_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    rfid_no = "3"
+    sebep = "6"
+    print("okunan zaman......yerud create.............", t_stamp)
+    response = requests.post("http://127.0.0.1:7000/ws/yerud_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('ariza_list')
+
+
+def yerud_update(request, pk=None):
+    deger = pk
+    print("gelen pk degeri...", deger)
+    url = "http://127.0.0.1:7000/ws/yerud_detail/" + str(deger) + "/"
+    print("işte url", url)
+    t_stamp = str(datetime.now())
+    vote = "1"
+    reason = "1"
+    print("okunan zaman...................", t_stamp)
+    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
+    response.json()
+    return redirect('ariza_list')
+
+
+def yerud_find_update(request, pk=None):
+    mac_no = 52812233799999999
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7000/ws/filtrele/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('ariza_list')
+
+
+
+
+# RFID dosya işlemleri....................
+#------------------------------------------------------
+
+
+@login_required
+def rfid_list(request, pk=None):
+    kullanici = request.user.id
+    print("kullanıcı rfid list içinden ...", kullanici)
+    kullanici_obj = Profile.objects.get(id=kullanici)
+    proje = kullanici_obj.proje
+    print("rfid list içinden proje...", proje)
+    if proje == "":
+        rfid_dosyasi_list = rfid_dosyasi.objects.all()
+    else:
+        rfid_dosyasi_list = rfid_dosyasi.objects.filter(proje=proje)
+    args = {'rfid_dosyasi_list': rfid_dosyasi_list,}
+    return render(request, 'islem/rfid_dosyasi_list.html', args)
+
+
+@login_required
+def rfid_sil(request, pk=None):
+    print("grup sildeki pk:", pk)
+    object = get_object_or_404(grup, pk=pk)
+    sil_rfid = object.grup_adi
+    sil_id = object.id
+    print("sil_rfid", sil_rfid)
+    print("sil_id", sil_id)
+    args = {'sil_id': sil_id, 'sil_rfid': sil_rfid, 'pk': pk,}
+    return render(request, 'islem/rfid_sil_soru.html', args)
+
+
+@login_required
+def rfid_sil_kesin(request, pk=None):
+    print("rfid sil kesindeki pk:", pk)
+    object = get_object_or_404(grup, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        error_message = "bağlantılı veri var,  silinemez...!!"
+        #return JsonResponse(error_message, safe=False)
+        messages.success(request, 'Bağlantılı veri var silinemez.......')
+        return redirect('grup')
+    messages.success(request, 'Başarıyla silindi....')
+    return redirect('rfid')
+
+
+
+#-------------------------------------------------------
+
+# rfid yaratma, güncelleme, silme ...
+
+class RfidCreate(LoginRequiredMixin,CreateView):
+    model = rfid_dosyasi
+    fields = '__all__'
+    success_url = "/islem/rfid/create/"
+
+class RfidUpdate(LoginRequiredMixin,UpdateView):
+    model = rfid_dosyasi
+    fields = '__all__'
+    success_url = "/islem/rfid/"
+
+class RfidDelete(LoginRequiredMixin,DeleteView):
+    model = rfid_dosyasi
+    success_url = reverse_lazy('rfid')
+
+
+
+#--------------------------------------------------------------
+
+class RfidListView(LoginRequiredMixin,generic.ListView):
+    model = rfid_dosyasi
+    paginate_by = 20
+
+
+
+class RfidDetailView(LoginRequiredMixin,generic.DetailView):
+    model = rfid_dosyasi
+
+
+
+#-------------------------------------------------------------------------------------
 
 def deneme_dropdown(request):
     return render(request, 'notif_test.html')
