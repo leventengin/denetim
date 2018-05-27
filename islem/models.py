@@ -108,7 +108,7 @@ class sirket(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT, null=True, blank=True)
-    proje = models.ForeignKey('proje', on_delete=models.PROTECT)
+    proje = models.ForeignKey('proje', on_delete=models.PROTECT, blank=True, null=True)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_gorev_tipi = models.CharField(max_length=3, choices=OPR_KULLANICI_TIPI, blank=True, null=True)
@@ -205,7 +205,7 @@ class yer(models.Model):
     den_son = models.TimeField(default=datetime.time(22,0,0))
     den_delta = models.TimeField(default=datetime.time(2,0,0))
     def __str__(self):
-        return str(self.yer_mac)
+        return '%s-%s' % (self.mac_no, self.proje_alanlari)
 
 
 class plan_opr_gun(models.Model):

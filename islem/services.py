@@ -45,7 +45,7 @@ def get_ariza_list():
 
 def get_rfid_list():
     print("get denetim list .............")
-    r = requests.get("http://127.0.0.1:7000/ws/rfid_list", auth=("admin", "masanata"))
+    r = requests.get("http://127.0.0.1:7000/ws/rfid_list",  auth=("admin", "masanata"))
     json_data = r.json()
     print(json_data)
     return json_data

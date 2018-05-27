@@ -56,7 +56,7 @@ urlpatterns = [
     url(r'^rfid_bul/$', RfidBul.as_view(), name='rfid_bul'),
     url(r'^rfid_detail/(?P<pk>[0-9]+)/$', RfidDetail.as_view(), name='rfid-rud'),
     url(r'^rfid_query/$', RfidQuery.as_view(), name='rfid_query'),
-    url(r'^rfid_filtrele/(?P<mac_no>.+)/$', RfidFilter.as_view(), name='rfid_filter'),
+    url(r'^rfid_filter/(?P<proje>.+)/$', RfidFilter.as_view(), name='rfid_filter'),
 
     url(r'^yerud_list/$', YerudList.as_view(), name='yerud_list'),
     url(r'^yerud_bul/$', YerudBul.as_view(), name='yerud_bul'),

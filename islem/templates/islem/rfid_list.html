@@ -7,10 +7,8 @@
     <ul>
       {% for deger in rfid_list %}
         <li>
-          <a href="{{deger.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
-          <a href="{{deger.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-          &emsp;   <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
-                      <a>{{ deger.sebep }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
+          <a>({{ deger.id }})</a> -- <a>{{ deger.rfid_no }}</a>--<a>{{ deger.proje }}</a>-- <a>{{ deger.rfid_tipi }} </a> --
+          <a>{{ deger.kullanici }} </a> -- <a> {{ deger.adi }} </a> --<a> {{ deger.soyadi }}
         </li>
       {% endfor %}
       <p> </p>

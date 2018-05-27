@@ -212,7 +212,7 @@ class YerudSerializer(serializers.ModelSerializer):
         fields = [
             'url',
             'id',
-            'yer',
+            'mac_no',
             'proje',
             'degis',
             'alive_time',

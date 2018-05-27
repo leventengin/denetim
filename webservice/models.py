@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-
+from islem.models import proje_alanlari, yer
 from rest_framework.reverse import reverse as api_reverse
 
 import datetime
@@ -135,15 +135,15 @@ OPERASYONDIGER = (
 
 
 class rfid_dosyasi(models.Model):
-    rfid_no = models.CharField(max_length=10)
+    rfid_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_tipi = models.CharField(max_length=1, choices=OPERASYONDIGER)
     kullanici = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
-    adi = models.CharField(max_length=20)
-    soyadi = models.CharField(max_length=20)
+    adi = models.CharField(max_length=20, null=True, blank=True)
+    soyadi = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return(self.rfid_no)
+        return '%s-%s' % (self.rfid_no, self.proje)
 
     @property
     def owner(self):
@@ -158,25 +158,28 @@ class rfid_dosyasi(models.Model):
 def create_rfid_yeni(sender, instance, **kwargs):
     print("receiver post save rfid...............")
     proje = instance.proje
+    print(" receiver post save proje.............", proje)
     alan_obj = proje_alanlari.objects.filter(proje=proje)
     print("projedeki alanlar....", alan_obj)
 
     for alan in alan_obj:
         yer_obj = yer.objects.filter(proje_alanlari=alan)
-        for yer in yer_obj:
-            rfid_degis_obj = rfid_degis.objects.filter(yer=yer)
-            if rfid_degis_obj:
-                mac_no = yer.mac_no
-                kaydetme_obj = yer_updown(id=rfid_degis_obj.id,
+        for deger in yer_obj:
+            yer_updown_obj = yer_updown.objects.filter(mac_no=deger.mac_no).first()
+            if yer_updown_obj:
+                kaydetme_obj = yer_updown(id=yer_up_down_obj.id,
                                           proje=proje,
                                           mac_no=mac_no,
                                           degis="E")
                 kaydetme_obj.save()
             else:
+                mac_no = deger.mac_no
                 kaydetme_obj = yer_updown(proje=proje,
                                           mac_no=mac_no,
                                           degis="E")
                 kaydetme_obj.save()
+
+
 
 
 EVETHAYIR = (
@@ -186,12 +189,12 @@ EVETHAYIR = (
 
 
 class yer_updown(models.Model):
+    mac_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
-    mac_no = models.IntegerField()
     degis = models.CharField(max_length=1, choices=EVETHAYIR, default="E")
     alive_time = models.DateTimeField(blank=True, null=True)
     def __str__(self):
-        return(self.yer)
+        return '%s-%s' % (self.mac_no, self.proje)
 
     @property
     def owner(self):

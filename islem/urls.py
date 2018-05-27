@@ -97,12 +97,12 @@ urlpatterns = [
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
 
-    url(r'^rfid/$', views.rfid_list, name='rfid'),
+    url(r'^rfid/$', views.rfid_dosyasi_list, name='rfid'),
     url(r'^rfid/(?P<pk>\d+)$', views.RfidDetailView.as_view(), name='rfid-detail'),
-    url(r'^rfid/create/$', views.RfidCreate.as_view(), name='rfid_create'),
-    url(r'^rfid/(?P<pk>\d+)/update/$', views.RfidUpdate.as_view(), name='rfid_update'),
-    url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_sil, name='rfid_sil'),
-    url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_sil_kesin, name='rfid_sil_kesin'),
+    url(r'^rfid/create/$', views.rfid_dosyasi_yarat, name='rfid_dosyasi_yarat'),
+    url(r'^rfid/(?P<pk>\d+)/update/$', views.rfid_dosyasi_duzenle, name='rfid_dosyasi_duzenle'),
+    url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_dosyasi_sil, name='rfid_dosyasi_sil'),
+    url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_dosyasi_sil_kesin, name='rfid_dosyasi_sil_kesin'),
 
 
 #---------------------------------------------------------------------------------------------------
@@ -135,7 +135,11 @@ urlpatterns = [
     url(r'^rfid_create/$', views.rfid_create, name='rfid_create'),
     url(r'^rfid_list/$', views.rfid_list, name='rfid_list'),
     url(r'^rfid_list/(?P<pk>\d+)/update/$', views.rfid_update, name='rfid_update'),
+    url(r'^rfid_filter/$', views.rfid_filter, name='rfid_filter'),        
+    url(r'^rfid_filter/(?P<proje>\d+)/$', views.rfid_filter_proje, name='rfid_filter_proje'),
     url(r'^rfid_list/find_update/$', views.rfid_find_update, name='rfid_find_update'),
+    url(r'^macnoyer/$', views.macnoyer, name='macnoyer'),
+    url(r'^macnoyer_degis/$', views.macnoyer_degis, name='macnoyer_degis'),
     url(r'^yerud_create/$', views.yerud_create, name='yerud_create'),
     url(r'^yerud_list/$', views.yerud_list, name='yerud_list'),
     url(r'^yerud_list/(?P<pk>\d+)/update/$', views.yerud_update, name='yerud_update'),

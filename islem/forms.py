@@ -3,6 +3,7 @@ from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil
 from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun
+from webservice.models import rfid_dosyasi
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
 #from __future__ import unicode_literals
@@ -28,6 +29,7 @@ import requests
 from django.core.exceptions import ValidationError
 from django import forms
 from .models import sonuc_detay
+from webservice.models import yer_updown
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from functools import reduce
@@ -241,6 +243,42 @@ class SaatForm(forms.ModelForm):
         print("cc zaman", cc_zaman)
 
 
+class RfidForm(forms.ModelForm):
+
+    class Meta:
+        model = rfid_dosyasi
+        fields = ( 'rfid_no', 'proje', 'rfid_tipi', 'kullanici', 'adi', 'soyadi',)
+        labels = {
+            'rfid_no': "RFID No:",
+            'proje': "Proje",
+            'rfid_tipi': "Tipi",
+            'kullanici': "Kullanici Seç:",
+            'adi': "Adı:",
+            'soyadi': "Soyadı:",
+        }
+
+    def clean(self):
+        cleaned_data = super(RfidForm, self).clean()
+        cc_rfid_no = cleaned_data.get("rfid_no")
+        cc_proje = cleaned_data.get("proje")
+        cc_rfid_tipi = cleaned_data.get("rfid_tipi")
+        cc_kullanici = cleaned_data.get("kullanici")
+        cc_adi = cleaned_data.get("adi")
+        cc_soyadi = cleaned_data.get("soyadi")
+
+        print("cc rfid no", cc_rfid_no)
+        print("cc proje", cc_proje)
+        print("cc rfid tipi", cc_rfid_tipi)
+        print("cc kullanici", cc_kullanici)
+        print("cc adi", cc_adi)
+        print("cc soyadi", cc_soyadi)
+
+
+
+
+
+
+
 class AcilAcForm(forms.Form):
     denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
     konu = forms.CharField()
@@ -266,8 +304,12 @@ class AcilKapaForm(forms.Form):
         print("queryset initial içinden..:", self.fields['denetim'].queryset)
 
 
+class MacnoYerForm(forms.Form):
+    macnoyer = forms.ModelChoiceField(queryset=yer_updown.objects.all(), label="Mac_no Seçiniz..")
 
 
+class RfidProjeForm(forms.Form):
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(), label="Proje Seçiniz..")
 
 
 class DenetimForm(forms.Form):

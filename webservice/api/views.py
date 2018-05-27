@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework import generics, mixins
 from django.views.decorators.csrf import csrf_exempt
 from ..models import BlogPost, MacPost, Memnuniyet
-from ..models import Operasyon_Data, Denetim_Data, Ariza_Data
+from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, rfid_dosyasi, yer_updown
 from .permissions import IsOwnerOrReadOnly
 from .serializers import BlogPostSerializer, MacPostSerializer, MemnuniyetSerializer
 from .serializers import OperasyonSerializer, DenetimSerializer, ArizaSerializer, RfidSerializer, YerudSerializer
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
-
+from django.http import HttpResponse, Http404
 
 
 class BlogPostAPIView(mixins.CreateModelMixin, generics.ListAPIView):
@@ -743,7 +743,9 @@ class RfidList(APIView):
     """
     List all Rfid  (get), or create a new Rfid (post).
     """
-    def get(self, request, format=None):
+    def get(self, request, proje_no=None, format=None):
+        pr_no = proje_no
+        print(" rfidlist get içinden proje_no", pr_no)
         rfid_data = rfid_dosyasi.objects.all()
         serializer = RfidSerializer(rfid_data, many=True)
         return Response(serializer.data)
@@ -777,9 +779,9 @@ class RfidFilter(generics.ListAPIView):
         This view should return a list of all the purchases for
         the user as determined by the username portion of the URL.
         """
-        mac_no = self.kwargs['mac_no']
-        print(" get query set içinden -  rfid -  mac no...", mac_no)
-        rfid_data = rfid_dosyasi.objects.filter(mac_no=mac_no)
+        proje = self.kwargs['proje']
+        print(" get query set içinden -  rfid -  project...", proje)
+        rfid_data = rfid_dosyasi.objects.filter(proje=proje)
         print("filtrelenen obje...", rfid_data)
         return rfid_data
 
@@ -883,11 +885,18 @@ class YerudBul(APIView):
     find id from mac_no.
     """
     def get(self, request, format=None):
-        deger = 52812233799999999
+        deger = 20
         print("find object çalıştı..yerud bul  api içinden ....", deger)
-        yerud_data = yer_updown.objects.filter(mac_no=deger).first()
+        """
+        try:
+            yerud_object = yer_updown.objects.get(pk=1)
+        except MyModel.DoesNotExist:
+            raise Http404("No MyModel matches the given query.")
+        """
+        #yerud_data = yer_updown.objects.filter(mac_no=deger).first()
+        yerud_data = yer_updown.objects.get(mac_no=deger)
         print(" yerud mac.. filter sonucu...", yerud_data)
-        serializer = YerudSerializer(yerud_data, many=True)
+        serializer = YerudSerializer(yerud_data)
         return Response(serializer.data)
 
 
@@ -912,7 +921,7 @@ class YerudQuery(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        This view should return a list of all the mac list (actually must be one)
+        This view should return a list of all the yerud list (actually must be one)
         for mac_no....
         """
         queryset = yer_updown.objects.all()
@@ -928,24 +937,45 @@ class YerudDetail(APIView):
     """
     def get_object(self, pk):
         try:
-            return yer_updown.objects.get(pk=pk)
+            return yer_updown.objects.get(mac_no=pk)
+        except yer_updown.DoesNotExist:
+            raise Http404
+
+    def get_object_macno(self, macno):
+        try:
+            return yer_updown.objects.get(mac_no=macno)
         except yer_updown.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
         yerud_data = self.get_object(pk)
-        serializer = RfidSerializer(yerud_data)
+        serializer = YerudSerializer(yerud_data)
         return Response(serializer.data)
+
 
     def put(self, request, pk, format=None):
         yerud_data = self.get_object(pk)
         print("def - put içinden yerud objesi...", yerud_data)
-        serializer = ArizaSerializer(yerud_data, data=request.data)
+        serializer = YerudSerializer(yerud_data, data=request.data)
         if serializer.is_valid():
             print(" serializer...", serializer)
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    def macno_degis(self, request, macno, format=None):
+
+        yerud_data = self.get_object_macno(macno)
+        print("def - put içinden yerud objesi...", yerud_data)
+        serializer = YerudSerializer(yerud_data, data=request.data)
+        if serializer.is_valid():
+            print(" serializer...", serializer)
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def delete(self, request, pk, format=None):
         yerud_data = self.get_object(pk)

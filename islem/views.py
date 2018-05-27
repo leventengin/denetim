@@ -18,10 +18,10 @@ from .models import plan_opr_gun, plan_den_gun
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
-from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm
+from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
-from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm
+from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -5942,10 +5942,45 @@ def ariza_find_update(request, pk=None):
 
 
 #--------------------------------------------------------------------------------------------------
-# rfid dosyası
+# rfid dosyası, web service işlemleri
 
 def rfid_list(request, pk=None):
     rfid_list = get_rfid_list()
+    print("rfid list..", rfid_list)
+    return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
+
+
+
+def rfid_filter(request):
+
+    if request.method == "POST":
+        form = RfidProjeForm(request.POST)
+        if form.is_valid():
+            proje = request.POST.get('proje', "")
+            print(" proje form okunduktan sonra post...", proje)
+
+            url = "http://127.0.0.1:7000/ws/rfid_filter/"+str(proje)+"/"
+            print("işte url", url)
+            response = requests.get(url, auth=("admin", "masanata"))
+            print("response...", response)
+            gelen = response.json()
+            print("gelen deger mac bul içinden...", gelen)
+            return render(request, 'islem/rfid_proje.html', {'form': form, 'gelen': gelen})
+    else:
+        form = RfidProjeForm()
+        gelen = ""
+    return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
+
+
+
+
+def rfid_filter_proje(request, proje=None):
+    print("rfid project list............", proje)
+    r = requests.get_queryset("http://127.0.0.1:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
+    json_data = r.json()
+    print(json_data)
+
+    rfid_list = json_data
     print("rfid list..", rfid_list)
     return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
 
@@ -6010,7 +6045,7 @@ def yerud_create(request, pk=None):
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
-    return redirect('ariza_list')
+    return redirect('yerud_list')
 
 
 def yerud_update(request, pk=None):
@@ -6024,7 +6059,7 @@ def yerud_update(request, pk=None):
     print("okunan zaman...................", t_stamp)
     response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
     response.json()
-    return redirect('ariza_list')
+    return redirect('yerud_list')
 
 
 def yerud_find_update(request, pk=None):
@@ -6036,23 +6071,33 @@ def yerud_find_update(request, pk=None):
     print("response...", response)
     gelen = response.json()
     print("gelen deger mac bul içinden...", gelen)
-    return redirect('ariza_list')
+    return redirect('yerud_list')
 
+def yerud_detail_get(request, pk=None):
+    mac_no = pk
+    print("gelen mac degeri...", mac_no)
+    url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(mac_no)+"/"
+    print("işte url", url)
+    response = requests.get(url, auth=("levent", "leventlevent"))
+    print("response...", response)
+    gelen = response.json()
+    print("gelen deger mac bul içinden...", gelen)
+    return redirect('yerud_list')
 
 
 
 # RFID dosya işlemleri....................
-#------------------------------------------------------
+# WEB SERVICE OLMADAN................-----
 
 
 @login_required
-def rfid_list(request, pk=None):
+def rfid_dosyasi_list(request, pk=None):
     kullanici = request.user.id
     print("kullanıcı rfid list içinden ...", kullanici)
     kullanici_obj = Profile.objects.get(id=kullanici)
     proje = kullanici_obj.proje
     print("rfid list içinden proje...", proje)
-    if proje == "":
+    if proje == None:
         rfid_dosyasi_list = rfid_dosyasi.objects.all()
     else:
         rfid_dosyasi_list = rfid_dosyasi.objects.filter(proje=proje)
@@ -6060,8 +6105,43 @@ def rfid_list(request, pk=None):
     return render(request, 'islem/rfid_dosyasi_list.html', args)
 
 
+
+def rfid_dosyasi_yarat(request):
+    kullanici = request.user.id
+    kullanici_obj = Profile.objects.get(user=kullanici)
+    proje = kullanici_obj.proje
+    print("kullanıcı ve projesi", kullanici, "-",  proje)
+
+
+    if request.method == "POST":
+        form = RfidForm(request.POST)
+        if form.is_valid():
+            rfid = form.save(commit=False)
+            rfid.save()
+            return redirect('rfid')
+    else:
+        form = RfidForm()
+    return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form})
+
+
+
+def rfid_dosyasi_duzenle(request, pk=None):
+
+    if request.method == "POST":
+        form = RfidForm(request.POST)
+        if form.is_valid():
+            rfid = form.save(commit=False)
+            rfid.save()
+            return redirect('rfid_list')
+    else:
+        form = PostForm()
+    return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form})
+
+
+
+
 @login_required
-def rfid_sil(request, pk=None):
+def rfid_dosyasi_sil(request, pk=None):
     print("grup sildeki pk:", pk)
     object = get_object_or_404(grup, pk=pk)
     sil_rfid = object.grup_adi
@@ -6069,11 +6149,11 @@ def rfid_sil(request, pk=None):
     print("sil_rfid", sil_rfid)
     print("sil_id", sil_id)
     args = {'sil_id': sil_id, 'sil_rfid': sil_rfid, 'pk': pk,}
-    return render(request, 'islem/rfid_sil_soru.html', args)
+    return render(request, 'islem/rfid_dosyasi_sil_soru.html', args)
 
 
 @login_required
-def rfid_sil_kesin(request, pk=None):
+def rfid_dosyasi_sil_kesin(request, pk=None):
     print("rfid sil kesindeki pk:", pk)
     object = get_object_or_404(grup, pk=pk)
     try:
@@ -6088,23 +6168,90 @@ def rfid_sil_kesin(request, pk=None):
 
 
 
-#-------------------------------------------------------
 
-# rfid yaratma, güncelleme, silme ...
+def macnoyer(request):
+    kullanici = request.user.id
+    kullanici_obj = Profile.objects.get(user=kullanici)
+    proje = kullanici_obj.proje
+    print("kullanıcı ve projesi", kullanici, "-",  proje)
 
-class RfidCreate(LoginRequiredMixin,CreateView):
-    model = rfid_dosyasi
-    fields = '__all__'
-    success_url = "/islem/rfid/create/"
+    if request.method == "POST":
+        form = MacnoYerForm(request.POST)
+        if form.is_valid():
+            macnoyer = request.POST.get('macnoyer', "")
+            print(" macnoyer form okunduktan sonra post...", macnoyer)
+            yerud_obj = yer_updown.objects.get(id=macnoyer)
+            gelen_macno = yerud_obj.mac_no
 
-class RfidUpdate(LoginRequiredMixin,UpdateView):
-    model = rfid_dosyasi
-    fields = '__all__'
-    success_url = "/islem/rfid/"
+            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            print("işte url", url)
+            response = requests.get(url, auth=("admin", "masanata"))
+            print("response...", response)
+            gelen = response.json()
+            print("gelen deger mac bul içinden...", gelen)
+            return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
+    else:
+        form = MacnoYerForm()
+        gelen = ""
+    return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
 
-class RfidDelete(LoginRequiredMixin,DeleteView):
-    model = rfid_dosyasi
-    success_url = reverse_lazy('rfid')
+
+
+def macnoyer_degis(request):
+    kullanici = request.user.id
+    kullanici_obj = Profile.objects.get(user=kullanici)
+    proje = kullanici_obj.proje
+    print("kullanıcı ve projesi", kullanici, "-",  proje)
+
+    if request.method == "POST":
+        form = MacnoYerForm(request.POST)
+        if form.is_valid():
+            macnoyer = request.POST.get('macnoyer', "")
+            print(" macnoyer form okunduktan sonra post...", macnoyer)
+            yerud_obj = yer_updown.objects.get(id=macnoyer)
+            gelen_macno = yerud_obj.mac_no
+
+            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            print("işte url", url)
+            response = requests.get(url, auth=("admin", "masanata"))
+            print("response...", response)
+            gelen = response.json()
+
+            gl_url = gelen['url']
+            gl_id = gelen['id']
+            gl_mac_no = gelen['mac_no']
+            gl_proje = gelen['proje']
+            gl_degis = gelen['degis']
+            gl_alive_time = gelen['alive_time']
+
+            print("gelen url..", gl_url)
+            print("gelen id..", gl_id)
+            print("gelen mac_no..", gl_mac_no)
+            print("gelen proje..", gl_proje)
+            print("gelen degis..", gl_degis)
+            print("gelen alive_time..", gl_alive_time)
+
+
+
+            data = {
+                    "url": gl_url,
+                    "id": gl_id,
+                    "mac_no": gl_mac_no,
+                    "proje": gl_proje,
+                    "degis": "H",
+                    "alive_time": gl_alive_time
+                    }
+            response = requests.put(url, data=data , auth=("admin", "masanata"))
+
+            response = requests.get(url, auth=("admin", "masanata"))
+            print("response...", response)
+            gelen = response.json()
+            print("gelen deger mac bul içinden...", gelen)
+            return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
+    else:
+        form = MacnoYerForm()
+        gelen = ""
+    return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
 
 
 
