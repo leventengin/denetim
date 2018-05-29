@@ -153,6 +153,12 @@ span.num {
     border-radius: 50%;
 }
 
+.middler {
+  text-align: center;
+  margin: auto; /* Important */
+
+}
+
 </style>
 
 </head>
@@ -245,61 +251,33 @@ span.num {
                         <li><a href="/islem/projealanlari">Proje Alanları</a></li>
                         <li><a href="/islem/yer">Yer</a></li>
                         <li><a href="/islem/rfid">RFID</a></li>
-                        <li><a href="/islem/rfid_filter">Rfid Filtrele </a></li>                        
+                        <li><a href="/islem/rfid_filter">Rfid Filtrele </a></li>
                         <li><a href="/islem/qrdosyasi">QRCode</a></li>
                     </ul>
                 </li>
                 <li>
                     <a href="#homeSubmenu5" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu5">
-                        <li><a href="/islem/rest_create">Rest Ekle</a></li>
-                        <li><a href="/islem/rest_list">Rest Listele </a></li>
-                        <li><a href="/islem/rest_delete">Rest Sil</a></li>
-                        <li><a href="/islem/rest_delete_all">Rest Hepsi Sil</a></li>
-                        <li><a href="/islem/mac_list">Mac Listele </a></li>
-                        <li><a href="/islem/mac_create">Mac Ekle</a></li>
-                        <li><a href="/islem/mac_update">Mac Düzenle</a></li>
-                        <li><a href="/islem/mac_list/find_update">Mac Bul ve Düzenle</a></li>
                         <li><a href="/islem/memnuniyet_list">Memnuniyet Listele </a></li>
                         <li><a href="/islem/memnuniyet_create">Memnuniyet Ekle</a></li>
-                        <li><a href="/islem/memnuniyet_update">Memnuniyet Düzenle</a></li>
-                        <li><a href="/islem/memnuniyet_list/find_update">Memnuniyet Bul ve Düzenle</a></li>
+                        <li><a href="/islem/operasyon_list">Operasyon Listele </a></li>
+                        <li><a href="/islem/operasyon_create">Operasyon Ekle</a></li>
+                        <li><a href="/islem/den_saha_list">Denetim Listele </a></li>
+                        <li><a href="/islem/den_saha_create">Denetim Ekle</a></li>
+                        <li><a href="/islem/ariza_list">Ariza Listele </a></li>
+                        <li><a href="/islem/ariza_create">Ariza Ekle</a></li>
+                        <li><a href="/islem/rfid_list">Rfid Listele </a></li>
+                        <li><a href="/islem/rfid_create">Rfid Ekle</a></li>
+                        <li><a href="/islem/macnoyer">Macno Yer</a></li>
+                        <li><a href="/islem/macnoyer_degis">Macno Yer Değiş</a></li>
+                        <li><a href="/islem/yerud_list">Yer Bilgisi Listele </a></li>
+                        <li><a href="/islem/yerud_create">Yer Bilgisi Ekle</a></li>
                         <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
-                        <!-- <li><a href="/islem/Mac_delete">Mac Sil</a></li>  -->
                         <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
                         <li><a href="/notification/create">bildirim yarat</a></li>
                         <li><a href="/notification">bildirim listele</a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="#homeSubmenu6" data-toggle="collapse" aria-expanded="false">Diğer İşlemler - 2</a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu6">
-                      <li><a href="/islem/operasyon_list">Operasyon Listele </a></li>
-                      <li><a href="/islem/operasyon_create">Operasyon Ekle</a></li>
-                      <li><a href="/islem/operasyon_update">Operasyon Düzenle</a></li>
-                      <li><a href="/islem/operasyon_list/find_update">Operasyon Bul ve Düzenle</a></li>
-                      <li><a href="/islem/den_saha_list">Denetim Listele </a></li>
-                      <li><a href="/islem/den_saha_create">Denetim Ekle</a></li>
-                      <li><a href="/islem/den_saha_update">Denetim Düzenle</a></li>
-                      <li><a href="/islem/den_saha_list/find_update">Denetim Bul ve Düzenle</a></li>
-                      <li><a href="/islem/ariza_list">Ariza Listele </a></li>
-                      <li><a href="/islem/ariza_create">Ariza Ekle</a></li>
-                      <li><a href="/islem/ariza_update">Ariza Düzenle</a></li>
-                      <li><a href="/islem/ariza_list/find_update">Ariza Bul ve Düzenle</a></li>
-                      <li><a href="/islem/rfid_list">Rfid Listele </a></li>
-                      <li><a href="/islem/rfid_create">Rfid Ekle</a></li>
-                      <li><a href="/islem/rfid_update">Rfid Düzenle</a></li>
-                      <li><a href="/islem/rfid_list/find_update">Rfid Bul ve Düzenle</a></li>
-                      <li><a href="/islem/macnoyer">Macno Yer</a></li>
-                      <li><a href="/islem/macnoyer_degis">Macno Yer Değiş</a></li>
-                      <li><a href="/islem/yerud_list">Yer Bilgisi Listele </a></li>
-                      <li><a href="/islem/yerud_create">Yer Bilgisi Ekle</a></li>
-                      <li><a href="/islem/yerud_update">Yer Bilgisi Düzenle</a></li>
-                      <li><a href="/islem/yerud_list/find_update">Yer Bilgisi Bul ve Düzenle</a></li>
-
-                    </ul>
-                </li>
-
 
 
                </ul>
@@ -316,7 +294,7 @@ span.num {
                       <div class="row">
 
 
-                                <div class="navbar-header col-lg-1">
+                                <div class="navbar-header col-md-1">
                                     <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
                                         <i class="glyphicon glyphicon-align-left"></i>
                                         <span></span>
@@ -326,25 +304,28 @@ span.num {
 
 
                                 {% if user.profile.profil_resmi %}
-                                <div class="col-lg-4 c"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
+                                <div class="col-md-4 c"><font color="white"> <a class="middler" href="#" onclick="return false;"><img class="img_for" src="{{ user.profile.profil_resmi.url }}" height="42" width="42" /> {{ user.get_full_name }}</a></font></div>
                                 {% else %}
-                                <div class="col-lg-4 c"><font color="white"> <a href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
+                                <div class="col-md-4 c"><font color="white"> <a class="middler" href="#" onclick="return false;"><img class="img_for" src="{{ STATIC_URL }}images/user/genericUser.png" height="42" width="42" />{{ user.get_full_name }}</a></font></div>
                                 {% endif %}
 
 
 
-                             <div class="col-lg-2 c" ><a class="dropbtn2" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
+                             <div class="col-md-2 c" ><a class="dropbtn2 middler" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
                                      <a href="#">Link 1</a>
                                      <a href="#">Link 2</a>
                                    </div>
                              </div>
 
-                            <div class="col-lg-3 c"><a href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
-                            {% if user.is_staff %}
-                            <div class="col-lg-3 c"><a href="/admin/"><font color="white">Ayarlar</font></a></div>
-                            {% endif %}
+                             {% if user.is_staff %}
+                             <div class="col-md-2 c"><a class="middler" href="/admin/"><font color="white">Ayarlar</font></a></div>
+                             {% else %}
+                             <div class="col-md-2 c"> </div>
+                             {% endif %}
+
+                            <div class="col-md-3 c"><a class="middler" href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
 
 
 
@@ -356,7 +337,7 @@ span.num {
 
                 {% block content %}    {% endblock %}
 
-          </div>  <!-- content -->
+        </div>  <!-- content -->
   </div>
 
 

@@ -5646,94 +5646,10 @@ def popup_notif(request):
 
 
 
-from islem.services  import get_rest_list, get_mac_list, get_memnuniyet_list, get_rfid_list
+from islem.services  import get_memnuniyet_list, get_rfid_list
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
 
 
-def rest_list(request, pk=None):
-    rest_list = get_rest_list()
-    return render(request, 'islem/rest_list.html', {'rest_list': rest_list,})
-
-
-def rest_create(request, pk=None):
-    response = requests.post("http://127.0.0.1:7001/api/postings/",
-        json={"title":"28 mart -2","content":"28 mart ikinci ekleme"}, auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('rest_list')
-
-def rest_delete_all(request, pk=None):
-    rest_list = get_rest_list()
-    id_all = []
-    for item in rest_list:
-        print("burada item id..", item["id"])
-        id_all.append(item["id"])
-    print("işte idler...", id_all)
-    deger = id_all[0]
-    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(deger) + "/"
-    print("işte url", url)
-    response = requests.delete(url, auth=("levent", "leventlevent"))
-    return redirect('rest_list')
-
-
-def rest_delete(request, pk=None):
-    pk = 6
-    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
-    print("işte url", url)
-    response = requests.delete(url, auth=("levent", "leventlevent"))
-    #response.json()
-    return redirect('rest_list')
-
-#----------------------------------------------------------------------------------------
-
-def mac_list(request, pk=None):
-    mac_list = get_mac_list()
-    return render(request, 'islem/mac_list.html', {'mac_list': mac_list,})
-
-
-def mac_create(request, pk=None):
-    t_stamp = str(datetime.datetime.now())
-    print("okunan zaman...................", t_stamp)
-    response = requests.post("http://127.0.0.1:7001/api/postings/mac_list/",
-        json={"mac_no":123451234512345, "timestamp": t_stamp}, auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('mac_list')
-
-def mac_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7001/api/postings/mac_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "timestamp": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('mac_list')
-
-
-def mac_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    #t_stamp = str(datetime.now())
-    #print("okunan zaman...................", t_stamp)
-    #data = str(mac_no)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('mac_list')
-
-
-"""
-def mac_delete(request, pk=None):
-    pk = 6
-    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
-    print("işte url", url)
-    response = requests.delete(url, auth=("levent", "leventlevent"))
-    #response.json()
-    return redirect('rest_list')
-"""
 
 #----------------------------------------------------------------------------------------
 
@@ -5757,41 +5673,7 @@ def memnuniyet_create(request, pk=None):
 
 
 
-def memnuniyet_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7001/api/postings/memnuniyet_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('memnuniyet_list')
 
-
-def memnuniyet_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('memnuniyet_list')
-
-
-"""
-def mac_delete(request, pk=None):
-    pk = 6
-    url = "http://127.0.0.1:7001/api/postings/bul/delete/" + str(pk) + "/"
-    print("işte url", url)
-    response = requests.delete(url, auth=("levent", "leventlevent"))
-    #response.json()
-    return redirect('rest_list')
-"""
 
 #----------------------------------------------------------------------------------------------
 
@@ -5815,38 +5697,15 @@ def operasyon_create(request, pk=None):
 
 
 
-def operasyon_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7001/api/postings/operasyon_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('operasyon_list')
 
-
-def operasyon_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('operasyon_list')
 
 
 #-----------------------------------------------------------------------------------------------
 
 
 def den_saha_list(request, pk=None):
-    denetim_list = get_denetim_saha_list()
-    print("denetim list..", denetim_list)
+    denetim_saha_list = get_denetim_saha_list()
+    print("denetim list..", denetim_saha_list)
     return render(request, 'islem/denetim_saha_list.html', {'denetim_saha_list': denetim_saha_list,})
 
 
@@ -5860,34 +5719,9 @@ def den_saha_create(request, pk=None):
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
-    return redirect('denetim_saha_list')
+    return redirect('den_saha_list')
 
 
-
-def den_saha_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7001/api/postings/denetim_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('denetim_saha_list')
-
-
-def den_saha_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('denetim_saha_list')
 
 
 #--------------------------------------------------------------------------------------------------
@@ -5911,32 +5745,6 @@ def ariza_create(request, pk=None):
     print("status code..", response.status_code)
     return redirect('ariza_list')
 
-
-
-def ariza_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7001/api/postings/ariza_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('ariza_list')
-
-
-def ariza_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7001/api/postings/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('ariza_list')
 
 
 
@@ -5999,30 +5807,7 @@ def rfid_create(request, pk=None):
 
 
 
-def rfid_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7000/ws/rfid_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('rfid_list')
 
-
-def rfid_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7000/ws/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('rfid_list')
 
 
 
@@ -6048,30 +5833,7 @@ def yerud_create(request, pk=None):
     return redirect('yerud_list')
 
 
-def yerud_update(request, pk=None):
-    deger = pk
-    print("gelen pk degeri...", deger)
-    url = "http://127.0.0.1:7000/ws/yerud_detail/" + str(deger) + "/"
-    print("işte url", url)
-    t_stamp = str(datetime.now())
-    vote = "1"
-    reason = "1"
-    print("okunan zaman...................", t_stamp)
-    response = requests.put(url, json={"mac_no":52812233799999999, "oy": vote, "sebep": reason, "gelen_tarih": t_stamp},  auth=("levent", "leventlevent"))
-    response.json()
-    return redirect('yerud_list')
 
-
-def yerud_find_update(request, pk=None):
-    mac_no = 52812233799999999
-    print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7000/ws/filtrele/"+str(mac_no)+"/"
-    print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
-    print("response...", response)
-    gelen = response.json()
-    print("gelen deger mac bul içinden...", gelen)
-    return redirect('yerud_list')
 
 def yerud_detail_get(request, pk=None):
     mac_no = pk
