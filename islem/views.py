@@ -5881,8 +5881,14 @@ def rfid_dosyasi_yarat(request):
             rfid = form.save(commit=False)
             rfid.save()
             return redirect('rfid')
+        else:
+            print("buraya düşüp duruyor.............")
+            form = RfidForm()
+            return redirect('rfid_dosyasi_yarat')
     else:
         form = RfidForm()
+
+
     return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form})
 
 

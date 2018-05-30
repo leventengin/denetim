@@ -243,6 +243,8 @@ class SaatForm(forms.ModelForm):
         print("cc zaman", cc_zaman)
 
 
+
+
 class RfidForm(forms.ModelForm):
 
     class Meta:
@@ -256,6 +258,8 @@ class RfidForm(forms.ModelForm):
             'adi': "Adı:",
             'soyadi': "Soyadı:",
         }
+
+
 
     def clean(self):
         cleaned_data = super(RfidForm, self).clean()
@@ -273,7 +277,21 @@ class RfidForm(forms.ModelForm):
         print("cc adi", cc_adi)
         print("cc soyadi", cc_soyadi)
 
+        if (cc_rfid_no == None):
+            raise forms.ValidationError("rfid alanı boş olamaz...")
 
+        if (cc_proje == None):
+            raise forms.ValidationError("proje alanı boş olamaz...")
+
+        if (cc_rfid_tipi == None):
+            raise forms.ValidationError("rfid tipi alanı boş olamaz...")
+
+        if (cc_rfid_tipi == "O") and (cc_adi == None or cc_soyadi == None):
+            print(" ne oluyor burada....")
+            raise forms.ValidationError("isim alanları boş olamaz.... ")
+        if (cc_rfid_tipi == "D") and (cc_kullanici == None):
+            print("yoksa burada.........")
+            raise forms.ValidationError("kullanıcı alanı boş olamaz...")
 
 
 

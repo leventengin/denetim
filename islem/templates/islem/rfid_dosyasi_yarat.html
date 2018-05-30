@@ -4,9 +4,39 @@
 {% block content %}
 
 
-<h4> RFID  </h4>
+<script>
+  function degistir() {
+      //alert("buraya da geldi...degistir .........");
+       var x = document.getElementById("id_rfid_tipi").value;
+       var a = document.getElementById("id_kullanici");
+       var b = document.getElementById("id_adi");
+       var c = document.getElementById("id_soyadi");
+       alert("value"+x);
+       if (x == "O") {
+           a.value = "";
+           a.disabled = true;
+           b.readOnly = false;
+           c.readOnly = false;
+       } else {
+         a.disabled = false;
+         b.value = "";
+         c.value = ""
+         b.readOnly = true;
+         c.readOnly = true;
+       }
+  }
+</script>
 
-<p> </p>
+
+<script>
+    $( ".degistir" ).degistir()
+    } );
+</script>
+
+
+<h4> RFID Dosyası</h4>
+
+<p> &emsp; </p>
 
 <form action="" method="POST">
     {% csrf_token %}
@@ -19,6 +49,16 @@
 
 </form>
 
+
+
+<script>
+      $(document).ready(function(){
+             $("#id_rfid_tipi").change(function(){
+                  //alert ( "...bolum detay seç çalıştı...");
+                   degistir();
+                 });   /*  change  kapanıyor ...  */
+              });  /* document ready  kapanıyor */
+</script>
 
 
 {% endblock %}

@@ -105,6 +105,7 @@ urlpatterns = [
     url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_dosyasi_sil_kesin, name='rfid_dosyasi_sil_kesin'),
 
 
+
 #---------------------------------------------------------------------------------------------------
     # rest urlleri aşağıda....
     url(r'^memnuniyet_create/$', views.memnuniyet_create, name='memnuniyet_create'),
