@@ -5847,7 +5847,7 @@ def yerud_detail_get(request, pk=None):
     return redirect('yerud_list')
 
 
-
+#---------------------------------------------------------------------------
 # RFID dosya işlemleri....................
 # WEB SERVICE OLMADAN................-----
 
@@ -5875,21 +5875,53 @@ def rfid_dosyasi_yarat(request):
     print("kullanıcı ve projesi", kullanici, "-",  proje)
 
 
-    if request.method == "POST":
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
         form = RfidForm(request.POST)
+        # check whether it's valid:
         if form.is_valid():
-            rfid = form.save(commit=False)
-            rfid.save()
+            print("valid....")
+            dd_rfid_no = request.POST.get('rfid_no', "")
+            dd_proje = request.POST.get('proje',"")
+            dd_rfid_tipi = request.POST.get('rfid_tipi',"")
+            dd_calisan = request.POST.get('calisan', "")
+            dd_adi = request.POST.get('adi',"")
+            dd_soyadi = request.POST.get('soyadi',"")
+
+            print ("rfid_no", dd_rfid_no)
+            print ("proje", dd_proje)
+            print ("rfid tipi", dd_rfid_tipi)
+            print ("calisan", dd_calisan)
+            print ("adı", dd_adi)
+            print ("soyadi", dd_soyadi)
+
+
+            kaydetme_obj = rfid_dosyasi(rfid_no=dd_rfid_no,
+                                        proje_id=dd_proje,
+                                        rfid_tipi=dd_rfid_tipi,
+                                        calisan_id=dd_calisan,
+                                        adi=dd_adi,
+                                        soyadi=dd_soyadi)
+
+            kaydetme_obj.save()
             return redirect('rfid')
         else:
-            print("buraya düşüp duruyor.............")
+            print(" valid değil rfid girişi ...........")
+            messages.error(request, "Error")
             form = RfidForm()
-            return redirect('rfid_dosyasi_yarat')
+            return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
     else:
+        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
+        kullanici = request.user.id
+        print("kullanici  ..", kullanici)
         form = RfidForm()
+        return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form,})
 
 
-    return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form})
 
 
 
@@ -5900,11 +5932,16 @@ def rfid_dosyasi_duzenle(request, pk=None):
         if form.is_valid():
             rfid = form.save(commit=False)
             rfid.save()
-            return redirect('rfid_list')
+            return redirect('rfid')
     else:
-        form = PostForm()
-    return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form})
+        form = RfidForm()
+    return render(request, 'islem/rfid_dosyasi_duzenle.html', {'form': form})
 
+
+
+def rfid_dosyasi_detay(request, pk=None):
+    rfid_obj = rfid_dosyasi.objects.get(pk=pk)
+    return render(request, 'islem/rfid_dosyasi_detail.html', {'rfid_obj': rfid_obj})
 
 
 

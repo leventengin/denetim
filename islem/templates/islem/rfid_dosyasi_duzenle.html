@@ -91,7 +91,7 @@ function kaydet_2() {
 
 <p> &emsp; </p>
 
-<form action="" method="POST"  id="rfid_form"  >
+<form action="" method="POST"  id="rfid_form">
     {% csrf_token %}
 
     {{ form.non_field_errors }}
@@ -100,7 +100,7 @@ function kaydet_2() {
     {{ form.as_table }}
     </table>
     <!-- <input type="button" onclick="kaydet()" value="kaydet"> -->
-    <input type="submit" value="kaydet" />
+    <input type="submit" value="kaydet" /> 
 
 </form>
 

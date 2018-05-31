@@ -138,7 +138,7 @@ class rfid_dosyasi(models.Model):
     rfid_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_tipi = models.CharField(max_length=1, choices=OPERASYONDIGER)
-    kullanici = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
+    calisan = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
     adi = models.CharField(max_length=20, null=True, blank=True)
     soyadi = models.CharField(max_length=20, null=True, blank=True)
 
@@ -167,7 +167,8 @@ def create_rfid_yeni(sender, instance, **kwargs):
         for deger in yer_obj:
             yer_updown_obj = yer_updown.objects.filter(mac_no=deger.mac_no).first()
             if yer_updown_obj:
-                kaydetme_obj = yer_updown(id=yer_up_down_obj.id,
+                mac_no = deger.mac_no
+                kaydetme_obj = yer_updown(id=yer_updown_obj.id,
                                           proje=proje,
                                           mac_no=mac_no,
                                           degis="E")

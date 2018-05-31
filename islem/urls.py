@@ -98,7 +98,7 @@ urlpatterns = [
 
 
     url(r'^rfid/$', views.rfid_dosyasi_list, name='rfid'),
-    url(r'^rfid/(?P<pk>\d+)$', views.RfidDetailView.as_view(), name='rfid-detail'),
+    url(r'^rfid/(?P<pk>\d+)$', views.rfid_dosyasi_detay, name='rfid_dosyasi_detay'),
     url(r'^rfid/create/$', views.rfid_dosyasi_yarat, name='rfid_dosyasi_yarat'),
     url(r'^rfid/(?P<pk>\d+)/update/$', views.rfid_dosyasi_duzenle, name='rfid_dosyasi_duzenle'),
     url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_dosyasi_sil, name='rfid_dosyasi_sil'),

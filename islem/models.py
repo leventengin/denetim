@@ -197,7 +197,7 @@ class proje_alanlari(models.Model):
 class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
     yer_adi = models.CharField(max_length=200)
-    mac_no = models.IntegerField()
+    mac_no = models.CharField(max_length=20)
     opr_basl = models.TimeField(default=datetime.time(8,0,0))
     opr_son = models.TimeField(default=datetime.time(22,0,0))
     opr_delta = models.TimeField(default=datetime.time(0,30,0))

@@ -26,7 +26,7 @@ import datetime
 from datetime import date, datetime
 from django.template.loader import render_to_string
 import requests
-from django.core.exceptions import ValidationError
+#from django.core.exceptions import ValidationError
 from django import forms
 from .models import sonuc_detay
 from webservice.models import yer_updown
@@ -46,6 +46,10 @@ from django.utils.translation import get_language
 
 from django.utils.encoding import force_text
 
+OPERASYONDIGER = (
+('O', 'Operasyon'),
+('D', 'Diğer'),
+)
 
 
 EVETHAYIR = (
@@ -245,57 +249,58 @@ class SaatForm(forms.ModelForm):
 
 
 
-class RfidForm(forms.ModelForm):
-
-    class Meta:
-        model = rfid_dosyasi
-        fields = ( 'rfid_no', 'proje', 'rfid_tipi', 'kullanici', 'adi', 'soyadi',)
-        labels = {
-            'rfid_no': "RFID No:",
-            'proje': "Proje",
-            'rfid_tipi': "Tipi",
-            'kullanici': "Kullanici Seç:",
-            'adi': "Adı:",
-            'soyadi': "Soyadı:",
-        }
 
 
+
+class RfidForm(forms.Form):
+    rfid_no = forms.CharField(label='Rfid No', max_length=20 )
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(), label="Proje..")
+    rfid_tipi = forms.ChoiceField(choices=OPERASYONDIGER, widget=forms.Select, label="Rfid Tipi:")
+    calisan = forms.ModelChoiceField(queryset=User.objects.all(), label="Kullanıcı..", required=False )
+    adi = forms.CharField(label='Adı', required=False, max_length=20  )
+    soyadi = forms.CharField(label='Soyadı', required=False, max_length=20  )
 
     def clean(self):
         cleaned_data = super(RfidForm, self).clean()
-        cc_rfid_no = cleaned_data.get("rfid_no")
-        cc_proje = cleaned_data.get("proje")
-        cc_rfid_tipi = cleaned_data.get("rfid_tipi")
-        cc_kullanici = cleaned_data.get("kullanici")
-        cc_adi = cleaned_data.get("adi")
-        cc_soyadi = cleaned_data.get("soyadi")
+        rfid_no = cleaned_data.get('rfid_no')
+        proje = cleaned_data.get('proje')
+        rfid_tipi = cleaned_data.get('rfid_tipi')
+        calisan = cleaned_data.get('calisan')
+        adi = cleaned_data.get('adi')
+        soyadi = cleaned_data.get('soyadi')
 
-        print("cc rfid no", cc_rfid_no)
-        print("cc proje", cc_proje)
-        print("cc rfid tipi", cc_rfid_tipi)
-        print("cc kullanici", cc_kullanici)
-        print("cc adi", cc_adi)
-        print("cc soyadi", cc_soyadi)
+        print("cc rfid no", rfid_no)
+        print("cc proje", proje)
+        print("cc rfid tipi", rfid_tipi)
+        print("cc çalışan", calisan)
+        print("cc adi", adi)
+        print("cc soyadi", soyadi)
 
-        if (cc_rfid_no == None):
-            raise forms.ValidationError("rfid alanı boş olamaz...")
-
-        if (cc_proje == None):
-            raise forms.ValidationError("proje alanı boş olamaz...")
-
-        if (cc_rfid_tipi == None):
-            raise forms.ValidationError("rfid tipi alanı boş olamaz...")
-
-        if (cc_rfid_tipi == "O") and (cc_adi == None or cc_soyadi == None):
+        if (rfid_tipi == "O") and (adi == ""  or  soyadi == ""):
             print(" ne oluyor burada....")
             raise forms.ValidationError("isim alanları boş olamaz.... ")
-        if (cc_rfid_tipi == "D") and (cc_kullanici == None):
+
+
+        if (rfid_tipi == "D") and (calisan == ""):
             print("yoksa burada.........")
             raise forms.ValidationError("kullanıcı alanı boş olamaz...")
 
+        return cleaned_data
 
+"""
+    def __init__(self, *args, **kwargs):
+        kullanici = kwargs.pop("kullanici")
+        super(RfidForm, self).__init__(*args, **kwargs)
+        print("rfid form init içinden kullanan..", kullanici)
+        # burada kullanıcının projesi alınacak...
+        # ona göre proje çıkacak ve ilgili proje çalışanları çıkacak...
+        # eğer adminse tüm projeler çıkacak fakat projeye göre çalışan değişecek...
 
-
+        # denetim_obj_ilk = denetim.objects.filter(durum="B")
+        # denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
+        # self.fields['denetim'].queryset = denetim_obj
+        # print("queryset initial içinden..:", self.fields['denetim'].queryset)
+"""
 
 class AcilAcForm(forms.Form):
     denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")

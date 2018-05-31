@@ -1,0 +1,18 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+  <h3>RFID Sayfası</h3>
+
+  <p><strong>Id         :</strong> {{ rfid_obj.id }}</p>
+  <p><strong>No         :</strong> {{ rfid_obj.rfid_no }}</p>
+  <p><strong>Proje      :</strong> {{ rfid_obj.proje }}</p>
+  <p><strong>Tipi       :</strong> {{ rfid_obj.rfid_tipi }}</p>
+  <p><strong>Yetkili Kullanıcı  :</strong> {{ rfid_obj.calisan }}</p>
+  <p><strong>Adı        :</strong> {{ rfid_obj.adi }}</p>
+  <p><strong>Soyadı     :</strong> {{ rfid_obj.soyadi }}</p>
+
+
+
+{% endblock %}
