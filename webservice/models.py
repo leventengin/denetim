@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from islem.models import proje_alanlari, yer
+from islem.models import proje_alanlari, yer, proje
 from rest_framework.reverse import reverse as api_reverse
 
 import datetime
@@ -180,6 +180,30 @@ def create_rfid_yeni(sender, instance, **kwargs):
                                           degis="E")
                 kaydetme_obj.save()
 
+
+
+@receiver(post_save, sender=yer)
+def create_yerupdown_yeni(sender, instance, **kwargs):
+    print("receiver post save rfid...............")
+    yer_id = instance.id
+    yer_obj = yer.objects.get(id=yer_id)
+    proje_alani = yer_obj.proje_alanlari.id
+    print("proje alanı...", proje_alani)
+    proje = proje_alanlari.objects.get(id=proje_alani).proje.id
+    mac_no_x = instance.mac_no
+
+    yer_updown_obj = yer_updown.objects.filter(mac_no=mac_no_x).first()
+    if yer_updown_obj:
+        kaydetme_obj = yer_updown(id=yer_updown_obj.id,
+                                  proje_id=proje,
+                                  mac_no=mac_no_x,
+                                  degis="E")
+        kaydetme_obj.save()
+    else:
+        kaydetme_obj = yer_updown(proje_id=proje,
+                                  mac_no=mac_no_x,
+                                  degis="E")
+        kaydetme_obj.save()
 
 
 

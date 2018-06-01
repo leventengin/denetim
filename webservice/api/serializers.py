@@ -190,7 +190,7 @@ class RfidSerializer(serializers.ModelSerializer):
             'rfid_no',
             'proje',
             'rfid_tipi',
-            'kullanici',
+            'calisan',
             'adi',
             'soyadi',
         ]

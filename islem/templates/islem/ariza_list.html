@@ -4,12 +4,21 @@
     <h4>Ariza List</h4>
     <p> </p>
     {% if ariza_list %}
+
+    <ul>
+    <li>
+        <a>ID </a>&emsp;<a>Tipi&emsp; </a>&emsp;<a>Mac No </a> &emsp;<a>RFID No </a> &emsp; <a> Sebep </a>
+            &emsp; <a> Gelen Zaman </a> &emsp; &emsp; &emsp; <a> Timestamp </a>
+    </li>
+    </ul>
+
+
+
     <ul>
       {% for deger in ariza_list %}
         <li>
-          <a href="{{deger.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
-          <a href="{{deger.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-          &emsp;   <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> -- 
+
+          <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
                       <a>{{ deger.sebep }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
         </li>
       {% endfor %}

@@ -5,13 +5,22 @@
     <h3>RFID Listesi</h3>
 
     {% if rfid_dosyasi_list %}
+
+    <ul>
+    <li>
+        <a>ID </a>&emsp;<a>RFID No&emsp; </a>&emsp;<a> Proje </a> &emsp;<a>Tipi </a> &emsp; <a> Kullanıcı </a> &emsp;
+            &emsp; <a> Adı </a> &emsp; <a> Soyadı </a>
+    </li>
+    </ul>
+
     <ul>
 
       {% for rfid in rfid_dosyasi_list %}
       <li>
-        <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+    <!--    <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
         <a href="{{rfid.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-              &emsp;   ({{rfid.id}})    <a href="{{rfid.id}}">{{ rfid.rfid_no }}</a>
+              &emsp;    ({{rfid.id}})    <a href="{{rfid.id}}">{{ rfid.rfid_no }}</a>  -->
+        ({{rfid.id}})    <a>{{ rfid.rfid_no }}</a>
               - <a>{{ rfid.proje }}</a> - <a>{{ rfid.rfid_tipi }}</a>
               - <a>{{ rfid.calisan }}</a> - <a>{{ rfid.adi }}</a> - <a>{{ rfid.soyadi }}</a>
 
@@ -20,12 +29,12 @@
       </li>
       {% endfor %}
       <p> </p>
-      <a href="/islem/rfid/create"> RFID Ekle </a>
+     <!--  <a href="/islem/rfid/create"> RFID Ekle </a>  -->
     </ul>
     {% else %}
       <p>Kayıtlı RFID yok ....</p>
       <p> </p>
-      <a href="/islem/rfid/create"> RFID Ekle </a>
+      <!-- <a href="/islem/rfid/create"> RFID Ekle </a> -->
     {% endif %}
 
 {% endblock %}

@@ -8,6 +8,7 @@ from django.dispatch import receiver
 import requests
 from gm2m import GM2MField
 from decimal import Decimal
+#from webservice.models  import yer_updown
 
 EVETHAYIR = (
 ('E', 'Evet'),
@@ -54,11 +55,6 @@ GUNLER = (
 ('Paz', 'Pazar'),
 )
 
-OPR_KULLANICI_TIPI = (
-('Opr', 'Operasyon Elemanı'),
-('Sef', 'Alan Şefi'),
-('Pry', 'Proje Yöneticisi'),
-)
 
 
 ONLUK = (
@@ -111,7 +107,8 @@ class Profile(models.Model):
     proje = models.ForeignKey('proje', on_delete=models.PROTECT, blank=True, null=True)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
-    opr_gorev_tipi = models.CharField(max_length=3, choices=OPR_KULLANICI_TIPI, blank=True, null=True)
+    opr_alan_sefi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    opr_proje_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     operasyon_merkezyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     isletme_projeyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     profil_resmi = models.ImageField(upload_to='xyz/profile_resmi/%Y/%m/%d/',blank=True, null=True,)
@@ -206,6 +203,9 @@ class yer(models.Model):
     den_delta = models.TimeField(default=datetime.time(2,0,0))
     def __str__(self):
         return '%s-%s' % (self.mac_no, self.proje_alanlari)
+
+
+
 
 
 class plan_opr_gun(models.Model):

@@ -213,6 +213,7 @@ span.num {
 
                 <ul class="list-unstyled components">
                     <h4><p>Operasyon ve Denetim Sistemleri</p></h4>
+                   {% if  user.profile.denetci == "E" or request.user.is_superuser %}
                     <li>
                         <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false">Yerinde Denetim</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu1">
@@ -224,7 +225,10 @@ span.num {
                             <li><a href="/islem/rapor_yazisi">Rapor Yazısı</a></li>
                         </ul>
                     </li>
-                    <li>
+                  {% endif %}
+
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                   <li>
                       <a href="#pageSubmenu2" data-toggle="collapse" aria-expanded="false">Denetim Oluştur</a>
                       <ul class="collapse list-unstyled" id="pageSubmenu2">
                         <li><a href="/islem/denetim/teksayfa_yarat">Denetim Yarat</a></li>
@@ -232,60 +236,74 @@ span.num {
                         <li><a href="/islem/denetim/teksayfa_sil">Denetim Sil</a></li>
                         <li><a href="/islem/denetim">Denetim Detayları</a><!-- row.... --></li>
                       </ul>
-                  </li>
-                  <li>
+                   </li>
+                  {% endif %}
+
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                   <li>
                     <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">Denetimler</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu3">
                       <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
                       <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
-                      {% if  user.profile.denetim_grup_yetkilisi == "E" %}
-                          <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
-                      {% endif %}
+                      <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
                     </ul>
-                  </li>
+                   </li>
+                  {% endif %}
 
-                  <li>
-                    <a href="#pageSubmenu4" data-toggle="collapse" aria-expanded="false">Tanımlar</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu4">
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                   <li>
+                    <a href="#pageSubmenu4" data-toggle="collapse" aria-expanded="false">Denetim Tanımları</a>
+                      <ul class="collapse list-unstyled" id="pageSubmenu4">
                         <li><a href="/islem/tipi">Denetim Tipi</a></li>
                         <li><a href="/islem/zon">Denetim Alanı</a></li>
                         <li><a href="/islem/bolum">Denetim Bölümü</a></li>
                         <li><a href="/islem/soru_listesi">Soru Listesi</a></li>
                         <li><a href="/islem/detay">Denetim Sorusu</a></li>
-                        <li><a href="/islem/grup">Grup</a></li>
-                        <li><a href="/islem/sirket">Şirket</a></li>
-                        <li><a href="/islem/proje">Proje</a></li>
+                      </ul>
+                   </li>
+                  {% endif %}
+
+                  {% if  user.profile.operasyon_merkezyon == "E" or user.profile.opr_proje_yon == "E" or request.user.is_superuser %}
+                   <li>
+                    <a href="#pageSubmenu5" data-toggle="collapse" aria-expanded="false">Proje Tanımları</a>
+                     <ul class="collapse list-unstyled" id="pageSubmenu5">
                         <li><a href="/islem/projealanlari">Proje Alanları</a></li>
                         <li><a href="/islem/yer">Yer</a></li>
                         <li><a href="/islem/rfid">RFID</a></li>
-                        <li><a href="/islem/rfid_filter">Rfid Filtrele </a></li>
-                        <li><a href="/islem/qrdosyasi">QRCode</a></li>
+                        <li><a href="/islem/memnuniyet_list">WS-Memnuniyet Listele </a></li>
+                        <li><a href="/islem/operasyon_list">WS-Operasyon Listele </a></li>
+                        <li><a href="/islem/den_saha_list">WS-Denetim Listele </a></li>
+                        <li><a href="/islem/ariza_list">WS-Ariza Listele </a></li>
+                        <li><a href="/islem/rfid_filter">WS-Rfid Filtrele </a></li>
+                        <li><a href="/islem/yerud_list">WS-Yer Bilgisi Listele </a></li>
                     </ul>
-                </li>
-                <li>
-                    <a href="#pageSubmenu5" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu5">
-                        <li><a href="/islem/memnuniyet_list">Memnuniyet Listele </a></li>
-                        <li><a href="/islem/memnuniyet_create">Memnuniyet Ekle</a></li>
-                        <li><a href="/islem/operasyon_list">Operasyon Listele </a></li>
-                        <li><a href="/islem/operasyon_create">Operasyon Ekle</a></li>
-                        <li><a href="/islem/den_saha_list">Denetim Listele </a></li>
-                        <li><a href="/islem/den_saha_create">Denetim Ekle</a></li>
-                        <li><a href="/islem/ariza_list">Ariza Listele </a></li>
-                        <li><a href="/islem/ariza_create">Ariza Ekle</a></li>
-                        <li><a href="/islem/rfid_list">Rfid Listele </a></li>
-                        <li><a href="/islem/rfid_create">Rfid Ekle</a></li>
-                        <li><a href="/islem/macnoyer">Macno Yer</a></li>
-                        <li><a href="/islem/macnoyer_degis">Macno Yer Değiş</a></li>
-                        <li><a href="/islem/yerud_list">Yer Bilgisi Listele </a></li>
-                        <li><a href="/islem/yerud_create">Yer Bilgisi Ekle</a></li>
+                 </li>
+                {% endif %}
+
+                {% if request.user.is_superuser %}
+                 <li>
+                    <a href="#pageSubmenu6" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu6">
+                        <li><a href="/islem/grup">Grup</a></li>
+                        <li><a href="/islem/sirket">Şirket</a></li>
+                        <li><a href="/islem/proje">Proje</a></li>
+                        <li><a href="/islem/memnuniyet_create">WS-Memnuniyet Ekle</a></li>
+                        <li><a href="/islem/operasyon_create">WS-Operasyon Ekle</a></li>
+                        <li><a href="/islem/den_saha_create">WS-Denetim Ekle</a></li>
+                        <li><a href="/islem/ariza_create">WS-Ariza Ekle</a></li>
+                        <!-- <li><a href="/islem/rfid_list">Rfid Listele </a></li>
+                        <li><a href="/islem/rfid_create">Rfid Ekle</a></li> -->
+                        <li><a href="/islem/macnoyer">WS-Macno Yer</a></li>
+                        <li><a href="/islem/macnoyer_degis">WS-Macno Yer Değiş</a></li>
+                        <li><a href="/islem/yerud_create">WS-Yer Bilgisi Ekle</a></li>
+                        <li><a href="/islem/qrdosyasi">QRCode</a></li>
                         <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
                         <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
                         <li><a href="/notification/create">bildirim yarat</a></li>
                         <li><a href="/notification">bildirim listele</a></li>
                     </ul>
-                </li>
-
+                 </li>
+                {% endif %}
 
                </ul>
 
@@ -379,14 +397,14 @@ span.num {
   </script>
 
 
-<!--  bildirimlerin her  yarım dakikada bir okunması için zaman planı
+<!--  bildirimlerin her   dakikada bir okunması için zaman planı -->
 <script>
   var myVar;
   function myInterval() {
-      myVar = setInterval(new_notif, 30000);
+      myVar = setInterval(new_notif, 60000);
   }
 </script>
--->
+<!--    -->
 
 
 
