@@ -7,7 +7,7 @@
 
     <ul>
     <li>
-        <a>ID </a>&emsp;<a>Tipi&emsp; </a>&emsp;<a>Mac No </a> &emsp;<a>RFID No </a> &emsp; <a> Kod </a>
+        <a>ID </a>&emsp;<a>Tipi</a>&emsp;<a>Proje</a>&emsp; <a>Mac No </a> &emsp;<a>RFID No </a> &emsp; <a> Kod </a>
             &emsp; <a> Gelen Zaman </a> &emsp; &emsp; &emsp; <a> Timestamp </a>
     </li>
     </ul>
@@ -17,7 +17,7 @@
     <ul>
       {% for deger in denetim_saha_list %}
         <li>
-           <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
+           <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.proje }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
                       <a>{{ deger.kod }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
         </li>
       {% endfor %}

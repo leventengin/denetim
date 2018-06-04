@@ -7,7 +7,7 @@
 
     <ul>
     <li>
-        <a>ID </a>&emsp;<a>Tipi&emsp; </a>&emsp;<a>Mac No </a> &emsp;<a>Oy </a> &emsp; <a> Sebep </a> &emsp;
+        <a>ID </a>&emsp;<a>Tipi </a>&emsp; <a>Proje </a>&emsp; <a>Mac No </a> &emsp;<a>Oy </a> &emsp; <a> Sebep </a> &emsp;
             &emsp; <a> Gelen Zaman </a> &emsp; &emsp; &emsp; &emsp; <a> Timestamp </a>
     </li>
     </ul>
@@ -16,7 +16,7 @@
     <ul>
       {% for deger in memnuniyet_list %}
         <li>
-           <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.oy }} </a> --
+           <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>-- <a>{{ deger.proje }}</a>  --<a>{{ deger.mac_no }}</a>-- <a>{{ deger.oy }} </a> --
                       <a>{{ deger.sebep }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
         </li>
       {% endfor %}

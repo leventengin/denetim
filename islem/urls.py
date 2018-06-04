@@ -25,7 +25,7 @@ from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
-
+from notification.views import list_notification, show_notification, create_notification, delete_notification
 
 
 
@@ -282,6 +282,11 @@ urlpatterns = [
     url(r'^cagir2/$', views.cagir2, name='cagir2'),
     url(r'^cagir3/$', views.cagir3, name='cagir3'),
     url(r'^cagir4/$', views.cagir4, name='cagir4'),
+
+    url(r'^notification/$', views.list_notification_2, name='list_notification_2'),
+    url(r'^notification/show/(?P<notification_id>\d+)/$', views.show_notification, name='show_notification'),
+    url(r'^notification/delete/(?P<notification_id>\d+)/$', views.delete_notification, name='delete_notification'),
+    url(r'^notification/create/$', views.create_notification, name='create_notification'),
 
 
     ]

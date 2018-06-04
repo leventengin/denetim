@@ -7,7 +7,7 @@
 
     <ul>
     <li>
-        <a>ID </a>&emsp;<a>Tipi&emsp; </a>&emsp;<a>Mac No </a> &emsp;<a>RFID No </a> &emsp; &emsp; <a> Başlangıç Zamanı </a> &emsp;
+        <a>ID </a>&emsp;<a>Tipi</a>&emsp;<a>Proje</a>&emsp; <a>Mac No </a> &emsp;<a>RFID No </a> &emsp; &emsp; <a> Başlangıç Zamanı </a> &emsp;
             &emsp; &emsp; <a> Sonuç Zamanı </a> &emsp; &emsp; <a> Bildirim Tipi </a> &emsp; &emsp; <a> Timestamp </a>
     </li>
     </ul>
@@ -17,7 +17,7 @@
     <ul>
       {% for deger in operasyon_list %}
         <li>
-            <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
+            <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>-- <a>{{ deger.proje }}</a>--  <a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
                       <a>{{ deger.bas_tarih }} </a> -- <a> {{ deger.son_tarih }} </a> --<a> {{ deger.bild_tipi }} --<a> {{ deger.timestamp }}
         </li>
       {% endfor %}

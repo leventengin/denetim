@@ -1452,7 +1452,7 @@ def teksayfa_yarat(request, pk=None):
             #return render(request, 'islem/tek_sayfa.html', context,)
             return redirect('index')
         else:
-            print("ne oldu be kardeşim...........")
+            print("ne oldu be kardeşim1...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
             return redirect('teksayfa_yarat')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -2028,7 +2028,7 @@ def teksayfa_duzenle_devam(request, pk=None):
             #return render(request, 'islem/tek_sayfa.html', context,)
             return redirect('index')
         else:
-            print("ne oldu be kardeşim...........")
+            print("ne oldu be kardeşim2...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
             return redirect('teksayfa_duzenle_devam')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -2498,7 +2498,7 @@ def denetim_detay_islemleri(request, pk=None):
 
 
         else:
-            print("ne oldu be kardeşim...........")
+            print("ne oldu be kardeşim3...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
             #return redirect('devam_liste')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -2673,7 +2673,7 @@ def sonuc_denetim_detay_duzenle(request, pk=None):
 
 
         else:
-            print("ne oldu be kardeşim...........")
+            print("ne oldu be kardeşim4...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
             #return redirect('devam_liste')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -5662,11 +5662,12 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
+    proje = "1"
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/memnuniyet_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://37.148.210.226:7000/ws/memnuniyet_list/",
+        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
@@ -5686,11 +5687,12 @@ def operasyon_list(request, pk=None):
 def operasyon_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
+    proje = "1"
     rfid_no = "3"
     bild_tipi = "A"
     print("okunan zaman......operasyon create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/operasyon_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "bas_tarih": t_stamp, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://37.148.210.226:7000/ws/operasyon_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": t_stamp, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
@@ -5712,11 +5714,12 @@ def den_saha_list(request, pk=None):
 def den_saha_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
+    proje = "1"
     rfid_no = "3"
     kod = "6"
     print("okunan zaman......denetim create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/denetim_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://37.148.210.226:7000/ws/denetim_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('den_saha_list')
@@ -5736,11 +5739,12 @@ def ariza_list(request, pk=None):
 def ariza_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
+    proje = "1"
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/ariza_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://37.148.210.226:7000/ws/ariza_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -5767,7 +5771,7 @@ def rfid_filter(request):
             proje = request.POST.get('proje', "")
             print(" proje form okunduktan sonra post...", proje)
 
-            url = "http://127.0.0.1:7000/ws/rfid_filter/"+str(proje)+"/"
+            url = "http://37.148.210.226:7000/ws/rfid_filter/"+str(proje)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -5784,7 +5788,7 @@ def rfid_filter(request):
 
 def rfid_filter_proje(request, proje=None):
     print("rfid project list............", proje)
-    r = requests.get_queryset("http://127.0.0.1:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
+    r = requests.get_queryset("http://37.148.210.226:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
     json_data = r.json()
     print(json_data)
 
@@ -5799,7 +5803,7 @@ def rfid_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/rfid_list/",
+    response = requests.post("http://37.148.210.226:7000/ws/rfid_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5826,7 +5830,7 @@ def yerud_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......yerud create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/yerud_list/",
+    response = requests.post("http://37.148.210.226:7000/ws/yerud_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5838,9 +5842,9 @@ def yerud_create(request, pk=None):
 def yerud_detail_get(request, pk=None):
     mac_no = pk
     print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(mac_no)+"/"
+    url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(mac_no)+"/"
     print("işte url", url)
-    response = requests.get(url, auth=("levent", "leventlevent"))
+    response = requests.get(url, auth=("admin", "masanata"))
     print("response...", response)
     gelen = response.json()
     print("gelen deger mac bul içinden...", gelen)
@@ -5988,7 +5992,7 @@ def macnoyer(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -6016,7 +6020,7 @@ def macnoyer_degis(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -6071,6 +6075,34 @@ class RfidListView(LoginRequiredMixin,generic.ListView):
 class RfidDetailView(LoginRequiredMixin,generic.DetailView):
     model = rfid_dosyasi
 
+
+#------------------------------------------------------------------------------------
+
+def show_notification(request, notification_id):
+    n = Notification.objects.get(id=notification_id)
+    return render_to_response('islem/bildirimler_2.html', {'notification': n})
+
+def delete_notification(request, notification_id):
+    n = Notification.objects.get(id=notification_id)
+    n.viewed = True
+    n.save()
+    return redirect('list_notification_2')
+
+def create_notification(request):
+    print("create notification kısmı...")
+    print("request.user.id", request.user.id)
+    Notification.objects.create(user_id=request.user.id,
+                                title="8 nisan uyarı  1",
+                                message="8 nisan uyarı...111")
+    return redirect('index')
+
+
+def list_notification_2(request):
+    print("list notifications ..")
+    print("request user id..", request.user.id)
+    #n = Notification.objects.all()
+    n = Notification.objects.filter(viewed=False)
+    return render_to_response('islem/bildirimler_2.html', {'notification_list': n})
 
 
 #-------------------------------------------------------------------------------------

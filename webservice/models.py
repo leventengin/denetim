@@ -13,50 +13,15 @@ import requests
 
 # django hosts --> subdomain for reverse
 
-class BlogPost(models.Model):
-    # pk aka id --> numbers
-    user        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    title       = models.CharField(max_length=120, null=True, blank=True)
-    content     = models.TextField(max_length=120, null=True, blank=True)
-    timestamp   = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return str(self.user.username)
-
-    @property
-    def owner(self):
-        return self.user
-    # def get_absolute_url(self):
-    #     return reverse("api-postings:post-rud", kwargs={'pk': self.pk}) '/api/postings/1/'
-
-    def get_api_url(self, request=None):
-        return api_reverse("api-ws:post-rud", kwargs={'pk': self.pk}, request=request)
-
-
-class MacPost(models.Model):
-    # pk aka id --> numbers
-    mac_no      = models.CharField(max_length=20)
-    timestamp   = models.DateTimeField()
-
-    def __str__(self):
-        return str(self.mac_no)
-
-    @property
-    def owner(self):
-        return self.mac_no
-
-
-    def get_api_url(self, request=None):
-        return api_reverse("api-ws:mac-rud", kwargs={'pk': self.pk}, request=request)
-
 
 
 class Memnuniyet(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)    
     oy          = models.CharField(max_length=1)
     sebep       = models.CharField(max_length=2)
-    gelen_tarih = models.CharField(max_length=30)
+    gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 
     def __str__(self):
@@ -73,9 +38,10 @@ class Memnuniyet(models.Model):
 class Operasyon_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
-    bas_tarih   = models.CharField(max_length=30)
-    son_tarih   = models.CharField(max_length=30)
+    bas_tarih   = models.DateTimeField()
+    son_tarih   = models.DateTimeField()
     bild_tipi   = models.CharField(max_length=1)
     timestamp   = models.DateTimeField()
 
@@ -92,9 +58,10 @@ class Operasyon_Data(models.Model):
 class Denetim_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
     kod         = models.CharField(max_length=8)
-    gelen_tarih = models.CharField(max_length=30)
+    gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 
     def __str__(self):
@@ -110,9 +77,10 @@ class Denetim_Data(models.Model):
 class Ariza_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
     sebep       = models.CharField(max_length=2)
-    gelen_tarih = models.CharField(max_length=30)
+    gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 
     def __str__(self):
