@@ -1,28 +1,102 @@
 {% extends "base_generic.html" %}
-
 {% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+</style>
+
+
     <h4>Yer Bilgisi Listesi</h4>
+
+
+
+
+
+
     <p> </p>
+
+
+
+    <script>
+          $(document).ready(function(){
+
+                      //alert ( "...bolum detay seç çalıştı...");
+                       degistir();
+
+                  });  /* document ready  kapanıyor */
+    </script>
+
+
+
     {% if yerud_list %}
-    <ul>
-    <li>
-        <a>ID </a>&emsp;<a>Mac_No&emsp;&emsp; </a>&emsp;<a>Proje </a> &emsp;<a>Değişim </a> &emsp; <a> Son Zaman </a>
-    </li>
-    </ul>
 
-    <ul>
-      {% for deger in yerud_list %}
-        <li>
+                  <table  id="table_id">
+                          <tr>
+                            <th>Id</th>
+                            <th>Mac_no</th>
+                            <th>Yer</th>
+                            <th>Proje</th>
+                            <th>Yeni Bilgi</th>
+                            <th>Alive time</th>
+                          </tr>
 
-            <a>{{ deger.id }}</a> &emsp;<a>{{ deger.mac_no }}</a>&emsp; <a>{{ deger.proje }} </a>&emsp;
-                   <a>{{ deger.degis }} </a> &emsp; <a> {{ deger.alive_time }} </a>
-        </li>
-      {% endfor %}
-      <p> </p>
-    </ul>
+                      {% for deger in yerud_list %}
+
+                          <tr class="yn" >
+                            <td>{{ deger.id }}  </td>
+                            <td>{{ deger.mac_no }}  </td>
+                            <td>{{ deger.yer }}  </td>
+                            <td>{{ deger.proje }}  </td>
+                            <td>{{ deger.degis }}  </td>
+                            <td>{{ deger.alive_time|date:" d/m/Y - H:i" }}  </td>
+                          </tr>
+
+                      {% endfor %}
+                  </table>
     {% else %}
       <p> gelen veri yok !!!!!....</p>
       <p> </p>
     {% endif %}
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if yerud_list.has_previous %}
+              <a href="?page={{ yerud_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ yerud_list.number }} / {{ yerud_list.paginator.num_pages }}.
+          </span>
+
+          {% if yerud_list.has_next %}
+              <a href="?page={{ yerud_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
 
 {% endblock %}

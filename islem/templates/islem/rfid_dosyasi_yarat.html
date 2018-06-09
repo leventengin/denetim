@@ -1,7 +1,10 @@
 
 {% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
+
+
 
 <script>
 function kaydet() {
@@ -93,10 +96,7 @@ function kaydet_2() {
 
 <form action="" method="POST"  id="rfid_form"  >
     {% csrf_token %}
-
-    {{ form.non_field_errors }}
     <table>
-    {{ form.errors }}
     {{ form.as_table }}
     </table>
     <!-- <input type="button" onclick="kaydet()" value="kaydet"> -->

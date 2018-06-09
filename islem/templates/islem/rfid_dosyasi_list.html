@@ -1,40 +1,83 @@
-
 {% extends "base_generic.html" %}
-
 {% block content %}
-    <h3>RFID Listesi</h3>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+</style>
+
+
+    <h4>RFID Kayıt Listesi</h4>
+
+
+
 
     {% if rfid_dosyasi_list %}
 
-    <ul>
-    <li>
-        <a>ID </a>&emsp;<a>RFID No&emsp; </a>&emsp;<a> Proje </a> &emsp;<a>Tipi </a> &emsp; <a> Kullanıcı </a> &emsp;
-            &emsp; <a> Adı </a> &emsp; <a> Soyadı </a>
-    </li>
-    </ul>
+                  <table  id="table_id">
+                          <tr>
+                            <th>Rfid No</th>
+                            <th>Proje</th>
+                            <th>Rfid Tipi</th>
+                            <th>Adı</th>
+                            <th>Soyadı</th>
+                          </tr>
 
-    <ul>
+                      {% for deger in rfid_dosyasi_list %}
 
-      {% for rfid in rfid_dosyasi_list %}
-      <li>
-    <!--    <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
-        <a href="{{rfid.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-              &emsp;    ({{rfid.id}})    <a href="{{rfid.id}}">{{ rfid.rfid_no }}</a>  -->
-        ({{rfid.id}})    <a>{{ rfid.rfid_no }}</a>
-              - <a>{{ rfid.proje }}</a> - <a>{{ rfid.rfid_tipi }}</a>
-              - <a>{{ rfid.calisan }}</a> - <a>{{ rfid.adi }}</a> - <a>{{ rfid.soyadi }}</a>
+                          <tr class="yn" >
+                            <td>{{ deger.rfid_no }}  </td>
+                            <td>{{ deger.proje }}  </td>
+                            <td>{{ deger.rfid_tipi }}  </td>
+                            <td>{{ deger.adi }}  </td>
+                            <td>{{ deger.soyadi }}  </td>
+                          </tr>
 
-
-        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
-      </li>
-      {% endfor %}
-      <p> </p>
-     <!--  <a href="/islem/rfid/create"> RFID Ekle </a>  -->
-    </ul>
+                      {% endfor %}
+                  </table>
     {% else %}
-      <p>Kayıtlı RFID yok ....</p>
+      <p> gelen veri yok !!!!!....</p>
       <p> </p>
-      <!-- <a href="/islem/rfid/create"> RFID Ekle </a> -->
     {% endif %}
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if rfid_dosyasi_list.has_previous %}
+              <a href="?page={{ rfid_dosyasi_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ rfid_dosyasi_list.number }} / {{ rfid_dosyasi_list.paginator.num_pages }}.
+          </span>
+
+          {% if rfid_dosyasi_list.has_next %}
+              <a href="?page={{ rfid_dosyasi_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
 
 {% endblock %}

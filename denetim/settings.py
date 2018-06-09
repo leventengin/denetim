@@ -25,17 +25,30 @@ SECRET_KEY = '0gd2u5e^uye5a5gvl!1p10=d35_z)y#gap11&f4%h7x4i0efqy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ADMINS = [('admin', 'levent@ez-check.org')]
+
 ALLOWED_HOSTS = ['37.148.210.226',
-                 '172,104,239,247',
+                 '172.104.239.247',
                  '127.0.0.1']
 
 
 
+
+
+EMAIL_HOST = 'mail.ez-check.org'
+EMAIL_HOST_USER = 'yonetici@ez-check.org'
+EMAIL_HOST_PASSWORD = '963f5cEk3'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+"""
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'hijyenakademisi.smtp@gmail.com'
 EMAIL_HOST_PASSWORD = 'silamonad126'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+"""
 
 """
 EMAIL_HOST = 'smtp.3gozmedia.com'
@@ -65,6 +78,7 @@ INSTALLED_APPS = [
     'searchableselect',
     'dal',
     'dal_select2',
+    'timedeltatemplatefilter',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,6 +96,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -104,6 +119,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },

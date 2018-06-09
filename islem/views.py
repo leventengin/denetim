@@ -61,6 +61,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from decimal import Decimal
 import datetime
 from datetime import  timedelta
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
 
 
 
@@ -1452,7 +1454,6 @@ def teksayfa_yarat(request, pk=None):
             #return render(request, 'islem/tek_sayfa.html', context,)
             return redirect('index')
         else:
-            print("ne oldu be kardeşim1...........")
             messages.success(request, ' form hatası - tekrar deneyin....')
             return redirect('teksayfa_yarat')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
@@ -3874,7 +3875,7 @@ def soru_listesi_kopyala(request, pk=None):
         form.fields["bolum"].initial = bolum_i
         return render(request, 'islem/soru_kopyala.html', {'form': form, 'soru_list': soru_list, 'kopya_flag': kopya_flag})
 
-
+@login_required
 def soru_kopyala_js(request, pk=None):
     print("selam buraya geldik...soru kopyala js")
     kullanan = request.user.id
@@ -3928,6 +3929,20 @@ def soru_listesi_kopyala_kesin(request, pk=None):
 
 
 import copy
+
+
+
+@login_required
+def yer_detay_gecici(request, pk=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    return render(request, 'islem/yer_detay.html', {'yer': yer_obj, })
+
+
+
+
+
+
 
 @login_required
 @transaction.atomic
@@ -4826,6 +4841,31 @@ def projealanlari_sil_kesin(request, pk=None):
 
 #------------------------------------------------------
 
+
+@login_required
+def yer_listele(request):
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        qs = yer.objects.none()
+        projealanlari_obj = proje_alanlari.objects.filter(proje=proje)
+        for x in projealanlari_obj:
+            qx = yer.objects.filter(proje_alanlari=x.id)
+            qs = qs.union(qx)
+        qs = qs.order_by('id')
+        return render(request, 'islem/yer_list.html', {'yer_list': qs,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+
+
 @login_required
 def yer_sil(request, pk=None):
     print("detay sildeki pk:", pk)
@@ -5321,7 +5361,7 @@ from weasyprint import HTML
 import tempfile
 from django.template import Context
 
-
+@login_required
 def generate_pdf(request):
     """Generate pdf."""
     # Model data
@@ -5619,24 +5659,33 @@ class list_bolumautocomplete(autocomplete.Select2QuerySetView):
         qs = bolum.objects.all()
         return qs
 
-
+@login_required
 def bildirim(request):
     print("bildirime geldik.....")
     response_data ={}
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
         print("js bildirim içinden zaman...", datetime.datetime.now())
-        n = Notification.objects.filter(viewed=False).values()
-        #print("obje...",n)
-        n_list = list(n)
-        #print("listesi...", n_list)
-        response_data = {"response_data" : n_list}
-        #print("response  data...", response_data)
-        response_data = json.dumps(n_list)
-        #print("response data", response_data)
-        #return render_to_response('notification.html', {'notification_list': n})
-        #return redirect('list_notification')
-    return HttpResponse(response_data, content_type='application/json')
+        response_data = ""
+        if (request.user.profile.opr_alan_sefi == "E"  or  request.user.profile.opr_proje_yon == "E" or request.user.profile.isletme_projeyon == "E"):
+            proje = request.user.profile.proje
+            print("proje", proje)
+            if proje == None:
+                pass
+            else:
+                n = Notification.objects.filter(viewed=False).filter(proje=proje).values()
+                print("obje - dictionary...",n)
+                if n:
+                    n_list = list(n)
+                    for i in n_list:
+                        i['timestamp'] = str(i['timestamp'])
+
+                    print("liste hali...", n_list)
+                    response_data = {"response_data" : n_list}
+                    #print("response  data...", response_data)
+                    response_data = json.dumps(n_list)
+
+        return HttpResponse(response_data, content_type='application/json')
 
 
 def popup_notif(request):
@@ -5646,19 +5695,101 @@ def popup_notif(request):
 
 
 
-from islem.services  import get_memnuniyet_list, get_rfid_list
+from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
 
 
 
 #----------------------------------------------------------------------------------------
-
+from dateutil import parser
+@login_required
 def memnuniyet_list(request, pk=None):
-    memnuniyet_list = get_memnuniyet_list()
-    print("memnuniyet list..", memnuniyet_list)
-    return render(request, 'islem/memnuniyet_list.html', {'memnuniyet_list': memnuniyet_list,})
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+
+        memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).order_by("-id")
+        m_list = []
+        for x in memnuniyet_obj:
+            temp = {}
+
+            ara_tarih = x.gelen_tarih
+
+            #parsed_date = parser.parse(ara_tarih)
+            parsed_date = ara_tarih
+            print("işte datetime a çevrilmiş hali string den ...", parsed_date)
+            temp['gelen_tarih'] = parsed_date
 
 
+            mac_no = x.mac_no
+            yer_obj = yer.objects.filter(mac_no=mac_no).first()
+            if yer_obj:
+                temp['yer'] = yer_obj.yer_adi
+            else:
+                temp['yer'] = mac_no
+
+            #proje_no = x.proje
+            #proje_obj = proje.objects.get(id=proje_no)
+            #if proje_obj:
+            temp['proje'] = x.proje.proje_adi
+            #else:
+            #    temp['proje'] = proje
+
+            oy = x.oy
+            sebep = x.sebep
+            print("oy", oy)
+            print("sebep", sebep)
+
+            if oy == "3":
+                temp['deger'] = 0
+            else:
+                temp['deger'] = None
+
+            if oy == "1":
+                temp['aciklama'] = "çok mutlu"
+            elif oy == "2":
+                temp['aciklama'] = "mutlu"
+            else:
+                if sebep == "1":
+                    temp['aciklama'] = "sabunluk"
+                if sebep == "2":
+                    temp['aciklama'] = "lavabo"
+                if sebep == "3":
+                    temp['aciklama'] = "havlu"
+                if sebep == "4":
+                    temp['aciklama'] = "koku"
+                if sebep == "5":
+                    temp['aciklama'] = "tuvalet"
+                if sebep == "6":
+                    temp['aciklama'] = "tuvalet kağıdı"
+
+            m_list.append(temp)
+
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(m_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/memnuniyet_list.html', {'memnuniyet_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+@login_required
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
@@ -5666,7 +5797,7 @@ def memnuniyet_create(request, pk=None):
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/memnuniyet_list/",
+    response = requests.post("http://127.0.0.1:7000/ws/memnuniyet_list/",
         json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5677,22 +5808,97 @@ def memnuniyet_create(request, pk=None):
 
 
 #----------------------------------------------------------------------------------------------
-
+@login_required
 def operasyon_list(request, pk=None):
-    operasyon_list = get_operasyon_list()
-    print("operasyon list..", operasyon_list)
-    return render(request, 'islem/operasyon_list.html', {'operasyon_list': operasyon_list,})
+
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+
+        print("atanmış proje var...")
+        operasyon_obj = Operasyon_Data.objects.filter(proje=proje).order_by("-id")
+        print("işte operasyon listesi...", operasyon_obj)
+        o_list = []
+        for x in operasyon_obj:
+            temp = {}
+
+            bas_tarih = x.bas_tarih
+            son_tarih = x.son_tarih
+            #parsed_date = parser.parse(ara_tarih)
+            #parsed_date_1 = ara_tarih
+            #print("işte datetime a çevrilmiş hali string den ...", parsed_date)
+            temp['bas_tarih'] = bas_tarih
+            temp['son_tarih'] = son_tarih
 
 
+            mac_no = x.mac_no
+            yer_obj = yer.objects.filter(mac_no=mac_no).first()
+            if yer_obj:
+                temp['yer'] = yer_obj.yer_adi
+            else:
+                temp['yer'] = mac_no
+
+            #proje_no = x.proje
+            #proje_obj = proje.objects.get(id=proje_no)
+            #if proje_obj:
+            temp['proje'] = x.proje.proje_adi
+            #else:
+            #    temp['proje'] = proje
+            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+            if rfid_obj:
+                temp['adi'] = rfid_obj.adi
+                temp['soyadi'] = rfid_obj.soyadi
+            else:
+                temp['adi'] = ""
+                temp['soyadi'] = ""
+
+            temp['sure'] = son_tarih - bas_tarih
+
+
+            if x.bild_tipi == "A":
+                temp['deger'] = 0
+            else:
+                temp['deger'] = None
+
+
+            o_list.append(temp)
+
+        print("işte çıkan liste...", o_list)
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(o_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/operasyon_list.html', {'operasyon_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+@login_required
 def operasyon_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
+    bas_tarih = str(datetime.datetime(2018, 6, 8, 13, 9, 45))
     tipi = "1"
     proje = "1"
-    rfid_no = "3"
-    bild_tipi = "A"
+    rfid_no = 34234
+    bild_tipi = "M"
     print("okunan zaman......operasyon create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/operasyon_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": t_stamp, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://127.0.0.1:7000/ws/operasyon_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
@@ -5704,21 +5910,116 @@ def operasyon_create(request, pk=None):
 
 #-----------------------------------------------------------------------------------------------
 
-
+@login_required
 def den_saha_list(request, pk=None):
-    denetim_saha_list = get_denetim_saha_list()
-    print("denetim list..", denetim_saha_list)
-    return render(request, 'islem/denetim_saha_list.html', {'denetim_saha_list': denetim_saha_list,})
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+
+        print("atanmış proje var...")
+        denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
+        print("işte denetim listesi...", denetim_obj)
+        d_list = []
+        for x in denetim_obj:
+            temp = {}
+
+            gelen_tarih = x.gelen_tarih
+            temp['gelen_tarih'] = gelen_tarih
+
+            mac_no = x.mac_no
+            yer_obj = yer.objects.filter(mac_no=mac_no).first()
+            if yer_obj:
+                temp['yer'] = yer_obj.yer_adi
+            else:
+                temp['yer'] = mac_no
+
+            #proje_no = x.proje
+            #proje_obj = proje.objects.get(id=proje_no)
+            #if proje_obj:
+            temp['proje'] = x.proje.proje_adi
+            #else:
+            #    temp['proje'] = proje
+            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+            if rfid_obj:
+                temp['adi'] = rfid_obj.adi
+                temp['soyadi'] = rfid_obj.soyadi
+            else:
+                temp['adi'] = ""
+                temp['soyadi'] = ""
+
+            sayi = int(x.kod)
+            print("işte gelen kodun sayısal hali...", sayi)
+
+            if sayi == 0:
+                temp['deger'] = None
+            else:
+                temp['deger'] = 5
+
+            sabun = sayi // 32
+            sayi = sayi % 32
+            lavabo = sayi // 16
+            sayi = sayi % 16
+            havlu = sayi // 8
+            sayi = sayi % 8
+            koku = sayi // 4
+            sayi = sayi % 4
+            tuvalet = sayi // 2
+            kagit = sayi % 2
+
+            aciklama = ""
+            if sabun == 1:
+                aciklama = aciklama + " sabun -"
+            if lavabo == 1:
+                aciklama = aciklama + " lavabo -"
+            if havlu == 1:
+                aciklama = aciklama + " havlu -"
+            if koku == 1:
+                aciklama = aciklama + " koku -"
+            if tuvalet == 1:
+                aciklama = aciklama + " tuvalet -"
+            if kagit == 1:
+                aciklama = aciklama + " kağıt -"
+
+            temp['aciklama'] = aciklama
 
 
+            d_list.append(temp)
+
+        print("işte çıkan liste...", d_list)
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(d_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/denetim_saha_list.html', {'denetim_saha_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+@login_required
 def den_saha_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
     proje = "1"
-    rfid_no = "3"
-    kod = "6"
+    rfid_no = 34234
+    kod = "3"
     print("okunan zaman......denetim create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/denetim_list/",
+    response = requests.post("http://127.0.0.1:7000/ws/denetim_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5729,21 +6030,88 @@ def den_saha_create(request, pk=None):
 
 #--------------------------------------------------------------------------------------------------
 
-
+@login_required
 def ariza_list(request, pk=None):
-    ariza_list = get_ariza_list()
-    print("ariza list..", ariza_list)
-    return render(request, 'islem/ariza_list.html', {'ariza_list': ariza_list,})
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
+        a_list = []
+        for x in ariza_obj:
+            temp = {}
+
+            temp['gelen_tarih'] = x.gelen_tarih
 
 
+            mac_no = x.mac_no
+            yer_obj = yer.objects.filter(mac_no=mac_no).first()
+            if yer_obj:
+                temp['yer'] = yer_obj.yer_adi
+            else:
+                temp['yer'] = mac_no
+
+            temp['proje'] = x.proje.proje_adi
+            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+            if rfid_obj:
+                temp['adi'] = rfid_obj.adi
+                temp['soyadi'] = rfid_obj.soyadi
+            else:
+                temp['adi'] = ""
+                temp['soyadi'] = ""
+
+            sebep = x.sebep
+            print("sebep", sebep)
+
+
+            temp['deger'] = 0
+
+            if sebep == "1":
+                temp['aciklama'] = "mekanik"
+            if sebep == "2":
+                temp['aciklama'] = "elektrik"
+            if sebep == "3":
+                temp['aciklama'] = "su"
+            if sebep == "4":
+                temp['aciklama'] = "ayna"
+
+
+            a_list.append(temp)
+
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(a_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/ariza_list.html', {'ariza_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+@login_required
 def ariza_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
     proje = "1"
-    rfid_no = "3"
-    sebep = "6"
+    rfid_no = "34234"
+    sebep = "2"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/ariza_list/",
+    response = requests.post("http://127.0.0.1:7000/ws/ariza_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5755,14 +6123,14 @@ def ariza_create(request, pk=None):
 
 #--------------------------------------------------------------------------------------------------
 # rfid dosyası, web service işlemleri
-
+@login_required
 def rfid_list(request, pk=None):
     rfid_list = get_rfid_list()
     print("rfid list..", rfid_list)
     return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
 
 
-
+@login_required
 def rfid_filter(request):
 
     if request.method == "POST":
@@ -5771,7 +6139,7 @@ def rfid_filter(request):
             proje = request.POST.get('proje', "")
             print(" proje form okunduktan sonra post...", proje)
 
-            url = "http://37.148.210.226:7000/ws/rfid_filter/"+str(proje)+"/"
+            url = "http://127.0.0.1:7000/ws/rfid_filter/"+str(proje)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -5785,10 +6153,10 @@ def rfid_filter(request):
 
 
 
-
+@login_required
 def rfid_filter_proje(request, proje=None):
     print("rfid project list............", proje)
-    r = requests.get_queryset("http://37.148.210.226:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
+    r = requests.get_queryset("http://127.0.0.1:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
     json_data = r.json()
     print(json_data)
 
@@ -5796,14 +6164,14 @@ def rfid_filter_proje(request, proje=None):
     print("rfid list..", rfid_list)
     return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
 
-
+@login_required
 def rfid_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/rfid_list/",
+    response = requests.post("http://127.0.0.1:7000/ws/rfid_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5817,20 +6185,67 @@ def rfid_create(request, pk=None):
 
 #--------------------------------------------------------------------------------------------------
 
-
+@login_required
 def yerud_list(request, pk=None):
-    yerud_list = get_yerud_list()
-    print("yerud list..", yerud_list)
-    return render(request, 'islem/yerud_list.html', {'yerud_list': yerud_list,})
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        yerud_obj = yer_updown.objects.filter(proje=proje).order_by("id")
+        y_list = []
+        for x in yerud_obj:
+            temp = {}
+
+            temp['id'] = x.id
+            temp['mac_no'] = x.mac_no
+            yer_obj = yer.objects.filter(mac_no=x.mac_no).first()
+            if yer_obj:
+                temp['yer'] = yer_obj.yer_adi
+            else:
+                temp['yer'] = ""
+
+            temp['proje'] = x.proje.proje_adi
+            temp['degis'] = x.degis
+            temp['alive_time'] = x.alive_time
 
 
+
+            y_list.append(temp)
+
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(y_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/yerud_list.html', {'yerud_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+
+@login_required
 def yerud_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......yerud create.............", t_stamp)
-    response = requests.post("http://37.148.210.226:7000/ws/yerud_list/",
+    response = requests.post("http://127.0.0.1:7000/ws/yerud_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
     response.json()
     print("status code..", response.status_code)
@@ -5838,11 +6253,11 @@ def yerud_create(request, pk=None):
 
 
 
-
+@login_required
 def yerud_detail_get(request, pk=None):
     mac_no = pk
     print("gelen mac degeri...", mac_no)
-    url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(mac_no)+"/"
+    url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(mac_no)+"/"
     print("işte url", url)
     response = requests.get(url, auth=("admin", "masanata"))
     print("response...", response)
@@ -5858,20 +6273,50 @@ def yerud_detail_get(request, pk=None):
 
 @login_required
 def rfid_dosyasi_list(request, pk=None):
-    kullanici = request.user.id
-    print("kullanıcı rfid list içinden ...", kullanici)
-    kullanici_obj = Profile.objects.get(id=kullanici)
-    proje = kullanici_obj.proje
-    print("rfid list içinden proje...", proje)
-    if proje == None:
-        rfid_dosyasi_list = rfid_dosyasi.objects.all()
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        rfid_dosyasi_obj = rfid_dosyasi.objects.filter(proje=proje).order_by("id")
+        r_list = []
+        for x in rfid_dosyasi_obj:
+            temp = {}
+
+            temp['rfid_no'] = x.rfid_no
+            temp['proje'] = x.proje.proje_adi
+            if x.rfid_tipi == "O":
+                temp['rfid_tipi'] = "Operasyon"
+            else:
+                temp['rfid_tipi'] = "İdari"
+            temp['adi'] = x.adi
+            temp['soyadi'] = x.soyadi
+
+            r_list.append(temp)
+
+
+        #m_list = memnuniyet_list
+        #contact_list = Contacts.objects.all()
+        paginator = Paginator(r_list, 20)
+        page = request.GET.get('page')
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+        print("işte sayfalanmış liste...", n)
+
+        return render(request, 'islem/rfid_dosyasi_list.html', {'rfid_dosyasi_list': n,})
+
     else:
-        rfid_dosyasi_list = rfid_dosyasi.objects.filter(proje=proje)
-    args = {'rfid_dosyasi_list': rfid_dosyasi_list,}
-    return render(request, 'islem/rfid_dosyasi_list.html', args)
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
-
+@login_required
 def rfid_dosyasi_yarat(request):
     kullanici = request.user.id
     kullanici_obj = Profile.objects.get(user=kullanici)
@@ -5909,11 +6354,13 @@ def rfid_dosyasi_yarat(request):
                                         soyadi=dd_soyadi)
 
             kaydetme_obj.save()
+            messages.success(request, 'rfid bilgisi başarıyla kaydedildi...')
             return redirect('rfid')
+
         else:
-            print(" valid değil rfid girişi ...........")
-            messages.error(request, "Error")
-            form = RfidForm()
+            #print(" valid değil rfid girişi ...........")
+            #messages.error(request, "form hatası")
+            #form = RfidForm()
             return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form,})
 
 
@@ -5928,7 +6375,7 @@ def rfid_dosyasi_yarat(request):
 
 
 
-
+@login_required
 def rfid_dosyasi_duzenle(request, pk=None):
 
     if request.method == "POST":
@@ -5942,7 +6389,7 @@ def rfid_dosyasi_duzenle(request, pk=None):
     return render(request, 'islem/rfid_dosyasi_duzenle.html', {'form': form})
 
 
-
+@login_required
 def rfid_dosyasi_detay(request, pk=None):
     rfid_obj = rfid_dosyasi.objects.get(pk=pk)
     return render(request, 'islem/rfid_dosyasi_detail.html', {'rfid_obj': rfid_obj})
@@ -5977,7 +6424,7 @@ def rfid_dosyasi_sil_kesin(request, pk=None):
 
 
 
-
+@login_required
 def macnoyer(request):
     kullanici = request.user.id
     kullanici_obj = Profile.objects.get(user=kullanici)
@@ -5992,7 +6439,7 @@ def macnoyer(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -6005,7 +6452,7 @@ def macnoyer(request):
     return render(request, 'islem/macnoyer.html', {'form': form, 'gelen': gelen})
 
 
-
+@login_required
 def macnoyer_degis(request):
     kullanici = request.user.id
     kullanici_obj = Profile.objects.get(user=kullanici)
@@ -6020,7 +6467,7 @@ def macnoyer_degis(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://37.148.210.226:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=("admin", "masanata"))
             print("response...", response)
@@ -6065,29 +6512,31 @@ def macnoyer_degis(request):
 
 
 #--------------------------------------------------------------
-
+@login_required
 class RfidListView(LoginRequiredMixin,generic.ListView):
     model = rfid_dosyasi
     paginate_by = 20
 
 
-
+@login_required
 class RfidDetailView(LoginRequiredMixin,generic.DetailView):
     model = rfid_dosyasi
 
 
 #------------------------------------------------------------------------------------
-
+@login_required
 def show_notification(request, notification_id):
     n = Notification.objects.get(id=notification_id)
-    return render_to_response('islem/bildirimler_2.html', {'notification': n})
+    return render_to_response('islem/bildirimler.html', {'notification': n})
 
+@login_required
 def delete_notification(request, notification_id):
     n = Notification.objects.get(id=notification_id)
     n.viewed = True
     n.save()
-    return redirect('list_notification_2')
+    return redirect('list_notification')
 
+@login_required
 def create_notification(request):
     print("create notification kısmı...")
     print("request.user.id", request.user.id)
@@ -6096,22 +6545,35 @@ def create_notification(request):
                                 message="8 nisan uyarı...111")
     return redirect('index')
 
-
-def list_notification_2(request):
+@login_required
+def list_notification(request):
     print("list notifications ..")
     print("request user id..", request.user.id)
     #n = Notification.objects.all()
-    n = Notification.objects.filter(viewed=False)
-    return render_to_response('islem/bildirimler_2.html', {'notification_list': n})
-
+    n_list = Notification.objects.filter(viewed=False).order_by("-id")
+    #contact_list = Contacts.objects.all()
+    paginator = Paginator(n_list, 20)
+    page = request.GET.get('page')
+    try:
+        n = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        n = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        n = paginator.page(paginator.num_pages)
+    print("işte sayfalanmış liste...", n)
+    return render_to_response('islem/bildirimler.html', {'notification_list': n,
+                                                         'user':request.user,
+                                                          })
 
 #-------------------------------------------------------------------------------------
-
+@login_required
 def deneme_dropdown(request):
     return render(request, 'notif_test.html')
 
 #-------------------------------------------------------------------------------
-
+@login_required
 def xyz(request):
     denetim_obj = denetim.objects.all().order_by('denetim_adi')
     #content = unicode(content)
@@ -6120,7 +6582,7 @@ def xyz(request):
 
 
 #-------------------------------------------------------------------------------
-
+@login_required
 def kamera(request):
     denetim_obj = denetim.objects.all().order_by('denetim_adi')
     #content = unicode(content)

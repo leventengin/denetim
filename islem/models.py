@@ -3,11 +3,12 @@ from django.contrib.auth.models import User, Group
 #from datetime import datetime, date
 import datetime
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import requests
 from gm2m import GM2MField
 from decimal import Decimal
+from django import forms
 #from webservice.models  import yer_updown
 
 EVETHAYIR = (
@@ -121,6 +122,9 @@ class Profile(models.Model):
 # operasyon elemanları şu andaki sistemde sadece rfid içinde isim olarak tutuluyor, sisteme user kayıtları yok
 #
 
+
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -129,6 +133,26 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+@receiver(pre_save, sender=User)
+def check_email(sender,instance,**kwargs):
+    kullanici_adi = instance.username
+    print("kullanıcı adı", kullanici_adi)
+    print("kullanıcı e-posta", instance.email)
+    if instance.email == "":
+        pass
+    else:
+        usr = User.objects.filter(email=instance.email).first()
+        if usr:
+            if usr.username == kullanici_adi:
+                pass
+            else:
+                print("olmadı burada.........")
+                raise Exception('EmailExists')
+                #raise forms.ValidationError("e-posta mevcut...")
+        else:
+            pass
+
 
 
 

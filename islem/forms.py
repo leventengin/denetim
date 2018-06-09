@@ -276,12 +276,15 @@ class RfidForm(forms.Form):
         print("cc adi", adi)
         print("cc soyadi", soyadi)
 
+        if (rfid_tipi == "O") and (adi == ""):
+            print(" ne oluyor burada....")
+            raise forms.ValidationError("isim alanı boş olamaz.... ")
+
         if (rfid_tipi == "O") and (adi == ""  or  soyadi == ""):
             print(" ne oluyor burada....")
-            raise forms.ValidationError("isim alanları boş olamaz.... ")
+            raise forms.ValidationError("soyad alanı boş olamaz.... ")
 
-
-        if (rfid_tipi == "D") and (calisan == ""):
+        if (rfid_tipi == "D") and (calisan == None):
             print("yoksa burada.........")
             raise forms.ValidationError("kullanıcı alanı boş olamaz...")
 
@@ -415,6 +418,7 @@ class DenetimForm(forms.Form):
                 raise forms.ValidationError(
                         " tarihler boş olamaz.... ")
             if (cc_hedef_baslangic > cc_hedef_bitis):
+                print("TARİH SIRALAMASI YANLIŞ...............")
                 raise forms.ValidationError(" tarih sıralaması yanlış...")
             """
             if (cc_hedef_baslangic.date < datetime.today()):
@@ -424,6 +428,8 @@ class DenetimForm(forms.Form):
                 raise forms.ValidationError(
                         " denetim bitişi için ileri bir tarih girmelisiniz.... ")
             """
+        return self.cleaned_data
+
 
 
 class KucukResimForm(forms.ModelForm):

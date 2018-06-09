@@ -1,32 +1,137 @@
 {% extends "base_generic.html" %}
-
 {% block content %}
-    <h4>Ariza List</h4>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+
+
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+
+.dikkat{
+  color:red;
+}
+.siyah{
+  color:black;
+}
+
+.yesil{
+  color:green;
+}
+/*
+th{
+    font-weight: normal;
+}
+*/
+
+</style>
+
+
+    <h4>Arıza Bildirim Listesi</h4>
+
+
+    <script type="text/javascript">
+     $(document).ready(function(){
+       /*alert("geldi..."); */
+       $("td").filter(function(index) { return $(this).html() == 0; }).parent().addClass("dikkat");
+       new_notif();
+       myInterval();
+     });
+
+  </script>
+
+
+
     <p> </p>
+
+
+
+    <script>
+          $(document).ready(function(){
+
+                      //alert ( "...bolum detay seç çalıştı...");
+                       degistir();
+
+                  });  /* document ready  kapanıyor */
+    </script>
+
+
+
     {% if ariza_list %}
 
-    <ul>
-    <li>
-        <a>ID </a>&emsp;<a>Tipi </a>&emsp;<a>Proje</a> &emsp;<a>Mac No </a> &emsp;<a>RFID No </a> &emsp; <a> Sebep </a>
-            &emsp; <a> Gelen Zaman </a> &emsp; &emsp; &emsp; <a> Timestamp </a>
-    </li>
-    </ul>
+                  <table  id="table_id">
+                          <tr>
+                            <th hidden>xxx</th>
+                            <th>Proje</th>
+                            <th>Yer</th>
+                            <th>Adı</th>
+                            <th>Soyadı</th>
+                            <th>Açıklama</th>
+                            <th>Zaman</th>
+                          </tr>
 
+                      {% for deger in ariza_list %}
 
+                          <tr class="yn" >
+                            <td hidden>{{ deger.deger }}  </td>
+                            <td>{{ deger.proje }}  </td>
+                            <td>{{ deger.yer }}  </td>
+                            <td>{{ deger.adi }}  </td>
+                            <td>{{ deger.soyadi }}  </td>
+                            <td>{{ deger.aciklama }}  </td>
+                            <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
+                          </tr>
 
-    <ul>
-      {% for deger in ariza_list %}
-        <li>
-
-          <a>({{ deger.id }})</a> -- <a>{{ deger.tipi }}</a>--<a>{{ deger.proje }}</a>--<a>{{ deger.mac_no }}</a>-- <a>{{ deger.rfid_no }} </a> --
-                      <a>{{ deger.sebep }} </a> -- <a> {{ deger.gelen_tarih }} </a> --<a> {{ deger.timestamp }}
-        </li>
-      {% endfor %}
-      <p> </p>
-    </ul>
+                      {% endfor %}
+                  </table>
     {% else %}
       <p> gelen veri yok !!!!!....</p>
       <p> </p>
     {% endif %}
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if ariza_list.has_previous %}
+              <a href="?page={{ ariza_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ ariza_list.number }} / {{ ariza_list.paginator.num_pages }}
+          </span>
+
+          {% if ariza_list.has_next %}
+              <a href="?page={{ ariza_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
 
 {% endblock %}

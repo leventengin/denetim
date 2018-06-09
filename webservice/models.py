@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from islem.models import proje_alanlari, yer, proje
+from islem.models import proje_alanlari, yer, proje, User
 from rest_framework.reverse import reverse as api_reverse
 
 import datetime
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import requests
 
@@ -18,7 +18,7 @@ import requests
 class Memnuniyet(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
-    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)    
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     oy          = models.CharField(max_length=1)
     sebep       = models.CharField(max_length=2)
     gelen_tarih = models.DateTimeField()
@@ -121,6 +121,20 @@ class rfid_dosyasi(models.Model):
         return api_reverse("api-ws:rfid-rud", kwargs={'pk': self.pk}, request=request)
 
 
+@receiver(pre_save, sender=rfid_dosyasi)
+def isim_ekle(sender,instance,**kwargs):
+    rfid_tipi = instance.rfid_tipi
+    if rfid_tipi == "D":
+        kisi_obj = User.objects.get(id=instance.calisan.id)
+        instance.adi = kisi_obj.first_name
+        instance.soyadi = kisi_obj.last_name
+        #instance.adi = instance.calisan.id.first_name
+        #instance.soyadi = instance.calisan.id.first_name
+    else:
+        pass
+
+
+
 
 @receiver(post_save, sender=rfid_dosyasi)
 def create_rfid_yeni(sender, instance, **kwargs):
@@ -129,6 +143,7 @@ def create_rfid_yeni(sender, instance, **kwargs):
     print(" receiver post save proje.............", proje)
     alan_obj = proje_alanlari.objects.filter(proje=proje)
     print("projedeki alanlar....", alan_obj)
+
 
     for alan in alan_obj:
         yer_obj = yer.objects.filter(proje_alanlari=alan)

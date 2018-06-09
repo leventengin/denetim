@@ -2,39 +2,39 @@
 <html lang="tr">
 <head>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>EZ-Check Denetim Sistemi</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>EZ-Check Denetim Sistemi</title>
 
 
-<!-- Bootstrap CSS CDN -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-<!-- Our Custom CSS -->
-{% load static %}
-<link rel="stylesheet" href="{% static 'sidebar/style2.css' %}">
+  <!-- Our Custom CSS -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'sidebar/style2.css' %}">
 
-<!-- Scrollbar Custom CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+  <!-- Scrollbar Custom CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
-<!--  dropdown için... -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-<!-- <link rel="stylesheet" href="{% static 'css/w3.css' %}">  -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"  />
+  <!--  dropdown için... -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
-<!-- dropdown  -->
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!-- jQuery CDN -->
-<!--<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>-->
-<!-- Bootstrap Js CDN -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- jQuery Custom Scroller CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+  <!-- <link rel="stylesheet" href="{% static 'css/w3.css' %}">  -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"  />
+
+
+  <!-- dropdown  -->
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- jQuery CDN -->
+  <!--<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>-->
+  <!-- Bootstrap Js CDN -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- jQuery Custom Scroller CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
 
 
@@ -203,9 +203,9 @@ span.num {
       <nav id="sidebar">
                 <div class="sidebar-header">
 
-                        <a href="{% url 'index' %}"> <img src="{{ STATIC_URL }}images/logo/logo-light-icon.png"
+                        <a href="{% url 'index' %}"> <img src="{% static "images/logo/logo-light-icon.png" %}"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
-                                        <img src="{{ STATIC_URL }}images/logo/logo-light-text.png"
+                                        <img src="{% static "images/logo/logo-light-text.png" %}"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
                                     </a>
 
@@ -213,7 +213,7 @@ span.num {
 
                 <ul class="list-unstyled components">
                     <h4><p>Operasyon ve Denetim Sistemleri</p></h4>
-                   {% if  user.profile.denetci == "E" or request.user.is_superuser %}
+                   {% if  user.profile.denetci == "E" or user.is_superuser %}
                     <li>
                         <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false">Yerinde Denetim</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu1">
@@ -227,7 +227,7 @@ span.num {
                     </li>
                   {% endif %}
 
-                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or user.is_superuser %}
                    <li>
                       <a href="#pageSubmenu2" data-toggle="collapse" aria-expanded="false">Denetim Oluştur</a>
                       <ul class="collapse list-unstyled" id="pageSubmenu2">
@@ -239,7 +239,7 @@ span.num {
                    </li>
                   {% endif %}
 
-                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or user.is_superuser %}
                    <li>
                     <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">Denetimler</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu3">
@@ -250,7 +250,7 @@ span.num {
                    </li>
                   {% endif %}
 
-                  {% if  user.profile.denetim_grup_yetkilisi == "E" or request.user.is_superuser %}
+                  {% if  user.profile.denetim_grup_yetkilisi == "E" or user.is_superuser %}
                    <li>
                     <a href="#pageSubmenu4" data-toggle="collapse" aria-expanded="false">Denetim Tanımları</a>
                       <ul class="collapse list-unstyled" id="pageSubmenu4">
@@ -263,9 +263,9 @@ span.num {
                    </li>
                   {% endif %}
 
-                  {% if  user.profile.operasyon_merkezyon == "E" or user.profile.opr_proje_yon == "E" or request.user.is_superuser %}
+                  {% if  user.profile.isletme_projeyon == "E" or user.profile.opr_proje_yon == "E" or user.profile.opr_alan_sefi == "E" or user.is_superuser %}
                    <li>
-                    <a href="#pageSubmenu5" data-toggle="collapse" aria-expanded="false">Proje Tanımları</a>
+                    <a href="#pageSubmenu5" data-toggle="collapse" aria-expanded="false">Proje Takip</a>
                      <ul class="collapse list-unstyled" id="pageSubmenu5">
                         <li><a href="/islem/projealanlari">Proje Alanları</a></li>
                         <li><a href="/islem/yer">Yer</a></li>
@@ -274,16 +274,32 @@ span.num {
                         <li><a href="/islem/operasyon_list">WS-Operasyon Listele </a></li>
                         <li><a href="/islem/den_saha_list">WS-Denetim Listele </a></li>
                         <li><a href="/islem/ariza_list">WS-Ariza Listele </a></li>
-                        <li><a href="/islem/rfid_filter">WS-Rfid Filtrele </a></li>
                         <li><a href="/islem/yerud_list">WS-Yer Bilgisi Listele </a></li>
                     </ul>
                  </li>
                 {% endif %}
 
-                {% if request.user.is_superuser %}
+                {% if  user.profile.operasyon_merkezyon == "E" or  user.is_superuser %}
                  <li>
-                    <a href="#pageSubmenu6" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu6">
+                  <a href="#pageSubmenu6" data-toggle="collapse" aria-expanded="false">Projeler Takip</a>
+                   <ul class="collapse list-unstyled" id="pageSubmenu6">
+                      <li><a href="/islem/projealanlari">Proje Alanları</a></li>
+                      <li><a href="/islem/yer">Yer</a></li>
+                      <li><a href="/islem/rfid">RFID</a></li>
+                      <li><a href="/islem/memnuniyet_list">WS-Memnuniyet Listele </a></li>
+                      <li><a href="/islem/operasyon_list">WS-Operasyon Listele </a></li>
+                      <li><a href="/islem/den_saha_list">WS-Denetim Listele </a></li>
+                      <li><a href="/islem/ariza_list">WS-Ariza Listele </a></li>
+                      <li><a href="/islem/yerud_list">WS-Yer Bilgisi Listele </a></li>
+                  </ul>
+               </li>
+              {% endif %}
+
+
+                {% if user.is_superuser %}
+                 <li>
+                    <a href="#pageSubmenu7" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu7">
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>
@@ -296,6 +312,7 @@ span.num {
                         <li><a href="/islem/macnoyer">WS-Macno Yer</a></li>
                         <li><a href="/islem/macnoyer_degis">WS-Macno Yer Değiş</a></li>
                         <li><a href="/islem/yerud_create">WS-Yer Bilgisi Ekle</a></li>
+                        <li><a href="/islem/rfid_filter">WS-Rfid Filtrele </a></li>
                         <li><a href="/islem/qrdosyasi">QRCode</a></li>
                         <li><a href="/islem/deneme_dropdown">deneme dropdown</a></li>
                         <!-- <li><a href="/islem/qrcode">QR code</a></li> -->
@@ -338,8 +355,6 @@ span.num {
 
                              <div class="col-md-2 c" ><a class="dropbtn2 middler" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
-                                     <a href="#">Link 1</a>
-                                     <a href="#">Link 2</a>
                                    </div>
                              </div>
 
@@ -392,16 +407,17 @@ span.num {
         $(document).ready(function(){
                       //alert("document ready..");
                       new_notif();
-                      //myInterval();
+                      myInterval();
              });  /* document ready  kapanıyor */
   </script>
 
 
-<!--  bildirimlerin her   dakikada bir okunması için zaman planı -->
+
+<!--  bildirimlerin her 1  dakikada bir okunması için zaman planı -->
 <script>
   var myVar;
   function myInterval() {
-      myVar = setInterval(new_notif, 60000);
+      myVar = setInterval(new_notif, 120000);
   }
 </script>
 <!--    -->

@@ -253,8 +253,9 @@ urlpatterns = [
 
 
     # yer urlleri aşağıda....
-    url(r'^yer/$', views.YerListView.as_view(), name='yer'),
-    url(r'^yer/(?P<pk>\d+)$', views.yer_detay, name='yer_detay'),
+    url(r'^yer/$', views.yer_listele, name='yer_listele'),
+    #url(r'^yer/(?P<pk>\d+)$', views.yer_detay, name='yer_detay'),
+    url(r'^yer/(?P<pk>\d+)$', views.yer_detay_gecici, name='yer_detay_gecici'),
     url(r'^yer/(?P<pk>\d+)/zaman_planla/$', views.yer_zaman_planla, name='yer_zaman_planla'),
     url(r'^yer/(?P<pk>\d+)/denetim_planla/$', views.yer_denetim_planla, name='yer_denetim_planla'),
     url(r'^yer/(?P<pk>\d+)/zaman_duzenle/$', views.yer_zaman_duzenle, name='yer_zaman_duzenle'),
@@ -283,7 +284,7 @@ urlpatterns = [
     url(r'^cagir3/$', views.cagir3, name='cagir3'),
     url(r'^cagir4/$', views.cagir4, name='cagir4'),
 
-    url(r'^notification/$', views.list_notification_2, name='list_notification_2'),
+    url(r'^notification/$', views.list_notification, name='list_notification'),
     url(r'^notification/show/(?P<notification_id>\d+)/$', views.show_notification, name='show_notification'),
     url(r'^notification/delete/(?P<notification_id>\d+)/$', views.delete_notification, name='delete_notification'),
     url(r'^notification/create/$', views.create_notification, name='create_notification'),

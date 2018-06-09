@@ -1,0 +1,139 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+
+
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+
+.dikkat{
+  color:red;
+}
+.siyah{
+  color:black;
+}
+
+.yesil{
+  color:green;
+}
+/*
+th{
+    font-weight: normal;
+}
+*/
+
+</style>
+
+
+    <h4>Memnuniyet Listesi</h4>
+
+
+    <script type="text/javascript">
+     $(document).ready(function(){
+       /*alert("geldi..."); */
+       $("td").filter(function(index) {
+        return $(this).html() == 5;
+      }).parent().addClass("dikkat");
+     });
+
+  </script>
+
+
+
+    <p> </p>
+
+
+
+    <script>
+          $(document).ready(function(){
+
+                      //alert ( "...bolum detay seç çalıştı...");
+                       degistir();
+
+                  });  /* document ready  kapanıyor */
+    </script>
+
+
+
+    {% if memnuniyet_list %}
+
+                  <table  id="table_id">
+                          <tr>
+                            <th>ID</th>
+                            <th>Tipi</th>
+                            <th>Proje</th>
+                            <th>Mac No</th>
+                            <th>Oy</th>
+                            <th>Sebep</th>
+                            <th>Zaman</th>
+                            <th>TStamp</th>
+                          </tr>
+
+                      {% for deger in memnuniyet_list %}
+
+                          <tr class="yn" >
+                            <td>{{ deger.id }}  </td>
+                            <td>{{ deger.tipi }}  </td>
+                            <td>{{ deger.proje }}  </td>
+                            <td>{{ deger.mac_no }}  </td>
+                            <td>{{ deger.oy }}  </td>
+                            <td>{{ deger.sebep }}  </td>
+                            <td>{{ deger.gelen_tarih }}  </td>
+                            <td>{{ deger.timestamp }}  </td>
+                          </tr>
+
+                      {% endfor %}
+                  </table>
+    {% else %}
+      <p> gelen veri yok !!!!!....</p>
+      <p> </p>
+    {% endif %}
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if memnuniyet_list.has_previous %}
+              <a href="?page={{ memnuniyet_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ memnuniyet_list.number }} / {{ memnuniyet_list.paginator.num_pages }}.
+          </span>
+
+          {% if memnuniyet_list.has_next %}
+              <a href="?page={{ memnuniyet_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
+
+{% endblock %}
