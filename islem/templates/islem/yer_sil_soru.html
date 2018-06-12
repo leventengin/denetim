@@ -5,11 +5,13 @@
 
       <h3>Yer Sil</h3>
 
+
+      <p>  <b> id: </b>   &emsp;   {{ sil_obj.id }}</p>
+      <p>  <b> Alanı: </b>  &emsp; {{ sil_obj.proje_alanlari }}</p>
+      <p>  <b> Adı: </b>   &emsp;  {{ sil_obj.yer_adi }}</p>
+      <p>  <b> Mac No: </b>  &emsp; {{ sil_obj.mac_no }}</p>
+
       <p>Bu yeri silmek istediğinizden emin misiniz ???: </p>
-
-      <p>  <b> id: </b>   &emsp;   {{ sil_id }}</p>
-
-      <p>   <b>  adı: </b>  &emsp;   {{ sil_yer }}</p>
 
       <form action="" method="POST">
         {% csrf_token %}

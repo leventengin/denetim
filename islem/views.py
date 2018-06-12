@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect , JsonResponse
 from django.views.generic import View
 from django.template.loader import get_template
 from islem.utils import render_to_pdf #created in step 4
@@ -18,8 +18,8 @@ from .models import plan_opr_gun, plan_den_gun
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
-from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm
-from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm
+from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
+from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
@@ -27,7 +27,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
 from webservice.models import Memnuniyet, Operasyon_Data, Denetim_Data, Ariza_Data
 from webservice.models import rfid_dosyasi, yer_updown
-
+from django.db.models import ProtectedError
 
 
 
@@ -4571,6 +4571,8 @@ def yer_denetim_duzenle(request, pk=None):
 
 
 
+
+
 #---------------------------------------------------------------------------------
 
 
@@ -4713,10 +4715,8 @@ def tipi_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('tipi')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('tipi')
 
@@ -4744,10 +4744,8 @@ def zon_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('zon')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('zon')
 
@@ -4775,10 +4773,8 @@ def bolum_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('bolum')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('bolum')
 
@@ -4803,10 +4799,8 @@ def detay_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('detay')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('detay')
 
@@ -4814,14 +4808,54 @@ def detay_sil_kesin(request, pk=None):
 #------------------------------------------------------
 
 @login_required
+def projealanlari_listele(request):
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        pa_obj = proje_alanlari.objects.filter(proje=proje)
+        return render(request, 'islem/proje_alanlari_list.html', {'proje_alanlari_list': pa_obj,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+@login_required
+def projealanlari_yarat(request):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = PAForm(request.POST, kullanici=kullanici)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            post = form.save(commit=False)
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('projealanlari_listele')
+        else:
+            return render(request, 'islem/proje_alanlari_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        print(" paform get alanı için...")
+        form = PAForm(kullanici=kullanici)
+        print("pa form tanımdan sonra...")
+        return render(request, 'islem/proje_alanlari_form.html', {'form': form,})
+
+
+
+
+
+@login_required
 def projealanlari_sil(request, pk=None):
     print("proje alanlari sildeki pk:", pk)
-    object = get_object_or_404(proje_alanlari, pk=pk)
-    sil_detay = object.alan
-    sil_id = object.id
-    print("sil_detay", sil_detay)
-    print("sil_id", sil_id)
-    args = {'sil_id': sil_id, 'sil_detay': sil_detay, 'pk': pk,}
+    pa_object = get_object_or_404(proje_alanlari, pk=pk)
+    args = {'pa_object': pa_object,}
     return render(request, 'islem/proje_alanlari_sil_soru.html', args)
 
 
@@ -4832,12 +4866,11 @@ def projealanlari_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('projealanlari')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
     messages.success(request, 'Başarıyla silindi....')
-    return redirect('projealanlari')
+    return redirect('projealanlari_listele')
 
 #------------------------------------------------------
 
@@ -4864,17 +4897,63 @@ def yer_listele(request):
 
 
 
+@login_required
+def yer_yarat(request):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = YerForm(request.POST, kullanici=kullanici)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            post = form.save(commit=False)
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('yer_listele')
+        else:
+            return render(request, 'islem/yer_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = YerForm(kullanici=kullanici)
+        return render(request, 'islem/yer_form.html', {'form': form,})
+
+
+
+@login_required
+def yer_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    yer_obj = get_object_or_404(yer, pk=pk)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = YerForm(request.POST, kullanici=kullanici, instance=yer_obj)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            post = form.save(commit=False)
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('yer_listele')
+        else:
+            return render(request, 'islem/yer_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = YerForm(kullanici=kullanici, instance=yer_obj)
+        return render(request, 'islem/yer_form.html', {'form': form,})
+
+
+
+
 
 
 @login_required
 def yer_sil(request, pk=None):
     print("detay sildeki pk:", pk)
-    object = get_object_or_404(yer, pk=pk)
-    sil_detay = object.yer_adi
-    sil_id = object.id
-    print("sil_detay", sil_detay)
-    print("sil_id", sil_id)
-    args = {'sil_id': sil_id, 'sil_detay': sil_detay, 'pk': pk,}
+    sil_object = get_object_or_404(yer, pk=pk)
+    args = {'sil_obj': sil_object,}
     return render(request, 'islem/yer_sil_soru.html', args)
 
 
@@ -4885,12 +4964,114 @@ def yer_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('yer')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
-    return redirect('yer')
+    return redirect('yer_listele')
+
+
+#---------------------------------------------------------------------------
+# RFID dosya işlemleri....................
+# WEB SERVICE OLMADAN................-----
+
+
+@login_required
+def rfid_dosyasi_listele(request):
+    user = request.user
+    if proje_varmi_kontrol(user):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        rfid_dosyasi_obj = rfid_dosyasi.objects.filter(proje=proje).order_by("id")
+        return render(request, 'islem/rfid_dosyasi_list.html', {'rfid_dosyasi_list': rfid_dosyasi_obj})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+@login_required
+def rfid_dosyasi_detay(request, pk=None):
+    rfid_obj = rfid_dosyasi.objects.get(pk=pk)
+    return render(request, 'islem/rfid_dosyasi_detail.html', {'rfid_obj': rfid_obj})
+
+
+
+
+@login_required
+def rfid_dosyasi_yarat(request):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = RfidForm(request.POST, kullanici=kullanici)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            post = form.save(commit=False)
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('rfid_dosyasi_listele')
+        else:
+            return render(request, 'islem/rfid_dosyasi_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = RfidForm(kullanici=kullanici)
+        return render(request, 'islem/rfid_dosyasi_form.html', {'form': form,})
+
+
+
+@login_required
+def rfid_dosyasi_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    rfid_dosyasi_obj = get_object_or_404(rfid_dosyasi, pk=pk)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = RfidForm(request.POST, kullanici=kullanici, instance=rfid_dosyasi_obj)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            post = form.save(commit=False)
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti....')
+            return redirect('rfid_dosyasi_listele')
+        else:
+            return render(request, 'islem/rfid_dosyasi_form.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = RfidForm(kullanici=kullanici, instance=rfid_dosyasi_obj)
+        return render(request, 'islem/rfid_dosyasi_form.html', {'form': form,})
+
+
+
+
+
+@login_required
+def rfid_dosyasi_sil(request, pk=None):
+    print("grup sildeki pk:", pk)
+    rfid_obj = get_object_or_404(rfid_dosyasi, pk=pk)
+    args = {'rfid_obj': rfid_obj}
+    return render(request, 'islem/rfid_dosyasi_sil_soru.html', args)
+
+
+@login_required
+def rfid_dosyasi_sil_kesin(request, pk=None):
+    print("rfid sil kesindeki pk:", pk)
+    object = get_object_or_404(rfid_dosyasi, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi....')
+    return redirect('rfid_dosyasi_listele')
+
+
+
 
 
 
@@ -4915,10 +5096,8 @@ def grup_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('grup')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('grup')
 
@@ -4944,10 +5123,8 @@ def sirket_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('sirket')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('sirket')
 
@@ -4972,10 +5149,8 @@ def proje_sil_kesin(request, pk=None):
     try:
         object.delete()
     except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('proje')
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi....')
     return redirect('proje')
 
@@ -6266,162 +6441,8 @@ def yerud_detail_get(request, pk=None):
     return redirect('yerud_list')
 
 
-#---------------------------------------------------------------------------
-# RFID dosya işlemleri....................
-# WEB SERVICE OLMADAN................-----
 
-
-@login_required
-def rfid_dosyasi_list(request, pk=None):
-    user = request.user
-    if proje_varmi_kontrol(user):
-        print("proje var mı kontrolden geçtik.....")
-        proje = user.profile.proje
-        rfid_dosyasi_obj = rfid_dosyasi.objects.filter(proje=proje).order_by("id")
-        r_list = []
-        for x in rfid_dosyasi_obj:
-            temp = {}
-
-            temp['rfid_no'] = x.rfid_no
-            temp['proje'] = x.proje.proje_adi
-            if x.rfid_tipi == "O":
-                temp['rfid_tipi'] = "Operasyon"
-            else:
-                temp['rfid_tipi'] = "İdari"
-            temp['adi'] = x.adi
-            temp['soyadi'] = x.soyadi
-
-            r_list.append(temp)
-
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
-        paginator = Paginator(r_list, 20)
-        page = request.GET.get('page')
-        try:
-            n = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            n = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            n = paginator.page(paginator.num_pages)
-        print("işte sayfalanmış liste...", n)
-
-        return render(request, 'islem/rfid_dosyasi_list.html', {'rfid_dosyasi_list': n,})
-
-    else:
-        print("buraya geldi...proje yetkilisi değil...")
-        mesaj = "kişi bu işlem için yetkili değil..."
-        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-
-
-@login_required
-def rfid_dosyasi_yarat(request):
-    kullanici = request.user.id
-    kullanici_obj = Profile.objects.get(user=kullanici)
-    proje = kullanici_obj.proje
-    print("kullanıcı ve projesi", kullanici, "-",  proje)
-
-
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = RfidForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print("valid....")
-            dd_rfid_no = request.POST.get('rfid_no', "")
-            dd_proje = request.POST.get('proje',"")
-            dd_rfid_tipi = request.POST.get('rfid_tipi',"")
-            dd_calisan = request.POST.get('calisan', "")
-            dd_adi = request.POST.get('adi',"")
-            dd_soyadi = request.POST.get('soyadi',"")
-
-            print ("rfid_no", dd_rfid_no)
-            print ("proje", dd_proje)
-            print ("rfid tipi", dd_rfid_tipi)
-            print ("calisan", dd_calisan)
-            print ("adı", dd_adi)
-            print ("soyadi", dd_soyadi)
-
-
-            kaydetme_obj = rfid_dosyasi(rfid_no=dd_rfid_no,
-                                        proje_id=dd_proje,
-                                        rfid_tipi=dd_rfid_tipi,
-                                        calisan_id=dd_calisan,
-                                        adi=dd_adi,
-                                        soyadi=dd_soyadi)
-
-            kaydetme_obj.save()
-            messages.success(request, 'rfid bilgisi başarıyla kaydedildi...')
-            return redirect('rfid')
-
-        else:
-            #print(" valid değil rfid girişi ...........")
-            #messages.error(request, "form hatası")
-            #form = RfidForm()
-            return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form,})
-
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
-        kullanici = request.user.id
-        print("kullanici  ..", kullanici)
-        form = RfidForm()
-        return render(request, 'islem/rfid_dosyasi_yarat.html', {'form': form,})
-
-
-
-
-@login_required
-def rfid_dosyasi_duzenle(request, pk=None):
-
-    if request.method == "POST":
-        form = RfidForm(request.POST)
-        if form.is_valid():
-            rfid = form.save(commit=False)
-            rfid.save()
-            return redirect('rfid')
-    else:
-        form = RfidForm()
-    return render(request, 'islem/rfid_dosyasi_duzenle.html', {'form': form})
-
-
-@login_required
-def rfid_dosyasi_detay(request, pk=None):
-    rfid_obj = rfid_dosyasi.objects.get(pk=pk)
-    return render(request, 'islem/rfid_dosyasi_detail.html', {'rfid_obj': rfid_obj})
-
-
-
-@login_required
-def rfid_dosyasi_sil(request, pk=None):
-    print("grup sildeki pk:", pk)
-    object = get_object_or_404(grup, pk=pk)
-    sil_rfid = object.grup_adi
-    sil_id = object.id
-    print("sil_rfid", sil_rfid)
-    print("sil_id", sil_id)
-    args = {'sil_id': sil_id, 'sil_rfid': sil_rfid, 'pk': pk,}
-    return render(request, 'islem/rfid_dosyasi_sil_soru.html', args)
-
-
-@login_required
-def rfid_dosyasi_sil_kesin(request, pk=None):
-    print("rfid sil kesindeki pk:", pk)
-    object = get_object_or_404(grup, pk=pk)
-    try:
-        object.delete()
-    except ProtectedError:
-        error_message = "bağlantılı veri var,  silinemez...!!"
-        #return JsonResponse(error_message, safe=False)
-        messages.success(request, 'Bağlantılı veri var silinemez.......')
-        return redirect('grup')
-    messages.success(request, 'Başarıyla silindi....')
-    return redirect('rfid')
-
+#---------------------------------------------------------------------------------------
 
 
 @login_required

@@ -97,15 +97,6 @@ urlpatterns = [
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
 
-    url(r'^rfid/$', views.rfid_dosyasi_list, name='rfid'),
-    url(r'^rfid/(?P<pk>\d+)$', views.rfid_dosyasi_detay, name='rfid_dosyasi_detay'),
-    url(r'^rfid/create/$', views.rfid_dosyasi_yarat, name='rfid_dosyasi_yarat'),
-    url(r'^rfid/(?P<pk>\d+)/update/$', views.rfid_dosyasi_duzenle, name='rfid_dosyasi_duzenle'),
-    url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_dosyasi_sil, name='rfid_dosyasi_sil'),
-    url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_dosyasi_sil_kesin, name='rfid_dosyasi_sil_kesin'),
-
-
-
 #---------------------------------------------------------------------------------------------------
     # rest urlleri aşağıda....
     url(r'^memnuniyet_create/$', views.memnuniyet_create, name='memnuniyet_create'),
@@ -244,13 +235,22 @@ urlpatterns = [
     url(r'^detay/(?P<pk>\d+)/delete/kesin/$', views.detay_sil_kesin, name='detay_sil_kesin'),
 
     # projealanlari urlleri aşağıda....
-    url(r'^projealanlari/$', views.ProjeAlanlariListView.as_view(), name='projealanlari'),
+    #url(r'^projealanlari/$', views.ProjeAlanlariListView.as_view(), name='projealanlari'),
+    url(r'^projealanlari/$', views.projealanlari_listele, name='projealanlari_listele'),
     url(r'^projealanlari/(?P<pk>\d+)$', views.ProjeAlanlariDetailView.as_view(), name='projealanlari-detail'),
-    url(r'^projealanlari/create/$', views.ProjeAlanlariCreate.as_view(), name='projealanlari_create'),
+    #url(r'^projealanlari/create/$', views.ProjeAlanlariCreate.as_view(), name='projealanlari_create'),
+    url(r'^projealanlari/create/$', views.projealanlari_yarat, name='projealanlari_yarat'),
     url(r'^projealanlari/(?P<pk>\d+)/update/$', views.ProjeAlanlariUpdate.as_view(), name='projealanlari_update'),
     url(r'^projealanlari/(?P<pk>\d+)/delete/$', views.projealanlari_sil, name='projealanlari_sil'),
     url(r'^projealanlari/(?P<pk>\d+)/delete/kesin/$', views.projealanlari_sil_kesin, name='projealanlari_sil_kesin'),
 
+    # rfid dosyası - ws olmayan -  urlleri aşağıda....
+    url(r'^rfid/$', views.rfid_dosyasi_listele, name='rfid_dosyasi_listele'),
+    url(r'^rfid/(?P<pk>\d+)$', views.rfid_dosyasi_detay, name='rfid_dosyasi_detay'),
+    url(r'^rfid/create/$', views.rfid_dosyasi_yarat, name='rfid_dosyasi_yarat'),
+    url(r'^rfid/(?P<pk>\d+)/update/$', views.rfid_dosyasi_duzenle, name='rfid_dosyasi_duzenle'),
+    url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_dosyasi_sil, name='rfid_dosyasi_sil'),
+    url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_dosyasi_sil_kesin, name='rfid_dosyasi_sil_kesin'),
 
     # yer urlleri aşağıda....
     url(r'^yer/$', views.yer_listele, name='yer_listele'),
@@ -265,8 +265,10 @@ urlpatterns = [
     url(r'^yer/(?P<pk>\d+)/zaman_duzenle/delete/$', views.yer_zaman_duzenle_delete, name='yer_zaman_duzenle_delete'),
     url(r'^yer/(?P<pk>\d+)/zaman_duzenle/delete/kesin/$', views.yer_zaman_duzenle_kesin, name='yer_zaman_duzenle_kesin'),
     url(r'^yer/(?P<pk>\d+)/denetim_duzenle/$', views.yer_denetim_duzenle, name='yer_denetim_duzenle'),
-    url(r'^yer/create/$', views.YerCreate.as_view(), name='yer_create'),
-    url(r'^yer/(?P<pk>\d+)/update/$', views.YerUpdate.as_view(), name='yer_update'),
+    #url(r'^yer/create/$', views.YerCreate.as_view(), name='yer_create'),
+    url(r'^yer/create/$', views.yer_yarat, name='yer_yarat'),
+    #url(r'^yer/(?P<pk>\d+)/update/$', views.YerUpdate.as_view(), name='yer_update'),
+    url(r'^yer/(?P<pk>\d+)/update/$', views.yer_duzenle, name='yer_duzenle'),
     url(r'^yer/(?P<pk>\d+)/delete/$', views.yer_sil, name='yer_sil'),
     url(r'^yer/(?P<pk>\d+)/delete/kesin/$', views.yer_sil_kesin, name='yer_sil_kesin'),
 

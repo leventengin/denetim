@@ -2,7 +2,7 @@
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil
-from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun
+from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun, yer, proje_alanlari
 from webservice.models import rfid_dosyasi
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
@@ -249,17 +249,92 @@ class SaatForm(forms.ModelForm):
 
 
 
+class YerForm(forms.ModelForm):
+    class Meta:
+        model = yer
+        fields = ( 'proje_alanlari', 'yer_adi', 'mac_no', 'opr_basl', 'opr_son', 'opr_delta', 'den_basl', 'den_son', 'den_delta')
+        labels = {
+            'proje_alanlari' : 'Proje Alanı:',
+            'yer_adi' : 'Yer Adı:',
+            'mac_no': 'Mac No:',
+            'opr_basl': 'Opr Başlangıç:',
+            'opr_son': 'Opr Son:',
+            'opr_delta': 'Opr Aralık',
+            'den_basl': 'Den Başlangıç:',
+            'den_son': 'Den Son:',
+            'den_delta': 'Den Aralık',
+        }
+
+    def clean(self):
+        cleaned_data = super(YerForm, self).clean()
+        cc_pa = cleaned_data.get("proje_alanlari")
+        cc_yer_adi = cleaned_data.get("yer_adi")
+        cc_mac_no = cleaned_data.get("mac_no")
+        cc_opr_basl = cleaned_data.get("opr_basl")
+        cc_opr_son = cleaned_data.get("opr_son")
+        cc_opr_delta = cleaned_data.get("opr_delta")
+        cc_den_basl = cleaned_data.get("den_basl")
+        cc_den_son = cleaned_data.get("den_son")
+        cc_den_delta = cleaned_data.get("den_delta")
+
+    def __init__(self, *args, **kwargs):
+        kullanici = kwargs.pop("kullanici")
+        super(YerForm, self).__init__(*args, **kwargs)
+        proje = kullanici.profile.proje
+        print("işte yer form init içinden proje...")
+        pa_obj = proje_alanlari.objects.filter(proje=proje)
+        self.fields['proje_alanlari'].queryset = pa_obj
 
 
 
-class RfidForm(forms.Form):
-    rfid_no = forms.CharField(label='Rfid No', max_length=20 )
-    proje = forms.ModelChoiceField(queryset=proje.objects.all(), label="Proje..")
-    rfid_tipi = forms.ChoiceField(choices=OPERASYONDIGER, widget=forms.Select, label="Rfid Tipi:")
-    calisan = forms.ModelChoiceField(queryset=User.objects.all(), label="Kullanıcı..", required=False )
-    adi = forms.CharField(label='Adı', required=False, max_length=20  )
-    soyadi = forms.CharField(label='Soyadı', required=False, max_length=20  )
+class PAForm(forms.ModelForm):
+    class Meta:
+        model = proje_alanlari
+        fields = ( 'proje', 'alan', )
+        labels = {
+            'proje' : 'Proje Adı:',
+            'alan' : 'Alan Adı:',
+        }
 
+    def clean(self):
+        cleaned_data = super(PAForm, self).clean()
+        cc_proje = cleaned_data.get("proje")
+        cc_alan = cleaned_data.get("alan")
+
+    def __init__(self, *args, **kwargs):
+        kullanici = kwargs.pop("kullanici")
+        super(PAForm, self).__init__(*args, **kwargs)
+        prj = kullanici.profile.proje
+        print("işte yer form init içinden proje...", prj)
+        proje_obj = proje.objects.filter(id=prj.id)
+        print("işte  proje objesi.....", proje_obj)
+        self.fields['proje'].queryset = proje_obj
+
+
+
+
+class RfidForm(forms.ModelForm):
+    class Meta:
+        model = rfid_dosyasi
+        fields = ( 'rfid_no', 'proje', 'rfid_tipi', 'calisan', 'adi', 'soyadi')
+        labels = {
+            'rfid_no': 'RFID No',
+            'proje' : 'Proje Adı:',
+            'rfid_tipi' : 'RFID Tipi:',
+            'çalışan': 'Kullanıcı:',
+            'adi' : 'Adı:',
+            'soyadi' : 'Soyadı:',
+        }
+
+    def __init__(self, *args, **kwargs):
+        kullanici = kwargs.pop("kullanici")
+        super(RfidForm, self).__init__(*args, **kwargs)
+        prj = kullanici.profile.proje
+        print("işte yer form init içinden proje...", prj)
+        proje_obj = proje.objects.filter(id=prj.id)
+        print("işte  proje objesi.....", proje_obj)
+        self.fields['proje'].queryset = proje_obj
+        
     def clean(self):
         cleaned_data = super(RfidForm, self).clean()
         rfid_no = cleaned_data.get('rfid_no')
@@ -290,20 +365,16 @@ class RfidForm(forms.Form):
 
         return cleaned_data
 
-"""
-    def __init__(self, *args, **kwargs):
-        kullanici = kwargs.pop("kullanici")
-        super(RfidForm, self).__init__(*args, **kwargs)
-        print("rfid form init içinden kullanan..", kullanici)
-        # burada kullanıcının projesi alınacak...
-        # ona göre proje çıkacak ve ilgili proje çalışanları çıkacak...
-        # eğer adminse tüm projeler çıkacak fakat projeye göre çalışan değişecek...
 
-        # denetim_obj_ilk = denetim.objects.filter(durum="B")
-        # denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
-        # self.fields['denetim'].queryset = denetim_obj
-        # print("queryset initial içinden..:", self.fields['denetim'].queryset)
-"""
+
+
+
+
+
+
+
+
+
 
 class AcilAcForm(forms.Form):
     denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")

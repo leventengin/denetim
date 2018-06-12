@@ -5,23 +5,20 @@
 {% block content %}
 
 
-<!--  buraya if konulacak ...-->
+      <h1>RFID  Sil</h1>
+
+      <p>  <b> id: </b>   &emsp;   {{ rfid_obj.id }}</p>
+      <p>  <b> RFID No: </b>  &emsp;   {{ rfid_obj.rfid_no}}</p>
+      <p>  <b> Proje: </b>   &emsp;   {{ rfid_obj.proje }}</p>
+      <p>  <b> Tipi: </b>  &emsp;   {{ rfid_obj.rfid_tipi}}</p>
+      <p>  <b> Adı: </b>  &emsp;   {{ rfid_obj.adi }}</p>
+      <p>  <b> Soyadı: </b>   &emsp;   {{ rfid_obj.soyadi }}</p>
 
 
-      <h1>Denetim Bölümü Sil</h1>
-
-      <p>Bu denetim bölümünü silmek istediğinizden emin misiniz ???: </p>
-
-      <p>  <b> id: </b>   &emsp;   {{ sil_id }}</p>
-
-      <p>   <b>  adı: </b>  &emsp;   {{ sil_bolum }}</p>
+      <p>Bu kaydı silmek istediğinizden emin misiniz: </p>
 
       <form action="" method="POST">
         {% csrf_token %}
-      <!--<input type="submit" action="demirbas_sil_kesin" value="Evet, sil.." /> -->
-
-      <!-- <a href="giris/demirbas/{{ sil_id }}/kesin"> Evet sil... </a>  -->
-
       <a href="kesin"> Evet sil... </a>
       </form>
 
