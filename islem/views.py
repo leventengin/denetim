@@ -19,7 +19,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
-from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm
+from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
@@ -4810,7 +4810,7 @@ def detay_sil_kesin(request, pk=None):
 @login_required
 def projealanlari_listele(request):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(user, request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         pa_obj = proje_alanlari.objects.filter(proje=proje)
@@ -5071,7 +5071,9 @@ def rfid_dosyasi_sil_kesin(request, pk=None):
     return redirect('rfid_dosyasi_listele')
 
 
-
+#----------------------------------------------
+#MK için olan listeleme işlemleri..............
+#---------------------------------------------
 
 
 
@@ -5870,8 +5872,9 @@ def popup_notif(request):
 
 
 
-from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol
+from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
+from islem.services import get_m_list, get_o_list
 
 
 
@@ -5880,82 +5883,43 @@ from dateutil import parser
 @login_required
 def memnuniyet_list(request, pk=None):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
 
-        memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).order_by("-id")
-        m_list = []
-        for x in memnuniyet_obj:
-            temp = {}
+        m2_list = request.session.get('rs_m_list')
+        if m2_list:
+            rs_okuma = True
+            m_list = []
+            for x in m2_list:
+                temp = {}
+                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                m_list.append(temp)
+        else:
+            rs_okuma = False
+            m_list = get_m_list(request)
+            request.session['rs_m_list'] = m_list
 
-            ara_tarih = x.gelen_tarih
-
-            #parsed_date = parser.parse(ara_tarih)
-            parsed_date = ara_tarih
-            print("işte datetime a çevrilmiş hali string den ...", parsed_date)
-            temp['gelen_tarih'] = parsed_date
-
-
-            mac_no = x.mac_no
-            yer_obj = yer.objects.filter(mac_no=mac_no).first()
-            if yer_obj:
-                temp['yer'] = yer_obj.yer_adi
-            else:
-                temp['yer'] = mac_no
-
-            #proje_no = x.proje
-            #proje_obj = proje.objects.get(id=proje_no)
-            #if proje_obj:
-            temp['proje'] = x.proje.proje_adi
-            #else:
-            #    temp['proje'] = proje
-
-            oy = x.oy
-            sebep = x.sebep
-            print("oy", oy)
-            print("sebep", sebep)
-
-            if oy == "3":
-                temp['deger'] = 0
-            else:
-                temp['deger'] = None
-
-            if oy == "1":
-                temp['aciklama'] = "çok mutlu"
-            elif oy == "2":
-                temp['aciklama'] = "mutlu"
-            else:
-                if sebep == "1":
-                    temp['aciklama'] = "sabunluk"
-                if sebep == "2":
-                    temp['aciklama'] = "lavabo"
-                if sebep == "3":
-                    temp['aciklama'] = "havlu"
-                if sebep == "4":
-                    temp['aciklama'] = "koku"
-                if sebep == "5":
-                    temp['aciklama'] = "tuvalet"
-                if sebep == "6":
-                    temp['aciklama'] = "tuvalet kağıdı"
-
-            m_list.append(temp)
-
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
-        paginator = Paginator(m_list, 20)
+        paginator = Paginator(m_list, 30)
         page = request.GET.get('page')
         try:
             n = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
+            if rs_okuma:
+                m_list = get_m_list(request)
+                request.session['rs_m_list'] = m_list
+            paginator = Paginator(m_list, 30)
             n = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             n = paginator.page(paginator.num_pages)
-        print("işte sayfalanmış liste...", n)
 
+        print("işte sayfalanmış liste...", n)
         return render(request, 'islem/memnuniyet_list.html', {'memnuniyet_list': n,})
 
     else:
@@ -5980,6 +5944,160 @@ def memnuniyet_create(request, pk=None):
 
 
 
+@login_required
+def mk_memnuniyet_list(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                m_list = request.session.get('mk_m_list')
+                mk_proje = request.session.get('mk_m_proje')
+
+                if mk_proje == proje:
+
+                    m2_list = []
+                    for x in m_list:
+                        temp = {}
+
+                        temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                        temp['yer'] = x['yer']
+                        temp['aciklama'] = x['aciklama']
+                        temp['deger'] = x['deger']
+                        temp['proje'] = x['proje']
+                        m2_list.append(temp)
+
+                else:
+                    memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).order_by("-id")
+                    m_list = []
+                    m2_list = []
+                    for x in memnuniyet_obj:
+                        temp = {}
+                        temp2 = {}
+
+                        ara_tarih = x.gelen_tarih
+                        #parsed_date = parser.parse(ara_tarih)
+                        parsed_date = str(ara_tarih)
+                        print("işte datetime a çevrilmiş hali string den ...", parsed_date)
+                        temp['gelen_tarih'] = parsed_date
+
+
+                        mac_no = x.mac_no
+                        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+                        if yer_obj:
+                            temp['yer'] = yer_obj.yer_adi
+                        else:
+                            temp['yer'] = mac_no
+
+                        #proje_no = x.proje
+                        #proje_obj = proje.objects.get(id=proje_no)
+                        #if proje_obj:
+                        temp['proje'] = x.proje.proje_adi
+                        #else:
+                        #    temp['proje'] = proje
+
+                        oy = x.oy
+                        sebep = x.sebep
+                        print("oy", oy)
+                        print("sebep", sebep)
+
+                        if oy == "3":
+                            temp['deger'] = 0
+                        else:
+                            temp['deger'] = None
+
+                        if oy == "1":
+                            temp['aciklama'] = "çok mutlu"
+                        elif oy == "2":
+                            temp['aciklama'] = "mutlu"
+                        else:
+                            if sebep == "1":
+                                temp['aciklama'] = "sabunluk"
+                            if sebep == "2":
+                                temp['aciklama'] = "lavabo"
+                            if sebep == "3":
+                                temp['aciklama'] = "havlu"
+                            if sebep == "4":
+                                temp['aciklama'] = "koku"
+                            if sebep == "5":
+                                temp['aciklama'] = "tuvalet"
+                            if sebep == "6":
+                                temp['aciklama'] = "tuvalet kağıdı"
+                        m_list.append(temp)
+
+                        temp2['gelen_tarih'] = parser.parse(temp['gelen_tarih'])
+                        temp2['yer'] = temp['yer']
+                        temp2['aciklama'] = temp['aciklama']
+                        temp2['deger'] = temp['deger']
+                        temp2['proje'] = temp['proje']
+                        m2_list.append(temp2)
+
+
+                    request.session['mk_m_list'] = m_list
+                    request.session['mk_m_proje'] = proje
+
+
+                paginator = Paginator(m2_list, 30)
+                page = request.GET.get('page')
+                try:
+                    n = paginator.page(page)
+                except PageNotAnInteger:
+                    # If page is not an integer, deliver first page.
+                    n = paginator.page(1)
+                except EmptyPage:
+                    # If page is out of range (e.g. 9999), deliver last page of results.
+                    n = paginator.page(paginator.num_pages)
+                print("işte sayfalanmış liste...", n)
+
+                return render(request, 'islem/mk_memnuniyet_list.html', {'form': form, 'mk_memnuniyet_list': n})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_memnuniyet_list')
+        else:
+            m_list = request.session.get('mk_m_list')
+            mk_proje = request.session.get('mk_m_proje')
+            print("işte alması gereken m list..!!!!!!!!!!!!!!!!!!!!!!!!", m_list)
+            m2_list = []
+            for x in m_list:
+                temp = {}
+
+                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                m2_list.append(temp)
+            print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
+            paginator = Paginator(m2_list, 30)
+            page = request.GET.get('page')
+            try:
+                n = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                n = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                n = paginator.page(paginator.num_pages)
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            form.fields["proje"].initial = mk_proje
+            print("get içinde mi.....")
+            #n = ""
+            return render(request, 'islem/mk_memnuniyet_list.html', {'form': form, 'mk_memnuniyet_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
 
 
 #----------------------------------------------------------------------------------------------
@@ -5987,68 +6105,52 @@ def memnuniyet_create(request, pk=None):
 def operasyon_list(request, pk=None):
 
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
 
         print("atanmış proje var...")
-        operasyon_obj = Operasyon_Data.objects.filter(proje=proje).order_by("-id")
-        print("işte operasyon listesi...", operasyon_obj)
-        o_list = []
-        for x in operasyon_obj:
-            temp = {}
-
-            bas_tarih = x.bas_tarih
-            son_tarih = x.son_tarih
-            #parsed_date = parser.parse(ara_tarih)
-            #parsed_date_1 = ara_tarih
-            #print("işte datetime a çevrilmiş hali string den ...", parsed_date)
-            temp['bas_tarih'] = bas_tarih
-            temp['son_tarih'] = son_tarih
 
 
-            mac_no = x.mac_no
-            yer_obj = yer.objects.filter(mac_no=mac_no).first()
-            if yer_obj:
-                temp['yer'] = yer_obj.yer_adi
-            else:
-                temp['yer'] = mac_no
+        o2_list = request.session.get('rs_o_list')
+        if o2_list:
+            rs_okuma = True
+            o_list = []
+            for x in o_list:
+                temp = {}
+                temp['bas_tarih'] = parser.parse(x['bas_tarih'])
+                temp['son_tarih'] = parser.parse(x['son_tarih'])
+                temp['yer'] = x['yer']
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
+                temp['sure'] = temp['son_tarih'] - temp['bas_tarih']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                o_list.append(temp)
+        else:
+            rs_okuma = False
+            o_list = get_o_list(request)
+            request.session['rs_o_list'] = o_list
+            for x in o_list:
+                x['bas_tarih'] = parser.parse(x['bas_tarih'])
+                x['son_tarih'] = parser.parse(x['son_tarih'])
+                x['sure'] = x['son_tarih'] - x['bas_tarih']
 
-            #proje_no = x.proje
-            #proje_obj = proje.objects.get(id=proje_no)
-            #if proje_obj:
-            temp['proje'] = x.proje.proje_adi
-            #else:
-            #    temp['proje'] = proje
-            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
-            if rfid_obj:
-                temp['adi'] = rfid_obj.adi
-                temp['soyadi'] = rfid_obj.soyadi
-            else:
-                temp['adi'] = ""
-                temp['soyadi'] = ""
-
-            temp['sure'] = son_tarih - bas_tarih
-
-
-            if x.bild_tipi == "A":
-                temp['deger'] = 0
-            else:
-                temp['deger'] = None
-
-
-            o_list.append(temp)
-
-        print("işte çıkan liste...", o_list)
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
-        paginator = Paginator(o_list, 20)
+        paginator = Paginator(o_list, 30)
         page = request.GET.get('page')
         try:
             n = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
+            if rs_okuma:
+                o_list = get_o_list(request)
+                request.session['rs_o_list'] = o_list
+                for x in o_list:
+                    x['bas_tarih'] = parser.parse(x['bas_tarih'])
+                    x['son_tarih'] = parser.parse(x['son_tarih'])
+                    x['sure'] = x['son_tarih'] - x['bas_tarih']
+
+            paginator = Paginator(o_list, 30)
             n = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
@@ -6088,7 +6190,7 @@ def operasyon_create(request, pk=None):
 @login_required
 def den_saha_list(request, pk=None):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
 
@@ -6208,7 +6310,7 @@ def den_saha_create(request, pk=None):
 @login_required
 def ariza_list(request, pk=None):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
@@ -6363,7 +6465,7 @@ def rfid_create(request, pk=None):
 @login_required
 def yerud_list(request, pk=None):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         yerud_obj = yer_updown.objects.filter(proje=proje).order_by("id")

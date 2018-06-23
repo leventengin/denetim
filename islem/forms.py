@@ -334,7 +334,7 @@ class RfidForm(forms.ModelForm):
         proje_obj = proje.objects.filter(id=prj.id)
         print("işte  proje objesi.....", proje_obj)
         self.fields['proje'].queryset = proje_obj
-        
+
     def clean(self):
         cleaned_data = super(RfidForm, self).clean()
         rfid_no = cleaned_data.get('rfid_no')
@@ -407,6 +407,18 @@ class MacnoYerForm(forms.Form):
 
 class RfidProjeForm(forms.Form):
     proje = forms.ModelChoiceField(queryset=proje.objects.all(), label="Proje Seçiniz..")
+
+
+class SirketIcinProjeForm(forms.Form):
+    proje = forms.ModelChoiceField(queryset=proje.objects.all())
+    def __init__(self, *args, **kwargs):
+        sirket = kwargs.pop("sirket")
+        super(SirketIcinProjeForm, self).__init__(*args, **kwargs)
+        proje_obj = proje.objects.filter(sirket=sirket)
+        self.fields['proje'].queryset = proje_obj
+        print("queryset initial içinden..:", self.fields['proje'].queryset)
+
+
 
 
 class DenetimForm(forms.Form):
