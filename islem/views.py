@@ -5883,13 +5883,40 @@ from dateutil import parser
 @login_required
 def memnuniyet_list(request, pk=None):
     user = request.user
+    test_url = str(request.get_full_path)
+    print("işte deneme url si.....", test_url)
+    src_str = '?page'
+    deger = test_url.find(src_str)
+    if deger == -1:
+        ilk_arama = True
+    else:
+        ilk_arama = False
+
+    print("değer ....", deger)
+    print("ilk_arama", ilk_arama)
+
+
+
     if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
-
         m2_list = request.session.get('rs_m_list')
-        if m2_list:
+
+        if not (m2_list) or ilk_arama:
+            m_list = get_m_list(request)
+            rs_m_list = []
+            for x in m_list:
+                temp = {}
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                temp['gelen_tarih'] = str(x['gelen_tarih'])
+                rs_m_list.append(temp)
+            request.session['rs_m_list'] = rs_m_list
+        else:
             rs_okuma = True
+            print(" rs okuma....", rs_okuma)
             m_list = []
             for x in m2_list:
                 temp = {}
@@ -5899,21 +5926,14 @@ def memnuniyet_list(request, pk=None):
                 temp['deger'] = x['deger']
                 temp['proje'] = x['proje']
                 m_list.append(temp)
-        else:
-            rs_okuma = False
-            m_list = get_m_list(request)
-            request.session['rs_m_list'] = m_list
 
         paginator = Paginator(m_list, 30)
         page = request.GET.get('page')
+
         try:
             n = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            if rs_okuma:
-                m_list = get_m_list(request)
-                request.session['rs_m_list'] = m_list
-            paginator = Paginator(m_list, 30)
             n = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
@@ -6063,16 +6083,16 @@ def mk_memnuniyet_list(request):
             mk_proje = request.session.get('mk_m_proje')
             print("işte alması gereken m list..!!!!!!!!!!!!!!!!!!!!!!!!", m_list)
             m2_list = []
-            for x in m_list:
-                temp = {}
-
-                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
-                temp['yer'] = x['yer']
-                temp['aciklama'] = x['aciklama']
-                temp['deger'] = x['deger']
-                temp['proje'] = x['proje']
-                m2_list.append(temp)
-            print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
+            if m_list:
+                for x in m_list:
+                    temp = {}
+                    temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                    temp['yer'] = x['yer']
+                    temp['aciklama'] = x['aciklama']
+                    temp['deger'] = x['deger']
+                    temp['proje'] = x['proje']
+                    m2_list.append(temp)
+                print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
             paginator = Paginator(m2_list, 30)
             page = request.GET.get('page')
             try:
@@ -6101,40 +6121,65 @@ def mk_memnuniyet_list(request):
 
 
 #----------------------------------------------------------------------------------------------
+from django.core.serializers.json import DjangoJSONEncoder
+
 @login_required
 def operasyon_list(request, pk=None):
 
     user = request.user
+    test_url = str(request.get_full_path)
+    print("işte deneme url si.....", test_url)
+    src_str = '?page'
+    deger = test_url.find(src_str)
+    if deger == -1:
+        ilk_arama = True
+    else:
+        ilk_arama = False
+    print("değer ....", deger)
+    print("ilk_arama", ilk_arama)
+
+
+
     if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
-
         print("atanmış proje var...")
-
-
         o2_list = request.session.get('rs_o_list')
-        if o2_list:
-            rs_okuma = True
-            o_list = []
+
+        if not(o2_list) or ilk_arama:
+            print("ilk bölüm...")
+            o_list = get_o_list(request)
+            print("get o listten gelen o list...", o_list)
+            rs_o_list = []
             for x in o_list:
                 temp = {}
-                temp['bas_tarih'] = parser.parse(x['bas_tarih'])
-                temp['son_tarih'] = parser.parse(x['son_tarih'])
+                temp['bas_tarih'] = str(x['bas_tarih'])
+                temp['son_tarih'] = str(x['son_tarih'])
+                temp['sure'] = None
                 temp['yer'] = x['yer']
                 temp['adi'] = x['adi']
                 temp['soyadi'] = x['soyadi']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                rs_o_list.append(temp)
+            request.session['rs_o_list'] = rs_o_list
+            print("if sonrasından gelen o list....", o_list)
+        else:
+            print("ikinci bölüm...")
+            o_list = []
+            for x in rs_o_list:
+                temp = {}
+                temp['bas_tarih'] = parser.parse(x['bas_tarih'])
+                temp['son_tarih'] = parser.parse(x['son_tarih'])
                 temp['sure'] = temp['son_tarih'] - temp['bas_tarih']
+                temp['yer'] = x['yer']
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
                 temp['deger'] = x['deger']
                 temp['proje'] = x['proje']
                 o_list.append(temp)
-        else:
-            rs_okuma = False
-            o_list = get_o_list(request)
-            request.session['rs_o_list'] = o_list
-            for x in o_list:
-                x['bas_tarih'] = parser.parse(x['bas_tarih'])
-                x['son_tarih'] = parser.parse(x['son_tarih'])
-                x['sure'] = x['son_tarih'] - x['bas_tarih']
+
+        print("paginator a göndermeden önce o list...", o_list)
 
         paginator = Paginator(o_list, 30)
         page = request.GET.get('page')
@@ -6142,22 +6187,15 @@ def operasyon_list(request, pk=None):
             n = paginator.page(page)
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            if rs_okuma:
-                o_list = get_o_list(request)
-                request.session['rs_o_list'] = o_list
-                for x in o_list:
-                    x['bas_tarih'] = parser.parse(x['bas_tarih'])
-                    x['son_tarih'] = parser.parse(x['son_tarih'])
-                    x['sure'] = x['son_tarih'] - x['bas_tarih']
-
-            paginator = Paginator(o_list, 30)
             n = paginator.page(1)
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             n = paginator.page(paginator.num_pages)
-        print("işte sayfalanmış liste...", n)
 
-        return render(request, 'islem/operasyon_list.html', {'operasyon_list': n,})
+
+        print("template göndermeden önce o list...", o_list)
+
+        return render(request, 'islem/operasyon_list.html', {'operasyon_list': n})
 
     else:
         print("buraya geldi...proje yetkilisi değil...")
@@ -6179,6 +6217,153 @@ def operasyon_create(request, pk=None):
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
+
+
+
+
+
+
+@login_required
+def mk_operasyon_list(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                o_list = request.session.get('mk_o_list')
+                mk_proje = request.session.get('mk_o_proje')
+
+                if mk_proje == proje:
+                    o2_list = []
+                    for x in o_list:
+                        temp = {}
+                        temp['son_tarih'] = parser.parse(x['son_tarih'])
+                        temp['bas_tarih'] = parser.parse(x['bas_tarih'])
+                        temp['sure'] = temp['son_tarih'] - temp['bas_tarih']
+                        temp['adi'] = x['adi']
+                        temp['soyadi'] = x['soyadi']
+                        temp['deger'] = x['deger']
+                        temp['proje'] = x['proje']
+                        temp['yer'] = x['yer']
+                        o2_list.append(temp)
+
+                else:
+                    operasyon_obj = Operasyon_Data.objects.filter(proje=proje).order_by("-id")
+                    o_list = []
+                    o2_list = []
+                    for x in operasyon_obj:
+                        temp = {}
+                        temp2 = {}
+                        temp['bas_tarih'] = x.bas_tarih
+                        temp['son_tarih'] = x.son_tarih
+
+                        mac_no = x.mac_no
+                        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+                        if yer_obj:
+                            temp['yer'] = yer_obj.yer_adi
+                        else:
+                            temp['yer'] = mac_no
+
+                        temp['proje'] = x.proje.proje_adi
+
+                        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+                        if rfid_obj:
+                            temp['adi'] = rfid_obj.adi
+                            temp['soyadi'] = rfid_obj.soyadi
+                        else:
+                            temp['adi'] = ""
+                            temp['soyadi'] = ""
+
+                        temp['sure'] = x.son_tarih - x.bas_tarih
+                        print("süre....", temp['sure'])
+
+                        if x.bild_tipi == "A":
+                            temp['deger'] = 0
+                        else:
+                            temp['deger'] = None
+
+                        temp2['son_tarih'] = str(temp['son_tarih'])
+                        temp2['bas_tarih'] = str(temp['bas_tarih'])
+                        temp2['sure'] = None
+                        temp2['adi'] = temp['adi']
+                        temp2['soyadi'] = temp['soyadi']
+                        temp2['deger'] = temp['deger']
+                        temp2['proje'] = temp['proje']
+                        temp2['yer'] = temp['yer']
+                        o2_list.append(temp)
+                        o_list.append(temp2)
+
+
+                    request.session['mk_o_list'] = o_list
+                    request.session['mk_o_proje'] = proje
+
+
+                paginator = Paginator(o2_list, 30)
+                page = request.GET.get('page')
+                try:
+                    n = paginator.page(page)
+                except PageNotAnInteger:
+                    # If page is not an integer, deliver first page.
+                    n = paginator.page(1)
+                except EmptyPage:
+                    # If page is out of range (e.g. 9999), deliver last page of results.
+                    n = paginator.page(paginator.num_pages)
+                print("işte sayfalanmış liste...", n)
+
+                return render(request, 'islem/mk_operasyon_list.html', {'form': form, 'mk_operasyon_list': n})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_operasyon_list')
+        else:
+            o_list = request.session.get('mk_o_list')
+            mk_proje = request.session.get('mk_o_proje')
+            print("işte alması gereken m list..!!!!!!!!!!!!!!!!!!!!!!!!", o_list)
+            o2_list = []
+            if o_list:
+                for x in o_list:
+                    temp = {}
+                    temp['son_tarih'] = parser.parse(x['son_tarih'])
+                    temp['bas_tarih'] = parser.parse(x['bas_tarih'])
+                    temp['sure'] = temp['son_tarih'] - temp['bas_tarih']
+                    temp['adi'] = x['adi']
+                    temp['soyadi'] = x['soyadi']
+                    temp['deger'] = x['deger']
+                    temp['proje'] = x['proje']
+                    temp['yer'] = x['yer']
+                    o2_list.append(temp)
+                #print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
+            paginator = Paginator(o2_list, 30)
+            page = request.GET.get('page')
+            try:
+                n = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                n = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                n = paginator.page(paginator.num_pages)
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            form.fields["proje"].initial = mk_proje
+            print("get içinde mi.....")
+            #n = ""
+            return render(request, 'islem/mk_operasyon_list.html', {'form': form, 'mk_operasyon_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+
+
 
 
 

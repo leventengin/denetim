@@ -54,12 +54,7 @@ def get_m_list(request):
         temp = {}
 
         ara_tarih = x.gelen_tarih
-
-        #parsed_date = parser.parse(ara_tarih)
-        parsed_date = str(ara_tarih)
-        print("işte datetime a çevrilmiş hali string den ...", parsed_date)
-        temp['gelen_tarih'] = parsed_date
-
+        temp['gelen_tarih'] = ara_tarih
 
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
@@ -72,8 +67,8 @@ def get_m_list(request):
 
         oy = x.oy
         sebep = x.sebep
-        print("oy", oy)
-        print("sebep", sebep)
+        #print("oy", oy)
+        #print("sebep", sebep)
 
         if oy == "3":
             temp['deger'] = 0
@@ -98,6 +93,7 @@ def get_m_list(request):
             if sebep == "6":
                 temp['aciklama'] = "tuvalet kağıdı"
         m_list.append(temp)
+    print("service get m list çalıştı......")
     return m_list
 
 
@@ -108,11 +104,11 @@ def get_o_list(request):
     o_list = []
     for x in operasyon_obj:
         temp = {}
-        bas_tarih = str(x.bas_tarih)
-        son_tarih = str(x.son_tarih)
+        #bas_tarih = str(x.bas_tarih)
+        #son_tarih = str(x.son_tarih)
 
-        temp['bas_tarih'] = bas_tarih
-        temp['son_tarih'] = son_tarih
+        temp['bas_tarih'] = x.bas_tarih
+        temp['son_tarih'] = x.son_tarih
 
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
@@ -131,9 +127,11 @@ def get_o_list(request):
             temp['adi'] = ""
             temp['soyadi'] = ""
 
-        #temp['sure'] = json.dumps(x.son_tarih-x.bas_tarih)
-
-
+        #ara_sure = x.son_tarih - x.bas_tarih
+        #temp['sure'] = str(ara_sure)
+        temp['sure'] = x.son_tarih - x.bas_tarih
+        print("süre....", temp['sure'])
+        
         if x.bild_tipi == "A":
             temp['deger'] = 0
         else:

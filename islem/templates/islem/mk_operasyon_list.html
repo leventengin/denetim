@@ -1,0 +1,152 @@
+{% extends "base_generic.html" %}
+{% load timedelta_filter %}
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+
+
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+
+.dikkat{
+  color:red;
+}
+.siyah{
+  color:black;
+}
+
+.yesil{
+  color:green;
+}
+/*
+th{
+    font-weight: normal;
+}
+*/
+
+</style>
+
+
+    <h4>Operasyon Listesi</h4>
+
+
+    <script type="text/javascript">
+     $(document).ready(function(){
+       /*alert("geldi..."); */
+       $("td").filter(function(index) { return $(this).html() == 0; }).parent().addClass("dikkat");
+       new_notif();
+       myInterval();
+     });
+
+  </script>
+
+
+
+    <p> </p>
+
+
+
+    <script>
+          $(document).ready(function(){
+
+                      //alert ( "...bolum detay seç çalıştı...");
+                       degistir();
+
+                  });  /* document ready  kapanıyor */
+    </script>
+
+
+    <form action="" method="POST">
+
+        {% csrf_token %}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        {{ form }}
+
+        <input type="submit" value="seç" />
+
+    </form>
+
+
+
+
+
+    {% if mk_operasyon_list %}
+
+    <table  id="table_id">
+            <tr>
+              <th hidden>xxx</th>
+              <th>Proje</th>
+              <th>Yer</th>
+              <th>Tarih</th>
+              <th>Adı</th>
+              <th>Soyadı</th>
+              <th>Süre</th>
+            </tr>
+
+        {% for deger in mk_operasyon_list %}
+
+            <tr class="yn" >
+              <td hidden>{{ deger.deger }}  </td>
+              <td>{{ deger.proje }}  </td>
+              <td>{{ deger.yer }}  </td>
+              <td>{{ deger.bas_tarih|date:" d/m/Y - H:i" }}  </td>
+              <td>{{ deger.adi }}  </td>
+              <td>{{ deger.soyadi }}  </td>
+              <td>{{ deger.sure|timedelta:"{minutes2}:{seconds2}" }}  </td>
+            </tr>
+
+        {% endfor %}
+    </table>
+     {% else %}
+      <p> </p>
+      <p> </p>
+    {% endif %}
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if mk_memnuniyet_list.has_previous %}
+              <a href="?page={{ mk_memnuniyet_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ mk_memnuniyet_list.number }} / {{ mk_memnuniyet_list.paginator.num_pages }}
+          </span>
+
+          {% if mk_memnuniyet_list.has_next %}
+              <a href="?page={{ mk_memnuniyet_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
+
+{% endblock %}
