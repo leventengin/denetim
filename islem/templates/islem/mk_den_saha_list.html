@@ -1,5 +1,4 @@
 {% extends "base_generic.html" %}
-{% load timedelta_filter %}
 {% block content %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
@@ -51,13 +50,13 @@ th{
 </style>
 
 
-    <h4>Operasyon Listesi</h4>
+    <h4>Saha Denetim Listesi</h4>
 
 
     <script type="text/javascript">
      $(document).ready(function(){
        /*alert("geldi..."); */
-       $("td").filter(function(index) { return $(this).html() == 0; }).parent().addClass("dikkat");
+       $("td").filter(function(index) { return $(this).html() == 5; }).parent().addClass("dikkat");
        new_notif();
        myInterval();
      });
@@ -95,33 +94,29 @@ th{
 
 
 
-    {% if mk_operasyon_list %}
+    {% if mk_den_saha_list %}
 
-    <table  id="table_id">
-            <tr>
-              <th hidden>xxx</th>
-              <th>Proje</th>
-              <th>Yer</th>
-              <th>Tarih</th>
-              <th>Adı</th>
-              <th>Soyadı</th>
-              <th>Süre</th>
-            </tr>
+                  <table  id="table_id">
+                          <tr>
+                            <th hidden>xxx</th>
+                            <th>Proje</th>
+                            <th>Yer</th>
+                            <th>Açıklama</th>
+                            <th>Zaman</th>
+                          </tr>
 
-        {% for deger in mk_operasyon_list %}
+                      {% for deger in mk_den_saha_list %}
 
-            <tr class="yn" >
-              <td hidden>{{ deger.deger }}  </td>
-              <td>{{ deger.proje }}  </td>
-              <td>{{ deger.yer }}  </td>
-              <td>{{ deger.bas_tarih|date:" d/m/Y - H:i" }}  </td>
-              <td>{{ deger.adi }}  </td>
-              <td>{{ deger.soyadi }}  </td>
-              <td>{{ deger.sure|timedelta:"{minutes2}:{seconds2}" }}  </td>
-            </tr>
+                          <tr class="yn" >
+                            <td hidden>{{ deger.deger }}  </td>
+                            <td>{{ deger.proje }}  </td>
+                            <td>{{ deger.yer }}  </td>
+                            <td>{{ deger.aciklama }}  </td>
+                            <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
+                          </tr>
 
-        {% endfor %}
-    </table>
+                      {% endfor %}
+                  </table>
      {% else %}
       <p> </p>
       <p> </p>
@@ -130,16 +125,16 @@ th{
 
     <div class="pagination">
       <span class="step-links">
-          {% if mk_operasyon_list.has_previous %}
-              <a href="?page={{ mk_operasyon_list.previous_page_number }}"> önceki </a>
+          {% if mk_den_saha_list.has_previous %}
+              <a href="?page={{ mk_den_saha_list.previous_page_number }}"> önceki </a>
           {% endif %}
 
           <span class="current">
-              sf {{ mk_operasyon_list.number }} / {{ mk_operasyon_list.paginator.num_pages }}
+              sf {{ mk_den_saha_list.number }} / {{ mk_den_saha_list.paginator.num_pages }}
           </span>
 
-          {% if mk_operasyon_list.has_next %}
-              <a href="?page={{ mk_operasyon_list.next_page_number }}"> sonraki </a>
+          {% if mk_den_saha_list.has_next %}
+              <a href="?page={{ mk_den_saha_list.next_page_number }}"> sonraki </a>
           {% endif %}
       </span>
     </div>

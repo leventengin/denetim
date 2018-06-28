@@ -2,7 +2,7 @@ import json
 import requests
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, render_to_response
-from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi
+from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi, Denetim_Data, Ariza_Data
 from .models import yer
 
 
@@ -131,7 +131,7 @@ def get_o_list(request):
         #temp['sure'] = str(ara_sure)
         temp['sure'] = x.son_tarih - x.bas_tarih
         print("süre....", temp['sure'])
-        
+
         if x.bild_tipi == "A":
             temp['deger'] = 0
         else:
@@ -139,6 +139,122 @@ def get_o_list(request):
 
         o_list.append(temp)
     return o_list
+
+
+def get_d_list(request):
+    proje = request.user.profile.proje
+    denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
+    print("işte denetim listesi...", denetim_obj)
+    d_list = []
+    for x in denetim_obj:
+        temp = {}
+
+        gelen_tarih = x.gelen_tarih
+        temp['gelen_tarih'] = gelen_tarih
+
+        mac_no = x.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+        if yer_obj:
+            temp['yer'] = yer_obj.yer_adi
+        else:
+            temp['yer'] = mac_no
+
+        #proje_no = x.proje
+        #proje_obj = proje.objects.get(id=proje_no)
+        #if proje_obj:
+        temp['proje'] = x.proje.proje_adi
+        #else:
+        #    temp['proje'] = proje
+        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+        if rfid_obj:
+            temp['adi'] = rfid_obj.adi
+            temp['soyadi'] = rfid_obj.soyadi
+        else:
+            temp['adi'] = ""
+            temp['soyadi'] = ""
+
+        sayi = int(x.kod)
+        print("işte gelen kodun sayısal hali...", sayi)
+
+        if sayi == 0:
+            temp['deger'] = None
+        else:
+            temp['deger'] = 5
+
+        sabun = sayi // 32
+        sayi = sayi % 32
+        lavabo = sayi // 16
+        sayi = sayi % 16
+        havlu = sayi // 8
+        sayi = sayi % 8
+        koku = sayi // 4
+        sayi = sayi % 4
+        tuvalet = sayi // 2
+        kagit = sayi % 2
+
+        aciklama = ""
+        if sabun == 1:
+            aciklama = aciklama + " sabun -"
+        if lavabo == 1:
+            aciklama = aciklama + " lavabo -"
+        if havlu == 1:
+            aciklama = aciklama + " havlu -"
+        if koku == 1:
+            aciklama = aciklama + " koku -"
+        if tuvalet == 1:
+            aciklama = aciklama + " tuvalet -"
+        if kagit == 1:
+            aciklama = aciklama + " kağıt -"
+
+        temp['aciklama'] = aciklama
+
+        d_list.append(temp)
+
+    return d_list
+
+
+
+
+
+def get_a_list(request):
+    proje = request.user.profile.proje
+    ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
+    a_list = []
+    for x in ariza_obj:
+        temp = {}
+        temp['gelen_tarih'] = x.gelen_tarih
+        mac_no = x.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+        if yer_obj:
+            temp['yer'] = yer_obj.yer_adi
+        else:
+            temp['yer'] = mac_no
+
+        temp['proje'] = x.proje.proje_adi
+        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+        if rfid_obj:
+            temp['adi'] = rfid_obj.adi
+            temp['soyadi'] = rfid_obj.soyadi
+        else:
+            temp['adi'] = ""
+            temp['soyadi'] = ""
+
+        sebep = x.sebep
+        print("sebep", sebep)
+
+        temp['deger'] = 0
+
+        if sebep == "1":
+            temp['aciklama'] = "mekanik"
+        if sebep == "2":
+            temp['aciklama'] = "elektrik"
+        if sebep == "3":
+            temp['aciklama'] = "su"
+        if sebep == "4":
+            temp['aciklama'] = "ayna"
+        a_list.append(temp)
+
+    return a_list
 
 
 

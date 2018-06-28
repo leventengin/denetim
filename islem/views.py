@@ -4810,7 +4810,7 @@ def detay_sil_kesin(request, pk=None):
 @login_required
 def projealanlari_listele(request):
     user = request.user
-    if proje_varmi_kontrol(user, request):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         pa_obj = proje_alanlari.objects.filter(proje=proje)
@@ -4849,8 +4849,6 @@ def projealanlari_yarat(request):
 
 
 
-
-
 @login_required
 def projealanlari_sil(request, pk=None):
     print("proje alanlari sildeki pk:", pk)
@@ -4878,7 +4876,7 @@ def projealanlari_sil_kesin(request, pk=None):
 @login_required
 def yer_listele(request):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         qs = yer.objects.none()
@@ -4946,9 +4944,6 @@ def yer_duzenle(request, pk=None):
 
 
 
-
-
-
 @login_required
 def yer_sil(request, pk=None):
     print("detay sildeki pk:", pk)
@@ -4978,7 +4973,7 @@ def yer_sil_kesin(request, pk=None):
 @login_required
 def rfid_dosyasi_listele(request):
     user = request.user
-    if proje_varmi_kontrol(user):
+    if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
         rfid_dosyasi_obj = rfid_dosyasi.objects.filter(proje=proje).order_by("id")
@@ -5045,8 +5040,6 @@ def rfid_dosyasi_duzenle(request, pk=None):
     else:
         form = RfidForm(kullanici=kullanici, instance=rfid_dosyasi_obj)
         return render(request, 'islem/rfid_dosyasi_form.html', {'form': form,})
-
-
 
 
 
@@ -5874,7 +5867,7 @@ def popup_notif(request):
 
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
-from islem.services import get_m_list, get_o_list
+from islem.services import get_m_list, get_o_list, get_d_list, get_a_list
 
 
 
@@ -6372,88 +6365,59 @@ def mk_operasyon_list(request):
 
 #-----------------------------------------------------------------------------------------------
 
+
 @login_required
 def den_saha_list(request, pk=None):
     user = request.user
+    test_url = str(request.get_full_path)
+    print("işte deneme url si.....", test_url)
+    src_str = '?page'
+    deger = test_url.find(src_str)
+    if deger == -1:
+        ilk_arama = True
+    else:
+        ilk_arama = False
+
+    print("değer ....", deger)
+    print("ilk_arama", ilk_arama)
+
     if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
+        d2_list = request.session.get('rs_d_list')
 
-        print("atanmış proje var...")
-        denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
-        print("işte denetim listesi...", denetim_obj)
-        d_list = []
-        for x in denetim_obj:
-            temp = {}
+        if not (d2_list) or ilk_arama:
+            d_list = get_d_list(request)
+            rs_d_list = []
+            for x in d_list:
+                temp = {}
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                temp['gelen_tarih'] = str(x['gelen_tarih'])
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
+                rs_d_list.append(temp)
+            request.session['rs_d_list'] = rs_d_list
+        else:
+            rs_okuma = True
+            print(" rs okuma....", rs_okuma)
+            d_list = []
+            for x in d2_list:
+                temp = {}
+                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
+                d_list.append(temp)
 
-            gelen_tarih = x.gelen_tarih
-            temp['gelen_tarih'] = gelen_tarih
-
-            mac_no = x.mac_no
-            yer_obj = yer.objects.filter(mac_no=mac_no).first()
-            if yer_obj:
-                temp['yer'] = yer_obj.yer_adi
-            else:
-                temp['yer'] = mac_no
-
-            #proje_no = x.proje
-            #proje_obj = proje.objects.get(id=proje_no)
-            #if proje_obj:
-            temp['proje'] = x.proje.proje_adi
-            #else:
-            #    temp['proje'] = proje
-            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
-            if rfid_obj:
-                temp['adi'] = rfid_obj.adi
-                temp['soyadi'] = rfid_obj.soyadi
-            else:
-                temp['adi'] = ""
-                temp['soyadi'] = ""
-
-            sayi = int(x.kod)
-            print("işte gelen kodun sayısal hali...", sayi)
-
-            if sayi == 0:
-                temp['deger'] = None
-            else:
-                temp['deger'] = 5
-
-            sabun = sayi // 32
-            sayi = sayi % 32
-            lavabo = sayi // 16
-            sayi = sayi % 16
-            havlu = sayi // 8
-            sayi = sayi % 8
-            koku = sayi // 4
-            sayi = sayi % 4
-            tuvalet = sayi // 2
-            kagit = sayi % 2
-
-            aciklama = ""
-            if sabun == 1:
-                aciklama = aciklama + " sabun -"
-            if lavabo == 1:
-                aciklama = aciklama + " lavabo -"
-            if havlu == 1:
-                aciklama = aciklama + " havlu -"
-            if koku == 1:
-                aciklama = aciklama + " koku -"
-            if tuvalet == 1:
-                aciklama = aciklama + " tuvalet -"
-            if kagit == 1:
-                aciklama = aciklama + " kağıt -"
-
-            temp['aciklama'] = aciklama
-
-
-            d_list.append(temp)
-
-        print("işte çıkan liste...", d_list)
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
-        paginator = Paginator(d_list, 20)
+        paginator = Paginator(d_list, 30)
         page = request.GET.get('page')
+
         try:
             n = paginator.page(page)
         except PageNotAnInteger:
@@ -6462,14 +6426,20 @@ def den_saha_list(request, pk=None):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             n = paginator.page(paginator.num_pages)
-        print("işte sayfalanmış liste...", n)
 
+        print("işte sayfalanmış liste...", n)
         return render(request, 'islem/denetim_saha_list.html', {'denetim_saha_list': n,})
 
     else:
         print("buraya geldi...proje yetkilisi değil...")
         mesaj = "kişi bu işlem için yetkili değil..."
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+
+
 
 
 
@@ -6489,62 +6459,312 @@ def den_saha_create(request, pk=None):
 
 
 
+@login_required
+def mk_den_saha_list(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                d_list = request.session.get('mk_d_list')
+                mk_proje = request.session.get('mk_d_proje')
+
+                if mk_proje == proje:
+                    d2_list = []
+                    for x in d_list:
+                        temp = {}
+                        temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                        temp['aciklama'] = x['aciklama']
+                        temp['adi'] = x['adi']
+                        temp['soyadi'] = x['soyadi']
+                        temp['deger'] = x['deger']
+                        temp['proje'] = x['proje']
+                        temp['yer'] = x['yer']
+                        d2_list.append(temp)
+
+                else:
+                    denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
+                    d_list = []
+                    d2_list = []
+                    for x in denetim_obj:
+                        temp = {}
+                        temp2 = {}
+                        gelen_tarih = x.gelen_tarih
+                        temp['gelen_tarih'] = gelen_tarih
+                        mac_no = x.mac_no
+                        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+                        if yer_obj:
+                            temp['yer'] = yer_obj.yer_adi
+                        else:
+                            temp['yer'] = mac_no
+
+                        temp['proje'] = x.proje.proje_adi
+
+                        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+                        if rfid_obj:
+                            temp['adi'] = rfid_obj.adi
+                            temp['soyadi'] = rfid_obj.soyadi
+                        else:
+                            temp['adi'] = ""
+                            temp['soyadi'] = ""
+
+                        sayi = int(x.kod)
+
+                        if sayi == 0:
+                            temp['deger'] = None
+                        else:
+                            temp['deger'] = 5
+
+                        sabun = sayi // 32
+                        sayi = sayi % 32
+                        lavabo = sayi // 16
+                        sayi = sayi % 16
+                        havlu = sayi // 8
+                        sayi = sayi % 8
+                        koku = sayi // 4
+                        sayi = sayi % 4
+                        tuvalet = sayi // 2
+                        kagit = sayi % 2
+
+                        aciklama = ""
+                        if sabun == 1:
+                            aciklama = aciklama + " sabun -"
+                        if lavabo == 1:
+                            aciklama = aciklama + " lavabo -"
+                        if havlu == 1:
+                            aciklama = aciklama + " havlu -"
+                        if koku == 1:
+                            aciklama = aciklama + " koku -"
+                        if tuvalet == 1:
+                            aciklama = aciklama + " tuvalet -"
+                        if kagit == 1:
+                            aciklama = aciklama + " kağıt -"
+
+                        temp['aciklama'] = aciklama
+
+
+                        temp2['gelen_tarih'] = str(temp['gelen_tarih'])
+                        temp2['aciklama'] = temp['aciklama']
+                        temp2['adi'] = temp['adi']
+                        temp2['soyadi'] = temp['soyadi']
+                        temp2['deger'] = temp['deger']
+                        temp2['proje'] = temp['proje']
+                        temp2['yer'] = temp['yer']
+                        d2_list.append(temp)
+                        d_list.append(temp2)
+
+
+                    request.session['mk_d_list'] = d_list
+                    request.session['mk_d_proje'] = proje
+
+
+                paginator = Paginator(d2_list, 30)
+                page = request.GET.get('page')
+                try:
+                    n = paginator.page(page)
+                except PageNotAnInteger:
+                    # If page is not an integer, deliver first page.
+                    n = paginator.page(1)
+                except EmptyPage:
+                    # If page is out of range (e.g. 9999), deliver last page of results.
+                    n = paginator.page(paginator.num_pages)
+                print("işte sayfalanmış liste...", n)
+
+                return render(request, 'islem/mk_den_saha_list.html', {'form': form, 'mk_den_saha_list': n})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_den_saha_list')
+        else:
+            d_list = request.session.get('mk_d_list')
+            mk_proje = request.session.get('mk_d_proje')
+            d2_list = []
+            if d_list:
+                for x in d_list:
+                    temp = {}
+                    temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                    temp['aciklama'] = x['aciklama']
+                    temp['adi'] = x['adi']
+                    temp['soyadi'] = x['soyadi']
+                    temp['deger'] = x['deger']
+                    temp['proje'] = x['proje']
+                    temp['yer'] = x['yer']
+                    d2_list.append(temp)
+            paginator = Paginator(d2_list, 30)
+            page = request.GET.get('page')
+            try:
+                n = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                n = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                n = paginator.page(paginator.num_pages)
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            form.fields["proje"].initial = mk_proje
+            return render(request, 'islem/mk_den_saha_list.html', {'form': form, 'mk_den_saha_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+@login_required
+def mk_projealanlari_listele(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+                pa_obj = proje_alanlari.objects.filter(proje=proje)
+                return render(request, 'islem/mk_pa_list.html', {'form': form, 'mk_pa_list': pa_obj, 'proje': proje})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_projealanlari_listele')
+        else:
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            n = None
+            proje = None
+            return render(request, 'islem/mk_pa_list.html', {'form': form, 'mk_pa_list': n, 'proje': proje})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+@login_required
+def mk_yer_listele(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+                qs = yer.objects.none()
+                pa_obj = proje_alanlari.objects.filter(proje=proje)
+                for x in pa_obj:
+                    qx = yer.objects.filter(proje_alanlari=x.id)
+                    qs = qs.union(qx)
+                qs = qs.order_by('id')
+                return render(request, 'islem/mk_yer_list.html', {'form': form, 'mk_yer_list': qs, 'proje': proje})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_yer_listele')
+        else:
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            n = None
+            proje = None
+            return render(request, 'islem/mk_yer_list.html', {'form': form, 'mk_yer_list': n, 'proje': proje})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+@login_required
+def mk_rfid_listele(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+                rfid_obj = rfid_dosyasi.objects.filter(proje=proje)
+                return render(request, 'islem/mk_rfid_list.html', {'form': form, 'mk_rfid_list': rfid_obj, 'proje': proje})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_rfid_listele')
+        else:
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            n = None
+            proje = None
+            return render(request, 'islem/mk_rfid_list.html', {'form': form, 'mk_rfid_list': n, 'proje': proje})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
 
 #--------------------------------------------------------------------------------------------------
 
 @login_required
 def ariza_list(request, pk=None):
     user = request.user
+    test_url = str(request.get_full_path)
+    print("işte deneme url si.....", test_url)
+    src_str = '?page'
+    deger = test_url.find(src_str)
+    if deger == -1:
+        ilk_arama = True
+    else:
+        ilk_arama = False
+
+    print("değer ....", deger)
+    print("ilk_arama", ilk_arama)
+
     if proje_varmi_kontrol(request):
         print("proje var mı kontrolden geçtik.....")
         proje = user.profile.proje
-        ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
-        a_list = []
-        for x in ariza_obj:
-            temp = {}
+        a2_list = request.session.get('rs_a_list')
 
-            temp['gelen_tarih'] = x.gelen_tarih
+        if not (a2_list) or ilk_arama:
+            a_list = get_a_list(request)
+            rs_a_list = []
+            for x in a_list:
+                temp = {}
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                temp['gelen_tarih'] = str(x['gelen_tarih'])
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
+                rs_a_list.append(temp)
+            request.session['rs_a_list'] = rs_a_list
+        else:
+            rs_okuma = True
+            print(" rs okuma....", rs_okuma)
+            a_list = []
+            for x in a2_list:
+                temp = {}
+                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                temp['yer'] = x['yer']
+                temp['aciklama'] = x['aciklama']
+                temp['deger'] = x['deger']
+                temp['proje'] = x['proje']
+                temp['adi'] = x['adi']
+                temp['soyadi'] = x['soyadi']
+                a_list.append(temp)
 
-
-            mac_no = x.mac_no
-            yer_obj = yer.objects.filter(mac_no=mac_no).first()
-            if yer_obj:
-                temp['yer'] = yer_obj.yer_adi
-            else:
-                temp['yer'] = mac_no
-
-            temp['proje'] = x.proje.proje_adi
-            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
-            if rfid_obj:
-                temp['adi'] = rfid_obj.adi
-                temp['soyadi'] = rfid_obj.soyadi
-            else:
-                temp['adi'] = ""
-                temp['soyadi'] = ""
-
-            sebep = x.sebep
-            print("sebep", sebep)
-
-
-            temp['deger'] = 0
-
-            if sebep == "1":
-                temp['aciklama'] = "mekanik"
-            if sebep == "2":
-                temp['aciklama'] = "elektrik"
-            if sebep == "3":
-                temp['aciklama'] = "su"
-            if sebep == "4":
-                temp['aciklama'] = "ayna"
-
-
-            a_list.append(temp)
-
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
-        paginator = Paginator(a_list, 20)
+        paginator = Paginator(a_list, 30)
         page = request.GET.get('page')
+
         try:
             n = paginator.page(page)
         except PageNotAnInteger:
@@ -6553,8 +6773,8 @@ def ariza_list(request, pk=None):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             n = paginator.page(paginator.num_pages)
-        print("işte sayfalanmış liste...", n)
 
+        print("işte sayfalanmış liste...", n)
         return render(request, 'islem/ariza_list.html', {'ariza_list': n,})
 
     else:
@@ -6578,6 +6798,145 @@ def ariza_create(request, pk=None):
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
+
+
+
+
+@login_required
+def mk_ariza_list(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                a_list = request.session.get('mk_a_list')
+                mk_proje = request.session.get('mk_a_proje')
+
+                if mk_proje == proje:
+                    a2_list = []
+                    for x in a_list:
+                        temp = {}
+                        temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                        temp['adi'] = x['adi']
+                        temp['soyadi'] = x['soyadi']
+                        temp['deger'] = x['deger']
+                        temp['proje'] = x['proje']
+                        temp['yer'] = x['yer']
+                        temp['aciklama'] = x['aciklama']
+                        o2_list.append(temp)
+
+                else:
+                    ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
+                    a_list = []
+                    a2_list = []
+                    for x in ariza_obj:
+                        temp = {}
+                        temp2 = {}
+                        temp['gelen_tarih'] = x.gelen_tarih
+                        mac_no = x.mac_no
+                        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+                        if yer_obj:
+                            temp['yer'] = yer_obj.yer_adi
+                        else:
+                            temp['yer'] = mac_no
+
+                        temp['proje'] = x.proje.proje_adi
+                        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+                        if rfid_obj:
+                            temp['adi'] = rfid_obj.adi
+                            temp['soyadi'] = rfid_obj.soyadi
+                        else:
+                            temp['adi'] = ""
+                            temp['soyadi'] = ""
+
+                        sebep = x.sebep
+                        print("sebep", sebep)
+
+                        temp['deger'] = 0
+
+                        if sebep == "1":
+                            temp['aciklama'] = "mekanik"
+                        if sebep == "2":
+                            temp['aciklama'] = "elektrik"
+                        if sebep == "3":
+                            temp['aciklama'] = "su"
+                        if sebep == "4":
+                            temp['aciklama'] = "ayna"
+
+                        temp2['gelen_tarih'] = str(temp['gelen_tarih'])
+                        temp2['adi'] = temp['adi']
+                        temp2['soyadi'] = temp['soyadi']
+                        temp2['deger'] = temp['deger']
+                        temp2['proje'] = temp['proje']
+                        temp2['yer'] = temp['yer']
+                        temp2['aciklama'] = temp['aciklama']
+                        a2_list.append(temp)
+                        a_list.append(temp2)
+
+
+                    request.session['mk_a_list'] = a_list
+                    request.session['mk_a_proje'] = proje
+
+
+                paginator = Paginator(a2_list, 30)
+                page = request.GET.get('page')
+                try:
+                    n = paginator.page(page)
+                except PageNotAnInteger:
+                    # If page is not an integer, deliver first page.
+                    n = paginator.page(1)
+                except EmptyPage:
+                    # If page is out of range (e.g. 9999), deliver last page of results.
+                    n = paginator.page(paginator.num_pages)
+                print("işte sayfalanmış liste...", n)
+
+                return render(request, 'islem/mk_ariza_list.html', {'form': form, 'mk_ariza_list': n})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_ariza_list')
+        else:
+            a_list = request.session.get('mk_a_list')
+            mk_proje = request.session.get('mk_a_proje')
+            a2_list = []
+            if a_list:
+                for x in a_list:
+                    temp = {}
+                    temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                    temp['adi'] = x['adi']
+                    temp['soyadi'] = x['soyadi']
+                    temp['deger'] = x['deger']
+                    temp['proje'] = x['proje']
+                    temp['yer'] = x['yer']
+                    temp['aciklama'] = x['aciklama']
+                    a2_list.append(temp)
+                #print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
+            paginator = Paginator(a2_list, 30)
+            page = request.GET.get('page')
+            try:
+                n = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                n = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                n = paginator.page(paginator.num_pages)
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            form.fields["proje"].initial = mk_proje
+            print("get içinde mi.....")
+            #n = ""
+            return render(request, 'islem/mk_ariza_list.html', {'form': form, 'mk_ariza_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
 
 
 

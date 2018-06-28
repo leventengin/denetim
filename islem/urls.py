@@ -274,13 +274,13 @@ urlpatterns = [
 
 
     # mk için olan url ler
-    #url(r'^mk_projealanlari/$', views.mk_projealanlari_listele, name='mk_projealanlari_listele'),
-    #url(r'^mk_yer/(?P<pk>\d+)$', views.mk_yer_detay_gecici, name='mk_yer_detay_gecici'),
-    #url(r'^mk_rfid/$', views.mk_rfid_dosyasi_listele, name='mk_rfid_dosyasi_listele'),
+    url(r'^mk_projealanlari/$', views.mk_projealanlari_listele, name='mk_projealanlari_listele'),
+    url(r'^mk_yer/$', views.mk_yer_listele, name='mk_yer_proje_listele'),
+    url(r'^mk_rfid/$', views.mk_rfid_listele, name='mk_rfid_proje_listele'),
     url(r'^mk_memnuniyet_list/$', views.mk_memnuniyet_list, name='mk_memnuniyet_list'),
     url(r'^mk_operasyon_list/$', views.mk_operasyon_list, name='mk_operasyon_list'),
-    #url(r'^mk_den_saha_list/$', views.mk_den_saha_list, name='mk_den_saha_list'),
-    #url(r'^mk_ariza_list/$', views.mk_ariza_list, name='mk_ariza_list'),
+    url(r'^mk_den_saha_list/$', views.mk_den_saha_list, name='mk_den_saha_list'),
+    url(r'^mk_ariza_list/$', views.mk_ariza_list, name='mk_ariza_list'),
 
 
 

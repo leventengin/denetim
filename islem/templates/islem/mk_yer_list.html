@@ -1,0 +1,97 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+
+
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+
+.dikkat{
+  color:red;
+}
+.siyah{
+  color:black;
+}
+
+.yesil{
+  color:green;
+}
+/*
+th{
+    font-weight: normal;
+}
+*/
+
+</style>
+
+
+    <h4>Proje Yerleri Listesi</h4>
+
+    <p> </p>
+
+    <form action="" method="POST">
+
+        {% csrf_token %}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        {{ form }}
+
+        <input type="submit" value="seç" />
+
+    </form>
+
+
+    {% if mk_yer_list %}
+
+                  <table  id="table_id">
+                          <tr>
+                            <th>Alan</th>
+                            <th>Yer Adı</th>
+                            <th>Mac No</th>
+                          </tr>
+
+                      {% for deger in mk_yer_list %}
+                          <tr class="yn" >
+                            <td>{{ deger.proje_alanlari }}  </td>
+                            <td>{{ deger.yer_adi }}  </td>
+                            <td>{{ deger.mac_no }}  </td>
+                          </tr>
+
+                      {% endfor %}
+                  </table>
+     {% else %}
+      <p> </p>
+          {% if proje %}
+          <h5> veri yok...</h5>
+          {% endif %}
+      <p> </p>
+    {% endif %}
+
+
+
+{% endblock %}
