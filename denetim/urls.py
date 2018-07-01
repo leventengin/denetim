@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^islem/', include('islem.urls')),
     url(r'^notification/', include('notification.urls')),
+    url(r'^charts/', include('charts.urls')),    
     #url(r'^rfid/', include('webservice.urls')),
     url(r'^ws/', include('webservice.api.urls', namespace='api-ws')),
     url(r'^bildirim/', views.bildirim, name='bildirim'),

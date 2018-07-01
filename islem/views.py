@@ -7029,13 +7029,8 @@ def yerud_list(request, pk=None):
             temp['degis'] = x.degis
             temp['alive_time'] = x.alive_time
 
-
-
             y_list.append(temp)
 
-
-        #m_list = memnuniyet_list
-        #contact_list = Contacts.objects.all()
         paginator = Paginator(y_list, 20)
         page = request.GET.get('page')
         try:

@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'islem',
     'notification',
     'webservice',
+    'charts',
     'rest_framework',
     'bootstrap3',
     'searchableselect',
