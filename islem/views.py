@@ -5953,8 +5953,8 @@ def memnuniyet_create(request, pk=None):
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/memnuniyet_list/",
-        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/memnuniyet_list/",
+        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
@@ -6212,8 +6212,8 @@ def operasyon_create(request, pk=None):
     rfid_no = 34234
     bild_tipi = "M"
     print("okunan zaman......operasyon create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/operasyon_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/operasyon_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
@@ -6461,8 +6461,8 @@ def den_saha_create(request, pk=None):
     rfid_no = 34234
     kod = "3"
     print("okunan zaman......denetim create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/denetim_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/denetim_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('den_saha_list')
@@ -6806,8 +6806,8 @@ def ariza_create(request, pk=None):
     rfid_no = "34234"
     sebep = "2"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/ariza_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/ariza_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -6976,9 +6976,9 @@ def rfid_filter(request):
             proje = request.POST.get('proje', "")
             print(" proje form okunduktan sonra post...", proje)
 
-            url = "http://127.0.0.1:7000/ws/rfid_filter/"+str(proje)+"/"
+            url = "http://172.104.239.247:7000/ws/rfid_filter/"+str(proje)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("admin", "masanata"))
+            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
@@ -6993,7 +6993,7 @@ def rfid_filter(request):
 @login_required
 def rfid_filter_proje(request, proje=None):
     print("rfid project list............", proje)
-    r = requests.get_queryset("http://127.0.0.1:7000/ws/rfid_filter" + str(proje) + "/",  auth=("admin", "masanata"))
+    r = requests.get_queryset("http://172.104.239.247:7000/ws/rfid_filter" + str(proje) + "/",  auth=("ez-admin", "ezadmincheck"))
     json_data = r.json()
     print(json_data)
 
@@ -7008,8 +7008,8 @@ def rfid_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/rfid_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/rfid_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -7085,8 +7085,8 @@ def yerud_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......yerud create.............", t_stamp)
-    response = requests.post("http://127.0.0.1:7000/ws/yerud_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("admin", "masanata"))
+    response = requests.post("http://172.104.239.247:7000/ws/yerud_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
     response.json()
     print("status code..", response.status_code)
     return redirect('yerud_list')
@@ -7097,9 +7097,9 @@ def yerud_create(request, pk=None):
 def yerud_detail_get(request, pk=None):
     mac_no = pk
     print("gelen mac degeri...", mac_no)
-    url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(mac_no)+"/"
+    url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(mac_no)+"/"
     print("işte url", url)
-    response = requests.get(url, auth=("admin", "masanata"))
+    response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
     print("response...", response)
     gelen = response.json()
     print("gelen deger mac bul içinden...", gelen)
@@ -7125,9 +7125,9 @@ def macnoyer(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("admin", "masanata"))
+            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
@@ -7153,9 +7153,9 @@ def macnoyer_degis(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://127.0.0.1:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("admin", "masanata"))
+            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
             print("response...", response)
             gelen = response.json()
 
@@ -7183,9 +7183,9 @@ def macnoyer_degis(request):
                     "degis": "H",
                     "alive_time": gl_alive_time
                     }
-            response = requests.put(url, data=data , auth=("admin", "masanata"))
+            response = requests.put(url, data=data , auth=("ez-admin", "ezadmincheck"))
 
-            response = requests.get(url, auth=("admin", "masanata"))
+            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
