@@ -8,16 +8,53 @@
     {% if rfid_dosyasi_list %}
     <ul>
 
+
+      <table  id="table_id">
+
+          {% for rfid in rfid_dosyasi_list %}
+
+              <tr class="yn" >
+                <td> <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a> </td>
+                <td> <a href="{{rfid.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a> </td>
+                <td>   &emsp;  </td>
+                <td> <a href="{{rfid.id}}"> {{ rfid.rfid_no }} </a> </td>
+                <td>   &emsp;  </td>
+                <td> {{rfid.proje}}   </td>
+                <td>   &emsp;  </td>
+                <td> {{rfid.rfid_tipi }}  </td>
+                <td>   &emsp;  </td>
+                <td> {{rfid.adi}}   </td>
+                <td>   &emsp;  </td>
+                <td> {{rfid.soyadi }}  </td>
+              </tr>
+
+          {% endfor %}
+      </table>
+
+
+
+
+
+
+
+<!--
       {% for rfid in rfid_dosyasi_list %}
+
+
       <li>
         <a href="{{rfid.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
         <a href="{{rfid.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
-              &emsp;   <a href="{{rfid.id}}">{{ rfid.rfid_no }}
+        &emsp;   <a href="{{rfid.id}}">{{ rfid.rfid_no }}
                   &emsp;   {{rfid.proje}}   &emsp; {{ rfid.rfid_tipi }}
-                  &emsp;   {{rfid.adi}}   &emsp; {{ rfid.soyadi }} </a>
+                            &emsp;   {{rfid.adi}}   &emsp; {{ rfid.soyadi }} </a>
 
       </li>
+
+
       {% endfor %}
+-->
+
+
       <p> </p>
       <a href="/islem/rfid/create"> RFID Ekle </a>
     </ul>

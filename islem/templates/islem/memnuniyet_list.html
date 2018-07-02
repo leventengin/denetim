@@ -87,8 +87,8 @@ th{
                             <th hidden>xxx</th>
                             <th>Proje</th>
                             <th>Yer</th>
+                            <th>Tarih</th>
                             <th>Açıklama</th>
-                            <th>Zaman</th>
                           </tr>
 
                       {% for deger in memnuniyet_list %}
@@ -97,8 +97,8 @@ th{
                             <td hidden>{{ deger.deger }}  </td>
                             <td>{{ deger.proje }}  </td>
                             <td>{{ deger.yer }}  </td>
-                            <td>{{ deger.aciklama }}  </td>
                             <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
+                            <td>{{ deger.aciklama }}  </td>
                           </tr>
 
                       {% endfor %}

@@ -151,10 +151,12 @@ def create_rfid_yeni(sender, instance, **kwargs):
             yer_updown_obj = yer_updown.objects.filter(mac_no=deger.mac_no).first()
             if yer_updown_obj:
                 mac_no = deger.mac_no
+                alive_x = yer_updown_obj.alive_time
                 kaydetme_obj = yer_updown(id=yer_updown_obj.id,
                                           proje=proje,
                                           mac_no=mac_no,
-                                          degis="E")
+                                          degis="E",
+                                          alive_time=alive_x)
                 kaydetme_obj.save()
             else:
                 mac_no = deger.mac_no
@@ -180,7 +182,8 @@ def create_yerupdown_yeni(sender, instance, **kwargs):
         kaydetme_obj = yer_updown(id=yer_updown_obj.id,
                                   proje_id=proje,
                                   mac_no=mac_no_x,
-                                  degis="E")
+                                  degis="E",
+                                  alive_time=yer_updown_obj.alive_time)
         kaydetme_obj.save()
     else:
         kaydetme_obj = yer_updown(proje_id=proje,

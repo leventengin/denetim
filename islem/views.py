@@ -5843,7 +5843,11 @@ def bildirim(request):
             if proje == None:
                 pass
             else:
-                n = Notification.objects.filter(viewed=False).filter(proje=proje).values()
+                bugun = datetime.datetime.now()
+                yedigun = datetime.timedelta(7,0,0)
+                yedigun_once = bugun - yedigun
+                print("yedi gün önce...", yedigun_once)
+                n = Notification.objects.filter(viewed=False).filter(proje=proje).filter(timestamp__gt=yedigun_once).values()
                 print("obje - dictionary...",n)
                 if n:
                     n_list = list(n)
@@ -5920,7 +5924,7 @@ def memnuniyet_list(request, pk=None):
                 temp['proje'] = x['proje']
                 m_list.append(temp)
 
-        paginator = Paginator(m_list, 30)
+        paginator = Paginator(m_list, 25)
         page = request.GET.get('page')
 
         try:
@@ -5986,7 +5990,10 @@ def mk_memnuniyet_list(request):
                         m2_list.append(temp)
 
                 else:
-                    memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).order_by("-id")
+                    bugun = datetime.datetime.now()
+                    yedigun = datetime.timedelta(7,0,0)
+                    yedigun_once = bugun - yedigun
+                    memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
                     m_list = []
                     m2_list = []
                     for x in memnuniyet_obj:
@@ -6055,7 +6062,7 @@ def mk_memnuniyet_list(request):
                     request.session['mk_m_proje'] = proje
 
 
-                paginator = Paginator(m2_list, 30)
+                paginator = Paginator(m2_list, 25)
                 page = request.GET.get('page')
                 try:
                     n = paginator.page(page)
@@ -6086,7 +6093,7 @@ def mk_memnuniyet_list(request):
                     temp['proje'] = x['proje']
                     m2_list.append(temp)
                 print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
-            paginator = Paginator(m2_list, 30)
+            paginator = Paginator(m2_list, 25)
             page = request.GET.get('page')
             try:
                 n = paginator.page(page)
@@ -6160,7 +6167,7 @@ def operasyon_list(request, pk=None):
         else:
             print("ikinci bölüm...")
             o_list = []
-            for x in rs_o_list:
+            for x in o2_list:
                 temp = {}
                 temp['bas_tarih'] = parser.parse(x['bas_tarih'])
                 temp['son_tarih'] = parser.parse(x['son_tarih'])
@@ -6174,7 +6181,7 @@ def operasyon_list(request, pk=None):
 
         print("paginator a göndermeden önce o list...", o_list)
 
-        paginator = Paginator(o_list, 30)
+        paginator = Paginator(o_list, 25)
         page = request.GET.get('page')
         try:
             n = paginator.page(page)
@@ -6246,7 +6253,10 @@ def mk_operasyon_list(request):
                         o2_list.append(temp)
 
                 else:
-                    operasyon_obj = Operasyon_Data.objects.filter(proje=proje).order_by("-id")
+                    bugun = datetime.datetime.now()
+                    yedigun = datetime.timedelta(7,0,0)
+                    yedigun_once = bugun - yedigun
+                    operasyon_obj = Operasyon_Data.objects.filter(proje=proje).filter(bas_tarih__gt=yedigun_once).order_by("-id")
                     o_list = []
                     o2_list = []
                     for x in operasyon_obj:
@@ -6296,7 +6306,7 @@ def mk_operasyon_list(request):
                     request.session['mk_o_proje'] = proje
 
 
-                paginator = Paginator(o2_list, 30)
+                paginator = Paginator(o2_list, 25)
                 page = request.GET.get('page')
                 try:
                     n = paginator.page(page)
@@ -6330,7 +6340,7 @@ def mk_operasyon_list(request):
                     temp['yer'] = x['yer']
                     o2_list.append(temp)
                 #print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
-            paginator = Paginator(o2_list, 30)
+            paginator = Paginator(o2_list, 25)
             page = request.GET.get('page')
             try:
                 n = paginator.page(page)
@@ -6415,7 +6425,7 @@ def den_saha_list(request, pk=None):
                 temp['soyadi'] = x['soyadi']
                 d_list.append(temp)
 
-        paginator = Paginator(d_list, 30)
+        paginator = Paginator(d_list, 25)
         page = request.GET.get('page')
 
         try:
@@ -6488,7 +6498,10 @@ def mk_den_saha_list(request):
                         d2_list.append(temp)
 
                 else:
-                    denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
+                    bugun = datetime.datetime.now()
+                    yedigun = datetime.timedelta(7,0,0)
+                    yedigun_once = bugun - yedigun
+                    denetim_obj = Denetim_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
                     d_list = []
                     d2_list = []
                     for x in denetim_obj:
@@ -6563,7 +6576,7 @@ def mk_den_saha_list(request):
                     request.session['mk_d_proje'] = proje
 
 
-                paginator = Paginator(d2_list, 30)
+                paginator = Paginator(d2_list, 25)
                 page = request.GET.get('page')
                 try:
                     n = paginator.page(page)
@@ -6594,7 +6607,7 @@ def mk_den_saha_list(request):
                     temp['proje'] = x['proje']
                     temp['yer'] = x['yer']
                     d2_list.append(temp)
-            paginator = Paginator(d2_list, 30)
+            paginator = Paginator(d2_list, 25)
             page = request.GET.get('page')
             try:
                 n = paginator.page(page)
@@ -6762,7 +6775,7 @@ def ariza_list(request, pk=None):
                 temp['soyadi'] = x['soyadi']
                 a_list.append(temp)
 
-        paginator = Paginator(a_list, 30)
+        paginator = Paginator(a_list, 25)
         page = request.GET.get('page')
 
         try:
@@ -6831,7 +6844,10 @@ def mk_ariza_list(request):
                         o2_list.append(temp)
 
                 else:
-                    ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
+                    bugun = datetime.datetime.now()
+                    yedigun = datetime.timedelta(7,0,0)
+                    yedigun_once = bugun - yedigun
+                    ariza_obj = Ariza_Data.objects.filter(proje=proje).filter(timestamp__gt=yedigun_once).order_by("-id")
                     a_list = []
                     a2_list = []
                     for x in ariza_obj:
@@ -6883,7 +6899,7 @@ def mk_ariza_list(request):
                     request.session['mk_a_proje'] = proje
 
 
-                paginator = Paginator(a2_list, 30)
+                paginator = Paginator(a2_list, 25)
                 page = request.GET.get('page')
                 try:
                     n = paginator.page(page)
@@ -6915,7 +6931,7 @@ def mk_ariza_list(request):
                     temp['aciklama'] = x['aciklama']
                     a2_list.append(temp)
                 #print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
-            paginator = Paginator(a2_list, 30)
+            paginator = Paginator(a2_list, 25)
             page = request.GET.get('page')
             try:
                 n = paginator.page(page)
@@ -7005,6 +7021,7 @@ def rfid_create(request, pk=None):
 
 
 #--------------------------------------------------------------------------------------------------
+from operator import attrgetter, itemgetter
 
 @login_required
 def yerud_list(request, pk=None):
@@ -7031,7 +7048,14 @@ def yerud_list(request, pk=None):
 
             y_list.append(temp)
 
-        paginator = Paginator(y_list, 20)
+        print("y list.....", y_list)
+
+        sorted_y = sorted(y_list, key=itemgetter('yer'))
+
+        print("sorted y....", sorted_y)
+
+        #paginator = Paginator(y_list, 20)
+        paginator = Paginator(sorted_y, 20)
         page = request.GET.get('page')
         try:
             n = paginator.page(page)
@@ -7192,11 +7216,16 @@ def show_notification(request, notification_id):
     return render_to_response('islem/bildirimler.html', {'notification': n})
 
 @login_required
-def delete_notification(request, notification_id):
+def delete_notification(request, notification_id, page_id):
+    print("delete notification içinden n id............", notification_id, "page id.....", page_id)
+    print("///////////////////////////////////////////////////////////////")
     n = Notification.objects.get(id=notification_id)
     n.viewed = True
     n.save()
-    return redirect('list_notification')
+    #return redirect('list_notification')
+    url_notif = '/islem/notification/?page='+str(page_id)
+    return redirect(url_notif)
+
 
 @login_required
 def create_notification(request):
@@ -7212,10 +7241,17 @@ def list_notification(request):
     print("list notifications ..")
     print("request user id..", request.user.id)
     #n = Notification.objects.all()
-    n_list = Notification.objects.filter(viewed=False).order_by("-id")
+    proje = request.user.profile.proje
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    print("yedi gün önce ...............", yedigun_once)
+    n_list = Notification.objects.filter(viewed=False).filter(timestamp__gt=yedigun_once).filter(proje=proje).order_by("-id")
     #contact_list = Contacts.objects.all()
-    paginator = Paginator(n_list, 20)
+    paginator = Paginator(n_list, 25)
     page = request.GET.get('page')
+    print("işte page.....", page)
+    print(".........................................")
     try:
         n = paginator.page(page)
     except PageNotAnInteger:

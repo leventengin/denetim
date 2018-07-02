@@ -30,7 +30,12 @@ def list_notification(request):
     print("list notifications ..")
     print("request user id..", request.user.id)
     #n = Notification.objects.all()
-    n_list = Notification.objects.filter(viewed=False).order_by("-id")
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    fark_yedigun = bugun - yedigun
+    print(bugun)
+    print(fark_yedigun)
+    n_list = Notification.objects.filter(viewed=False).filter(timestamp > fark_yedigun).order_by("-id")
     #contact_list = Contacts.objects.all()
     paginator = Paginator(n_list, 20)
     page = request.GET.get('page')

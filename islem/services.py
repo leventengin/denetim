@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import render, render_to_response
 from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi, Denetim_Data, Ariza_Data
 from .models import yer
+import datetime
 
 
 def proje_varmi_kontrol(request):
@@ -48,7 +49,10 @@ def sirket_varmi_kontrol(request):
 
 def get_m_list(request):
     proje = request.user.profile.proje
-    memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).order_by("-id")
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     m_list = []
     for x in memnuniyet_obj:
         temp = {}
@@ -99,7 +103,10 @@ def get_m_list(request):
 
 def get_o_list(request):
     proje = request.user.profile.proje
-    operasyon_obj = Operasyon_Data.objects.filter(proje=proje).order_by("-id")
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    operasyon_obj = Operasyon_Data.objects.filter(proje=proje).filter(bas_tarih__gt=yedigun_once).order_by("-id")
     print("işte operasyon listesi...", operasyon_obj)
     o_list = []
     for x in operasyon_obj:
@@ -143,7 +150,10 @@ def get_o_list(request):
 
 def get_d_list(request):
     proje = request.user.profile.proje
-    denetim_obj = Denetim_Data.objects.filter(proje=proje).order_by("-id")
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    denetim_obj = Denetim_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     print("işte denetim listesi...", denetim_obj)
     d_list = []
     for x in denetim_obj:
@@ -218,7 +228,10 @@ def get_d_list(request):
 
 def get_a_list(request):
     proje = request.user.profile.proje
-    ariza_obj = Ariza_Data.objects.filter(proje=proje).order_by("-id")
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    ariza_obj = Ariza_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     a_list = []
     for x in ariza_obj:
         temp = {}

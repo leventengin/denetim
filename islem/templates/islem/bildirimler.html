@@ -9,14 +9,33 @@
     <h4> Bildirimler </h4>
     <p> </p>
     {% if notification_list %}
-          <ul>
-            {% for n in notification_list %}
-              <li>
-                <a href="delete/{{ n.id }}"> &nbsp; &nbsp; {{ n.timestamp|date:" d/m/Y - H:i"  }} &nbsp; &nbsp; {{ n.proje }} &nbsp; &nbsp; {{ n.message }}  </a>
-              </li>
-            {% endfor %}
+
+    <div class="pagination">
+
+      <ul>
+        <span class="current">
+            <table  id="table_id">
+
+                {% for n in notification_list %}
+
+                    <tr>
+                      <td> <a href="delete/{{ n.id }}/{{ notification_list.number }}"> {{ n.timestamp|date:" d/m/Y - H:i" }} </a> </td>
+                      <td>   &emsp;  </td>
+                      <td>  <a href="delete/{{ n.id }}/{{ notification_list.number }}"> {{ n.proje }} </a> </td>
+                      <td>   &emsp;  </td>
+                      <td>  <a href="delete/{{ n.id }}/{{ notification_list.number }}"> {{ n.message }} </a> </td>
+
+                    </tr>
+
+                {% endfor %}
+            </table>
+
+          </span>
+
             <p> </p>
           </ul>
+    </div>
+
     {% else %}
           <p> gelen bildirim yok !!!!!....</p>
           <p> </p>

@@ -299,7 +299,7 @@ urlpatterns = [
 
     url(r'^notification/$', views.list_notification, name='list_notification'),
     url(r'^notification/show/(?P<notification_id>\d+)/$', views.show_notification, name='show_notification'),
-    url(r'^notification/delete/(?P<notification_id>\d+)/$', views.delete_notification, name='delete_notification'),
+    url(r'^notification/delete/(?P<notification_id>\d+)/(?P<page_id>\d+)/$', views.delete_notification, name='delete_notification'),
     url(r'^notification/create/$', views.create_notification, name='create_notification'),
 
 

@@ -80,7 +80,7 @@ th{
 
 
     <form action="" method="POST">
-      
+
         {% csrf_token %}
         {{ form.errors }}
         {{ form.non_field_errors }}
@@ -101,8 +101,8 @@ th{
                             <th hidden>xxx</th>
                             <th>Proje</th>
                             <th>Yer</th>
+                            <th>Tarih</th>
                             <th>Açıklama</th>
-                            <th>Zaman</th>
                           </tr>
 
                       {% for deger in mk_memnuniyet_list %}
@@ -111,8 +111,8 @@ th{
                             <td hidden>{{ deger.deger }}  </td>
                             <td>{{ deger.proje }}  </td>
                             <td>{{ deger.yer }}  </td>
+                            <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>                            
                             <td>{{ deger.aciklama }}  </td>
-                            <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
                           </tr>
 
                       {% endfor %}
