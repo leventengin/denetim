@@ -302,7 +302,7 @@ span.num {
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>
-                        <li><a href="/islem/yerud_list">WS-Yer Bilgisi Listele </a></li>
+                        <li><a href="/islem/ad_yerud_list">WS-Yer Bilgisi Listele </a></li>
                         <li><a href="/islem/memnuniyet_create">WS-Memnuniyet Ekle</a></li>
                         <li><a href="/islem/operasyon_create">WS-Operasyon Ekle</a></li>
                         <li><a href="/islem/den_saha_create">WS-Denetim Ekle</a></li>
@@ -352,11 +352,16 @@ span.num {
                                 {% endif %}
 
 
-
-                             <div class="col-md-2 c" ><a class="dropbtn2 middler" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
+                                {% if user.profile.isletme_projeyon == "E" or user.profile.opr_proje_yon == "E" or user.profile.opr_alan_sefi == "E" %}
+                                <div class="col-md-2 c" ><a class="dropbtn2 middler" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
                                    </div>
-                             </div>
+                                </div>
+                                {%  else  %}
+                                <div class="col-md-2 c" >
+                                </div>
+                                {% endif %}
+
 
 
                              {% if user.is_staff %}

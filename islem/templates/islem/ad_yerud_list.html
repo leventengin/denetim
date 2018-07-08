@@ -1,0 +1,115 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<style>
+
+
+table td
+{
+  table-layout:fixed;
+  width:20px;
+  overflow:hidden;
+  word-wrap:break-word;
+
+}
+
+
+table {
+    width:100%;
+}
+
+
+
+
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+
+
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+
+.dikkat{
+  color:red;
+}
+.siyah{
+  color:black;
+}
+
+.yesil{
+  color:green;
+}
+/*
+th{
+    font-weight: normal;
+}
+*/
+
+</style>
+
+
+    <h4>Yerler Listesi</h4>
+
+
+
+
+    <p> </p>
+
+
+
+    <form action="" method="POST">
+
+        {% csrf_token %}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        {{ form }}
+
+        <input type="submit" value="seç" />
+
+    </form>
+
+
+
+
+
+    {% if ad_yerud_list %}
+
+            <table  id="table_id">
+                    <tr>
+                      <th>Proje</th>
+                      <th>Yer</th>
+                      <th>Mac No</th>
+                      <th>Kod</th>
+                      <th>Son Zaman</th>
+                    </tr>
+
+                {% for deger in ad_yerud_list %}
+
+                    <tr class="yn" >
+                      <td>{{ deger.proje }}  </td>
+                      <td>{{ deger.yer }}  </td>
+                      <td>{{ deger.mac_no }}  </td>
+                      <td>{{ deger.degis }}  </td>
+                      <td>{{ deger.alive_time|date:" d/m/Y - H:i" }}  </td>
+                    </tr>
+
+                {% endfor %}
+            </table>
+
+     {% else %}
+      <p> </p>
+      <p> </p>
+    {% endif %}
+
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    {{ form.media }}
+
+
+{% endblock %}

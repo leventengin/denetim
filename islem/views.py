@@ -21,6 +21,7 @@ from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_B
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
+from islem.forms import Sirket_Proje_Form
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -5662,6 +5663,37 @@ class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(bolum__icontains=self.q)
         return qs
 
+class sirketautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return sirket.objects.none()
+        qs = sirket.objects.all()
+
+        if self.q:
+            qs = qs.filter(bolum__icontains=self.q)
+        return qs
+
+
+
+class sirketprojeautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return proje.objects.none()
+        qs = proje.objects.all()
+
+        sirket_proje  = self.forwarded.get('sirket', None)
+        print("şirket proje...:", sirket)
+        if sirket_proje:
+            qs = qs.filter(sirket=sirket_proje)
+        print("qs....", qs)
+        if self.q:
+            qs = qs.filter(bolum__icontains=self.q)
+        return qs
+
+
+
 
 
 @login_required
@@ -5871,7 +5903,7 @@ def popup_notif(request):
 
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
-from islem.services import get_m_list, get_o_list, get_d_list, get_a_list
+from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol
 
 
 
@@ -5953,8 +5985,8 @@ def memnuniyet_create(request, pk=None):
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/memnuniyet_list/",
-        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/memnuniyet_list/",
+        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
@@ -6212,8 +6244,8 @@ def operasyon_create(request, pk=None):
     rfid_no = 34234
     bild_tipi = "M"
     print("okunan zaman......operasyon create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/operasyon_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/operasyon_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
@@ -6461,8 +6493,8 @@ def den_saha_create(request, pk=None):
     rfid_no = 34234
     kod = "3"
     print("okunan zaman......denetim create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/denetim_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/denetim_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('den_saha_list')
@@ -6806,8 +6838,8 @@ def ariza_create(request, pk=None):
     rfid_no = "34234"
     sebep = "2"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/ariza_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/ariza_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -6841,7 +6873,7 @@ def mk_ariza_list(request):
                         temp['proje'] = x['proje']
                         temp['yer'] = x['yer']
                         temp['aciklama'] = x['aciklama']
-                        o2_list.append(temp)
+                        a2_list.append(temp)
 
                 else:
                     bugun = datetime.datetime.now()
@@ -6975,10 +7007,9 @@ def rfid_filter(request):
         if form.is_valid():
             proje = request.POST.get('proje', "")
             print(" proje form okunduktan sonra post...", proje)
-
-            url = "http://172.104.239.247:7000/ws/rfid_filter/"+str(proje)+"/"
+            url = "http://"+settings.ADR_LOCAL+":7000/ws/rfid_filter/"+str(proje)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
+            response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
@@ -6993,7 +7024,7 @@ def rfid_filter(request):
 @login_required
 def rfid_filter_proje(request, proje=None):
     print("rfid project list............", proje)
-    r = requests.get_queryset("http://172.104.239.247:7000/ws/rfid_filter" + str(proje) + "/",  auth=("ez-admin", "ezadmincheck"))
+    r = requests.get_queryset("http://"+settings.ADR_LOCAL+":7000/ws/rfid_filter" + str(proje) + "/",  auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
 
@@ -7008,8 +7039,8 @@ def rfid_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/rfid_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/rfid_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -7076,6 +7107,60 @@ def yerud_list(request, pk=None):
 
 
 
+@login_required
+def ad_yerud_list(request):
+    user = request.user
+    if admin_kontrol(request):
+        print("admin kontrolden geçtik.....")
+        if request.method == "POST":
+            form = Sirket_Proje_Form(request.POST)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                yerud_obj = yer_updown.objects.filter(proje=proje).order_by("id")
+                y_list = []
+                for x in yerud_obj:
+                    temp = {}
+
+                    temp['id'] = x.id
+                    temp['mac_no'] = x.mac_no
+                    yer_obj = yer.objects.filter(mac_no=x.mac_no).first()
+                    if yer_obj:
+                        temp['yer'] = yer_obj.yer_adi
+                    else:
+                        temp['yer'] = ""
+
+                    temp['proje'] = x.proje.proje_adi
+                    temp['degis'] = x.degis
+                    temp['alive_time'] = x.alive_time
+
+                    y_list.append(temp)
+
+                print("y list.....", y_list)
+
+                sorted_y = sorted(y_list, key=itemgetter('yer'))
+
+                print("sorted y....", sorted_y)
+
+
+                return render(request, 'islem/ad_yerud_list.html', {'form': form, 'ad_yerud_list': sorted_y})
+            else:
+                print("form is invalid.....")
+                return redirect('ad_yerud_list')
+        else:
+
+
+            form = Sirket_Proje_Form()
+            n = ""
+            return render(request, 'islem/ad_yerud_list.html', {'form': form, 'ad_yerud_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
 
 
 @login_required
@@ -7085,8 +7170,8 @@ def yerud_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......yerud create.............", t_stamp)
-    response = requests.post("http://172.104.239.247:7000/ws/yerud_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=("ez-admin", "ezadmincheck"))
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/yerud_list/",
+        json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('yerud_list')
@@ -7097,9 +7182,9 @@ def yerud_create(request, pk=None):
 def yerud_detail_get(request, pk=None):
     mac_no = pk
     print("gelen mac degeri...", mac_no)
-    url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(mac_no)+"/"
+    url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(mac_no)+"/"
     print("işte url", url)
-    response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
+    response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
     print("response...", response)
     gelen = response.json()
     print("gelen deger mac bul içinden...", gelen)
@@ -7125,9 +7210,9 @@ def macnoyer(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
+            response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
@@ -7153,9 +7238,9 @@ def macnoyer_degis(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://172.104.239.247:7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
-            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
+            response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
             gelen = response.json()
 
@@ -7183,9 +7268,9 @@ def macnoyer_degis(request):
                     "degis": "H",
                     "alive_time": gl_alive_time
                     }
-            response = requests.put(url, data=data , auth=("ez-admin", "ezadmincheck"))
+            response = requests.put(url, data=data , auth=(settings.USER_GLB, settings.PASW_GLB))
 
-            response = requests.get(url, auth=("ez-admin", "ezadmincheck"))
+            response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
             gelen = response.json()
             print("gelen deger mac bul içinden...", gelen)
@@ -7217,8 +7302,8 @@ def show_notification(request, notification_id):
 
 @login_required
 def delete_notification(request, notification_id, page_id):
-    print("delete notification içinden n id............", notification_id, "page id.....", page_id)
-    print("///////////////////////////////////////////////////////////////")
+    #print("delete notification içinden n id............", notification_id, "page id.....", page_id)
+    #print("///////////////////////////////////////////////////////////////")
     n = Notification.objects.get(id=notification_id)
     n.viewed = True
     n.save()

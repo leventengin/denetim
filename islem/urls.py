@@ -25,6 +25,7 @@ from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
+from .views import sirketautocomplete, sirketprojeautocomplete
 from notification.views import list_notification, show_notification, create_notification, delete_notification
 
 
@@ -48,7 +49,8 @@ urlpatterns = [
     url(r'^list_tipi-autocomplete/$', list_tipiautocomplete.as_view(),name='list_tipi-autocomplete',),
     url(r'^list_zon-autocomplete/$', list_zonautocomplete.as_view(),name='list_zon-autocomplete',),
     url(r'^list_bolum-autocomplete/$', list_bolumautocomplete.as_view(),name='list_bolum-autocomplete',),
-
+    url(r'^sirket-autocomplete/$', sirketautocomplete.as_view(),name='sirket-autocomplete',),
+    url(r'^sirketproje-autocomplete/$', sirketprojeautocomplete.as_view(),name='sirketproje-autocomplete',),
 
 
 #  yerinde denetim ile ilgili işlemler...................
@@ -115,7 +117,7 @@ urlpatterns = [
     url(r'^macnoyer_degis/$', views.macnoyer_degis, name='macnoyer_degis'),
     url(r'^yerud_create/$', views.yerud_create, name='yerud_create'),
     url(r'^yerud_list/$', views.yerud_list, name='yerud_list'),
-
+    url(r'^ad_yerud_list/$', views.ad_yerud_list, name='ad_yerud_list'),
 
     url(r'^deneme_dropdown/$', views.deneme_dropdown, name='deneme_dropdown'),
 

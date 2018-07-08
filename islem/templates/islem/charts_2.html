@@ -21,28 +21,7 @@
 -->
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'> </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<style>
-
-table {
-  border-collapse: collapse;
-}
-
-table tr {
-  border-bottom: 1px solid black;
-}
-/*
-table tr:last-child {
-  border: 0;
-}
-*/
-td {
-  border-right: solid 1px;
-  border-left: solid 1px;
-}
-
-</style>
 
 <script>
 function dataChart(){
@@ -59,27 +38,9 @@ function dataChart(){
           defaultData_1 = data.default_1;
           labels_2 = data.labels_2;
           defaultData_2 = data.default_2;
-          $("#div_proje").text("Proje: "+ data.proje);
-          $("#m1").text(data.mem_1);
-          $("#m2").text(data.mem_2);
-          $("#m3").text(data.mem_3);
-          $("#mt").text(data.mem_toplam);
-          $("#my1").text("%"+data.m_yuzde_1);
-          $("#my2").text("%"+data.m_yuzde_2);
-          $("#my3").text("%"+data.m_yuzde_3);
-          $("#s1").text(data.seb_1);
-          $("#s2").text(data.seb_2);
-          $("#s3").text(data.seb_3);
-          $("#s4").text(data.seb_4);
-          $("#s5").text(data.seb_5);
-          $("#s6").text(data.seb_6);
-          $("#st").text(data.seb_toplam);
-          $("#sy1").text("%"+data.s_yuzde_1);
-          $("#sy2").text("%"+data.s_yuzde_2);
-          $("#sy3").text("%"+data.s_yuzde_3);
-          $("#sy4").text("%"+data.s_yuzde_4);
-          $("#sy5").text("%"+data.s_yuzde_5);
-          $("#sy6").text("%"+data.s_yuzde_6);
+          //alert(data);
+          //alert(labels_1);
+          //alert(defaultData_1);
           setChart(labels_1, defaultData_1, labels_2, defaultData_2);
       },
       error: function(error_data){
@@ -180,100 +141,89 @@ $(document).ready(function(){
 
 <h2>Memnuniyet Değerlendirme </h2>
 
-<h3 id="div_proje"> Let jQuery AJAX Change This Text</h3>
 
-<div class='row'  class="h-50 d-inline-block" >
-    <div class='col-sm-12' url-endpoint='{% url "api-data" %}' >
+<div class="row">
+  <div class="col">
+    <canvas id="myChart" width="400" height="400"></canvas>
+  </div>
+  <div class="col">
+    <canvas id="myChart2" width="400" height="400"></canvas>
+  </div>
+  <div class="w-100"></div>
 
-        <div class='col-sm-6' >
-            <canvas id="myChart"></canvas>
-        </div>
+  <div class="col">
 
-        <div class='col-sm-6' >
-            <canvas id="myChart2"></canvas>
-        </div>
-    </div>
+    <table  id="table_1">
+            <tr>
+              <th></th>
+              <th>Çok Memnun</th>
+              <th>Memnun</th>
+              <th>Memnun Değil</th>
+              <th>Toplam</th>
+            </tr>
+
+
+            <tr>
+              <td>Adet </td>
+              <td>... </td>
+              <td>... </td>
+              <td>...  </td>
+              <td>...  </td>
+            </tr>
+
+
+            <tr>
+              <td>Yüzde </td>
+              <td>... </td>
+              <td>... </td>
+              <td>...  </td>
+              <td>...  </td>
+            </tr>
+
+    </table>
+
+  </div>
+  <div class="col">
+
+    <table  id="table_2">
+            <tr>
+              <th></th>
+              <th>Sabunluk</th>
+              <th>Lavabo</th>
+              <th>Havlu</th>
+              <th>Koku</th>
+              <th>Tuvalet</th>
+              <th>T.Kağıdı</th>
+              <th>Toplam</th>
+            </tr>
+
+            <tr >
+              <td>Adet </td>
+              <td>...  </td>
+              <td>... </td>
+              <td>...  </td>
+              <td>...  </td>
+              <td>...  </td>
+              <td>... </td>
+              <td>...  </td>
+            </tr>
+
+            <tr >
+              <td>Yüzde </td>
+              <td>...  </td>
+              <td>... </td>
+              <td>...  </td>
+              <td>...  </td>
+              <td>...  </td>
+              <td>... </td>
+              <td>.... </td>
+            </tr>
+
+    </table>
+
+  </div>
 </div>
 
-
-<div class='row'>
-    <div class='col-sm-12' url-endpoint='{% url "api-data" %}' >
-
-        <div class='col-sm-6'>
-
-          <table >
-                  <tr>
-                    <th></th>
-                    <th>Çok Memnun  &emsp;  &emsp; </th>
-                    <th>Memnun   &emsp; &emsp;  </th>
-                    <th>Memnun Değil   &emsp;  &emsp; </th>
-                    <th>Toplam  &emsp; &emsp;  </th>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center"> &emsp;Adet&emsp; </td>
-                    <td id="m1" align="center">... </td>
-                    <td id="m2" align="center">... </td>
-                    <td id="m3" align="center">...  </td>
-                    <td id="mt" align="center">...  </td>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center">&emsp; Yüzde &emsp; </td>
-                    <td id="my1" align="center">... </td>
-                    <td id="my2" align="center">... </td>
-                    <td id="my3" align="center">...  </td>
-                    <td align="center"> - </td>
-                  </tr>
-
-          </table>
-
-        </div>
-
-        <div class='col-sm-6'>
-
-          <table>
-                  <tr>
-                    <th></th>
-                    <th>Sabunluk &emsp; </th>
-                    <th>Lavabo &emsp;   </th>
-                    <th>Havlu &emsp;   </th>
-                    <th>Koku &emsp;  </th>
-                    <th>Tuvalet &emsp;  </th>
-                    <th>T.Kağıdı &emsp;  </th>
-                    <th>Toplam &emsp;   </th>
-                  </tr>
-
-                  <tr>
-                    <td align="center">&emsp; Adet &emsp;</td>
-                    <td id="s1" align="center">... </td>
-                    <td id="s2" align="center">... </td>
-                    <td id="s3" align="center">...  </td>
-                    <td id="s4" align="center">... </td>
-                    <td id="s5" align="center">... </td>
-                    <td id="s6" align="center">...  </td>
-                    <td id="st" align="center">...  </td>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center"> &emsp;Yüzde &emsp;</td>
-                    <td id="sy1" align="center">... </td>
-                    <td id="sy2" align="center">... </td>
-                    <td id="sy3" align="center">...  </td>
-                    <td id="sy4" align="center">... </td>
-                    <td id="sy5" align="center">... </td>
-                    <td id="sy6" align="center">...  </td>
-                    <td align="center"> - </td>
-                  </tr>
-
-          </table>
-
-        </div>
-    </div>
-</div>
 
 
 

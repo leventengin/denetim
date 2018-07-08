@@ -625,6 +625,15 @@ class BolumSecForm(forms.Form):
         print("queryset initial içinden..:", self.fields['bolum'].queryset)
 
 
+
+class Sirket_Proje_Form(forms.Form):
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),
+         widget=autocomplete.ModelSelect2(url='sirket-autocomplete'), required=False)
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(),
+         widget=autocomplete.ModelSelect2(url='sirketproje-autocomplete', forward=['sirket']  ), required=False)
+
+
+
 class NebuForm(forms.Form):
     nedirbu = forms.ModelChoiceField(queryset=denetim.objects.all(), label="nedir bu")
     def clean(self):
