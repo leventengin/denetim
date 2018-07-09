@@ -6986,7 +6986,9 @@ def mk_ariza_list(request):
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
-
+@login_required
+def rapor_memnuniyet(request, pk=None):
+    return render(request, 'islem/charts.html',)
 
 
 
@@ -7159,6 +7161,9 @@ def ad_yerud_list(request):
         print("buraya geldi...şirket merkez yetkilisi değil...")
         mesaj = "kişi bu işlem için yetkili değil..."
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
 
 
 

@@ -42,6 +42,14 @@ td {
   border-left: solid 1px;
 }
 
+.chart-container {
+  position: relative;
+  margin: auto;
+  height: 35vh;
+  width: 35vw;
+}
+
+
 </style>
 
 <script>
@@ -94,7 +102,9 @@ function dataChart(){
 function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
     //alert("buraya buraya da geldi.........................");
     var ctx = document.getElementById("myChart");
+    //ctx.textAlign = "center";
     var ctx2 = document.getElementById("myChart2");
+    ctx2.textAlign = "center";
     var myChart = new Chart(ctx2, {
           type: 'bar',
           data: {
@@ -122,10 +132,22 @@ function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
               }]
           },
           options: {
+              maintainAspectRatio: false,
+              /*
+              layout: {
+                   padding: {
+                       left: 50,
+                       right: 0,
+                       top: 0,
+                       bottom: 0
+                   }
+              }
+              */
               scales: {
                   yAxes: [{
                       ticks: {
                           beginAtZero:true
+                          //min: 30
                       }
                   }]
               }
@@ -153,17 +175,22 @@ function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
                   borderWidth: 1
               }]
           },
-          /*
+
           options: {
-              scales: {
-                  yAxes: [{
-                      ticks: {
-                          beginAtZero:true
-                      }
-                  }]
-              }
+            segmentShowStroke : true,
+        		segmentStrokeColor : "#fff",
+        		segmentStrokeWidth : 2,
+        		percentageInnerCutout : 50,
+        		animationSteps : 100,
+        		animationEasing : "easeOutBounce",
+        		animateRotate : true,
+        		animateScale : false,
+        		responsive: true,
+        		maintainAspectRatio: false,
+        		showScale: true,
+        		animateScale: true
           }
-          */
+
       });   // end   second chart............
 
 }  // end ************  function  set chart  ****************
@@ -182,14 +209,14 @@ $(document).ready(function(){
 
 <h3 id="div_proje"> Let jQuery AJAX Change This Text</h3>
 
-<div class='row'  class="h-50 d-inline-block" >
+<div class='row'  >
     <div class='col-sm-12' url-endpoint='{% url "api-data" %}' >
 
-        <div class='col-sm-6' >
+        <div class='col-sm-6 chart-container' >
             <canvas id="myChart"></canvas>
         </div>
 
-        <div class='col-sm-6' >
+        <div class='col-sm-6 chart-container' >
             <canvas id="myChart2"></canvas>
         </div>
     </div>

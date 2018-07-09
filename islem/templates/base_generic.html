@@ -203,11 +203,16 @@ span.num {
       <nav id="sidebar">
                 <div class="sidebar-header">
 
-                        <a href="{% url 'index' %}"> <img src="{% static "images/logo/logo-light-icon.png" %}"
+                        <a href="{% url 'index' %}">
+                          <img src="{% static "images/logo/ez-manage-logo_1.png" %}"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
-                                        <img src="{% static "images/logo/logo-light-text.png" %}"
+                          <!--
+                          <img src="{% static "images/logo/logo-light-icon.png" %}"
                                                     alt="EasyCheck&#169;" class="dark-logo" />
-                                    </a>
+                          <img src="{% static "images/logo/logo-light-text.png" %}"
+                                                    alt="EasyCheck&#169;" class="dark-logo" />
+                          -->
+                          </a>
 
                 </div>
 
@@ -279,10 +284,19 @@ span.num {
                  </li>
                 {% endif %}
 
+                {% if  user.profile.isletme_projeyon == "E" or user.profile.opr_proje_yon == "E" or user.profile.opr_alan_sefi == "E" or user.is_superuser %}
+                 <li>
+                  <a href="#pageSubmenu6" data-toggle="collapse" aria-expanded="false">Proje Raporları</a>
+                   <ul class="collapse list-unstyled" id="pageSubmenu6">
+                      <li><a href="/islem/rapormemnuniyet">Proje Memnuniyet Raporu</a></li>
+                  </ul>
+               </li>
+              {% endif %}
+
                 {% if  user.profile.operasyon_merkezyon == "E" or  user.is_superuser %}
                  <li>
-                  <a href="#pageSubmenu6" data-toggle="collapse" aria-expanded="false">Projeler Takip</a>
-                   <ul class="collapse list-unstyled" id="pageSubmenu6">
+                  <a href="#pageSubmenu7" data-toggle="collapse" aria-expanded="false">Projeler Takip</a>
+                   <ul class="collapse list-unstyled" id="pageSubmenu7">
                       <li><a href="/islem/mk_projealanlari">Proje Alanları</a></li>
                       <li><a href="/islem/mk_yer">Yer</a></li>
                       <li><a href="/islem/mk_rfid">RFID</a></li>
@@ -297,8 +311,8 @@ span.num {
 
                 {% if user.is_superuser %}
                  <li>
-                    <a href="#pageSubmenu7" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu7">
+                    <a href="#pageSubmenu8" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu8">
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>
