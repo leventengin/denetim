@@ -266,6 +266,8 @@ def get_a_list(request):
 
         temp['deger'] = 0
 
+        if sebep == "0":
+            temp["aciklama"] = "mekanik"
         if sebep == "1":
             temp['aciklama'] = "mekanik"
         if sebep == "2":
