@@ -514,6 +514,62 @@ class DenetimForm(forms.Form):
         return self.cleaned_data
 
 
+class RaporTarihForm(forms.Form):
+    hedef_baslangic = forms.DateField(label='Hedef başlangıç...:', required=False,
+                        widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+    hedef_bitis = forms.DateField(label='Hedef bitiş...:', required=False,
+                        widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+
+    def clean(self):
+        cleaned_data = super(DenetimForm, self).clean()
+        cc_hedef_baslangic = cleaned_data.get("hedef_baslangic")
+        cc_hedef_bitis = cleaned_data.get("hedef_bitis")
+
+        if (cc_hedef_baslangic == "" ) or (cc_hedef_baslangic == "" ):
+            raise forms.ValidationError(" tarihler boş olamaz.... ")
+        if (cc_hedef_baslangic > cc_hedef_bitis):
+            raise forms.ValidationError(" tarih sıralaması yanlış...")
+        if (cc_hedef_baslangic.date < datetime.today()):
+            raise forms.ValidationError(" başlangıç için ileri bir tarih girmelisiniz.... ")
+        if (cc_hedef_bitis < datetime.date.today()):
+            raise forms.ValidationError(" bitiş için ileri bir tarih girmelisiniz.... ")
+        return self.cleaned_data
+
+
+
+class Sirket_Mem_RaporForm(forms.Form):
+    proje = forms.ModelChoiceField(queryset=proje.objects.all())
+    hedef_baslangic = forms.DateField(label='Hedef başlangıç...:', required=False,
+                        widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+    hedef_bitis = forms.DateField(label='Hedef bitiş...:', required=False,
+                        widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+
+    def __init__(self, *args, **kwargs):
+        sirket = kwargs.pop("sirket")
+        super(Sirket_Mem_RaporForm, self).__init__(*args, **kwargs)
+        proje_obj = proje.objects.filter(sirket=sirket)
+        self.fields['proje'].queryset = proje_obj
+        print("queryset initial içinden..:", self.fields['proje'].queryset)
+
+    def clean(self):
+        cleaned_data = super(DenetimForm, self).clean()
+        cc_hedef_baslangic = cleaned_data.get("hedef_baslangic")
+        cc_hedef_bitis = cleaned_data.get("hedef_bitis")
+        cc_proje = cleaned_data.get("proje")
+        if (cc_hedef_baslangic == "" ) or (cc_hedef_baslangic == "" ):
+            raise forms.ValidationError(" tarihler boş olamaz.... ")
+        if (cc_hedef_baslangic > cc_hedef_bitis):
+            raise forms.ValidationError(" tarih sıralaması yanlış...")
+        if (cc_hedef_baslangic.date < datetime.today()):
+            raise forms.ValidationError(" başlangıç için ileri bir tarih girmelisiniz.... ")
+        if (cc_hedef_bitis < datetime.date.today()):
+            raise forms.ValidationError(" bitiş için ileri bir tarih girmelisiniz.... ")
+        return self.cleaned_data
+
+
+
+
+
 
 class KucukResimForm(forms.ModelForm):
     class Meta:

@@ -15,9 +15,36 @@ class HomeView(View):
         print("AMA İŞLEM BURADA....................................!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return render(request, 'islem/charts.html', {"customers": 10})
 
+def secilen_bolumu_kaydet(request):
+    print("seçilen bölümü kaydet .  jquery içinden.....")
+    response_data ={}
+    if request.method == 'GET':
+        selected = request.GET.get('selected', None)
+        print("selected...:", selected )
+        selected_obj = sonuc_bolum.objects.get(id=selected)
+        print("selected obj", selected_obj)
+        selected_bol = selected_obj.bolum.id
+        print("selected_bol", selected_bol)
+        if selected_bol != None:
+            request.session['secili_bolum'] = selected_bol
+            request.session.modified = True
+            print("secili bölüm burada...:", request.session['secili_bolum'])
+        else:
+            print("selected none  .....  neler oluyor !!!!!")
+    return HttpResponse(response_data, content_type='application/json')
+
+
+
 
 
 def get_data(request, *args, **kwargs):
+    js_proje = request.GET.get('js_proje', None)
+    print("js_proje...:", js_proje )
+    js_ilk_tarih = request.GET.get('js_ilk_tarih', None)
+    print("js ilk tarih", js_ilk_tarih)
+    js_son_tarih = request.GET.get('js_son_tarih', None)
+    print("js son tarih", js_son_tarih)
+
     kullanici_id = request.user.id
     p_obj = Profile.objects.get(id=kullanici_id)
     proje = p_obj.proje

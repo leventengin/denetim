@@ -285,6 +285,8 @@ urlpatterns = [
     url(r'^mk_ariza_list/$', views.mk_ariza_list, name='mk_ariza_list'),
 
     url(r'^rapormemnuniyet/$', views.rapor_memnuniyet, name='rapor_memnuniyet'),
+    url(r'^rapor_mk_memnuniyet/$', views.rapor_mk_memnuniyet, name='rapor_mk_memnuniyet'),
+        
 
     # qrcode urlleri aşağıda....""
     url(r'^qrdosyasi/$', views.QrdosyasiListView.as_view(), name='qrdosyasi'),

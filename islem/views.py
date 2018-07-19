@@ -21,7 +21,7 @@ from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_B
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
-from islem.forms import Sirket_Proje_Form
+from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -5985,7 +5985,7 @@ def memnuniyet_create(request, pk=None):
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/memnuniyet_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/memnuniyet_list/",
         json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -6244,7 +6244,7 @@ def operasyon_create(request, pk=None):
     rfid_no = 34234
     bild_tipi = "M"
     print("okunan zaman......operasyon create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/operasyon_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/operasyon_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -6493,7 +6493,7 @@ def den_saha_create(request, pk=None):
     rfid_no = 34234
     kod = "3"
     print("okunan zaman......denetim create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/denetim_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/denetim_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -6838,7 +6838,7 @@ def ariza_create(request, pk=None):
     rfid_no = "34234"
     sebep = "2"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/ariza_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/ariza_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -6991,6 +6991,37 @@ def rapor_memnuniyet(request, pk=None):
     return render(request, 'islem/charts.html',)
 
 
+@login_required
+def rapor_mk_memnuniyet(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = Sirket_Mem_RaporForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                ilk_tarih = request.POST.get('ilk_tarih', "")
+                son_tarih = request.POST.get('son_tarih', "")
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra tarihler...", ilk_tarih, son_tarih)
+                return render(request, 'islem/charts_2.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+            else:
+                print("form is invalid.....")
+                return redirect('rapor_mk_memnuniyet')
+        else:
+
+            form = Sirket_Mem_RaporForm(sirket=sirket)
+            proje = None
+            ilk_tarih = None
+            son_tarih = None
+            return render(request, 'islem/charts_2.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
 
 #--------------------------------------------------------------------------------------------------
 # rfid dosyası, web service işlemleri
@@ -7009,7 +7040,7 @@ def rfid_filter(request):
         if form.is_valid():
             proje = request.POST.get('proje', "")
             print(" proje form okunduktan sonra post...", proje)
-            url = "http://"+settings.ADR_LOCAL+":7000/ws/rfid_filter/"+str(proje)+"/"
+            url = "http://"+settings.ADR_LOCAL+"/ws/rfid_filter/"+str(proje)+"/"
             print("işte url", url)
             response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
@@ -7026,7 +7057,7 @@ def rfid_filter(request):
 @login_required
 def rfid_filter_proje(request, proje=None):
     print("rfid project list............", proje)
-    r = requests.get_queryset("http://"+settings.ADR_LOCAL+":7000/ws/rfid_filter" + str(proje) + "/",  auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get_queryset("http://"+settings.ADR_LOCAL+"/ws/rfid_filter" + str(proje) + "/",  auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
 
@@ -7041,7 +7072,7 @@ def rfid_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/rfid_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/rfid_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -7175,7 +7206,7 @@ def yerud_create(request, pk=None):
     rfid_no = "3"
     sebep = "6"
     print("okunan zaman......yerud create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/yerud_list/",
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/yerud_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
@@ -7187,7 +7218,7 @@ def yerud_create(request, pk=None):
 def yerud_detail_get(request, pk=None):
     mac_no = pk
     print("gelen mac degeri...", mac_no)
-    url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(mac_no)+"/"
+    url = "http://"+settings.ADR_LOCAL+"/ws/yerud_detail/"+str(mac_no)+"/"
     print("işte url", url)
     response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
     print("response...", response)
@@ -7215,7 +7246,7 @@ def macnoyer(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://"+settings.ADR_LOCAL+"/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)
@@ -7243,7 +7274,7 @@ def macnoyer_degis(request):
             yerud_obj = yer_updown.objects.get(id=macnoyer)
             gelen_macno = yerud_obj.mac_no
 
-            url = "http://"+settings.ADR_LOCAL+":7000/ws/yerud_detail/"+str(gelen_macno)+"/"
+            url = "http://"+settings.ADR_LOCAL+"/ws/yerud_detail/"+str(gelen_macno)+"/"
             print("işte url", url)
             response = requests.get(url, auth=(settings.USER_GLB, settings.PASW_GLB))
             print("response...", response)

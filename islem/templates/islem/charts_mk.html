@@ -3,6 +3,18 @@
 
 {% block content %}
 
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+
 <!-- Latest compiled and minified CSS -->
 <!--
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -20,8 +32,10 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 -->
 
+
+
 <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'> </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 
 <style>
 
@@ -52,6 +66,42 @@ td {
 
 </style>
 
+
+<script>
+$( function() {
+$.datepicker.regional['tr'] = {
+  monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+  monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+  'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+  weekHeader: 'Hf', weekStatus: '',
+  dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+  dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+  dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+  dateFormat: 'yy-mm-dd', firstDay: 1,
+  prevText: 'Önce',
+  nextText: 'Sonra',
+  isRTL: false};
+$.datepicker.setDefaults($.datepicker.regional['tr']);
+$( "#datepicker" ).datepicker()
+} );
+</script>
+
+
+
+
+
+
+<script>
+function sakla(){
+var x = document.getElementById("div_proje");
+var y = document.getElementById("div_canvas");
+var z = document.getElementById("div_table");
+x.style.display = "none";
+y.style.display = "none";
+z.style.display = "none";
+}
+</script>
 
 
 <script>
@@ -203,17 +253,35 @@ function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
 <script>
 $(document).ready(function(){
   //alert("buraya geldi....");
-  dataChart();
-  //sakla()
+  //dataChart();
+  sakla()
 })
 </script>
 
 <h2>Memnuniyet Değerlendirme </h2>
 
+<form method="post" onsubmit="goster()" >
+      {% csrf_token %}
+      {{ form.errors }}
+      {{ form.non_field_errors }}
+      {{ form.proje.label_tag }}
+        {{ form.proje.errors }}
+        {{ form.proje }}
+      {{ form.hedef_baslangic.label_tag }}
+        {{ form.hedef_baslangic.errors }}
+        {{ form.hedef_baslangic }}
+      {{ form.hedef_bitis.label_tag }}
+        {{ form.hedef_bitis.errors }}
+        {{ form.hedef_bitis }}
+      <button type="submit">Göster</button>
+</form>
+
+
+
 
 <h3 id="div_proje"> </h3>
 
-<div class='row'  >
+<div class='row' id="div_canvas" >
     <div class='col-sm-12' url-endpoint='{% url "api-data" %}' >
 
         <div class='col-sm-6 chart-container' >
@@ -227,7 +295,7 @@ $(document).ready(function(){
 </div>
 
 
-<div class='row'>
+<div class='row' id="div_table">
     <div class='col-sm-12' url-endpoint='{% url "api-data" %}' >
 
         <div class='col-sm-6'>
@@ -305,7 +373,6 @@ $(document).ready(function(){
         </div>
     </div>
 </div>
-
 
 
 

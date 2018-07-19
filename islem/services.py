@@ -284,42 +284,42 @@ def get_a_list(request):
 
 def get_memnuniyet_list():
     print("get memnuniyet list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/memnuniyet_list", auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/memnuniyet_list", auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
 
 def get_operasyon_list():
     print("get operasyon list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/operasyon_list", auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/operasyon_list", auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
 
 def get_denetim_saha_list():
     print("get denetim list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/denetim_list", auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/denetim_list", auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
 
 def get_ariza_list():
     print("get ariza list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/ariza_list", auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/ariza_list", auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
 
 def get_rfid_list():
     print("get denetim list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/rfid_list",  auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/rfid_list",  auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
 
 def get_yerud_list():
     print("get ariza list .............")
-    r = requests.get("http://"+settings.ADR_LOCAL+":7000/ws/yerud_list", auth=(settings.USER_GLB, settings.PASW_GLB))
+    r = requests.get("http://"+settings.ADR_LOCAL+"/ws/yerud_list", auth=(settings.USER_GLB, settings.PASW_GLB))
     json_data = r.json()
     print(json_data)
     return json_data
