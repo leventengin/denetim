@@ -6988,7 +6988,33 @@ def mk_ariza_list(request):
 
 @login_required
 def rapor_memnuniyet(request, pk=None):
-    return render(request, 'islem/charts.html',)
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = RaporTarihForm(request.POST)
+            if form.is_valid():
+                ilk_tarih = request.POST.get('ilk_tarih', "")
+                son_tarih = request.POST.get('son_tarih', "")
+                #proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra tarihler...", ilk_tarih, son_tarih)
+                return render(request, 'islem/charts.html', {'form': form,  'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+            else:
+                print("form is invalid.....")
+                return redirect('rapor_memnuniyet')
+        else:
+
+            form = RaporTarihForm()
+            #proje = None
+            ilk_tarih = None
+            son_tarih = None
+            return render(request, 'islem/charts.html', {'form': form,  'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
 @login_required
@@ -7004,7 +7030,7 @@ def rapor_mk_memnuniyet(request):
                 son_tarih = request.POST.get('son_tarih', "")
                 proje = request.POST.get('proje', "")
                 print(" proje form okunduktan sonra tarihler...", ilk_tarih, son_tarih)
-                return render(request, 'islem/charts_2.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+                return render(request, 'islem/charts_mk.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
             else:
                 print("form is invalid.....")
                 return redirect('rapor_mk_memnuniyet')
@@ -7014,7 +7040,38 @@ def rapor_mk_memnuniyet(request):
             proje = None
             ilk_tarih = None
             son_tarih = None
-            return render(request, 'islem/charts_2.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+            return render(request, 'islem/charts_mk.html', {'form': form, 'proje': proje, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+@login_required
+def rapor_krs_memnuniyet(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = RaporTarihForm(request.POST,)
+            if form.is_valid():
+                ilk_tarih = request.POST.get('ilk_tarih', "")
+                son_tarih = request.POST.get('son_tarih', "")
+                #proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra tarihler...", ilk_tarih, son_tarih)
+                return render(request, 'islem/charts_krs.html', {'form': form, 'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
+            else:
+                print("form is invalid.....")
+                return redirect('rapor_krs_memnuniyet')
+        else:
+
+            form = RaporTarihForm()
+            #proje = None
+            ilk_tarih = None
+            son_tarih = None
+            return render(request, 'islem/charts_krs.html', {'form': form,  'ilk_tarih': ilk_tarih, 'son_tarih': son_tarih})
 
     else:
         print("buraya geldi...şirket merkez yetkilisi değil...")
