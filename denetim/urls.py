@@ -23,13 +23,20 @@ from django_select2.forms import (
     ModelSelect2TagWidget, ModelSelect2Widget, Select2MultipleWidget,
     Select2Widget
 )
+from django.conf.urls import (
+    handler400, handler403, handler404, handler500
+)
+
+
+
+
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^islem/', include('islem.urls')),
     url(r'^notification/', include('notification.urls')),
-    url(r'^charts/', include('charts.urls')),    
+    url(r'^charts/', include('charts.urls')),
     #url(r'^rfid/', include('webservice.urls')),
     url(r'^ws/', include('webservice.api.urls', namespace='api-ws')),
     url(r'^bildirim/', views.bildirim, name='bildirim'),
@@ -57,3 +64,10 @@ if settings.DEBUG:
 
     #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^report_builder/', include('report_builder.urls')),
+
+
+
+handler400 = 'islem.views.my_400_bad_request_view'
+handler403 = 'islem.views.my_403_permission_denied_view'
+handler404 = 'islem.views.my_404_page_not_found_view'
+handler500 = 'islem.views.my_500_error_view'

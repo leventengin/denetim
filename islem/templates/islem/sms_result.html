@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4>SMS result</h4>
+    <p> </p>
+    {% if sms_result %}
+      {{ sms_result }}
+    {% else %}
+      <p> gelen veri yok !!!!!....</p>
+      <p> </p>
+    {% endif %}
+
+{% endblock %}

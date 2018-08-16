@@ -219,12 +219,12 @@ class yer(models.Model):
     proje_alanlari = models.ForeignKey(proje_alanlari, on_delete=models.PROTECT)
     yer_adi = models.CharField(max_length=200)
     mac_no = models.CharField(max_length=20)
-    opr_basl = models.TimeField(default=datetime.time(8,0,0))
-    opr_son = models.TimeField(default=datetime.time(22,0,0))
-    opr_delta = models.TimeField(default=datetime.time(0,30,0))
-    den_basl = models.TimeField(default=datetime.time(10,0,0))
-    den_son = models.TimeField(default=datetime.time(22,0,0))
-    den_delta = models.TimeField(default=datetime.time(2,0,0))
+    opr_basl = models.TimeField(default=datetime.time(8,0))
+    opr_son = models.TimeField(default=datetime.time(22,0))
+    opr_delta = models.TimeField(default=datetime.time(0,30))
+    den_basl = models.TimeField(default=datetime.time(10,0))
+    den_son = models.TimeField(default=datetime.time(22,0))
+    den_delta = models.TimeField(default=datetime.time(2,0))
     def __str__(self):
         return '%s-%s' % (self.mac_no, self.proje_alanlari)
 
@@ -367,6 +367,15 @@ class sonuc_operator(models.Model):
     operator = models.ForeignKey(User, related_name='operator', on_delete=models.CASCADE)
     def __str__(self):
         return(self.operator.username)
+
+"""
+class sms_donen(models.Model):
+    kod = models.CharField(max_length=2)
+    ek_kod = models.CharField(max_length=20)
+    timestamp = models.DateTimeField(default=datetime.datetime.now())
+    def __str__(self):
+        return '%s-%s-%s' % (self.kod, self.ek_kod, self.timestamp)
+"""
 
 
 class acil(models.Model):

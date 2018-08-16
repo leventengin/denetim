@@ -323,3 +323,27 @@ def get_yerud_list():
     json_data = r.json()
     print(json_data)
     return json_data
+
+
+def get_sms():
+    print("get sms .............")
+    kullanici="02166062562"
+    sifre="24112005ZM"
+    gsmno="5336201786"
+    sms_mesaj="deneme için atılan SMS, başlık değiştirilecek...."
+    #msgheader="02166062562"
+    msgheader="HIJYEN AKDM"
+
+    sms_1="https://api.netgsm.com.tr/sms/send/get/?usercode="+kullanici+"&password="+sifre+"&gsmno="+gsmno+"&"
+    sms_2="message="+sms_mesaj+"&msgheader="+msgheader+"&startdate=&stopdate=&dil=TR"
+    sms_toplam=sms_1+sms_2
+    print(sms_toplam)
+
+    r = requests.get(sms_toplam)
+    print("get sonrasında oluşan",r.text)
+    #json_data = r.json()
+    #print(json_data)
+    #return json_data
+    donen = r.text.split()
+    print("dönen değer",donen)
+    return donen

@@ -148,7 +148,7 @@ class Generate_Rapor_PDF(View):
         denetim_obj = denetim.objects.get(id=denetim_no)
         bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
         if not(bolumler_obj):
-            messages.success(request, 'Denetime ait bölüm yok.......')
+            messages.success(request, 'Denetime ait bölüm yok')
             return redirect('index')
 
         kontrol_degiskeni = True
@@ -157,7 +157,7 @@ class Generate_Rapor_PDF(View):
                 kontrol_degiskeni = False
 
         if not(kontrol_degiskeni):
-            messages.success(request, 'Tamamlanmamış bölümler var.......')
+            messages.success(request, 'Tamamlanmamış bölümler var')
             return redirect('index')
 
         #########################################################################
@@ -869,7 +869,7 @@ def acil_devam_sec(request, pk=None):
             #connection.close()
 
 
-            messages.success(request, 'Acil bildirim gönderildi.......')
+            messages.success(request, 'Acil bildirim gönderildi')
             return redirect('index')
         else:
             return render(request, 'islem/acil_devam_sec.html', {'form': form,})
@@ -1002,7 +1002,7 @@ def denetim_tamamla(request, pk=None):
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok.......')
+        messages.success(request, 'Denetime ait bölüm yok')
         return redirect('devam_liste')
 
     kontrol_degiskeni = True
@@ -1011,7 +1011,7 @@ def denetim_tamamla(request, pk=None):
             kontrol_degiskeni = False
 
     if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        messages.success(request, 'Tamamlanmamış bölümler var')
         return redirect('devam_liste')
 
 
@@ -1189,7 +1189,7 @@ def denetim_bolum_sec(request, pk=None):
         detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum).order_by('detay')
         print("detaylar..:", detaylar)
         if not detaylar:
-            messages.success(request, 'Seçili bölümde bölüm detayı yok....')
+            messages.success(request, 'Seçili bölümde bölüm detayı yok')
             return redirect('denetim_baslat')
 
         for detay in detaylar:
@@ -1214,7 +1214,7 @@ def denetim_bolum_sec(request, pk=None):
             request.session["secili_bolum"] = bolum
             detaylar = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum)
             if not detaylar:
-                messages.success(request, 'Seçili bölümde bölüm detayı yok....')
+                messages.success(request, 'Seçili bölümde bölüm detayı yok')
                 return redirect('denetim_baslat')
             #form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
             form = SonucForm(puanlama_turu="")
@@ -1251,7 +1251,7 @@ def denetim_bolum_sec(request, pk=None):
                     #return reverse('denetim_tamamla', kwargs={'pk': pk})
                 else:
                     request.session['tamam_bolum_tekmi'] = False
-                    messages.success(request, 'Bölüm işlemleri tamamlanmış....')
+                    messages.success(request, 'Bölüm işlemleri tamamlanmış')
                     return redirect('index')
                 #return redirect('denetim_tamamla')
 
@@ -1451,11 +1451,11 @@ def teksayfa_yarat(request, pk=None):
             request.session['js_hedef_bitis'] = None
             request.session['js_aciklama'] = None
 
-            messages.success(request, 'denetim başarıyla kaydedildi......')
+            messages.success(request, 'denetim başarıyla kaydedildi')
             #return render(request, 'islem/tek_sayfa.html', context,)
             return redirect('index')
         else:
-            messages.success(request, ' form hatası - tekrar deneyin....')
+            messages.success(request, ' form hatası - tekrar deneyin')
             return redirect('teksayfa_yarat')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
@@ -2026,12 +2026,12 @@ def teksayfa_duzenle_devam(request, pk=None):
             request.session['js_hedef_baslangic'] = None
             request.session['js_hedef_bitis'] = None
             request.session['js_aciklama'] = None
-            messages.success(request, 'denetim başarıyla kaydedildi......')
+            messages.success(request, 'denetim başarıyla kaydedildi')
             #return render(request, 'islem/tek_sayfa.html', context,)
             return redirect('index')
         else:
             print("ne oldu be kardeşim2...........")
-            messages.success(request, ' form hatası - tekrar deneyin....')
+            messages.success(request, ' form hatası - tekrar deneyin')
             return redirect('teksayfa_duzenle_devam')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
 
@@ -2314,7 +2314,7 @@ def teksayfa_sil_kesin(request, pk=None):
 
     #connection.close()
 
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('index')
 
 
@@ -2348,7 +2348,7 @@ def detay_islemleri_baslat(request, pk=None):
         detaylar = ilk_detaylar.filter(bolum=secili_bolum)
         print("detaylar..:", detaylar)
         if not detaylar:
-            messages.success(request, 'Seçili bölümde bölüm detayı yok....')
+            messages.success(request, 'Seçili bölümde bölüm detayı yok')
             return redirect('denetim_baslat')
         for detay in detaylar:
             print("bolum id for loop içinden", detay.bolum.id, "ve detay id", detay.detay.id)
@@ -2476,11 +2476,11 @@ def denetim_detay_islemleri(request, pk=None):
                 sec_bolum.save()
                 devam_tekrar = request.session.get('devam_tekrar')
                 if devam_tekrar == "devam":
-                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı')
                     request.session['bolum_atla_flag'] = False
                     return redirect('denetim_bolum_sec')
                 else:
-                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı....')
+                    messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı')
                     return redirect('devam_liste')
 
             secili_obj = secili_detay_obj.first()
@@ -2501,7 +2501,7 @@ def denetim_detay_islemleri(request, pk=None):
 
         else:
             print("ne oldu be kardeşim3...........")
-            messages.success(request, ' form hatası - tekrar deneyin....')
+            messages.success(request, ' form hatası - tekrar deneyin')
             #return redirect('devam_liste')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
             return render(request, 'islem/denetim_detay_islemleri.html', {'form': form,})
@@ -2516,7 +2516,7 @@ def denetim_detay_islemleri(request, pk=None):
         print("seçili detaylar tamam H olanlar...", secili_detay_obj)
 
         if not secili_detay_obj:
-            messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı....')
+            messages.success(request, 'Bölüm içinde detay işlemleri tamamlandı')
             request.session['bolum_atla_flag'] = False
             return redirect('denetim_bolum_sec')
         secili_obj = secili_detay_obj.first()
@@ -2676,7 +2676,7 @@ def sonuc_denetim_detay_duzenle(request, pk=None):
 
         else:
             print("ne oldu be kardeşim4...........")
-            messages.success(request, ' form hatası - tekrar deneyin....')
+            messages.success(request, ' form hatası - tekrar deneyin')
             #return redirect('devam_liste')
             #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
             return render(request, 'islem/denetim_detay_duzenle.html', {'form': form,})
@@ -2822,7 +2822,7 @@ def qrcode_islemi_baslat(request, pk=None):
     print(" qrcode işlemi başlat içinden okunan değer....",  result)
 
     if result == None:
-        messages.success(request, 'Code okunamadı....')
+        messages.success(request, 'Code okunamadı')
         return redirect('qrcode_tara')
 
     result2 = str(result)
@@ -2840,7 +2840,7 @@ def qrcode_islemi_baslat(request, pk=None):
         print(" qrcode başlat içinden  denetim no", denetim.id)
         return redirect('rutin_baslat_kesin')
     else:
-        messages.success(request, 'Code eşleşmedi....')
+        messages.success(request, 'Code eşleşmedi')
         return redirect('qrcode_tara')
 
     context = {'result' : result}
@@ -2964,13 +2964,13 @@ def isemrisonrasi_devam(request, pk=None):
     print("takipciler", tak_varmi)
 
     if not(tak_varmi):
-        messages.success(request, 'Takipçi girilmemiş....')
+        messages.success(request, 'Takipçi girilmemiş')
         return redirect('isemri_denetim_sec')
     if not(bol_varmi):
-        messages.success(request, 'Bölümler girilmemiş....')
+        messages.success(request, 'Bölümler girilmemiş')
         return redirect('isemri_denetim_sec')
     if not(det_varmi):
-        messages.success(request, 'Detaylar girilmemiş....')
+        messages.success(request, 'Detaylar girilmemiş')
         return redirect('isemri_denetim_sec')
 
     denetim_obj = denetim.objects.get(id=denetim_no)
@@ -3080,13 +3080,13 @@ def baslanmislar_devam(request, pk=None):
     print("takipçiler", tak_varmi)
 
     if not(tak_varmi):
-        messages.success(request, 'Takipçi girilmemiş....')
+        messages.success(request, 'Takipçi girilmemiş')
         return redirect('isemri_denetim_sec')
     if not(bol_varmi):
-        messages.success(request, 'Bölümler girilmemiş....')
+        messages.success(request, 'Bölümler girilmemiş')
         return redirect('isemri_denetim_sec')
     if not(det_varmi):
-        messages.success(request, 'Detaylar girilmemiş....')
+        messages.success(request, 'Detaylar girilmemiş')
         return redirect('isemri_denetim_sec')
 
     denetim_obj = denetim.objects.get(id=denetim_no)
@@ -3275,7 +3275,7 @@ def raporlar_ilerle(request, pk=None):
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok.......')
+        messages.success(request, 'Denetime ait bölüm yok')
         return redirect('index')
 
     kontrol_degiskeni = True
@@ -3284,7 +3284,7 @@ def raporlar_ilerle(request, pk=None):
             kontrol_degiskeni = False
 
     if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        messages.success(request, 'Tamamlanmamış bölümler var')
         return redirect('index')
 
     #########################################################################
@@ -3522,7 +3522,7 @@ def iptal_ilerle(request, pk=None):
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok.......')
+        messages.success(request, 'Denetime ait bölüm yok')
         return redirect('index')
 
     kontrol_degiskeni = True
@@ -3531,7 +3531,7 @@ def iptal_ilerle(request, pk=None):
             kontrol_degiskeni = False
 
     if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var.......')
+        messages.success(request, 'Tamamlanmamış bölümler var')
         return redirect('index')
 
     #########################################################################
@@ -3677,7 +3677,7 @@ def denetim_iptal_devam(request, pk=None):
     print("seçilen denetim kesin ...", denetim_obj)
     denetim_obj.durum = "Y"
     denetim_obj.save()
-    messages.success(request, 'Denetim iptal edildi....')
+    messages.success(request, 'Denetim iptal edildi')
     return redirect('index' )
 
 
@@ -3704,7 +3704,7 @@ def soru_listesi(request, pk=None):
             return redirect('/islem/soru_listesi/devam/')
 
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('soru_listesi')
             #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
 
@@ -3854,7 +3854,7 @@ def soru_listesi_kopyala(request, pk=None):
             return redirect('/islem/soru_listesi/devam/kopyala/kesin/')
 
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('soru_listesi')
             #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
 
@@ -3924,7 +3924,7 @@ def soru_listesi_kopyala_kesin(request, pk=None):
                             bolum_id=bolum_yaz,
                             puanlama_turu=detaylar.puanlama_turu)
         kaydetme_obj.save()
-    messages.success(request, 'kopyalama işlemi gerçekleştirildi....')
+    messages.success(request, 'kopyalama işlemi gerçekleştirildi')
     return redirect('soru_listesi')
 
 
@@ -4221,7 +4221,7 @@ def yer_zaman_planla(request, pk=None):
         print("new st time..", st_time)
 
 
-    messages.success(request, 'zaman planı yaratma işlemi gerçekleştirildi....')
+    messages.success(request, 'zaman planı yaratma işlemi gerçekleştirildi')
     return redirect('yer_detay', pk=pk)
 
 
@@ -4306,7 +4306,7 @@ def yer_denetim_planla(request, pk=None):
         print("new st time..", st_time)
 
 
-    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi....')
+    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi')
     return redirect('yer_detay', pk=pk)
 
 
@@ -4331,7 +4331,7 @@ def yer_zaman_duzenle(request, pk=None):
             return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
 
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('yer_detay')
 
     # if a GET (or any other method) we'll create a blank form
@@ -4375,11 +4375,11 @@ def yer_zaman_duzenle_create(request, pk=None):
             print("saat..", saat)
             kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
             kaydetme_obj.save()
-            messages.success(request, 'Operasyon saati kaydedildi....')
+            messages.success(request, 'Operasyon saati kaydedildi')
             return redirect('yer_zaman_duzenle', pk=pk)
         else:
             print(" saat form valid değil !!!!!!!!!............")
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('yer_zaman_duzenle', pk=pk)
 
     # if a GET (or any other method) we'll create a blank form
@@ -4406,10 +4406,10 @@ def yer_zaman_duzenle_update(request, pk=None):
             print("saat..", saat)
             kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
             kaydetme_obj.save()
-            messages.success(request, 'Operasyon saati kaydedildi....')
+            messages.success(request, 'Operasyon saati kaydedildi')
             return redirect('yer_zaman_duzenle', pk=pk)
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('yer_zaman_duzenle', pk=pk)
 
     # if a GET (or any other method) we'll create a blank form
@@ -4440,7 +4440,7 @@ def yer_zaman_duzenle_delete(request, pk=None):
             return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
 
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('yer_detay')
 
     # if a GET (or any other method) we'll create a blank form
@@ -4473,7 +4473,7 @@ def yer_zaman_duzenle_kesin(request, pk=None):
             return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
 
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('yer_detay')
 
     # if a GET (or any other method) we'll create a blank form
@@ -4566,7 +4566,7 @@ def yer_denetim_duzenle(request, pk=None):
         print("new st time..", st_time)
 
 
-    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi....')
+    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi')
     return redirect('yer_detay', pk=pk)
 
 
@@ -4596,15 +4596,15 @@ def qrdosyasi_create(request, pk=None):
             qr_obj = qrdosyasi.objects.filter(qr_deger=qrcode).first()
 
             if qr_obj:
-                messages.success(request, 'QRCode zaten tanımlı....')
+                messages.success(request, 'QRCode zaten tanımlı')
                 return redirect('qrdosyasi_create')
             else:
                 kaydetme_obj = qrdosyasi(qr_deger=qrcode, denetim_id=denetim)
                 kaydetme_obj.save()
-                messages.success(request, 'Başarıyla kaydetti....')
+                messages.success(request, 'Başarıyla kaydetti')
                 return redirect('qrdosyasi_create')
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('qrdosyasi_create')
             #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
 
@@ -4631,19 +4631,19 @@ def qrdosyasi_update(request, pk=None):
         form = Qrcode_Form(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             denetim = request.POST.get('denetim', "")
             qrcode = request.POST.get('qrcode', "")
-            print ("denetim....", denetim)
+            print ("denetim", denetim)
             print("qrcode...", qrcode)
             request.session['denetim_qrcode'] = denetim
             request.session['qrdosyasi_qrcode'] = qrcode
             kaydetme_obj = qrdosyasi(id=pk, qr_deger=qrcode, denetim_id=denetim)
             kaydetme_obj.save()
-            messages.success(request, 'Başarıyla düzenledi....')
+            messages.success(request, 'Başarıyla düzenledi')
             return redirect('qrdosyasi_update')
         else:
-            messages.success(request, 'Formda uygunsuzluk var....')
+            messages.success(request, 'Formda uygunsuzluk var')
             return redirect('qrdosyasi_update')
             #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
 
@@ -4689,7 +4689,7 @@ def qrdosyasi_sil_kesin(request, pk=None):
     print("seçilen qrdosyasi", qrdosyasi_obj)
 
     qrdosyasi_obj.delete()
-    messages.success(request, 'QRCode iptal edildi....')
+    messages.success(request, 'QRCode iptal edildi')
     return redirect('qrdosyasi')
     #return render(request, 'islem/tipi_sil_soru.html', args)
 
@@ -4718,7 +4718,7 @@ def tipi_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('tipi')
 
 
@@ -4747,7 +4747,7 @@ def zon_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('zon')
 
 
@@ -4776,7 +4776,7 @@ def bolum_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('bolum')
 
 #------------------------------------------------------
@@ -4802,7 +4802,7 @@ def detay_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('detay')
 
 
@@ -4833,10 +4833,10 @@ def projealanlari_yarat(request):
         form = PAForm(request.POST, kullanici=kullanici)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             post = form.save(commit=False)
             post.save()
-            messages.success(request, 'Başarıyla kaydetti....')
+            messages.success(request, 'Başarıyla kaydetti')
             return redirect('projealanlari_listele')
         else:
             return render(request, 'islem/proje_alanlari_form.html', {'form': form})
@@ -4868,7 +4868,7 @@ def projealanlari_sil_kesin(request, pk=None):
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('projealanlari_listele')
 
 #------------------------------------------------------
@@ -4878,7 +4878,7 @@ def projealanlari_sil_kesin(request, pk=None):
 def yer_listele(request):
     user = request.user
     if proje_varmi_kontrol(request):
-        print("proje var mı kontrolden geçtik.....")
+        print("proje var mı kontrolden geçtik.")
         proje = user.profile.proje
         qs = yer.objects.none()
         projealanlari_obj = proje_alanlari.objects.filter(proje=proje)
@@ -4905,10 +4905,10 @@ def yer_yarat(request):
         form = YerForm(request.POST, kullanici=kullanici)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             post = form.save(commit=False)
             post.save()
-            messages.success(request, 'Başarıyla kaydetti....')
+            messages.success(request, 'Başarıyla kaydetti')
             return redirect('yer_listele')
         else:
             return render(request, 'islem/yer_form.html', {'form': form})
@@ -4930,10 +4930,10 @@ def yer_duzenle(request, pk=None):
         form = YerForm(request.POST, kullanici=kullanici, instance=yer_obj)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             post = form.save(commit=False)
             post.save()
-            messages.success(request, 'Başarıyla kaydetti....')
+            messages.success(request, 'Başarıyla kaydetti')
             return redirect('yer_listele')
         else:
             return render(request, 'islem/yer_form.html', {'form': form})
@@ -4962,7 +4962,7 @@ def yer_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('yer_listele')
 
 
@@ -4975,7 +4975,7 @@ def yer_sil_kesin(request, pk=None):
 def rfid_dosyasi_listele(request):
     user = request.user
     if proje_varmi_kontrol(request):
-        print("proje var mı kontrolden geçtik.....")
+        print("proje var mı kontrolden geçtik.")
         proje = user.profile.proje
         rfid_dosyasi_obj = rfid_dosyasi.objects.filter(proje=proje).order_by("id")
         return render(request, 'islem/rfid_dosyasi_list.html', {'rfid_dosyasi_list': rfid_dosyasi_obj})
@@ -5004,10 +5004,10 @@ def rfid_dosyasi_yarat(request):
         form = RfidForm(request.POST, kullanici=kullanici)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             post = form.save(commit=False)
             post.save()
-            messages.success(request, 'Başarıyla kaydetti....')
+            messages.success(request, 'Başarıyla kaydetti')
             return redirect('rfid_dosyasi_listele')
         else:
             return render(request, 'islem/rfid_dosyasi_form.html', {'form': form})
@@ -5029,10 +5029,10 @@ def rfid_dosyasi_duzenle(request, pk=None):
         form = RfidForm(request.POST, kullanici=kullanici, instance=rfid_dosyasi_obj)
         # check whether it's valid:
         if form.is_valid():
-            print("valid....")
+            print("valid")
             post = form.save(commit=False)
             post.save()
-            messages.success(request, 'Başarıyla kaydetti....')
+            messages.success(request, 'Başarıyla kaydetti')
             return redirect('rfid_dosyasi_listele')
         else:
             return render(request, 'islem/rfid_dosyasi_form.html', {'form': form})
@@ -5061,7 +5061,7 @@ def rfid_dosyasi_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('rfid_dosyasi_listele')
 
 
@@ -5094,7 +5094,7 @@ def grup_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('grup')
 
 
@@ -5121,7 +5121,7 @@ def sirket_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('sirket')
 
 #------------------------------------------------------
@@ -5147,7 +5147,7 @@ def proje_sil_kesin(request, pk=None):
     except ProtectedError:
         mesaj = "bağlantılı veri var,  silinemez...!!"
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
-    messages.success(request, 'Başarıyla silindi....')
+    messages.success(request, 'Başarıyla silindi')
     return redirect('proje')
 
 
@@ -5632,7 +5632,7 @@ def deneme_denetim(request, pk=None):
         form = Denetim_Deneme_Form(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            messages.success(request, 'Başarıyla oldu bu iş....')
+            messages.success(request, 'Başarıyla oldu')
             return redirect('deneme_denetim')
         else:
             #messages.success(request, 'Formda uygunsuzluk var....')
@@ -5658,7 +5658,7 @@ class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
         print("denetim deneme...:", denetim_deneme)
         if denetim_deneme:
             qs = qs.filter(denetim=denetim_deneme)
-        print("qs....", qs)
+        print("qs", qs)
         if self.q:
             qs = qs.filter(bolum__icontains=self.q)
         return qs
@@ -5687,7 +5687,7 @@ class sirketprojeautocomplete(autocomplete.Select2QuerySetView):
         print("şirket proje...:", sirket)
         if sirket_proje:
             qs = qs.filter(sirket=sirket_proje)
-        print("qs....", qs)
+        print("qs", qs)
         if self.q:
             qs = qs.filter(bolum__icontains=self.q)
         return qs
@@ -5704,7 +5704,7 @@ def deneme_sonucbolum(request, pk=None):
         form = Ikili_Deneme_Form(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            messages.success(request, 'Başarıyla oldu bu iş....')
+            messages.success(request, 'Başarıyla oldu ')
             return redirect('deneme_sonucbolum')
         else:
             #messages.success(request, 'Formda uygunsuzluk var....')
@@ -5727,7 +5727,7 @@ def deneme_nebu(request, pk=None):
         form = NebuForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            messages.success(request, 'Başarıyla oldu bu iş....')
+            messages.success(request, 'Başarıyla oldu ')
             return redirect('deneme_nebu')
         else:
             #messages.success(request, 'Formda uygunsuzluk var....')
@@ -5863,7 +5863,7 @@ class list_bolumautocomplete(autocomplete.Select2QuerySetView):
 
 @login_required
 def bildirim(request):
-    print("bildirime geldik.....")
+    print("bildirime geldik.")
     response_data ={}
     if request.method == 'GET':
         selected = request.GET.get('selected', None)
@@ -5903,7 +5903,7 @@ def popup_notif(request):
 
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
-from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol
+from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms
 
 
 
@@ -7089,6 +7089,8 @@ def rfid_list(request, pk=None):
     return render(request, 'islem/rfid_list.html', {'rfid_list': rfid_list,})
 
 
+
+
 @login_required
 def rfid_filter(request):
 
@@ -7286,6 +7288,49 @@ def yerud_detail_get(request, pk=None):
 
 
 #---------------------------------------------------------------------------------------
+
+@login_required
+def sms_mesaj(request, pk=None):
+    sms_result = get_sms()
+    print("sms result..", sms_result)
+    sayı = len(sms_result)
+    print("dönen mesaj listesinin uzunluğu...", sayı)
+    kod = sms_result[0]
+    if sayı == 2:
+        ek_kod = sms_result[1]
+    else:
+        ek_kod = ""
+    print("kod", kod)
+    print("ek kod", ek_kod)
+    return render(request, 'islem/sms_result.html', {'sms_result': sms_result,})
+
+
+#---------------------------------------------------------------------------------------
+
+from django.template import RequestContext
+
+# HTTP Error 400
+def my_400_bad_request_view(request):
+    data = {}
+    return render(request,'islem/hata_400.html', data)
+
+# HTTP Error 403
+def my_403_permission_denied_view(request):
+    data = {}
+    return render(request,'islem/hata_403.html', data)
+
+# HTTP Error 404
+def my_404_page_not_found_view(request):
+    data = {}
+    return render(request,'islem/hata_400.html', data)
+
+# HTTP Error 500
+def my_500_error_view(request):
+    data = {}
+    return render(request,'islem/hata_500.html', data)
+
+
+
 
 
 @login_required

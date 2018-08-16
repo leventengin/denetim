@@ -306,5 +306,6 @@ urlpatterns = [
     url(r'^notification/delete/(?P<notification_id>\d+)/(?P<page_id>\d+)/$', views.delete_notification, name='delete_notification'),
     url(r'^notification/create/$', views.create_notification, name='create_notification'),
 
+    url(r'^sms_mesaj/$', views.sms_mesaj, name='sms_mesaj'),
 
     ]
