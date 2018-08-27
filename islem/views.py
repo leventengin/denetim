@@ -5178,7 +5178,7 @@ class DenetimDelete(LoginRequiredMixin,DeleteView):
 class TipiCreate(LoginRequiredMixin,CreateView):
     model = tipi
     fields = '__all__'
-    success_url = "/islem/tipi/create/response.json()"
+    success_url = "/islem/tipi/create/"
 
 class TipiUpdate(LoginRequiredMixin,UpdateView):
     model = tipi
@@ -6989,7 +6989,7 @@ def mk_ariza_list(request):
 @login_required
 def rapor_memnuniyet(request, pk=None):
     user = request.user
-    if sirket_varmi_kontrol(request):
+    if proje_varmi_kontrol(request):
         print("şirket var mı kontrolden geçtik.....")
         sirket = user.profile.sirket
         if request.method == "POST":

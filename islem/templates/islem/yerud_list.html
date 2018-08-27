@@ -70,7 +70,15 @@ table {
 
                       {% endfor %}
                   </table>
-    {% else %}HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHWon">
+        {% else %}
+          <p> gelen veri yok !!!!!....</p>
+          <p> </p>
+        {% endif %}
+
+
+
+
+   <div class="pagination">
       <span class="step-links">
           {% if yerud_list.has_previous %}
               <a href="?page={{ yerud_list.previous_page_number }}"> önceki </a>
@@ -85,6 +93,32 @@ table {
           {% endif %}
       </span>
     </div>
+
+
+
+
+
+
+    <div class="pagination">
+      <span class="step-links">
+          {% if denetim_saha_list.has_previous %}
+              <a href="?page={{ denetim_saha_list.previous_page_number }}"> önceki </a>
+          {% endif %}
+
+          <span class="current">
+              sf {{ denetim_saha_list.number }} / {{ denetim_saha_list.paginator.num_pages }}
+          </span>
+
+          {% if denetim_saha_list.has_next %}
+              <a href="?page={{ denetim_saha_list.next_page_number }}"> sonraki </a>
+          {% endif %}
+      </span>
+    </div>
+
+
+
+
+
 
 
 
