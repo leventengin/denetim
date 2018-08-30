@@ -1,0 +1,34 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h3>&emsp;Alan/Zon  Listesi</h3>
+
+<p> &emsp;Denetim Tipi: &emsp;<b> {{ tipi }}  </b></p>
+
+{% if zon_list %}
+<ul>
+
+  {% for zon in zon_list %}
+  <li>
+    <a href="{{zon.id}}/sil"><span class='glyphicon glyphicon-remove'></span></a>
+    <a href="{{zon.id}}/duzenle"><span class='glyphicon glyphicon-pencil'></span></a>
+          &emsp;   ({{zon.id}})   &emsp;     {{ zon.zon_adi }}
+  </li>
+  {% endfor %}
+  <p> </p>
+  <p> </p>
+  <a href="yarat"> Alan Ekle </a>
+  <p> </p>
+
+
+</ul>
+{% else %}
+  <p>Kayıtlı alan yok ....</p>
+  <p> </p>
+  <a href="yarat"> Alan Ekle </a>
+  <p>&emsp; </p>
+
+{% endif %}
+
+{% endblock %}

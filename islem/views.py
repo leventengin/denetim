@@ -21,7 +21,7 @@ from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_B
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
-from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm
+from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -621,7 +621,7 @@ def rutin_baslat_kesin(request, pk=None):
     secili_denetim = denetim.objects.get(id=denetim_no)
     dd_denetim_adi = secili_denetim.denetim_adi
 
-    bugun = datetime.now().strftime("%Y-%m-%d")
+    bugun = datetime.datetime.now().strftime("%Y-%m-%d")
     print("bugun...", bugun)
     dd_denetim_yeni_adi = dd_denetim_adi + "- " + str(bugun)
     print("yeni denetim adi...", dd_denetim_yeni_adi)
@@ -2557,11 +2557,17 @@ def sonuc_denetim_sec(request, pk=None):
             denetim_no = request.POST.get('denetim_no', "")
             print ("denetim seçim yapılmış...", denetim_no)
             request.session['secilen_denetim'] = denetim_no
-            sonuc_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
-            denetimin_adi = sonuc_list.first().denetim
-            denetimin_durumu = sonuc_list.first().denetim.durum
-            context = {'sonuc_list': sonuc_list, 'denetimin_adi': denetimin_adi, 'denetimin_durumu': denetimin_durumu}
-            return render(request, 'islem/sonuc_list.html', context)
+            denetim_obj = denetim.objects.get(id=denetim_no)
+            if rapor_verisi_hazirla(request,denetim_no=denetim_no):
+                sonuc_detay_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
+                sonuc_bolum_list = sonuc_bolum.objects.filter(denetim=denetim_no).order_by('id')
+                context = {'sonuc_detay_list': sonuc_detay_list,
+                           'sonuc_bolum_list': sonuc_bolum_list,
+                           'denetim_obj': denetim_obj}
+                return render(request, 'islem/sonuc_list.html', context)
+            else:
+                mesaj = request.session.get('mesaj_rapor_verisi')
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
         else:
             #form = DenetimSecForm()
             return render(request, 'islem/ana_menu.html',)
@@ -3271,134 +3277,70 @@ def raporlar_devam(request, pk=None):
 def raporlar_ilerle(request, pk=None):
     denetim_no = pk
 
-    denetim_obj = denetim.objects.get(id=denetim_no)
+    if rapor_verisi_hazirla(request,denetim_no=denetim_no):
+        denetim_obj = denetim.objects.get(id=denetim_no)
+        denetim_adi = denetim_obj.denetim_adi
+        proje = denetim_obj.proje
+        rutin_planli = denetim_obj.rutin_planli
+        denetci = denetim_obj.denetci
+        tipi = denetim_obj.tipi
+        yaratim_tarihi = denetim_obj.yaratim_tarihi
+        yaratan = denetim_obj.yaratan
+        hedef_baslangic = denetim_obj.hedef_baslangic
+        hedef_bitis = denetim_obj.hedef_bitis
+        gerc_baslangic = denetim_obj.gerc_baslangic
+        gerc_bitis = denetim_obj.gerc_bitis
+        durum = denetim_obj.durum
+        rutindenetci = denetim_obj.rutindenetci
+        takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+        print("takipci objesi...", takipci_obj)
+        i = 0
+        takipciler = []
+        for takipci in takipci_obj:
+            takipciler.append(takipci.takipci)
+            i = i + 1
+        print("takipciler listesi..", takipciler)
+        d = collections.defaultdict(list)
+        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        for bolum in bolum_obj:
+            print("bolum list . bolum", bolum.bolum)
+            detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+            for detay in detay_obj:
+                print("detay list . detay", detay.bolum, detay.detay)
+                #d[detay.bolum].append(detay.detay)
+                d[bolum].append(detay)
+        print("***********************")
+        print(d)
+        d.default_factory = None
+        dict_bol_detay = dict(d)
+        print("************************")
+        print(dict_bol_detay)
+        context = { 'dict_bol_detay':dict_bol_detay,
+                    'takipciler': takipciler,
+                    'denetim_adi': denetim_adi,
+                    'proje' : proje,
+                    'rutin_planli' : rutin_planli,
+                    'rutindenetci' : rutindenetci,
+                    'denetci' : denetci,
+                    'tipi' : tipi,
+                    'yaratim_tarihi' : yaratim_tarihi,
+                    'yaratan' : yaratan,
+                    'hedef_baslangic' : hedef_baslangic,
+                    'hedef_bitis' : hedef_bitis,
+                    'durum' : durum,
+                    'soru_adedi' : denetim_soru,
+                    'dd_adedi' :  denetim_dd,
+                    'net_adet' : denetim_net,
+                    'toplam_puan' : denetim_puan,
+                    'ortalama_puan' : ortalama_puan,
+                    'pk' : denetim_no,
+                    }
+        #return render(request, 'islem/teksayfa_sil_soru.html', context )
+        return render(request, 'islem/denetim_rapor_goster.html', context )
 
-    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
-    if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok')
-        return redirect('index')
-
-    kontrol_degiskeni = True
-    for bolum in bolumler_obj:
-        if bolum.tamam == "H":
-            kontrol_degiskeni = False
-
-    if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var')
-        return redirect('index')
-
-    #########################################################################
-    ###   RAPOR
-    #########################################################################
-
-    bolum_soru = 0
-    bolum_dd = 0
-    bolum_net = 0
-    bolum_puan = 0
-    denetim_soru = 0
-    denetim_dd = 0
-    denetim_net = 0
-    denetim_puan = 0
-    i = 0
-    for bolum in bolumler_obj:
-        bolum_no = bolum.bolum
-        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
-        print("seçilmiş olan detaylar...", detaylar_obj)
-        for detay in detaylar_obj:
-            bolum_soru = bolum_soru + 1
-            denetim_soru = denetim_soru + 1
-            if detay.denetim_disi == "E":
-                bolum_dd = bolum_dd + 1
-                denetim_dd = denetim_dd + 1
-            else:
-                bolum_net = bolum_net + 1
-                bolum_puan = bolum_puan + detay.puan
-                denetim_net = denetim_net +1
-                denetim_puan = denetim_puan + detay.puan
-        bolum.soru_adedi = bolum_soru
-        bolum.dd_adedi = bolum_dd
-        bolum.net_adet = bolum_net
-        bolum.toplam_puan = bolum_puan
-        ortalama_puan = bolum_puan / bolum_net
-        print("ortalama puan ...", ortalama_puan)
-        bolum.ortalama_puan = ortalama_puan
-        bolum.save()
-        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
-        bolum_soru = 0
-        bolum_dd = 0
-        bolum_net = 0
-        bolum_puan = 0
-    denetim_obj.soru_adedi = denetim_soru
-    denetim_obj.dd_adedi = denetim_dd
-    denetim_obj.net_adet = denetim_net
-    denetim_obj.toplam_puan = denetim_puan
-    ortalama_puan = denetim_puan / denetim_net
-    print("ortalama puan ...", ortalama_puan)
-    denetim_obj.ortalama_puan = ortalama_puan
-    denetim_obj.save()
-    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
-
-
-
-    denetim_adi = denetim_obj.denetim_adi
-    proje = denetim_obj.proje
-    rutin_planli = denetim_obj.rutin_planli
-    denetci = denetim_obj.denetci
-    tipi = denetim_obj.tipi
-    yaratim_tarihi = denetim_obj.yaratim_tarihi
-    yaratan = denetim_obj.yaratan
-    hedef_baslangic = denetim_obj.hedef_baslangic
-    hedef_bitis = denetim_obj.hedef_bitis
-    gerc_baslangic = denetim_obj.gerc_baslangic
-    gerc_bitis = denetim_obj.gerc_bitis
-    durum = denetim_obj.durum
-    rutindenetci = denetim_obj.rutindenetci
-    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
-    print("takipci objesi...", takipci_obj)
-    i = 0
-    takipciler = []
-    for takipci in takipci_obj:
-        takipciler.append(takipci.takipci)
-        i = i + 1
-    print("takipciler listesi..", takipciler)
-    d = collections.defaultdict(list)
-    bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
-    for bolum in bolum_obj:
-        print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
-        for detay in detay_obj:
-            print("detay list . detay", detay.bolum, detay.detay)
-            #d[detay.bolum].append(detay.detay)
-            d[bolum].append(detay)
-    print("***********************")
-    print(d)
-    d.default_factory = None
-    dict_bol_detay = dict(d)
-    print("************************")
-    print(dict_bol_detay)
-    context = {'dict_bol_detay':dict_bol_detay,
-                'takipciler': takipciler,
-                'denetim_adi': denetim_adi,
-                'proje' : proje,
-                'rutin_planli' : rutin_planli,
-                'rutindenetci' : rutindenetci,
-                'denetci' : denetci,
-                'tipi' : tipi,
-                'yaratim_tarihi' : yaratim_tarihi,
-                'yaratan' : yaratan,
-                'hedef_baslangic' : hedef_baslangic,
-                'hedef_bitis' : hedef_bitis,
-                'durum' : durum,
-                'soru_adedi' : denetim_soru,
-                'dd_adedi' :  denetim_dd,
-                'net_adet' : denetim_net,
-                'toplam_puan' : denetim_puan,
-                'ortalama_puan' : ortalama_puan,
-                'pk' : denetim_no,
-                }
-    #return render(request, 'islem/teksayfa_sil_soru.html', context )
-    return render(request, 'islem/denetim_rapor_goster.html', context )
-
+    else:
+        mesaj = request.session.get('mesaj_rapor_verisi')
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
 
@@ -3681,6 +3623,7 @@ def denetim_iptal_devam(request, pk=None):
     return redirect('index' )
 
 
+#--------------------------------------------------------------------------------
 
 @login_required
 def soru_listesi(request, pk=None):
@@ -3705,8 +3648,8 @@ def soru_listesi(request, pk=None):
 
         else:
             messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('soru_listesi')
-            #return render(request, 'islem/denetim_deneme_form.html', {'form': form})
+            #return redirect('soru_listesi')
+            return render(request, 'islem/soru_listesi.html', {'form': form})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -3826,10 +3769,15 @@ def soru_listesi_sil(request, pk=None):
 
 @login_required
 def soru_listesi_sil_kesin(request, pk=None):
-    detay_obj = detay.objects.get(id=pk)
-    print("soru listesi sil kesin içinden detay obj..", detay_obj)
-    detay_obj.delete()
+    object = get_object_or_404(detay, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
     return redirect('soru_listesi_devam')
+
 
 
 @login_required
@@ -3926,6 +3874,283 @@ def soru_listesi_kopyala_kesin(request, pk=None):
         kaydetme_obj.save()
     messages.success(request, 'kopyalama işlemi gerçekleştirildi')
     return redirect('soru_listesi')
+
+
+
+
+#--------------------------------------------------------------------------------
+
+@login_required
+def bolum_listesi(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = BolumListesiForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            tipi_i = request.POST.get('tipi', "")
+            zon_i = request.POST.get('zon', "")
+            print ("tipi....", tipi_i)
+            print("zon...", zon_i)
+            request.session['bolumlist_tipi'] = tipi_i
+            request.session['bolumlist_zon'] = zon_i
+
+            return redirect('/islem/bolum_listesi/devam/')
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var')
+            #return redirect('bolum_listesi')
+            return render(request, 'islem/bolum_listesi.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = BolumListesiForm()
+        return render(request, 'islem/bolum_listesi.html', {'form': form,})
+
+
+@login_required
+def bolum_listesi_devam(request, pk=None):
+    # if this is a POST request we need to process the form data
+    tipi_i = request.session.get('bolumlist_tipi')
+    zon_i = request.session.get('bolumlist_zon')
+    print ("tipi....", tipi_i)
+    print("zon...", zon_i)
+    tipi_l = tipi.objects.get(id=tipi_i)
+    zon_l = zon.objects.get(id=zon_i)
+    bolum_list = bolum.objects.filter(zon=zon_l)
+    context = {'tipi': tipi_l,
+               'zon' : zon_l,
+               'bolum_list' : bolum_list,
+              }
+    return render(request, 'islem/bolum_listesi_devam.html', context )
+
+
+@login_required
+def bolum_listesi_yarat(request, pk=None):
+    # if this is a POST request we need to process the form data
+    zon = request.session.get('bolumlist_zon')
+    print("bölüm listesi yarat içinden zon", zon)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = BolumForm(request.POST)
+        print("bölümform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            bolum_kodu = request.POST.get('bolum_kodu', "")
+            bolum_adi = request.POST.get('bolum_adi', "")
+            kaydetme_obj = bolum(bolum_kodu=bolum_kodu,
+                                 bolum_adi=bolum_adi,
+                                 zon_id=zon)
+            kaydetme_obj.save()
+            return redirect('bolum_listesi_devam')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/bolum_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = BolumForm()
+        return render(request, 'islem/bolum_form.html', {'form': form,})
+
+
+@login_required
+def bolum_listesi_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    zon = request.session.get('bolumlist_zon')
+    print("bölüm listesi düzenle içinden zon...", zon)
+    bolum_obj = bolum.objects.get(id=pk)
+    print("bölüm listesi düzenle içinden bölüm obj..", bolum_obj)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = BolumForm(request.POST)
+        print("bölümform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            bolum_kodu = request.POST.get('bolum_kodu', "")
+            bolum_adi = request.POST.get('bolum_adi', "")
+            kaydetme_obj = bolum(id=pk,
+                                 bolum_kodu=bolum_kodu,
+                                 bolum_adi=bolum_adi,
+                                 zon_id=zon)
+            kaydetme_obj.save()
+            return redirect('bolum_listesi_devam')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/bolum_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = BolumForm()
+        form.fields["bolum_kodu"].initial = bolum_obj.bolum_kodu
+        form.fields["bolum_adi"].initial = bolum_obj.bolum_adi
+        return render(request, 'islem/bolum_form.html', {'form': form,})
+
+
+@login_required
+def bolum_listesi_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    bolum_obj = bolum.objects.get(id=pk)
+    print("bölüm listesi sil içinden bölüm obj..", bolum_obj)
+    context = {'bolum_obj' : bolum_obj,
+              }
+    return render(request, 'islem/bolum_sil_soru.html', context )
+
+
+
+@login_required
+def bolum_listesi_sil_kesin(request, pk=None):
+    object = get_object_or_404(bolum, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
+    return redirect('bolum_listesi_devam')
+
+
+#------------------------------------------------------------------------------------
+
+@login_required
+def zon_listesi(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ZonListesiForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            tipi_i = request.POST.get('tipi', "")
+            print ("tipi....", tipi_i)
+            request.session['zonlist_tipi'] = tipi_i
+            return redirect('/islem/zon_listesi/devam/')
+
+        else:
+            messages.success(request, 'Formda uygunsuzluk var')
+            #return redirect('bolum_listesi')
+            return render(request, 'islem/zon_listesi.html', {'form': form})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #selected_alt = request.session.get('selected_alt')
+        form = ZonListesiForm()
+        return render(request, 'islem/zon_listesi.html', {'form': form,})
+
+
+@login_required
+def zon_listesi_devam(request, pk=None):
+    # if this is a POST request we need to process the form data
+    tipi_i = request.session.get('zonlist_tipi')
+    print ("tipi....", tipi_i)
+    tipi_l = tipi.objects.get(id=tipi_i)
+    zon_list = zon.objects.filter(tipi=tipi_l)
+    context = {'tipi': tipi_l,
+               'zon_list' : zon_list,
+              }
+    return render(request, 'islem/zon_listesi_devam.html', context )
+
+
+@login_required
+def zon_listesi_yarat(request, pk=None):
+    # if this is a POST request we need to process the form data
+    tipi = request.session.get('zonlist_tipi')
+    print("zon listesi yarat içinden tipi", tipi)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = ZonForm(request.POST)
+        print("zonform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            zon_kodu = request.POST.get('zon_kodu', "")
+            zon_adi = request.POST.get('zon_adi', "")
+            kaydetme_obj = zon(zon_kodu=zon_kodu,
+                                 zon_adi=zon_adi,
+                                 tipi_id=tipi)
+            kaydetme_obj.save()
+            return redirect('zon_listesi_devam')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/zon_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ZonForm()
+        return render(request, 'islem/zon_form.html', {'form': form,})
+
+
+@login_required
+def zon_listesi_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    tipi = request.session.get('zonlist_tipi')
+    print("zon listesi düzenle içinden tipi...", tipi)
+    zon_obj = zon.objects.get(id=pk)
+    print("zon listesi düzenle içinden zon obj..", zon_obj)
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = ZonForm(request.POST)
+        print("bölümform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            zon_kodu = request.POST.get('zon_kodu', "")
+            zon_adi = request.POST.get('zon_adi', "")
+            kaydetme_obj = zon(id=pk,
+                                 zon_kodu=zon_kodu,
+                                 zon_adi=zon_adi,
+                                 tipi_id=tipi)
+            kaydetme_obj.save()
+            return redirect('zon_listesi_devam')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/zon_listesi.html', {'form': form,})
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ZonForm()
+        form.fields["zon_kodu"].initial = zon_obj.zon_kodu
+        form.fields["zon_adi"].initial = zon_obj.zon_adi
+        return render(request, 'islem/zon_form.html', {'form': form,})
+
+
+@login_required
+def zon_listesi_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    zon_obj = zon.objects.get(id=pk)
+    print("zon listesi sil içinden zon obj..", zon_obj)
+    context = {'zon_obj' : zon_obj,
+              }
+    return render(request, 'islem/zon_sil_soru.html', context )
+
+
+
+@login_required
+def zon_listesi_sil_kesin(request, pk=None):
+    object = get_object_or_404(zon, pk=pk)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
+    return redirect('zon_listesi_devam')
+
+
+
+#------------------------------------------------------------------------------------
+
 
 
 
@@ -5849,8 +6074,17 @@ class list_zonautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return user.objects.none()
-        qs = zon.objects.all()
+        tipi = self.forwarded.get('tipi', None)
+        print("tipi...", tipi)
+
+        if not tipi:
+            qs = None
+        else:
+            qs = zon.objects.filter(tipi=tipi)
+
         return qs
+
+
 
 
 class list_bolumautocomplete(autocomplete.Select2QuerySetView):
@@ -5858,8 +6092,16 @@ class list_bolumautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             return user.objects.none()
-        qs = bolum.objects.all()
+        zon = self.forwarded.get('zon', None)
+        print("zon...", zon)
+
+        if not zon:
+            qs = None
+        else:
+            qs = bolum.objects.filter(zon=zon)
+
         return qs
+
 
 @login_required
 def bildirim(request):
@@ -5903,7 +6145,7 @@ def popup_notif(request):
 
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
-from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms
+from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms, rapor_verisi_hazirla
 
 
 

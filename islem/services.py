@@ -3,7 +3,7 @@ import requests
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, render_to_response
 from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi, Denetim_Data, Ariza_Data
-from .models import yer
+from .models import yer, sonuc_bolum, sonuc_detay, denetim
 import datetime
 
 
@@ -53,6 +53,74 @@ def admin_kontrol(request):
         return True
     else:
         return False
+
+
+def rapor_verisi_hazirla(request, denetim_no):
+    print("rapor verisine gelen denetim no...", denetim_no)
+    denetim_obj = denetim.objects.get(id=denetim_no)
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    if not(bolumler_obj):
+        request.session['mesaj_rapor_verisi'] = "Denetime ait bölüm yok..!!"
+        return False
+
+    kontrol_degiskeni = True
+    for bolum in bolumler_obj:
+        if bolum.tamam == "H":
+            kontrol_degiskeni = False
+
+    if not(kontrol_degiskeni):
+        request.session['mesaj_rapor_verisi'] = "Tamamlanmamış bölümler var..!!"
+        return False
+
+    bolum_soru = 0
+    bolum_dd = 0
+    bolum_net = 0
+    bolum_puan = 0
+    denetim_soru = 0
+    denetim_dd = 0
+    denetim_net = 0
+    denetim_puan = 0
+    i = 0
+    for bolum in bolumler_obj:
+        bolum_no = bolum.bolum
+        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+        print("seçilmiş olan detaylar...", detaylar_obj)
+        for detay in detaylar_obj:
+            bolum_soru = bolum_soru + 1
+            denetim_soru = denetim_soru + 1
+            if detay.denetim_disi == "E":
+                bolum_dd = bolum_dd + 1
+                denetim_dd = denetim_dd + 1
+            else:
+                bolum_net = bolum_net + 1
+                bolum_puan = bolum_puan + detay.puan
+                denetim_net = denetim_net +1
+                denetim_puan = denetim_puan + detay.puan
+        bolum.soru_adedi = bolum_soru
+        bolum.dd_adedi = bolum_dd
+        bolum.net_adet = bolum_net
+        bolum.toplam_puan = bolum_puan
+        ortalama_puan = bolum_puan / bolum_net
+        print("ortalama puan ...", ortalama_puan)
+        bolum.ortalama_puan = ortalama_puan
+        bolum.save()
+        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
+        bolum_soru = 0
+        bolum_dd = 0
+        bolum_net = 0
+        bolum_puan = 0
+    denetim_obj.soru_adedi = denetim_soru
+    denetim_obj.dd_adedi = denetim_dd
+    denetim_obj.net_adet = denetim_net
+    denetim_obj.toplam_puan = denetim_puan
+    ortalama_puan = denetim_puan / denetim_net
+    print("ortalama puan ...", ortalama_puan)
+    denetim_obj.ortalama_puan = ortalama_puan
+    denetim_obj.save()
+    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
+    return True
+
+
 
 
 

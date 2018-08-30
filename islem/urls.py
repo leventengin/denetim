@@ -79,7 +79,7 @@ urlpatterns = [
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^bolum_sec/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
-    #url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
     url(r'^baslat/devam/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
     url(r'^baslat/devam/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^baslat/devam/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
@@ -213,6 +213,12 @@ urlpatterns = [
 
     # bolum urlleri aşağıda....
     url(r'^bolum/$', views.BolumListView.as_view(), name='bolum'),
+    url(r'^bolum/(?P<pk>\d+)$', views.BolumDetailView.as_view(), name='bolum-detail'),
+    url(r'^bolum/create/$', views.BolumCreate.as_view(), name='bolum_create'),
+    url(r'^bolum/(?P<pk>\d+)/update/$', views.BolumUpdate.as_view(), name='bolum_update'),
+    url(r'^bolum/(?P<pk>\d+)/delete/$', views.bolum_sil, name='bolum_sil'),
+    url(r'^bolum/(?P<pk>\d+)/delete/kesin/$', views.sirket_sil_kesin, name='bolum_sil_kesin'),
+
     url(r'^soru_listesi/$', views.soru_listesi, name='soru_listesi'),
     url(r'^soru_listesi/devam/$', views.soru_listesi_devam, name='soru_listesi_devam'),
     url(r'^soru_listesi/devam/yarat/$', views.soru_listesi_yarat, name='soru_listesi_yarat'),
@@ -222,11 +228,21 @@ urlpatterns = [
     url(r'^soru_listesi/devam/kopyala/$', views.soru_listesi_kopyala, name='soru_listesi_kopyala'),
     url(r'^soru_listesi/devam/kopyala/kopyala_js/$', views.soru_kopyala_js, name='soru_kopyala_js'),
     url(r'^soru_listesi/devam/kopyala/kesin$', views.soru_listesi_kopyala_kesin, name='soru_listesi_kopyala_kesin'),
-    url(r'^bolum/(?P<pk>\d+)$', views.BolumDetailView.as_view(), name='bolum-detail'),
-    url(r'^bolum/create/$', views.BolumCreate.as_view(), name='bolum_create'),
-    url(r'^bolum/(?P<pk>\d+)/update/$', views.BolumUpdate.as_view(), name='bolum_update'),
-    url(r'^bolum/(?P<pk>\d+)/delete/$', views.bolum_sil, name='bolum_sil'),
-    url(r'^bolum/(?P<pk>\d+)/delete/kesin/$', views.sirket_sil_kesin, name='bolum_sil_kesin'),
+
+    url(r'^bolum_listesi/$', views.bolum_listesi, name='bolum_listesi'),
+    url(r'^bolum_listesi/devam/$', views.bolum_listesi_devam, name='bolum_listesi_devam'),
+    url(r'^bolum_listesi/devam/yarat/$', views.bolum_listesi_yarat, name='bolum_listesi_yarat'),
+    url(r'^bolum_listesi/devam/(?P<pk>\d+)/duzenle/$', views.bolum_listesi_duzenle, name='bolum_listesi_duzenle'),
+    url(r'^bolum_listesi/devam/(?P<pk>\d+)/sil/$', views.bolum_listesi_sil, name='bolum_listesi_sil'),
+    url(r'^bolum_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.bolum_listesi_sil_kesin, name='bolum_listesi_sil_kesin'),
+
+    url(r'^zon_listesi/$', views.zon_listesi, name='zon_listesi'),
+    url(r'^zon_listesi/devam/$', views.zon_listesi_devam, name='zon_listesi_devam'),
+    url(r'^zon_listesi/devam/yarat/$', views.zon_listesi_yarat, name='zon_listesi_yarat'),
+    url(r'^zon_listesi/devam/(?P<pk>\d+)/duzenle/$', views.zon_listesi_duzenle, name='zon_listesi_duzenle'),
+    url(r'^zon_listesi/devam/(?P<pk>\d+)/sil/$', views.zon_listesi_sil, name='zon_listesi_sil'),
+    url(r'^zon_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.zon_listesi_sil_kesin, name='zon_listesi_sil_kesin'),
+
 
     # detay urlleri aşağıda....
     url(r'^detay/$', views.DetayListView.as_view(), name='detay'),

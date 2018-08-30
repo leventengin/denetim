@@ -4,25 +4,74 @@
 {% block content %}
     <h3>Sonuç Listesi</h3>
     <p> </p>
-    <h4> Seçili Denetim...:&emsp; {{ denetimin_adi}} </h4>
-<!--
+    <h4> Seçili Denetim:&emsp; {{ denetim_obj.denetim_adi}} </h4>
     <p> </p>
-    <h5> Durumu...........:&emsp; {{ denetimin_durumu}} </h5>
--->
+    <h5> Puan          :&emsp; {{ denetim_obj.ortalama_puan}} </h5>
+    <p>  &emsp; </p>
 
-    {% if sonuc_list %}
-    <ul>
-      {% for sonuc in sonuc_list %}
-      <li>
-      <!--    <a href="{{sonuc.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>  -->
+    {% if sonuc_bolum_list %}
 
-              &emsp;       {{sonuc.detay.detay_kodu}} -
-              &emsp;       <a>{{ sonuc.bolum }}</a> -
-              &emsp;       <a href="{{sonuc.id}}">{{ sonuc.detay }}</a>
-        <!--  <a href="{{marka.id}}">{{ marka.id }}</a> ({{marka.marka_adi}}) -->
-      </li>
-      {% endfor %}
-      </ul>
+        <table cellspacing="10" cellpadding="0">
+                <tr>
+                  <th>Bölüm Kodu</th>
+                  <th> &emsp;&emsp; </th>
+                  <th>Bölüm Adı</th>
+                  <th> &emsp;&emsp; </th>
+                  <th>Ortalama Puan</th>
+                </tr>
+
+            {% for sonuc in sonuc_bolum_list %}
+
+                <tr >
+                  <td>{{ sonuc.bolum.bolum_kodu }}  </td>
+                  <td> &emsp;&emsp; </td>
+                  <td>{{ sonuc.bolum.bolum_adi }}  </td>
+                  <td> &emsp;&emsp; </td>
+                  <td>{{ sonuc.ortalama_puan }}  </td>
+                </tr>
+
+            {% endfor %}
+        </table>
+
+    {% else %}
+      <p>Kayıtlı bölüm yok  </p>
+    {% endif %}
+
+
+
+    {% if sonuc_detay_list %}
+
+        <table cellspacing="10" cellpadding="0">
+                <tr>
+                  <th>Bölüm</th>
+                  <th> &emsp;&emsp;</th>
+                  <th>Soru</th>
+                  <th> &emsp;&emsp;</th>
+                  <th>Puan</th>
+                </tr>
+
+            {% for sonuc in sonuc_detay_list %}
+
+                <tr>
+                  <td> <a href="{{sonuc.id}}">  {{ sonuc.bolum.bolum_adi }}  </a> </td>
+                  <td> &emsp;&emsp; </td>
+                  <td>  <a href="{{sonuc.id}}"> {{ sonuc.detay.detay_adi }} </a> </td>
+                  <td> &emsp;&emsp; </td>
+                  <td> <a href="{{sonuc.id}}">  {{ sonuc.puan }} </a> </td>
+                  {% if sonuc.puanlama_turu == "A" %}
+                      <td> <a href="{{sonuc.id}}"> /10 </a> </td>
+                  {% endif %}
+                  {% if sonuc.puanlama_turu == "B" %}
+                      <td> <a href="{{sonuc.id}}">  /5 </a> </td>
+                  {% endif %}
+                  {% if sonuc.puanlama_turu == "C" %}
+                      <td> <a href="{{sonuc.id}}"> /2 </a> </td>
+                  {% endif %}
+                </tr>
+
+            {% endfor %}
+        </table>
+
     {% else %}
       <p>Kayıtlı sonuc yok  </p>
     {% endif %}

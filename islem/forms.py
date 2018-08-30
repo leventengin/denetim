@@ -156,6 +156,7 @@ class ProjeSecForm(forms.Form):
                  widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
 
 
+
 class SoruListesiForm(forms.Form):
     tipi = forms.ModelChoiceField(queryset=tipi.objects.all(),
          widget=autocomplete.ModelSelect2(url='list_tipi-autocomplete'), required=False)
@@ -163,6 +164,57 @@ class SoruListesiForm(forms.Form):
          widget=autocomplete.ModelSelect2(url='list_zon-autocomplete', forward=['tipi'] ), required=False)
     bolum = forms.ModelChoiceField(queryset=bolum.objects.all(),
          widget=autocomplete.ModelSelect2(url='list_bolum-autocomplete', forward=['zon'] ), required=False)
+
+    def clean(self):
+        cleaned_data = super(SoruListesiForm, self).clean()
+        cc_tipi = cleaned_data.get("tipi")
+        cc_zon = cleaned_data.get("zon")
+        cc_bolum = cleaned_data.get("bolum")
+        print("cc tipi...", cc_tipi)
+        print("cc zon....", cc_zon)
+        print("cc bölüm....", cc_bolum)
+
+        if cc_tipi == None:
+            raise forms.ValidationError("denetim tipi alanı boş olamaz")
+        if cc_zon == None:
+            raise forms.ValidationError("denetim zonu alanı boş olamaz")
+        if cc_bolum == None:
+            raise forms.ValidationError("denetim bölümü alanı boş olamaz")
+
+
+
+
+
+class BolumListesiForm(forms.Form):
+    tipi = forms.ModelChoiceField(queryset=tipi.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_tipi-autocomplete'), required=False)
+    zon = forms.ModelChoiceField(queryset=zon.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_zon-autocomplete', forward=['tipi'] ), required=False)
+
+    def clean(self):
+        cleaned_data = super(BolumListesiForm, self).clean()
+        cc_tipi = cleaned_data.get("tipi")
+        cc_zon = cleaned_data.get("zon")
+        print("cc tipi...", cc_tipi)
+        print("cc zon....", cc_zon)
+        if cc_tipi == None:
+            raise forms.ValidationError("denetim tipi alanı boş olamaz")
+        if cc_zon == None:
+            raise forms.ValidationError("denetim zonu alanı boş olamaz")
+
+
+
+class ZonListesiForm(forms.Form):
+    tipi = forms.ModelChoiceField(queryset=tipi.objects.all(),
+         widget=autocomplete.ModelSelect2(url='list_tipi-autocomplete'), required=False)
+
+    def clean(self):
+        cleaned_data = super(ZonListesiForm, self).clean()
+        cc_tipi = cleaned_data.get("tipi")
+        print("cc tipi...", cc_tipi)
+        if cc_tipi == None:
+            raise forms.ValidationError("denetim tipi alanı boş olamaz")
+
 
 
 # esas işin döndüğü yer foto yüklüyor................
@@ -227,6 +279,42 @@ class SoruForm(forms.Form):
         print("cc detay kodu...", cc_detay_kodu)
         print("cc detay adı....", cc_detay_adi)
         print("cc puanlama türü", cc_puanlama_turu)
+
+
+
+
+class BolumForm(forms.Form):
+    bolum_kodu = forms.CharField(label='Bölüm Kodu:', widget=forms.TextInput(attrs={'class':'special', 'size': '10'}))
+    bolum_adi = forms.CharField(label='Bölüm Adı:', widget=forms.Textarea(attrs={'cols': 100, 'rows': 1}))
+    def __init__(self, *args, **kwargs):
+        super(BolumForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(BolumForm, self).clean()
+        cc_bolum_kodu = cleaned_data.get("bolum_kodu")
+        cc_bolum_adi = cleaned_data.get("bolum_adi")
+        print("cc detay kodu...", cc_bolum_kodu)
+        print("cc detay adı....", cc_bolum_adi)
+
+
+class ZonForm(forms.Form):
+    zon_kodu = forms.CharField(label='Alan Kodu:', widget=forms.TextInput(attrs={'class':'special', 'size': '10'}))
+    zon_adi = forms.CharField(label='Alan Adı:', widget=forms.Textarea(attrs={'cols': 100, 'rows': 1}))
+    def __init__(self, *args, **kwargs):
+        super(ZonForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(ZonForm, self).clean()
+        cc_zon_kodu = cleaned_data.get("zon_kodu")
+        cc_zon_adi = cleaned_data.get("zon_adi")
+        print("cc zon kodu...", cc_zon_kodu)
+        print("cc zon adı....", cc_zon_adi)
+
+
+
+
+
+
 
 class GunForm(forms.Form):
     gun = forms.ChoiceField(choices=GUNLER, widget=forms.Select, label="Gün Seçiniz:")

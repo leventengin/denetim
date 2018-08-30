@@ -10,9 +10,9 @@
 
       <p>Bu denetim zonunu silmek istediğinizden emin misiniz ???: </p>
 
-      <p>  <b> id: </b>   &emsp;   {{ sil_id }}</p>
+      <p>  <b> id : </b>   &emsp;   {{ zon_obj.id }}</p>
 
-      <p>   <b>  adı: </b>  &emsp;   {{ sil_zon }}</p>
+      <p>   <b>  adı: </b>  &emsp;   {{ zon_obj.zon_adi }}</p>
 
       <form action="" method="POST">
         {% csrf_token %}

@@ -5,13 +5,12 @@
 {% block content %}
 
 
-<h4> Bölüm Soru Listesi  - Bölüm Seçin </h4>
+<h4> Alan/Zon Listesi  </h4>
 
 <p> </p>
 
 <form action="" method="POST">
     {% csrf_token %}
-
     <table>
     {{ form.as_table }}
     </table>

@@ -1,0 +1,36 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h3>&emsp;Bölüm  Listesi</h3>
+
+<p> &emsp;Denetim Tipi: &emsp;<b> {{ tipi }}  </b></p>
+<p> &emsp;Denetim Zonu: &emsp;<b> {{ zon.zon_adi }} </b></p>
+
+
+{% if bolum_list %}
+<ul>
+
+  {% for bolum in bolum_list %}
+  <li>
+    <a href="{{bolum.id}}/sil"><span class='glyphicon glyphicon-remove'></span></a>
+    <a href="{{bolum.id}}/duzenle"><span class='glyphicon glyphicon-pencil'></span></a>
+          &emsp;   ({{bolum.id}})   &emsp;     {{ bolum.bolum_adi }}
+  </li>
+  {% endfor %}
+  <p> </p>
+  <p> </p>
+  <a href="yarat"> Bölüm Ekle </a>
+  <p> </p>
+
+
+</ul>
+{% else %}
+  <p>Kayıtlı bölüm yok ....</p>
+  <p> </p>
+  <a href="yarat"> Bölüm Ekle </a>
+  <p>&emsp; </p>
+
+{% endif %}
+
+{% endblock %}
