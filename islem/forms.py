@@ -1,7 +1,7 @@
 ""
 from django import forms
 from django.forms import ModelForm
-from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil
+from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil, sonuc_resim
 from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun, yer, proje_alanlari
 from webservice.models import rfid_dosyasi
 from django.contrib.admin.widgets import AdminDateWidget
@@ -222,10 +222,12 @@ class ZonListesiForm(forms.Form):
 class SonucForm(forms.ModelForm):
     class Meta:
         model = sonuc_detay
-        fields = ( 'puanlama_turu', 'onluk', 'beslik', 'ikilik', 'denetim_disi', 'resim_varmi',)
+        fields = ( 'puanlama_turu', 'onluk', 'beslik', 'ikilik', 'denetim_disi',  )
+        """
         widgets = {
-            'resim_varmi' : forms.HiddenInput(),
+            'tamam' : forms.HiddenInput(),
         }
+        """
         labels = {
             'denetim_disi' : "Denetim dışı",
             'onluk' : "Puan",
@@ -233,10 +235,20 @@ class SonucForm(forms.ModelForm):
             'ikilik': "Puan",
         }
     def __init__(self, *args, **kwargs):
-        puanlama_turu = kwargs.pop("puanlama_turu")
+        #puanlama_turu = kwargs.pop("puanlama_turu")
+        #detay_obj = kwargs.pop("detay_obj")
         super(SonucForm, self).__init__(*args, **kwargs)
-        print("puanlama türü initial içinden..:", puanlama_turu)
-        self.fields['puanlama_turu'].value = puanlama_turu
+        #print("puanlama türü initial içinden..:", puanlama_turu)
+        #print("detay obje initial içinden..:", detay_obj)
+        puanlama_turu = self.instance.puanlama_turu
+        """
+        if detay_obj:
+            self.fields['onluk'] = detay_obj.onluk
+            self.fields['beslik'] = detay_obj.beslik
+            self.fields['ikilik'] = detay_obj.ikilik
+            self.fields['denetim_disi'] = detay_obj.denetim_disi
+        self.instance.fields['puanlama_turu'].value = puanlama_turu
+        """
         if puanlama_turu=="A":
             self.fields['beslik'].widget = forms.HiddenInput()
             self.fields['ikilik'].widget = forms.HiddenInput()
@@ -247,6 +259,8 @@ class SonucForm(forms.ModelForm):
             self.fields['onluk'].widget = forms.HiddenInput()
             self.fields['beslik'].widget = forms.HiddenInput()
         self.fields['puanlama_turu'].widget = forms.HiddenInput()
+
+
     def clean(self):
         cleaned_data = super(SonucForm, self).clean()
         cc_puanlama_turu = cleaned_data.get("puanlama_turu")
@@ -254,13 +268,34 @@ class SonucForm(forms.ModelForm):
         cc_beslik = cleaned_data.get("beslik")
         cc_ikilik = cleaned_data.get("ikilik")
         cc_denetim_disi = cleaned_data.get("denetim_disi")
-        cc_resim_varmi = cleaned_data.get("resim_varmi")
         print("cc puanlama türü...:", cc_puanlama_turu)
         print("cc onluk", cc_onluk)
         print("cc beslik", cc_beslik)
         print("cc ikilik", cc_ikilik)
         print("cc denetim dışı", cc_denetim_disi)
-        print("cc resim var mı", cc_resim_varmi)
+
+
+class SonucResimForm(forms.ModelForm):
+    class Meta:
+        model = sonuc_resim
+        fields = ( 'sonuc_detay', 'foto',)
+        """
+        fields = ( 'foto', 'resim_kalktimi',)
+        widgets = {
+            'resim_kalktimi' : forms.HiddenInput(),
+        }
+        labels = {
+            'foto' : "Foto",
+        }
+        """
+    def clean(self):
+        cleaned_data = super(SonucResimForm, self).clean()
+        cc_foto = cleaned_data.get("sonuc_detay")
+        cc_foto = cleaned_data.get("foto")
+        #cc_resim_kalktimi = cleaned_data.get("resim_kalktimi")
+        print("cc sonuc detay...:", cc_sonuc_detay)
+        print("cc foto...:", cc_foto)
+        #print("cc resim kalkti mı", cc_resim_kalktimi)
 
 
 
@@ -737,6 +772,31 @@ class DenetimSecForm(forms.Form):
         print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
 
 
+class DuzenleDenetimSecForm(forms.Form):
+    denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+    def __init__(self, *args, **kwargs):
+        denetci = kwargs.pop("denetci")
+        super(DuzenleDenetimSecForm, self).__init__(*args, **kwargs)
+        #denetim_obj_ilk = denetim.objects.filter(durum="B") |  denetim.objects.filter(durum="C")
+        denetim_obj_ilk = denetim.objects.filter(durum="B") |  denetim.objects.filter(durum="C")
+        denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
+        ex_list = []
+        for x in denetim_obj:
+            tamam_mi = True
+            bolumler = sonuc_bolum.objects.filter(denetim=x.id)
+            for y in bolumler:
+                print("işte y...", y, "işte tamam mı...", y.tamam)
+                if y.tamam == "H":
+                    tamam_mi =  False
+            if not tamam_mi:
+                print("tamam mı hayır oldu   siliyor mu....", x)
+                ex_list.append(x.id)
+        print(" denetim ex list...", ex_list)
+        print("denetim ilk obje................", denetim_obj)
+        denetim_son_obj = denetim_obj.exclude(id__in=ex_list)
+        print("denetim son obje................", denetim_son_obj)
+        self.fields['denetim_no'].queryset = denetim_son_obj
+        print("queryset initial içinden..:", self.fields['denetim_no'].queryset)
 
 
 

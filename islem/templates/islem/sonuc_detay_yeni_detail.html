@@ -99,16 +99,16 @@
 
   <br /> <br /> <br />
   {% if prev_issue %}
-  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk=prev_issue.id %}'">Önceki </button>
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk_den=denetim_no pk=prev_issue.id %}'">Önceki </button>
   {% endif %}
   &emsp;
   {% if next_issue %}
-  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk=next_issue.id %}'">Sonraki </button>
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_sec' pk_den=denetim_no pk=next_issue.id %}'">Sonraki </button>
   {% endif %}
   &emsp;
-
-  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_duzenle' pk=secili_detay.id %}'">Düzenle </button>
-
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_detay_duzenle' pk_den=denetim_no pk=secili_detay.id %}'">Düzenle </button>
+  <br />
+  <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'sonuc_denetim_sec_dogrudan' pk_den=denetim_no %}'">Listeye dön </button>
 
 
 

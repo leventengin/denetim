@@ -35,20 +35,13 @@
 
 <script>
   function resim_kaldir() {
-    alert("resim kaldır başladı...");
-    var deger = getvalue_resim_varmi();
-    //var deger = sessionStorage.getItem("resim_varmi");
-    alert("resim kaldır içinden değer..." + deger);
-    if (deger == "E") { alert("değer evet...E");}
-    if (deger == "H") { alert("değer hayır..H");}
-        else { alert(deger);}
 
-    document.getElementById("id_resim_varmi").value == "H";
-    document.getElementById('preview').src = "";
-    var x = document.getElementById("resim_kaldir");
-    x.style.display = "none";
-    update_resim_varmi("H");
-    //x.style.display = "block";
+    document.getElementById('id_resim_varmi').value="H";
+    var x = document.getElementById('preview');
+    var y = document.getElementById("resim_kaldir");
+    x.style.visibility = "hidden";
+    y.style.visibility = "hidden";
+
     }  //resim_kaldır...
 </script>
 
@@ -97,7 +90,7 @@
 
 
 <script>
-  function baslat_jquery() {
+  function kaydet_jquery() {
       //alert("başlat jquery...");
     if ( document.getElementById("id_denetim_disi").value == "E" ) {
           document.getElementById("myForm").submit();
@@ -142,13 +135,13 @@
           else { alert(" yüklenen resim formatı yanlış...." );  }
         }
       } //denetim dışı....
-    }  //baslat_jquery....
+    }  //kaydet_jquery....
   </script>
 
 
 
 <script>
-    $( ".baslat_jquery" ).baslat_jquery();
+    $( ".kaydet_jquery" ).kaydet_jquery();
 </script>
 
 
@@ -290,25 +283,6 @@ $(document).ready(function()
 
 
 
-<!--
-<script>
-$(document).ready(function()
-{
-      document.getElementById('preview').onchange = function(evt)
-      {
-            alert("preview değiştiğinde oluyor...");
-            var resim_varmi = document.getElementById('id_resim_varmi').value;
-            alert("resim var mı..." + resim_varmi);
-            if  resim_varmi == "E"
-                 {x.style.display = "block";}
-            else
-                 {x.style.display = "none";}
-      };  // on change...
-});  /* document ready  kapanıyor */
-</script>
--->
-
-
 
 <form method='POST' id ="myForm" action="" enctype='multipart/form-data'>
     {% csrf_token %}
@@ -319,7 +293,7 @@ $(document).ready(function()
         {{form.as_table}}
 
     </table>
-    <!-- <input type="button" onclick="baslat_jquery()" value="kaydet" />  -->
+    <!-- <input type="button" onclick="kaydet_jquery()" value="kaydet" />  -->
 </form>
 <p></p>
 <p></p>
@@ -339,7 +313,7 @@ $(document).ready(function()
 
 <p></p>
 <p></p>
-<input type="button" onclick="baslat_jquery()" value="kaydet" />
+<input type="button" onclick="kaydet_jquery()" value="kaydet" />
 <p></p>
 <p></p>
 
@@ -353,6 +327,8 @@ $(document).ready(function()
 
 <input id="resim_kaldir" type="button" onclick="resim_kaldir()" value="resim kaldır" />
 <p></p>
+
+
 
 
 

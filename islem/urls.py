@@ -75,12 +75,15 @@ urlpatterns = [
     url(r'^qrcode/result/$', views.qrcode_islemi_baslat, name='qrcode_islemi_baslat'),
     #url(r'^qrcode/(?P<pk>\d+)$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
     url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
+
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^bolum_sec/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
     url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    url(r'^bolum_sec/denetim_detay_islemleri/kucuk_resim_sil/$', views.kucuk_resim_sil, name='kucuk_resim_sil'),
     url(r'^baslat/devam/denetim_detay_islemleri/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    url(r'^baslat/devam/denetim_detay_islemleri/kucuk_resim_sil/$', views.kucuk_resim_sil, name='kucuk_resim_sil'),
     url(r'^baslat/devam/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^baslat/devam/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
     url(r'^baslat/devam/denetim_detay_islemleri/$', views.denetim_detay_islemleri, name='denetim_detay_islemleri'),
@@ -90,11 +93,14 @@ urlpatterns = [
     # sonuç urlleri aşağıda....
     #url(r'^sonuc/$', views.SonucListView.as_view(), name='sonuc'),
     url(r'^sonuc/$', views.sonuc_denetim_sec, name='sonuc_denetim_sec'),
-    url(r'^sonuc/(?P<pk>\d+)$', views.sonuc_denetim_detay_sec, name='sonuc_denetim_detay_sec'),
-    url(r'^sonuc/(?P<pk>\d+)/duzenle/$', views.sonuc_denetim_detay_duzenle, name='sonuc_denetim_detay_duzenle'),
-    url(r'^sonuc/(?P<pk>\d+)/duzenle/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al_2'),
-    url(r'^sonuc/(?P<pk>\d+)/duzenle/update_resim_varmi/$', views.update_resim_varmi, name='update_resim_varmi'),
-    url(r'^sonuc/(?P<pk>\d+)/duzenle/getvalue_resim_varmi/$', views.getvalue_resim_varmi, name='getvalue_resim_varmi'),
+    url(r'^sonuc/(?P<pk_den>\d+)/$', views.sonuc_denetim_sec_dogrudan, name='sonuc_denetim_sec_dogrudan'),
+    #url(r'^sonuc/denetim_sec/(?P<pk>\d+)$', views.sonuc_denetim_sec_dogrudan, name='sonuc_denetim_sec_dogrudan'),
+    url(r'^sonuc/(?P<pk_den>\d+)/(?P<pk>\d+)$', views.sonuc_denetim_detay_sec, name='sonuc_denetim_detay_sec'),
+    url(r'^sonuc/(?P<pk>\d+)/(?P<pk_den>\d+)/duzenle/$', views.sonuc_denetim_detay_duzenle, name='sonuc_denetim_detay_duzenle'),
+    url(r'^sonuc/(?P<pk>\d+)/(?P<pk_den>\d+)/duzenle/kucuk_resim_al/$', views.kucuk_resim_al, name='kucuk_resim_al'),
+    url(r'^sonuc/(?P<pk>\d+)/(?P<pk_den>\d+)/duzenle/kucuk_resim_sil/$', views.kucuk_resim_sil, name='kucuk_resim_sil'),
+    url(r'^sonuc/(?P<pk>\d+)/(?P<pk_den>\d+)/duzenle/update_resim_varmi/$', views.update_resim_varmi, name='update_resim_varmi'),
+    url(r'^sonuc/(?P<pk>\d+)/(?P<pk_den>\d+)/duzenle/getvalue_resim_varmi/$', views.getvalue_resim_varmi, name='getvalue_resim_varmi'),
     #url(r'^sonuc/(?P<pk>\d+)$', views.SonucDetayDetailView.as_view(), name='sonuc-detail'),
     #url(r'^sonuc/(?P<pk>\d+)/update/$', views.SonucUpdate.as_view(), name='sonuc_update'),
 
@@ -243,6 +249,12 @@ urlpatterns = [
     url(r'^zon_listesi/devam/(?P<pk>\d+)/sil/$', views.zon_listesi_sil, name='zon_listesi_sil'),
     url(r'^zon_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.zon_listesi_sil_kesin, name='zon_listesi_sil_kesin'),
 
+    url(r'^spv_listesi/$', views.spv_listesi, name='spv_listesi'),
+    #url(r'^spv_listesi/devam/$', views.spv_listesi_devam, name='spv_listesi_devam'),
+    #url(r'^spv_listesi/devam/yarat/$', views.spv_listesi_yarat, name='spv_listesi_yarat'),
+    #url(r'^spv_listesi/devam/(?P<pk>\d+)/duzenle/$', views.spv_listesi_duzenle, name='spv_listesi_duzenle'),
+    #url(r'^spv_listesi/devam/(?P<pk>\d+)/sil/$', views.spv_listesi_sil, name='spv_listesi_sil'),
+    #url(r'^spv_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.spv_listesi_sil_kesin, name='spv_listesi_sil_kesin'),
 
     # detay urlleri aşağıda....
     url(r'^detay/$', views.DetayListView.as_view(), name='detay'),

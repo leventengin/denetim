@@ -104,7 +104,7 @@ class sirket(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    sirket = models.ForeignKey(sirket, on_delete=models.PROTECT, null=True, blank=True)
+    sirket = models.ForeignKey(sirket, on_delete=models.PROTECT, blank=True, null=True)
     proje = models.ForeignKey('proje', on_delete=models.PROTECT, blank=True, null=True)
     denetci = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
@@ -122,17 +122,84 @@ class Profile(models.Model):
 # operasyon elemanları şu andaki sistemde sadece rfid içinde isim olarak tutuluyor, sisteme user kayıtları yok
 #
 
-
+"""
+@receiver(pre_save, sender=User)
+def check_sirket(sender,instance,**kwargs):
+    print("kullanıcı şirketi ", instance.profile.sirket)
+    if instance.profile.sirket == None:
+        print("olmadı burada.........")
+        raise Exception('Şirket tanımlanmadı...')
+        #raise forms.ValidationError("e-posta mevcut...")
+    else:
+        print("check şirket pass...")
+        pass
+"""
 
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
+    #profile_created = False
     if created:
+        profile_created = True
+        print("işte profile nesnesi created...")
         Profile.objects.create(user=instance)
+    #request.session['profile_created'] = profile_created
+    #print("profile created...", profile_created)
+
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
+    #profile_created = request.session.get('profile_created')
+    #print("save içinden profile created...", profile_created)
+    if  instance.profile.sirket == None:
+        print("şirket girilmemiş....")
+    else:
+        if instance.profile.sirket.turu == "D":
+            pass
+        else:
+            grup = instance.profile.sirket.grubu
+            print("işte grup...", grup)
+            sirketler = sirket.objects.filter(grubu=grup.id)
+            print("şirketler...", sirketler, "şirketlerin sayısı..", sirketler.count())
+            if instance.profile.denetim_grup_yetkilisi == "E":
+                for secilen in sirketler:
+                    kaydet_obj = spv_yetkilisi(sirket_id=secilen.id, spv_yetkilisi_id=instance.profile.id)
+                    kaydet_obj.save()
+            else:
+                for secilen in sirketler:
+                    silme_obj = spv_yetkilisi.objects.filter(spv_yetkilisi_id=instance.profile.id)
+                    if silme_obj:
+                        silme_obj.delete()
+
     instance.profile.save()
+
+
+"""
+@receiver(post_save, sender=Profile)
+def spv_duzenle(sender, instance, **kwargs):
+    #profile_created = request.session.get('profile_created')
+    if  instance.sirket == None:
+        print("şirket girilmemiş....")
+    else:
+        if instance.sirket.turu == "D":
+            pass
+        else:
+            grup = instance.sirket.grubu
+            print("işte grup...", grup)
+            sirketler = sirket.objects.filter(grubu=grup.id)
+            print("şirketler...", sirketler, "şirketlerin sayısı..", sirketler.count())
+            if instance.denetim_grup_yetkilisi == "E":
+                for secilen in sirketler:
+                    kaydet_obj = spv_yetkilisi(sirket_id=secilen.id, spv_yetkilisi_id=instance.id)
+                    kaydet_obj.save()
+            else:
+                for secilen in sirketler:
+                    silme_obj = spv_yetkilisi.objects.filter(spv_yetkilisi_id=instance.id)
+                    if silme_obj:
+                        silme_obj.delete()
+"""
+
+
 
 @receiver(pre_save, sender=User)
 def check_email(sender,instance,**kwargs):
@@ -154,8 +221,11 @@ def check_email(sender,instance,**kwargs):
             pass
 
 
-
-
+class spv_yetkilisi(models.Model):
+    sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
+    spv_yetkilisi = models.ForeignKey(User, related_name='spv_yetkilisi', on_delete=models.CASCADE)
+    def __str__(self):
+        return(self.spv_yetkilisi.username)
 
 
 
@@ -186,7 +256,7 @@ class detay(models.Model):
     puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")
     sil = models.BooleanField(default=False)
     def __str__(self):
-        return '%s-%s' % (self.detay_kodu, self.detay_adi)
+        return '%s-%s-%s' % (self.bolum.bolum_adi, self.detay_kodu, self.detay_adi)
         #return(self.detay_adi)
 
 """
@@ -306,7 +376,7 @@ class qrdosyasi(models.Model):
 
 
 class kucukresim(models.Model):
-    kullanici = models.ForeignKey(User, related_name='resim_ceken', on_delete=models.CASCADE)
+    kullanici = models.ForeignKey(User, related_name='related_user', on_delete=models.CASCADE)
     foto_kucuk = models.ImageField(upload_to='xyz/kucukresim/%Y/%m/%d/',blank=True, null=True,)
 
 def upload_location(instance, filename):
@@ -322,17 +392,25 @@ class sonuc_detay(models.Model):
     ikilik = models.CharField(max_length=1, choices=IKILIK, blank=True, null=True)
     puan = models.IntegerField(blank=True, null=True)
     denetim_disi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
-    resim_varmi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    #resim_varmi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     aciklama = models.CharField(max_length=100, blank=True, null=True)
     #foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True, height_field="height_field", width_field="width_field")
-    foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True)
-    height_field = models.IntegerField(default=0)
-    width_field = models.IntegerField(default=0)
+    #foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True)
+    #height_field = models.IntegerField(default=0)
+    #width_field = models.IntegerField(default=0)
     tamam = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     def __str__(self):
-        return(self.denetim.denetim_adi)
+        return '%s-%s' % (self.denetim.denetim_adi, self.detay.detay_adi)
+
+
+class sonuc_resim(models.Model):
+    sonuc_detay = models.ForeignKey(sonuc_detay, on_delete=models.PROTECT)
+    foto = models.ImageField(upload_to='xyz/%Y/%m/%d/',blank=True, null=True)
+    resim_kalktimi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    def __str__(self):
+        return (self.sonuc_detay.detay.detay_adi)
 
 class sonuc_bolum(models.Model):
     denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
@@ -345,7 +423,7 @@ class sonuc_bolum(models.Model):
     toplam_puan = models.IntegerField(default=0)
     ortalama_puan = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     def __str__(self):
-        return(self.bolum.bolum_adi)
+        return '%s-%s' % (self.denetim.denetim_adi, self.bolum.bolum_adi)
 
 
 class sonuc_takipci(models.Model):

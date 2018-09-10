@@ -2,6 +2,11 @@
 
 {% block content %}
 
+<!--
+<input type="file" id="select">
+<img id="preview">
+
+-->
 
 {% load static %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
@@ -29,25 +34,15 @@
 
 
 <script>
-  function resim_kaldir(x) {
-    alert("resim kaldır için parametre..." + x);
-    //document.getElementById('id_resim_varmi').value="H";
-    var id_verisi = x;
+  function resim_kaldir() {
 
-    $.ajax({
-        url: "kucuk_resim_sil/",
-        type: "POST",
-        data: {'id_verisi':x},
-        dataType: "text",
-        success: function(){
-          alert("küçük resim silme başarı.....");
-          window.location.reload();
-        },
-        failure: function(){
-          alert("küçük resim hata....");
-        },
-    });  //ajax kapa...............
-}  //resim_kaldır...
+    document.getElementById('id_resim_varmi').value="H";
+    var x = document.getElementById('preview');
+    var y = document.getElementById("resim_kaldir");
+    x.style.visibility = "hidden";
+    y.style.visibility = "hidden";
+
+    }  //resim_kaldır...
 </script>
 
 
@@ -158,7 +153,7 @@
 
 
 
-<!-- resim var mı ... {{ request.session.resim_varmi  }} -->
+resim var mı ... {{ request.session.resim_varmi  }}
 
 <h5> <b> Denetim Detay İşlemleri </b> </h5>
             <p> </p>
@@ -170,25 +165,45 @@
                         <td>  &emsp;      {{ secili_obj.denetim }}</td>
                     </tr>
                     <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
 
                     <tr>
                         <td><b>Bolüm..........:</b></td>
                         <td> &emsp;     {{ secili_obj.bolum }}</td>
                     </tr>
                     <p> </p>
-
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
 
                     <tr>
                         <td><b>Detay Adı......:   </b></td>
                         <td> &emsp;     {{ secili_obj.detay }}</td>
                     </tr>
                     <p> </p>
-
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
+                    <p> </p>
 
                 </tbody>
             </table>
 
 <p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p> </p>
+
+
 
 
 
@@ -226,19 +241,17 @@ $(document).ready(function()
                           processData: false,
                           success: function(){
                             alert("küçük resim başarı.....");
-                            window.location.reload();
                           },
                           failure: function(){
                             alert("küçük resim hata....");
                           },
                       });  //ajax kapa...............
-                //document.getElementById('id_resim_varmi').value="E";
-                //var x = document.getElementById('preview');
-                //var y = document.getElementById("resim_kaldir");
-                //x.style.visibility = "visible";
-                //y.style.visibility = "visible";
+                document.getElementById('id_resim_varmi').value="E";
+                var x = document.getElementById('preview');
+                var y = document.getElementById("resim_kaldir");
+                x.style.visibility = "visible";
+                y.style.visibility = "visible";
             }); //image tools...
-            //window.location.reload();
       };  // on change...
 });  /* document ready  kapanıyor */
 </script>
@@ -280,14 +293,29 @@ $(document).ready(function()
         {{form.as_table}}
 
     </table>
+
+
+
     <!-- <input type="button" onclick="kaydet_jquery()" value="kaydet" />  -->
 </form>
+
+<p></p>
+<p></p>
+
+<form method='POST' id ="myFormset" action="" enctype='multipart/form-data'>
+  {% csrf_token %}
+  {{ formset.management_form }}
+   {% for formx in formset %}
+       {{ formx }}
+       <!--<input id="resim_kaldir{{formx.id}}" type="button" onclick="resim_kaldir()" value="resim kaldır" /> -->
+   {% endfor %}
+</form>
+
 <p></p>
 <p></p>
 
 
 <form id="take_photo" enctype="multipart/form-data">
-      {% csrf_token %}
       <input name="foto" type="file" id="id_foto" accept="image/jpeg"  class="inputfile" />
       <label for="id_foto"> <font color="blue" font-weight="normal"> Resim yükle </font>  </label>
 </form>
@@ -296,33 +324,27 @@ $(document).ready(function()
 <p></p>
 
 <form method="POST" name="small_image_form_to_upload" enctype="multipart/form-data">
-    {% csrf_token %}
     <input type="hidden" name="foto_kucuk" id="id_foto_kucuk" value="value_kucuk" />
 </form>
-
-<p></p>
-<p></p>
-
-{% for resim in detay_resim_obj %}
-
-    <img id="preview{{resim.id}}"  src="{{ resim.foto.url }}">
-
-    <input id="resim_kaldir{{resim.id}}" type="button" onclick="resim_kaldir({{resim.id}})" value="sil" />
-    <p> </p>
-    <p> </p>
-    <p> </p>
-    <br/>
-
-{% endfor %}
-
-<p></p>
-<img id="preview" >
 
 <p></p>
 <p></p>
 <input type="button" onclick="kaydet_jquery()" value="kaydet" />
 <p></p>
 <p></p>
+
+<!--
+{% for resim in secili_resim_obj %}
+    <img id="preview{{resim}}"  src="{{ resim.foto.url }}">
+    <input id="resim_kaldir{{resim}}" type="button" onclick="resim_kaldir()" value="resim kaldır" />
+{% endfor %}
+-->
+
+<p></p>
+<img id="preview" >
+
+
+
 
 
 {% endblock %}

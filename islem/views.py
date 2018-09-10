@@ -14,11 +14,11 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon, yer, proje_alanlari
 from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
-from .models import plan_opr_gun, plan_den_gun
+from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
-from islem.forms import BolumSecForm, SonucForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
-from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm
+from islem.forms import BolumSecForm, SonucForm, SonucResimForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
+from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm, DuzenleDenetimSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
@@ -720,23 +720,26 @@ def rutin_baslat_kesin(request, pk=None):
 
     bolumler_list = []
     detaylar_list = []
+    puanlama_list = []
     i = 0
     if detaylar_obj:
         for detay in detaylar_obj:
             bolumler_list.append(detay.bolum)
             detaylar_list.append(detay.detay)
-
+            puanlama_list.append(detay.puanlama_turu)
 
 
     if detaylar_obj:
-        for item_bolum, item_detay in zip(bolumler_list, detaylar_list):
-            print("item bölüm,  item detay..", item_bolum, item_detay)
+        for item_bolum, item_detay, item_puanlama in zip(bolumler_list, detaylar_list, puanlama_list):
+            print("item bölüm,  item detay, item_puanlama..", item_bolum, item_detay, item_puanlama)
             dd_denetim = yeni_denetim_no
             dd_bolum = item_bolum.id
             dd_detay = item_detay.id
+            dd_puanlama_turu = item_puanlama
             detay_kaydet_obj = sonuc_detay(denetim_id=dd_denetim,
                                             bolum_id=dd_bolum,
-                                            detay_id=dd_detay)
+                                            detay_id=dd_detay,
+                                            puanlama_turu=dd_puanlama_turu)
             detay_kaydet_obj.save()
 
 
@@ -1217,9 +1220,17 @@ def denetim_bolum_sec(request, pk=None):
                 messages.success(request, 'Seçili bölümde bölüm detayı yok')
                 return redirect('denetim_baslat')
             #form = DetayForm(denetim_no=denetim_no, secili_bolum=secili_bolum)
-            form = SonucForm(puanlama_turu="")
-            print("puanlama türü boş olarak ilk adımda çalıştı ama nasıl ????????????")
-            return render(request, 'islem/denetim_detay_islemleri.html')
+            #form = SonucForm(puanlama_turu="")
+            #print("puanlama türü boş olarak ilk adımda çalıştı ama nasıl ????????????")
+            #return render(request, 'islem/denetim_detay_islemleri.html')
+
+            for detay in detaylar:
+                print("bolum id for loop içinden", detay.bolum.id, "ve detay id", detay.detay.id)
+                detay.tamam = "H"
+                detay.save()
+            ilk_detay_obj = detaylar.first()
+            request.session['secili_detay'] = ilk_detay_obj.id
+            return redirect('denetim_detay_islemleri')
 
         else:
             print("valid değil bu form neden, ne var bunda...")
@@ -1246,7 +1257,6 @@ def denetim_bolum_sec(request, pk=None):
                     pk = denetim_no
                     print(" tek olduğunda buraya geldi tamamlaya gidecek...", denetim_no)
                     print(" denetimi tamamlıyor *****  cep telefonunda problem oluyor---nedennnnnn")
-                    return HttpResponseRedirect(reverse('denetim_tamamla', args=(denetim_no,)))
 
                     #return reverse('denetim_tamamla', kwargs={'pk': pk})
                 else:
@@ -1372,11 +1382,13 @@ def teksayfa_yarat(request, pk=None):
                     print("işte detay no...", detay_no)
                     detayli_obj = detay.objects.get(id=detay_no)
                     olmali_bolum = detayli_obj.bolum.id
+                    olmali_p_turu = detayli_obj.puanlama_turu
                     print("bölüm no", bolum_no, "olmalı bölüm :", olmali_bolum)
                     if bolum_no == olmali_bolum:
                         kaydet_obj = sonuc_detay(denetim_id=denetim_no,
                                                     bolum_id=bolum_no,
-                                                    detay_id=detay_no
+                                                    detay_id=detay_no,
+                                                    puanlama_turu=olmali_p_turu
                                                     )
                         kaydet_obj.save()
                     j = j + 1
@@ -2370,9 +2382,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render
 
 
-@csrf_protect
+#@csrf_protect
 @login_required
 def denetim_detay_islemleri(request, pk=None):
+
 
     # if this is a POST request we need to process the form data
     denetim_no = request.session.get('denetim_no')
@@ -2387,74 +2400,45 @@ def denetim_detay_islemleri(request, pk=None):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         print("buraya mı geldi...  denetim_detay işlemleri...POST")
-
-        bir = sonuc_detay.objects.filter(denetim=denetim_no)
-        iki = bir.filter(bolum=secili_bolum)
-        bulunan = iki.get(detay=secili_detay)
-        #bulunan = get_object_or_404(sonuc, detay=secili_detay)
-        detay_obj = detay.objects.get(id=secili_detay)
-        print("detay obj...", detay_obj)
-        puanlama_turu = detay_obj.puanlama_turu
-        print(" puanlama türü...", puanlama_turu)
-
-        form = SonucForm(request.POST or None, request.FILES or None, instance=bulunan, puanlama_turu=puanlama_turu)
-
+        secili_detay_obje_id = request.session.get('secili_detay_obje_id')
+        print("secili detay obje id, get tarafında kaydedilen...", secili_detay_obje_id)
+        detay_obj = sonuc_detay.objects.get(id=secili_detay_obje_id)
+        print("detay obj...", detay_obj.id, "adııı", detay_obj.detay.detay_adi)
+        form = SonucForm(request.POST or None, instance=detay_obj)
+        #form = SonucForm(request.POST or None)
         if form.is_valid():
             print("neyse ki valid..bin...ext...")
             # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
-            edit = form.save(commit=False)
-            resim_acaba = edit.resim_varmi
-            print("resim acaba....", resim_acaba)
+            form_one = form.save(commit=False)
 
-            if edit.denetim_disi == "E":
-                edit.tamam = "E"
-                edit.foto = None
-                edit.puan = None
-                edit.save()
-            else:
-                resim_var = False
-                if edit.resim_varmi == "E":
-                    uploaded_image_obj = kucukresim.objects.filter(kullanici=request.user.id).last()
-                    print(" upload image object", uploaded_image_obj)
-                    uploaded_image = uploaded_image_obj.foto_kucuk
-                    #edit.foto = file(uploaded_image, os.path.basename(uploaded_image.path))
-                    print("yollu.........",  os.path.basename(uploaded_image.path))
-                    print("ikinci yollu...", os.path.abspath(uploaded_image.path))
-                    str1 = os.path.abspath(uploaded_image.path)
-                    str2 = "/home/levent/nata/media_cdn/"
-                    if str2 in str1:
-                        print("içinde....")
-                        str1 = str1.replace(str2,'')
-                    print("sonuç.........", str1)
-                    #edit.foto = os.path.abspath(uploaded_image.path)
-                    edit.foto = str1
-                    uploaded_image.close()
-                    resim_var = True
-                else:
-                    edit.foto = None
-
-                print("puanlama türü...", edit.puanlama_turu)
-                print("puanlama türü...doğrusu, ilk okunan", puanlama_turu)
-
-
+            puanlama_turu = form_one.puanlama_turu
+            print("puanlama türü...", form_one.puanlama_turu)
+            if form_one.denetim_disi == "H":
                 if puanlama_turu == "A":
-                    puan_hesap = int(edit.onluk)
+                    puan_hesap = int(form_one.onluk)
                 if puanlama_turu == "B":
-                    puan_hesap = int(edit.beslik)
+                    puan_hesap = int(form_one.beslik)
                     puan_hesap = puan_hesap * 2
                 if puanlama_turu == "C":
-                    puan_hesap = int(edit.ikilik)
+                    puan_hesap = int(form_one.ikilik)
                     puan_hesap = puan_hesap * 10
+                form_one.puan = puan_hesap
 
-                edit.puan = puan_hesap
-                edit.tamam = "E"
-                edit.save()
-                # eski resimleri silip yeri temizle................
-                """
-                if resim_var:
-                    silme_obj = kucukresim.objects.filter(kullanici=request.user.id)
-                    silme_obj.delete
-                """
+            form_one.tamam = "E"
+            form_one.save()
+
+
+            print("form one kaydet sonrası")
+            # denetim dışı bilgisi gelirse resimlerin hepsini sil......
+            if form_one.denetim_disi == "E":
+                print(" form one denetim dışı ==  evet olmuş...")
+                resimler_obj = sonuc_resim.objects.filter(sonuc_detay=pk)
+                print("işte silinecek resimler...", resimler_obj)
+                if resimler_obj:
+                    for resim in resimler_obj:
+                        print("silinecek resmin id si...", resim.id)
+                        resim.delete()
+
             print("kaydetmiş olması lazım.................")
 
             # bir sonraki................
@@ -2462,9 +2446,10 @@ def denetim_detay_islemleri(request, pk=None):
             ilk_detaylar = sonuc_detay.objects.filter(denetim=denetim_no)
             print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
             detaylar = ilk_detaylar.filter(bolum=secili_bolum)
-            print("detaylar.. denetim detay işişlemleri..:", detaylar)
+            print("detaylar.. denetim detay işlemleri..:", detaylar)
             secili_detay_obj = detaylar.filter(tamam="H")
-            print("seçili detaylar tamam H olanlar...", secili_detay_obj)
+            for dty in secili_detay_obj:
+                print("seçili detaylar tamam H olanlar...", dty.detay.detay_adi, "---tamam---", dty.tamam)
 
             if not secili_detay_obj:
                 # sonuc_bolum dosyasında tamamlandıyı E yap bölüm bitmiş olsun....
@@ -2482,32 +2467,34 @@ def denetim_detay_islemleri(request, pk=None):
                 else:
                     messages.success(request, 'Bölüm içindeki denetim detay işlemleri tamamlandı')
                     return redirect('devam_liste')
-
+            """
             secili_obj = secili_detay_obj.first()
-            secili_detay = secili_obj.detay.id
-            print("secili - detay.... bakalım  doğru mu...", secili_detay)
-            request.session['secili_detay'] = secili_detay
+            secili_detay_id = secili_obj.detay.id
+            print("secili - detay.... bakalım  doğru mu...", secili_detay_id)
+            request.session['secili_detay'] = secili_detay_id
 
-            detay_obj = detay.objects.get(id=secili_detay)
-            puanlama_turu = detay_obj.puanlama_turu
-            print(" puanlama türü...", puanlama_turu)
+            detay_resim_obj = sonuc_resim.objects.filter(sonuc_detay=secili_detay_id)
+            print("detay resimleri kaç taneyde...", detay_resim_obj)
 
-            form = SonucForm(puanlama_turu=puanlama_turu)
+            form = SonucForm(instance=secili_obj)
+
             context = { 'form': form,
+                        #'formset': formset,
                         'secili_obj' : secili_obj,
+                        'detay_resim_obj': detay_resim_obj,
                         }
             return render(request, 'islem/denetim_detay_islemleri.html', context,)
-
+            """
+            return redirect('denetim_detay_islemleri')
 
         else:
-            print("ne oldu be kardeşim3...........")
-            messages.success(request, ' form hatası - tekrar deneyin')
-            #return redirect('devam_liste')
-            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
-            return render(request, 'islem/denetim_detay_islemleri.html', {'form': form,})
+            print(form.errors)
+            return render(request, 'islem/denetim_detay_islemleri.html')
+
 
     # if a GET (or any other method) we'll create a blank form
     else:
+        print("denetim detay işlemleri...GETTTTTT")
         ilk_detaylar = sonuc_detay.objects.filter(denetim=denetim_no)
         print("ilk detaylar..denetim detay işlemleri :", ilk_detaylar)
         detaylar = ilk_detaylar.filter(bolum=secili_bolum)
@@ -2520,20 +2507,25 @@ def denetim_detay_islemleri(request, pk=None):
             request.session['bolum_atla_flag'] = False
             return redirect('denetim_bolum_sec')
         secili_obj = secili_detay_obj.first()
-        secili_detay = secili_obj.detay.id
+        secili_detay_id = secili_obj.detay.id
+        request.session['sonuc_detay_id'] = secili_obj.id
 
-        detay_obj = detay.objects.get(id=secili_detay)
-        puanlama_turu = detay_obj.puanlama_turu
-        print(" puanlama türü...", puanlama_turu)
+        print("secili - detay.... bakalım  doğru mu...", secili_detay_id)
+        print("seçili obje ise ayrı...", secili_obj.id)
+        request.session['secili_detay'] = secili_detay_id
+        request.session['secili_detay_obje_id'] = secili_obj.id
+        detay_resim_obj = sonuc_resim.objects.filter(sonuc_detay=secili_obj.id)
+        print("detay resimleri kaç taneyde...", detay_resim_obj)
 
-        print("secili - detay.... bakalım  doğru mu...", secili_detay)
-        request.session['secili_detay'] = secili_detay
-        form = SonucForm(puanlama_turu=puanlama_turu)
+        form = SonucForm(instance=secili_obj)
+
         context = { 'form': form,
+                    #'formset': formset,
                     'secili_obj' : secili_obj,
+                    'detay_resim_obj': detay_resim_obj,
                     }
-        return render(request, 'islem/denetim_detay_islemleri.html', context,)
 
+        return render(request, 'islem/denetim_detay_islemleri.html', context,)
 
 
 
@@ -2551,14 +2543,16 @@ def sonuc_denetim_sec(request, pk=None):
         #denetim_obj = denetim_obj_ilk.filter(denetci=request.user)
         print("post içinden form yüklemeden önce...............")
         denetci=request.user
-        form = DenetimSecForm(request.POST, denetci=denetci)
+        form = DuzenleDenetimSecForm(request.POST, denetci=denetci)
         # check whether it's valid:
         if form.is_valid():
             denetim_no = request.POST.get('denetim_no', "")
             print ("denetim seçim yapılmış...", denetim_no)
             request.session['secilen_denetim'] = denetim_no
+            return redirect('sonuc_denetim_sec_dogrudan', pk_den=denetim_no)
+            """
             denetim_obj = denetim.objects.get(id=denetim_no)
-            if rapor_verisi_hazirla(request,denetim_no=denetim_no):
+            if rapor_verisi_hazirla(request, denetim_no=denetim_no):
                 sonuc_detay_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
                 sonuc_bolum_list = sonuc_bolum.objects.filter(denetim=denetim_no).order_by('id')
                 context = {'sonuc_detay_list': sonuc_detay_list,
@@ -2568,6 +2562,7 @@ def sonuc_denetim_sec(request, pk=None):
             else:
                 mesaj = request.session.get('mesaj_rapor_verisi')
                 return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+            """
         else:
             #form = DenetimSecForm()
             return render(request, 'islem/ana_menu.html',)
@@ -2580,12 +2575,30 @@ def sonuc_denetim_sec(request, pk=None):
         #if denetim_obj:
         #print("get çalıştı..................", denetim_obj)
         denetci=request.user
-        form = DenetimSecForm(denetci=denetci)
+        form = DuzenleDenetimSecForm(denetci=denetci)
         return render(request, 'islem/sonuc_denetim_form.html', {'form': form,})
 
 
+
 @login_required
-def sonuc_denetim_detay_sec(request, pk=None):
+def sonuc_denetim_sec_dogrudan(request, pk_den=None):
+    denetim_no = pk_den
+    denetim_obj = denetim.objects.get(id=denetim_no)
+    if rapor_verisi_hazirla(request, denetim_no=denetim_no):
+        sonuc_detay_list = sonuc_detay.objects.filter(denetim=denetim_no).order_by('id')
+        sonuc_bolum_list = sonuc_bolum.objects.filter(denetim=denetim_no).order_by('id')
+        context = {'sonuc_detay_list': sonuc_detay_list,
+                   'sonuc_bolum_list': sonuc_bolum_list,
+                   'denetim_obj': denetim_obj}
+        return render(request, 'islem/sonuc_list.html', context)
+    else:
+        mesaj = request.session.get('mesaj_rapor_verisi')
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+@login_required
+def sonuc_denetim_detay_sec(request, pk_den=None, pk=None):
     # if this is a POST request we need to process the form data
     pk = pk
     print("gelen pk...", pk)
@@ -2604,16 +2617,26 @@ def sonuc_denetim_detay_sec(request, pk=None):
     if next_issue:
         print("next...", next_issue.id)
 
-    return render(request, 'islem/sonuc_detay_yeni_detail.html', {'secili_detay': secili_detay, 'prev_issue': prev_issue, 'next_issue': next_issue})
+    context = {'secili_detay': secili_detay,
+                'prev_issue': prev_issue,
+                'next_issue': next_issue,
+                'denetim_no': denetim_no}
+
+    return render(request, 'islem/sonuc_detay_yeni_detail.html', context)
 
 
 
+
+
+#ÇALIŞILAN ......................
+from django.forms import modelformset_factory
 
 @login_required
-def sonuc_denetim_detay_duzenle(request, pk=None):
+def sonuc_denetim_detay_duzenle(request, pk_den=None, pk=None):
     # if this is a POST request we need to process the form data
     pk = pk
     print("gelen pk...", pk)
+    request.session['sonuc_detay_id'] = pk
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -2622,86 +2645,62 @@ def sonuc_denetim_detay_duzenle(request, pk=None):
         detay_obj = sonuc_detay.objects.filter(id=pk).first()
         puanlama_turu = detay_obj.puanlama_turu
         denetim_no = detay_obj.denetim.id
-        form = SonucForm(request.POST or None, request.FILES or None, instance=detay_obj, puanlama_turu=puanlama_turu)
+        form = SonucForm(request.POST or None, instance=detay_obj)
+        #formset = ResimFormSet(request.POST, request.FILES, queryset=resim_detay.objects.none())
 
         if form.is_valid():
-            print("neyse ki valid..bin...ext...")
-            # bu detay için tamamı E yap, yani tamamlandı....sonra update yap...
-            edit = form.save(commit=False)
-            resim_acaba = edit.resim_varmi
-            print("resim acaba....", resim_acaba)
-
-            if edit.denetim_disi == "E":
-                edit.tamam = "E"
-                edit.foto = None
-                edit.puan = None
-                edit.save()
-            else:
-                resim_var = False
-                if edit.resim_varmi == "E":
-                    uploaded_image_obj = kucukresim.objects.filter(kullanici=request.user.id).last()
-                    print(" upload image object", uploaded_image_obj)
-                    uploaded_image = uploaded_image_obj.foto_kucuk
-                    #edit.foto = file(uploaded_image, os.path.basename(uploaded_image.path))
-                    print("yollu.........",  os.path.basename(uploaded_image.path))
-                    print("ikinci yollu...", os.path.abspath(uploaded_image.path))
-                    str1 = os.path.abspath(uploaded_image.path)
-                    str2 = "/home/levent/nata/media_cdn/"
-                    if str2 in str1:
-                        print("içinde....")
-                        str1 = str1.replace(str2,'')
-                    print("sonuç.........", str1)
-                    #edit.foto = os.path.abspath(uploaded_image.path)
-                    edit.foto = str1
-                    uploaded_image.close()
-                    resim_var = True
-                else:
-                    edit.foto = None
-
-                print("puanlama türü...", edit.puanlama_turu)
-                print("puanlama türü...doğrusu, ilk okunan", puanlama_turu)
+            form_one = form.save(commit=False)
+            puanlama_turu = form_one.puanlama_turu
+            if puanlama_turu == "A":
+                puan_hesap = int(form_one.onluk)
+            if puanlama_turu == "B":
+                puan_hesap = int(form_one.beslik)
+                puan_hesap = puan_hesap * 2
+            if puanlama_turu == "C":
+                puan_hesap = int(form_one.ikilik)
+                puan_hesap = puan_hesap * 10
+            form_one.puan = puan_hesap
+            form_one.tamam = "E"
+            form_one.save()
 
 
-                if puanlama_turu == "A":
-                    puan_hesap = int(edit.onluk)
-                if puanlama_turu == "B":
-                    puan_hesap = int(edit.beslik)
-                    puan_hesap = puan_hesap * 2
-                if puanlama_turu == "C":
-                    puan_hesap = int(edit.ikilik)
-                    puan_hesap = puan_hesap * 10
+            # denetim dışı bilgisi gelirse resimlerin hepsini sil......
+            if form_one.denetim_disi == "E":
+                print(" form one denetim dışı ==  evet olmuş...")
+                resimler_obj = sonuc_resim.objects.filter(sonuc_detay=pk)
+                print("işte silinecek resimler...", resimler_obj)
+                if resimler_obj:
+                    for resim in resimler_obj:
+                        print("silinecek resmin id si...", resim.id)
+                        resim.delete()
 
-                edit.puan = puan_hesap
-                edit.tamam = "E"
-                edit.save()
+            if not(rapor_verisi_hazirla(request, denetim_no=denetim_no)):
+                mesaj = "Rapor verisi hazırlanamadı..."
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
-            print("kaydetmiş olması lazım.................")
-            return redirect('sonuc_denetim_detay_sec', pk=pk)
-            #return render(request, 'islem/denetim_detay_islemleri.html', context,)
-
+            return redirect('sonuc_denetim_detay_sec', pk_den=pk_den, pk=pk)
 
         else:
-            print("ne oldu be kardeşim4...........")
-            messages.success(request, ' form hatası - tekrar deneyin')
-            #return redirect('devam_liste')
-            #return render(request, 'islem/denetim_bolum_sec.html', {'form': form,})
-            return render(request, 'islem/denetim_detay_duzenle.html', {'form': form,})
-
-    # if a GET (or any other method) we'll create a blank form
+            print(form.errors)
+            return render(request, 'islem/sonuc_detay_duzenle.html',)
     else:
 
         detay_obj = sonuc_detay.objects.filter(id=pk).first()
-        puanlama_turu = detay_obj.puanlama_turu
-        request.session['secili_detay'] = pk
-        request.session['resim_varmi'] = detay_obj.resim_varmi
-        #form = SonucForm(puanlama_turu=puanlama_turu)
-        form = SonucForm(instance=detay_obj, puanlama_turu=puanlama_turu)
+        print("detay obje olmalı - ......", detay_obj)
+        detay_resim_obj = sonuc_resim.objects.filter(sonuc_detay=pk)
+        print("detay resimleri kaç taneyde...", detay_resim_obj)
+
+        form = SonucForm(instance=detay_obj)
 
         context = { 'form': form,
+                    #'formset': formset,
                     'secili_obj' : detay_obj,
+                    'detay_resim_obj': detay_resim_obj,
                     }
 
         return render(request, 'islem/sonuc_detay_duzenle.html', context,)
+
+
 
 
 
@@ -2744,7 +2743,31 @@ from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 @csrf_exempt
-def kucuk_resim_al(request, pk=None):
+
+def kucuk_resim_yaz(request, pk_den=None, pk=None):
+    print("selam buraya geldik.... küçük resim yaz...")
+    response_data ={}
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        print("buraya mı geldi...küçük resim al.............POST")
+        js_sonuc_detay = request.POST.get('sonuc_detay')
+        js_foto = request.POST.get('form_data')
+        bir = sonuc_resim.objects.create(sonuc_detay=js_sonuc_detay, foto="")
+        form = SonucResimForm(request.POST or None, request.FILES or None, instance=bir)
+        if form.is_valid():
+            print(" gelen resim valid......")
+            kaydet = form.save(commit=False)
+            kaydet.save()
+            print("kaydetmiş olması lazım.................")
+        else:
+            print("bu ibnenin nesi valid değil anlamadım ki......")
+    print ("son nokta  küçük resim al....", response_data)
+    return HttpResponse(response_data, content_type='application/json')
+
+
+@login_required
+@csrf_exempt
+def kucuk_resim_al(request, pk_den=None, pk=None):
     print("selam buraya geldik.... küçük resim al...")
     response_data ={}
     if request.method == 'POST':
@@ -2770,10 +2793,58 @@ def kucuk_resim_al(request, pk=None):
                 print("küçük resim boş................")
             kaydet.save()
             print("kaydetmiş olması lazım.................")
+
+            #buraya ekleme yapıldı , yazılan küçük resim dosyasını sonuc_resme de kaydedecek, belki silecek ???...
+            sonuc_detay_id = request.session.get('sonuc_detay_id')
+            print("İŞTE SONUÇ DETAY ID...", sonuc_detay_id)
+            uploaded_image_obj = kucukresim.objects.filter(kullanici=request.user.id).last()
+            print(" upload image object", uploaded_image_obj)
+            uploaded_image = uploaded_image_obj.foto_kucuk
+            #edit.foto = file(uploaded_image, os.path.basename(uploaded_image.path))
+            print("yollu.........",  os.path.basename(uploaded_image.path))
+            print("ikinci yollu...", os.path.abspath(uploaded_image.path))
+            str1 = os.path.abspath(uploaded_image.path)
+            str2 = "/home/levent/nata/media_cdn/"
+            if str2 in str1:
+                print("içinde....")
+                str1 = str1.replace(str2,'')
+            print("sonuç.........", str1)
+            #edit.foto = os.path.abspath(uploaded_image.path)
+
+            kaydetme_obj = sonuc_resim(sonuc_detay_id=sonuc_detay_id, foto=str1)
+            kaydetme_obj.save()
+            sonuc_detay_obj = sonuc_detay.objects.get(id=sonuc_detay_id)
+            denetim_no = sonuc_detay_obj.denetim.id
         else:
             print("bu ibnenin nesi valid değil anlamadım ki......")
     print ("son nokta  küçük resim al....", response_data)
+    #return HttpResponse(response_data, content_type='application/json')
+    return HttpResponseRedirect(reverse('sonuc_denetim_detay_duzenle', args=(denetim_no, sonuc_detay_id,)))
+
+
+
+@login_required
+@csrf_exempt
+def kucuk_resim_sil(request, pk_den=None, pk=None):
+    print("selam buraya geldik.... küçük resim sil...")
+    response_data ={}
+    if request.method == 'POST':
+        js_id = request.POST.get('id_verisi')
+        sonuc_detay_id = request.session.get('sonuc_detay_id')
+        print("silinecek kaydın id si...", js_id)
+        print("ana sonuç detay...", sonuc_detay_id)
+        silme_obj = sonuc_resim.objects.filter(id=js_id)
+        if silme_obj:
+            silme_obj.delete()
+        else:
+            print("silinecek kayıt bulunamadı......")
+    print ("son nokta  küçük resim sil....", response_data)
     return HttpResponse(response_data, content_type='application/json')
+    #return HttpResponseRedirect(reverse('sonuc_denetim_detay_duzenle', args=(sonuc_detay_id,)))
+
+
+
+
 
 
 #--------------------------------------------------------------------------------
@@ -3277,7 +3348,7 @@ def raporlar_devam(request, pk=None):
 def raporlar_ilerle(request, pk=None):
     denetim_no = pk
 
-    if rapor_verisi_hazirla(request,denetim_no=denetim_no):
+    if rapor_verisi_hazirla(request, denetim_no=denetim_no):
         denetim_obj = denetim.objects.get(id=denetim_no)
         denetim_adi = denetim_obj.denetim_adi
         proje = denetim_obj.proje
@@ -3464,8 +3535,8 @@ def iptal_ilerle(request, pk=None):
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok')
-        return redirect('index')
+        mesaj = "Denetime ait bölüm yok!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
     kontrol_degiskeni = True
     for bolum in bolumler_obj:
@@ -3473,120 +3544,77 @@ def iptal_ilerle(request, pk=None):
             kontrol_degiskeni = False
 
     if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var')
-        return redirect('index')
+        mesaj = "Tamamlanmamış bölümler var!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
 
     #########################################################################
     ###   RAPOR
     #########################################################################
+    if not(rapor_verisi_hazirla(request, denetim_no=pk)):
+        mesaj = "Rapor verisi hazırlanamadı..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    else:
+        denetim_adi = denetim_obj.denetim_adi
+        proje = denetim_obj.proje
+        rutin_planli = denetim_obj.rutin_planli
+        denetci = denetim_obj.denetci
+        tipi = denetim_obj.tipi
+        yaratim_tarihi = denetim_obj.yaratim_tarihi
+        yaratan = denetim_obj.yaratan
+        hedef_baslangic = denetim_obj.hedef_baslangic
+        hedef_bitis = denetim_obj.hedef_bitis
+        gerc_baslangic = denetim_obj.gerc_baslangic
+        gerc_bitis = denetim_obj.gerc_bitis
+        durum = denetim_obj.durum
+        rutindenetci = denetim_obj.rutindenetci
+        takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+        print("takipci objesi...", takipci_obj)
+        i = 0
+        takipciler = []
+        for takipci in takipci_obj:
+            takipciler.append(takipci.takipci)
+            i = i + 1
+        print("takipciler listesi..", takipciler)
+        d = collections.defaultdict(list)
+        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+        for bolum in bolum_obj:
+            print("bolum list . bolum", bolum.bolum)
+            detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+            for detay in detay_obj:
+                print("detay list . detay", detay.bolum, detay.detay)
+                #d[detay.bolum].append(detay.detay)
+                d[bolum].append(detay)
+        print("***********************")
+        print(d)
+        d.default_factory = None
+        dict_bol_detay = dict(d)
+        print("************************")
+        print(dict_bol_detay)
+        context = {'dict_bol_detay':dict_bol_detay,
+                    'takipciler': takipciler,
+                    'denetim_adi': denetim_adi,
+                    'proje' : proje,
+                    'rutin_planli' : rutin_planli,
+                    'rutindenetci' : rutindenetci,
+                    'denetci' : denetci,
+                    'tipi' : tipi,
+                    'yaratim_tarihi' : yaratim_tarihi,
+                    'yaratan' : yaratan,
+                    'hedef_baslangic' : hedef_baslangic,
+                    'hedef_bitis' : hedef_bitis,
+                    'durum' : durum,
+                    'soru_adedi' : denetim_soru,
+                    'dd_adedi' :  denetim_dd,
+                    'net_adet' : denetim_net,
+                    'toplam_puan' : denetim_puan,
+                    'ortalama_puan' : ortalama_puan,
+                    'pk' : denetim_no,
+                    }
+        #return render(request, 'islem/teksayfa_sil_soru.html', context )
+        #return render(request, 'islem/denetim_rapor_goster.html', context )
 
-    bolum_soru = 0
-    bolum_dd = 0
-    bolum_net = 0
-    bolum_puan = 0
-    denetim_soru = 0
-    denetim_dd = 0
-    denetim_net = 0
-    denetim_puan = 0
-    i = 0
-    for bolum in bolumler_obj:
-        bolum_no = bolum.bolum
-        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
-        print("seçilmiş olan detaylar...", detaylar_obj)
-        for detay in detaylar_obj:
-            bolum_soru = bolum_soru + 1
-            denetim_soru = denetim_soru + 1
-            if detay.denetim_disi == "E":
-                bolum_dd = bolum_dd + 1
-                denetim_dd = denetim_dd + 1
-            else:
-                bolum_net = bolum_net + 1
-                bolum_puan = bolum_puan + detay.puan
-                denetim_net = denetim_net +1
-                denetim_puan = denetim_puan + detay.puan
-        bolum.soru_adedi = bolum_soru
-        bolum.dd_adedi = bolum_dd
-        bolum.net_adet = bolum_net
-        bolum.toplam_puan = bolum_puan
-        ortalama_puan = bolum_puan / bolum_net
-        print("ortalama puan ...", ortalama_puan)
-        bolum.ortalama_puan = ortalama_puan
-        bolum.save()
-        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
-        bolum_soru = 0
-        bolum_dd = 0
-        bolum_net = 0
-        bolum_puan = 0
-    denetim_obj.soru_adedi = denetim_soru
-    denetim_obj.dd_adedi = denetim_dd
-    denetim_obj.net_adet = denetim_net
-    denetim_obj.toplam_puan = denetim_puan
-    ortalama_puan = denetim_puan / denetim_net
-    print("ortalama puan ...", ortalama_puan)
-    denetim_obj.ortalama_puan = ortalama_puan
-    denetim_obj.save()
-    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
-
-    denetim_adi = denetim_obj.denetim_adi
-    proje = denetim_obj.proje
-    rutin_planli = denetim_obj.rutin_planli
-    denetci = denetim_obj.denetci
-    tipi = denetim_obj.tipi
-    yaratim_tarihi = denetim_obj.yaratim_tarihi
-    yaratan = denetim_obj.yaratan
-    hedef_baslangic = denetim_obj.hedef_baslangic
-    hedef_bitis = denetim_obj.hedef_bitis
-    gerc_baslangic = denetim_obj.gerc_baslangic
-    gerc_bitis = denetim_obj.gerc_bitis
-    durum = denetim_obj.durum
-    rutindenetci = denetim_obj.rutindenetci
-    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
-    print("takipci objesi...", takipci_obj)
-    i = 0
-    takipciler = []
-    for takipci in takipci_obj:
-        takipciler.append(takipci.takipci)
-        i = i + 1
-    print("takipciler listesi..", takipciler)
-    d = collections.defaultdict(list)
-    bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
-    for bolum in bolum_obj:
-        print("bolum list . bolum", bolum.bolum)
-        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
-        for detay in detay_obj:
-            print("detay list . detay", detay.bolum, detay.detay)
-            #d[detay.bolum].append(detay.detay)
-            d[bolum].append(detay)
-    print("***********************")
-    print(d)
-    d.default_factory = None
-    dict_bol_detay = dict(d)
-    print("************************")
-    print(dict_bol_detay)
-    context = {'dict_bol_detay':dict_bol_detay,
-                'takipciler': takipciler,
-                'denetim_adi': denetim_adi,
-                'proje' : proje,
-                'rutin_planli' : rutin_planli,
-                'rutindenetci' : rutindenetci,
-                'denetci' : denetci,
-                'tipi' : tipi,
-                'yaratim_tarihi' : yaratim_tarihi,
-                'yaratan' : yaratan,
-                'hedef_baslangic' : hedef_baslangic,
-                'hedef_bitis' : hedef_bitis,
-                'durum' : durum,
-                'soru_adedi' : denetim_soru,
-                'dd_adedi' :  denetim_dd,
-                'net_adet' : denetim_net,
-                'toplam_puan' : denetim_puan,
-                'ortalama_puan' : ortalama_puan,
-                'pk' : denetim_no,
-                }
-    #return render(request, 'islem/teksayfa_sil_soru.html', context )
-    #return render(request, 'islem/denetim_rapor_goster.html', context )
-
-    return render(request, 'islem/denetim_iptal_sor.html', context )
+        return render(request, 'islem/denetim_iptal_sor.html', context )
 
 
 
@@ -4147,6 +4175,38 @@ def zon_listesi_sil_kesin(request, pk=None):
     messages.success(request, 'Başarıyla silindi')
     return redirect('zon_listesi_devam')
 
+
+
+
+#------------------------------------------------------------------------------------
+
+@login_required
+def spv_listesi(request, pk=None):
+    secili_sirket = request.user.profile.sirket
+    print("işte kişinin şirketi...", secili_sirket)
+    if not secili_sirket:
+        mesaj = "kişinin bağlı olduğu şirket yok...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    spv_obj = spv_yetkilisi.objects.filter(sirket=secili_sirket)
+    grup_list = []
+    grupdisi_list = []
+
+    for spv in spv_obj:
+        kisi = spv.spv_yetkilisi.id
+        kisi_obj = Profile.objects.get(id=kisi)
+        print("kişi object...", kisi_obj)
+        kisi_sirket = kisi_obj.sirket
+        print("kişi şirket..", kisi_sirket)
+        if kisi_sirket:
+            if kisi_sirket.turu == "P":
+                grup_list.append(kisi_obj)
+            else:
+                grupdisi_list.append(kisi_obj)
+
+    print("grup list..", grup_list)
+    print("grup dışı list..", grupdisi_list)
+    context = {'grup_list': grup_list, 'grupdisi_list': grupdisi_list}
+    return render(request, 'islem/spv_list.html', context )
 
 
 #------------------------------------------------------------------------------------

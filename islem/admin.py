@@ -42,7 +42,9 @@ from .models import denetim
 from .models import sonuc_detay
 from .models import sonuc_bolum
 from .models import sonuc_takipci
+from .models import sonuc_resim
 from .models import kucukresim
+from .models import spv_yetkilisi
 from .models import acil
 from .models import isaretler
 from .models import qrdosyasi
@@ -65,7 +67,9 @@ admin.site.register(denetim)
 admin.site.register(sonuc_detay)
 admin.site.register(sonuc_bolum)
 admin.site.register(sonuc_takipci)
+admin.site.register(sonuc_resim)
 admin.site.register(kucukresim)
+admin.site.register(spv_yetkilisi)
 admin.site.register(acil)
 admin.site.register(isaretler)
 admin.site.register(qrdosyasi)

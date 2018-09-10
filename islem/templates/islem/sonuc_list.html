@@ -37,7 +37,7 @@
       <p>Kayıtlı bölüm yok  </p>
     {% endif %}
 
-
+    <p>  &emsp; </p>
 
     {% if sonuc_detay_list %}
 
@@ -47,7 +47,9 @@
                   <th> &emsp;&emsp;</th>
                   <th>Soru</th>
                   <th> &emsp;&emsp;</th>
-                  <th>Puan</th>
+                  <th>D.D.</th>
+                  <th> &emsp;&emsp;</th>
+                  <th>P</th>
                 </tr>
 
             {% for sonuc in sonuc_detay_list %}
@@ -57,14 +59,18 @@
                   <td> &emsp;&emsp; </td>
                   <td>  <a href="{{sonuc.id}}"> {{ sonuc.detay.detay_adi }} </a> </td>
                   <td> &emsp;&emsp; </td>
-                  <td> <a href="{{sonuc.id}}">  {{ sonuc.puan }} </a> </td>
+                  <td> <a href="{{sonuc.id}}">  {{ sonuc.denetim_disi }} </a> </td>
+                  <td> &emsp;&emsp; </td>
                   {% if sonuc.puanlama_turu == "A" %}
+                      <td> <a href="{{sonuc.id}}">  {{ sonuc.onluk }} </a> </td>
                       <td> <a href="{{sonuc.id}}"> /10 </a> </td>
                   {% endif %}
                   {% if sonuc.puanlama_turu == "B" %}
+                      <td> <a href="{{sonuc.id}}">  {{ sonuc.beslik }} </a> </td>
                       <td> <a href="{{sonuc.id}}">  /5 </a> </td>
                   {% endif %}
                   {% if sonuc.puanlama_turu == "C" %}
+                      <td> <a href="{{sonuc.id}}">  {{ sonuc.ikilik }} </a> </td>
                       <td> <a href="{{sonuc.id}}"> /2 </a> </td>
                   {% endif %}
                 </tr>
