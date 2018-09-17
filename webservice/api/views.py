@@ -4,10 +4,11 @@ from django.db.models import Q
 from rest_framework import generics, mixins
 from django.views.decorators.csrf import csrf_exempt
 from ..models import Memnuniyet
-from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, rfid_dosyasi, yer_updown
+from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, rfid_dosyasi, yer_updown, Sayi_Data
 from .permissions import IsOwnerOrReadOnly
 from .serializers import MemnuniyetSerializer
-from .serializers import OperasyonSerializer, DenetimSerializer, ArizaSerializer, RfidSerializer, YerudSerializer
+from .serializers import OperasyonSerializer, DenetimSerializer, SayiSerializer
+from .serializers import ArizaSerializer, RfidSerializer, YerudSerializer
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -507,6 +508,129 @@ class ArizaDetail(APIView):
     def delete(self, request, pk, format=None):
         ariza_data = self.get_object(pk)
         ariza_data.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#-----------------------------------------------------------------------------------
+# Sayı data
+
+
+class SayiRudView(generics.RetrieveUpdateDestroyAPIView): # DetailView CreateView FormView
+    lookup_field            = 'pk' # slug, id # url(r'?P<pk>\d+')
+    serializer_class        = SayiSerializer
+    permission_classes      = [IsOwnerOrReadOnly]
+    #queryset                = BlogPost.objects.all()
+    @csrf_exempt
+    def get_queryset(self):
+        return Sayi_Data.objects.all()
+    @csrf_exempt
+    def get_serializer_context(self, *args, **kwargs):
+        return {"request": self.request}
+
+
+class SayiDetailView(APIView):
+    def get(self, request, pk):
+        sayi_data = get_object_or_404(Sayi_Data, pk=pk)
+        serializer = SayiSerializer(sayi_data)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        sayi_data = get_object_or_404(Sayi_Data, pk=pk)
+        sayi_data.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class SayiList(APIView):
+    """
+    List all Sayi  (get), or create a new Sayi (post).
+    """
+    def get(self, request, format=None):
+        sayi_data = Sayi_Data.objects.all()
+        serializer = SayiSerializer(sayi_data, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = SayiSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SayiBul(APIView):
+    """
+    find id from mac_no.
+    """
+    def get(self, request, format=None):
+        deger = 52812233799999999
+        print("find object çalıştı..sayi bul  api içinden ....", deger)
+        sayi_data = Sayi_Data.objects.filter(mac_no=deger).first()
+        print("ariza mac.. filter sonucu...", sayi_data)
+        serializer = SayiSerializer(sayi_data, many=True)
+        return Response(serializer.data)
+
+
+class SayiFilter(generics.ListAPIView):
+    serializer_class = SayiSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases for
+        the user as determined by the username portion of the URL.
+        """
+        mac_no = self.kwargs['mac_no']
+        print(" get query set içinden -  sayı -  mac no...", mac_no)
+        sayi_data = Sayi_Data.objects.filter(mac_no=mac_no)
+        print("filtrelenen obje...", sayi_data)
+        return sayi_data
+
+
+
+class SayiQuery(generics.ListAPIView):
+    serializer_class = SayiSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the mac list (actually must be one)
+        for mac_no....
+        """
+        queryset = Sayi_Data.objects.all()
+        mac_no = self.request.query_params.get('mac_no', None)
+        if mac_no is not None:
+            queryset = queryset.filter(mac_no=mac_no)
+        return queryset
+
+
+class SayiDetail(APIView):
+    """
+    Retrieve, update or delete a Ariza instance.
+    """
+    def get_object(self, pk):
+        try:
+            return Sayi_Data.objects.get(pk=pk)
+        except Sayi_Data.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        ariza_data = self.get_object(pk)
+        serializer = SayiSerializer(ariza_data)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        sayi_data = self.get_object(pk)
+        print("def - put içinden sayı objesi...", sayi_data)
+        serializer = SayiSerializer(sayi_data, data=request.data)
+        if serializer.is_valid():
+            print(" serializer...", serializer)
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        sayi_data = self.get_object(pk)
+        sayi_data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

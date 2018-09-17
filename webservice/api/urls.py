@@ -10,6 +10,7 @@ from .views import MemnuniyetRudView, MemnuniyetList, MemnuniyetDetail, Memnuniy
 from .views import OperasyonRudView, OperasyonList, OperasyonDetail, OperasyonDetailView, OperasyonBul, OperasyonQuery, OperasyonFilter
 from .views import DenetimRudView, DenetimList, DenetimDetail, DenetimDetailView, DenetimBul, DenetimQuery, DenetimFilter
 from .views import ArizaRudView, ArizaList, ArizaDetail, ArizaDetailView, ArizaBul, ArizaQuery, ArizaFilter
+from .views import SayiRudView, SayiList, SayiDetail, SayiDetailView, SayiBul, SayiQuery, SayiFilter
 from .views import RfidRudView, RfidList, RfidDetail, RfidDetailView, RfidBul, RfidQuery, RfidFilter
 from .views import YerudRudView, YerudList, YerudDetail, YerudDetailView, YerudBul, YerudQuery, YerudFilter
 
@@ -51,6 +52,13 @@ urlpatterns = [
     url(r'^yerud_detail/(?P<pk>[0-9]+)/$', YerudDetail.as_view(), name='yerud-rud'),
     url(r'^yerud_query/$', YerudQuery.as_view(), name='yerud_query'),
     url(r'^yerud_filtrele/(?P<mac_no>.+)/$', YerudFilter.as_view(), name='yerud_filter'),
+
+    url(r'^sayi_list/$', SayiList.as_view(), name='sayi_list'),
+    url(r'^sayi_bul/$', SayiBul.as_view(), name='sayi_bul'),
+    url(r'^sayi_detail/(?P<pk>[0-9]+)/$', SayiDetail.as_view(), name='sayi-rud'),
+    url(r'^sayi_query/$', SayiQuery.as_view(), name='sayi_query'),
+    url(r'^sayi_filtrele/(?P<mac_no>.+)/$', SayiFilter.as_view(), name='sayi_filter'),
+
 
 
 

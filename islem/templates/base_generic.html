@@ -266,7 +266,7 @@ span.num {
                         <li><a href="/islem/bolum_listesi">Denetim Bölümü</a></li>
                         <!-- <li><a href="/islem/detay">Denetim Sorusu</a></li>  -->
                         <li><a href="/islem/soru_listesi">Soru Listesi</a></li>
-                        <li><a href="/islem/spv_listesi">Supervisor Listesi</a></li>                        
+                        <li><a href="/islem/spv_listesi">Supervisor Listesi</a></li>
                       </ul>
                    </li>
                   {% endif %}
@@ -282,6 +282,7 @@ span.num {
                         <li><a href="/islem/operasyon_list">WS-Operasyon Listele </a></li>
                         <li><a href="/islem/den_saha_list">WS-Denetim Listele </a></li>
                         <li><a href="/islem/ariza_list">WS-Ariza Listele </a></li>
+                        <li><a href="/islem/sayi_list">WS-Sayı Listele </a></li>
                         <li><a href="/islem/yerud_list">WS-Yer Bilgisi Listele </a></li>
                     </ul>
                  </li>
@@ -296,7 +297,7 @@ span.num {
                </li>
               {% endif %}
 
-                {% if  user.profile.operasyon_merkezyon == "E" or  user.is_superuser %}
+                {% if  user.profile.opr_merkez_yon == "E" or  user.is_superuser %}
                  <li>
                   <a href="#pageSubmenu7" data-toggle="collapse" aria-expanded="false">Projeler Takip</a>
                    <ul class="collapse list-unstyled" id="pageSubmenu7">
@@ -307,16 +308,18 @@ span.num {
                       <li><a href="/islem/mk_operasyon_list">WS-Operasyon Listele </a></li>
                       <li><a href="/islem/mk_den_saha_list">WS-Denetim Listele </a></li>
                       <li><a href="/islem/mk_ariza_list">WS-Ariza Listele </a></li>
+                      <li><a href="/islem/mk_sayi_list">WS-Sayı Listele </a></li>
                   </ul>
                </li>
               {% endif %}
 
-              {% if  user.profile.operasyon_merkezyon == "E" or  user.is_superuser %}
+              {% if  user.profile.opr_merkez_yon == "E" or  user.is_superuser %}
                <li>
                 <a href="#pageSubmenu8" data-toggle="collapse" aria-expanded="false">Projeler Raporları</a>
                  <ul class="collapse list-unstyled" id="pageSubmenu8">
                     <li><a href="/islem/rapor_mk_memnuniyet">Memnuniyet Raporları</a></li>
                     <li><a href="/islem/rapor_krs_memnuniyet">Memnuniyet Karşılaştırma</a></li>
+                    <li><a href="/islem/sayi_create">WS-Sayı Ekle</a></li>                    
                   </ul>
                 </li>
                 {% endif %}
@@ -333,6 +336,7 @@ span.num {
                         <li><a href="/islem/operasyon_create">WS-Operasyon Ekle</a></li>
                         <li><a href="/islem/den_saha_create">WS-Denetim Ekle</a></li>
                         <li><a href="/islem/ariza_create">WS-Ariza Ekle</a></li>
+                        <li><a href="/islem/sayi_create">WS-Sayı Ekle</a></li>
                         <!-- <li><a href="/islem/rfid_list">Rfid Listele </a></li>
                         <li><a href="/islem/rfid_create">Rfid Ekle</a></li> -->
                         <li><a href="/islem/macnoyer">WS-Macno Yer</a></li>

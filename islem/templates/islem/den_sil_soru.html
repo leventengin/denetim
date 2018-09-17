@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+      <h3>Denetçi Listeden Kaldır</h3>
+
+      <p>  <b> Adı   : </b>  &emsp; {{ den_obj.den_yetkilisi }}</p>
+      <p>  <b> Şirket: </b>  &emsp; {{ den_obj.sirket }}</p>
+
+      <p>Bu yetkiliyi listeden kaldırmak istediğinizden emin misiniz ???: </p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+      <a href="kesin"> Evet </a>
+      </form>
+
+{% endblock %}

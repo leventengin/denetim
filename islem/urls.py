@@ -21,11 +21,11 @@ from django.urls import reverse
 from django.utils.translation import get_language
 
 from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
-from .views import bolumautocomplete, detayautocomplete, tipiautocomplete
+from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, spvautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
-from .views import sirketautocomplete, sirketprojeautocomplete
+from .views import sirketautocomplete, sirketprojeautocomplete, spvautocomplete, denautocomplete
 from notification.views import list_notification, show_notification, create_notification, delete_notification
 
 
@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^sonucbolum-autocomplete/$', sonucbolumautocomplete.as_view(),name='sonucbolum-autocomplete',),
     url(r'^takipci-autocomplete/$', takipciautocomplete.as_view(),name='takipci-autocomplete',),
     url(r'^bolum-autocomplete/$', bolumautocomplete.as_view(),name='bolum-autocomplete',),
+    url(r'^spv-autocomplete/$', spvautocomplete.as_view(),name='spv-autocomplete',),
+    url(r'^den-autocomplete/$', denautocomplete.as_view(),name='den-autocomplete',),
     url(r'^detay-autocomplete/$', detayautocomplete.as_view(),name='detay-autocomplete',),
     url(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
     url(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
@@ -115,6 +117,8 @@ urlpatterns = [
     url(r'^den_saha_list/$', views.den_saha_list, name='den_saha_list'),
     url(r'^ariza_create/$', views.ariza_create, name='ariza_create'),
     url(r'^ariza_list/$', views.ariza_list, name='ariza_list'),
+    url(r'^sayi_create/$', views.sayi_create, name='sayi_create'),
+    url(r'^sayi_list/$', views.sayi_list, name='sayi_list'),
     url(r'^rfid_create/$', views.rfid_create, name='rfid_create'),
     url(r'^rfid_list/$', views.rfid_list, name='rfid_list'),
     url(r'^rfid_filter/$', views.rfid_filter, name='rfid_filter'),
@@ -250,11 +254,14 @@ urlpatterns = [
     url(r'^zon_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.zon_listesi_sil_kesin, name='zon_listesi_sil_kesin'),
 
     url(r'^spv_listesi/$', views.spv_listesi, name='spv_listesi'),
-    #url(r'^spv_listesi/devam/$', views.spv_listesi_devam, name='spv_listesi_devam'),
-    #url(r'^spv_listesi/devam/yarat/$', views.spv_listesi_yarat, name='spv_listesi_yarat'),
-    #url(r'^spv_listesi/devam/(?P<pk>\d+)/duzenle/$', views.spv_listesi_duzenle, name='spv_listesi_duzenle'),
-    #url(r'^spv_listesi/devam/(?P<pk>\d+)/sil/$', views.spv_listesi_sil, name='spv_listesi_sil'),
-    #url(r'^spv_listesi/devam/(?P<pk>\d+)/sil/kesin/$', views.spv_listesi_sil_kesin, name='spv_listesi_sil_kesin'),
+    url(r'^spv_listesi/yarat/$', views.spv_yarat, name='spv_yarat'),
+    url(r'^spv_listesi/(?P<pk>\d+)/sil/$', views.spv_listesi_sil, name='spv_listesi_sil'),
+    url(r'^spv_listesi/(?P<pk>\d+)/sil/kesin/$', views.spv_listesi_sil_kesin, name='spv_listesi_sil_kesin'),
+
+    url(r'^den_listesi/$', views.den_listesi, name='den_listesi'),
+    url(r'^den_listesi/yarat/$', views.den_yarat, name='den_yarat'),
+    url(r'^den_listesi/(?P<pk>\d+)/sil/$', views.den_listesi_sil, name='den_listesi_sil'),
+    url(r'^den_listesi/(?P<pk>\d+)/sil/kesin/$', views.den_listesi_sil_kesin, name='den_listesi_sil_kesin'),
 
     # detay urlleri aşağıda....
     url(r'^detay/$', views.DetayListView.as_view(), name='detay'),
@@ -311,6 +318,8 @@ urlpatterns = [
     url(r'^mk_operasyon_list/$', views.mk_operasyon_list, name='mk_operasyon_list'),
     url(r'^mk_den_saha_list/$', views.mk_den_saha_list, name='mk_den_saha_list'),
     url(r'^mk_ariza_list/$', views.mk_ariza_list, name='mk_ariza_list'),
+    url(r'^mk_sayi_list/$', views.mk_sayi_list, name='mk_sayi_list'),
+
 
     url(r'^rapormemnuniyet/$', views.rapor_memnuniyet, name='rapor_memnuniyet'),
     url(r'^rapor_mk_memnuniyet/$', views.rapor_mk_memnuniyet, name='rapor_mk_memnuniyet'),

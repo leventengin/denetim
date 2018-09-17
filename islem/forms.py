@@ -626,14 +626,6 @@ class DenetimForm(forms.Form):
             if (cc_hedef_baslangic > cc_hedef_bitis):
                 print("TARİH SIRALAMASI YANLIŞ...............")
                 raise forms.ValidationError(" tarih sıralaması yanlış...")
-            """
-            if (cc_hedef_baslangic.date < datetime.today()):
-                raise forms.ValidationError(
-                        " denetim başlangıcı için ileri bir tarih girmelisiniz.... ")
-            if (cc_hedef_bitis < datetime.date.today()):
-                raise forms.ValidationError(
-                        " denetim bitişi için ileri bir tarih girmelisiniz.... ")
-            """
         return self.cleaned_data
 
 
@@ -700,6 +692,18 @@ class KucukResimForm(forms.ModelForm):
         fields = ('foto_kucuk',)
 
 
+class SpvForm(forms.Form):
+    spv = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label="Süpervizör",
+                 widget=autocomplete.ModelSelect2Multiple(url='spv-autocomplete'), required=False)
+
+
+class DenForm(forms.Form):
+    den = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label="Denetci",
+                 widget=autocomplete.ModelSelect2Multiple(url='den-autocomplete'), required=False)
+
+
+
+
 #ilk bölümde detay işlemleri öncesinde denetim ve bölüm seçen form js ile...
 class IkiliSecForm(forms.Form):
     denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
@@ -734,12 +738,32 @@ class YaziForm(forms.Form):
     yazi = forms.CharField(label='Rapor Yazısı', widget=forms.Textarea(attrs={'cols': 80, 'rows': 40}),)
     def __init__(self, *args, **kwargs):
         kullanan = kwargs.pop("kullanan")
-        #kullanan = request.user.id
         super(YaziForm, self).__init__(*args, **kwargs)
-        print("form init içinden kullanan", kullanan)
-        denetim_obj_ilk = denetim.objects.filter(durum="C")
-        denetim_obj = denetim_obj_ilk.filter(yaratan=kullanan)
-        self.fields['denetim'].queryset = denetim_obj
+        denetim_obj_ilk = denetim.objects.filter(durum="B")
+        denetim_obj = denetim_obj_ilk.filter(denetci=kullanan)
+        ex_list = []
+        for x in denetim_obj:
+            tamam_mi = True
+            bolumler = sonuc_bolum.objects.filter(denetim=x.id)
+            for y in bolumler:
+                print("işte y...", y, "işte tamam mı...", y.tamam)
+                if y.tamam == "H":
+                    tamam_mi =  False
+            if not tamam_mi:
+                print("tamam mı hayır oldu   siliyor mu....", x)
+                ex_list.append(x.id)
+        print(" denetim ex list...", ex_list)
+        print("denetim ilk obje................", denetim_obj)
+        denetim_son_obj = denetim_obj.exclude(id__in=ex_list)
+        print("denetim son obje................", denetim_son_obj)
+        self.fields['denetim'].queryset = denetim_son_obj
+        print("queryset initial içinden..:", self.fields['denetim'].queryset)
+
+
+
+
+
+
 
 
 # ilk bölümde denetim oluşturuken kullanılan form....

@@ -95,6 +95,27 @@ class Ariza_Data(models.Model):
 
 
 
+
+class Sayi_Data(models.Model):
+    mac_no      = models.CharField(max_length=20)
+    tipi        = models.CharField(max_length=2)
+    proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    adet        = models.CharField(max_length=20)
+    gelen_tarih = models.DateTimeField()
+    timestamp   = models.DateTimeField()
+
+    def __str__(self):
+        return str(self.mac_no)
+
+    @property
+    def owner(self):
+        return self.mac_no
+
+    def get_api_url(self, request=None):
+        return api_reverse("api-ws:sayi-rud", kwargs={'pk': self.pk}, request=request)
+
+
+
 OPERASYONDIGER = (
 ('O', 'Operasyon'),
 ('D', 'Diğer'),

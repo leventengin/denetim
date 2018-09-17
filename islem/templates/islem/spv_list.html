@@ -7,7 +7,7 @@
     <h4> Şirket...:&emsp; {{ user.profile.sirket}} </h4>
     </br>
     </br>
-    <h4>Grup içinden planlayıcılar:</h4>
+    <!-- <h4>Grup içinden planlayıcılar:</h4>  -->
 
     {% if grup_list %}
 
@@ -20,9 +20,9 @@
 
             {% for ic in grup_list %}
                 <tr >
-                  <td>{{ ic.user.get_full_name  }}  </td>
+                  <td>{{ ic.get_full_name  }}  </td>
                   <td> &emsp;&emsp; </td>
-                  <td>{{ ic.sirket }}  </td>
+                  <td>{{ ic.profile.sirket }}  </td>
                 </tr>
             {% endfor %}
         </table>
@@ -37,16 +37,20 @@
 
           <table cellspacing="10" cellpadding="0">
                   <tr>
+                    <th></th>
+                    <th> &emsp;&emsp; </th>
                     <th>Süpervizör</th>
                     <th> &emsp;&emsp; </th>
                     <th>Şirketi</th>
                   </tr>
 
-              {% for dis in grup_list %}
+              {% for dis in grupdisi_list %}
                   <tr >
-                    <td> <a href="{{dis.id}}"> {{ dis.spv_yetkilisi.get_full_name  }} </a> </td>
+                    <td> <a href="{{dis.id}}/sil"><span class='glyphicon glyphicon-remove'></span></a> </td>
                     <td> &emsp;&emsp; </td>
-                    <td> <a href="{{dis.id}}">  {{ dis.sirket }}  </a> </td>
+                    <td> <a> {{ dis.get_full_name  }} </a> </td>
+                    <td> &emsp;&emsp; </td>
+                    <td> <a>  {{ dis.profile.sirket }}  </a> </td>
                   </tr>
               {% endfor %}
           </table>
@@ -54,8 +58,10 @@
     {% else %}
       <p>Grup dışı planlayıcı yok... </p>
     {% endif %}
+  </br>
+  </br>
 
-
+    <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'spv_yarat'  %}'">Ekle</button>
 
 
 

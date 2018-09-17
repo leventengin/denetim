@@ -1,0 +1,30 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<!-- <h4>  Süpervizörler  </h4>  -->
+
+<p> </p>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="kaydet" />
+
+</form>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+{{ form.media }}
+
+
+
+{% endblock %}

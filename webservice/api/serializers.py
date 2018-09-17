@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import Memnuniyet, rfid_dosyasi, yer_updown
-from ..models import Operasyon_Data, Denetim_Data, Ariza_Data
+from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, Sayi_Data
 
 
 
@@ -99,6 +99,31 @@ class ArizaSerializer(serializers.ModelSerializer):
             'mac_no',
             'rfid_no',
             'sebep',
+            'gelen_tarih',
+            'timestamp',
+        ]
+        read_only_fields = ['id']
+
+    # converts to JSON
+    # validations for data passed
+
+    def get_url(self, obj):
+        # request
+        request = self.context.get("request")
+        return obj.get_api_url(request=request)
+
+
+class SayiSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Sayi_Data
+        fields = [
+            'url',
+            'id',
+            'tipi',
+            'proje',
+            'mac_no',
+            'adet',
             'gelen_tarih',
             'timestamp',
         ]

@@ -2,20 +2,9 @@
 
 {% block content %}
 
-<!--
-<input type="file" id="select">
-<img id="preview">
-
--->
 
 {% load static %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/ImageTools.js"></script>
-
-
-BASE_DIR {{ BASE_DIR }}
-PROJECT_DIR {{ PROJECT_DIR }}
-MEDIA_ROOT  {{ MEDIA_ROOT }}
-STATIC_ROOT {{ STATIC_ROOT }}
 
 
 
@@ -93,14 +82,6 @@ $(document).ready(function()
 
 
 
-
-
-
-
-
-
-
-
 <h5> <b> Denetim Rapor Yazisi</b> </h5>
 
 
@@ -110,18 +91,13 @@ $(document).ready(function()
     {{ form.non_field_errors }}
     <table>
 
-        {{form.as_table}}
+        {{form.as_p}}
 
     </table>
     <input type="submit" value="kaydet" />
 </form>
 <p></p>
 <p></p>
-
-
-
-
-
 
 
 

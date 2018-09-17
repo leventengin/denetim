@@ -2,7 +2,7 @@ import json
 import requests
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, render_to_response
-from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi, Denetim_Data, Ariza_Data
+from webservice.models import Memnuniyet, Operasyon_Data, rfid_dosyasi, Denetim_Data, Ariza_Data, Sayi_Data
 from .models import yer, sonuc_bolum, sonuc_detay, denetim
 import datetime
 
@@ -31,7 +31,7 @@ def proje_varmi_kontrol(request):
 
 def sirket_varmi_kontrol(request):
     user = request.user
-    if (user.profile.operasyon_merkezyon == "E"):
+    if (user.profile.opr_merkez_yon == "E"):
         sirket = user.profile.sirket
         print("şirket", sirket)
         if sirket == None:
@@ -101,6 +101,7 @@ def rapor_verisi_hazirla(request, denetim_no):
         bolum.net_adet = bolum_net
         bolum.toplam_puan = bolum_puan
         ortalama_puan = bolum_puan / bolum_net
+        ortalama_puan = ortalama_puan * 10
         print("ortalama puan ...", ortalama_puan)
         bolum.ortalama_puan = ortalama_puan
         bolum.save()
@@ -114,6 +115,7 @@ def rapor_verisi_hazirla(request, denetim_no):
     denetim_obj.net_adet = denetim_net
     denetim_obj.toplam_puan = denetim_puan
     ortalama_puan = denetim_puan / denetim_net
+    ortalama_puan = ortalama_puan * 10
     print("ortalama puan ...", ortalama_puan)
     denetim_obj.ortalama_puan = ortalama_puan
     denetim_obj.save()
@@ -347,6 +349,32 @@ def get_a_list(request):
         a_list.append(temp)
 
     return a_list
+
+
+def get_sy_list(request):
+    proje = request.user.profile.proje
+    bugun = datetime.datetime.now()
+    yedigun = datetime.timedelta(7,0,0)
+    yedigun_once = bugun - yedigun
+    sayi_obj = Sayi_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
+    sy_list = []
+    for x in sayi_obj:
+        temp = {}
+        temp['gelen_tarih'] = x.gelen_tarih
+        mac_no = x.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+        if yer_obj:
+            temp['yer'] = yer_obj.yer_adi
+        else:
+            temp['yer'] = mac_no
+
+        temp['proje'] = x.proje.proje_adi
+
+        temp['adet'] = x.adet
+
+        sy_list.append(temp)
+
+    return sy_list
 
 
 

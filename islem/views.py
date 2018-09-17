@@ -19,14 +19,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, SonucResimForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm, DuzenleDenetimSecForm
-from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm
+from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm, SpvForm, DenForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
-from webservice.models import Memnuniyet, Operasyon_Data, Denetim_Data, Ariza_Data
+from webservice.models import Memnuniyet, Operasyon_Data, Denetim_Data, Ariza_Data, Sayi_Data
 from webservice.models import rfid_dosyasi, yer_updown
 from django.db.models import ProtectedError
 
@@ -193,6 +193,7 @@ class Generate_Rapor_PDF(View):
             bolum.net_adet = bolum_net
             bolum.toplam_puan = bolum_puan
             ortalama_puan = bolum_puan / bolum_net
+            ortalama_puan = ortalama_puan * 10
             print("ortalama puan ...", ortalama_puan)
             bolum.ortalama_puan = ortalama_puan
             bolum.save()
@@ -206,6 +207,7 @@ class Generate_Rapor_PDF(View):
         denetim_obj.net_adet = denetim_net
         denetim_obj.toplam_puan = denetim_puan
         ortalama_puan = denetim_puan / denetim_net
+        ortalama_puan = ortalama_puan * 10
         print("ortalama puan ...", ortalama_puan)
         denetim_obj.ortalama_puan = ortalama_puan
         denetim_obj.save()
@@ -362,35 +364,91 @@ def index(request):
     kullanici = Profile.objects.get(user=kisi)
     print("kullanıcı", kullanici)
 
-    if kullanici.denetci == "E":
-        acik_denetimler = denetim.objects.filter(durum="A")
-        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
-        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
-        return render(request, 'ana_menu.html',
+    if kullanici.opr_merkez_yon == "E":
+        print(" merkez yöneticisi   evet....")
+        sirket = kullanici.sirket
+        print("şirketi....", sirket)
+        if not sirket:
+            mesaj = "kişiye tanımlı şirket yok "
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+        projeler = proje.objects.filter(sirket=sirket)
+        if not projeler:
+            mesaj = "şirkete tanımlı proje yok "
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        # projeler sayılacak ilk 3 proje seçilecek.....
+        # ve bu seçime göre sıraya dizilecek...
+        # 3 ve ikiyse yine sıraya dizilecek...
+        #
+
+        proje_sayisi = projeler.count()
+
+
+
+
+        secili_denetimler = None
+        return render(request, 'ana_menu_mky.html',
             context={
             'secili_denetimler': secili_denetimler,
             },
         )
-    else:
-        num_tipi=tipi.objects.all().count()
-        num_bolum=bolum.objects.all().count()
-        num_detay=detay.objects.all().count()
 
-        num_grup=grup.objects.all().count()
-        num_sirket=sirket.objects.all().count()
-        num_proje=proje.objects.count()
-
-        return render(request, 'ana_menu_eski.html',
+    if kullanici.opr_proje_yon == "E"  or  kullanici.opr_alan_sefi == "E":
+        print(" denetçi   evet....")
+        acik_denetimler = denetim.objects.filter(durum="A")
+        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
+        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
+        return render(request, 'ana_menu_opy.html',
             context={
-                'num_tipi':num_tipi,
-                'num_bolum':num_bolum,
-                'num_detay':num_detay,
+            'secili_denetimler': secili_denetimler,
+            },
+        )
 
-                'num_grup': num_grup,
-                'num_sirket': num_sirket,
-                'num_proje': num_proje,
-                },
-            )
+    if kullanici.isletme_projeyon == "E":
+        print(" denetçi   evet....")
+        acik_denetimler = denetim.objects.filter(durum="A")
+        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
+        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
+        return render(request, 'ana_menu_ipy.html',
+            context={
+            'secili_denetimler': secili_denetimler,
+            },
+        )
+
+    if kullanici.denetim_grup_yetkilisi == "E":
+        print(" denetçi   evet....")
+        acik_denetimler = denetim.objects.filter(durum="A")
+        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
+        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
+        return render(request, 'ana_menu_dgy.html',
+            context={
+            'secili_denetimler': secili_denetimler,
+            },
+        )
+
+
+    if kullanici.denetci == "E":
+        print(" denetçi   evet....")
+        acik_denetimler = denetim.objects.filter(durum="A")
+        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
+        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
+        return render(request, 'ana_menu_denetci.html',
+            context={
+            'secili_denetimler': secili_denetimler,
+            },
+        )
+
+    if kullanici.opr_admin == "E":
+        print(" denetçi   evet....")
+        acik_denetimler = denetim.objects.filter(durum="A")
+        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
+        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
+        return render(request, 'ana_menu_opradmin.html',
+            context={
+            'secili_denetimler': secili_denetimler,
+            },
+        )
+
 
 
 
@@ -508,6 +566,7 @@ def denetim_baslat_kesin(request, pk=None):
     denetim_obj = denetim.objects.get(id=denetim_no)
     print("seçilen denetim kesin ...", denetim_obj)
     denetim_obj.durum = "B"
+    denetim_obj.gerc_baslangic = datetime.datetime.now()
     denetim_obj.save()
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
@@ -994,7 +1053,6 @@ def denetim_tekrarla_kesin(request, pk=None):
 @login_required
 def denetim_tamamla(request, pk=None):
 
-
     tamam_bolum_tekmi = request.session.get('tamam_bolum_tekmi')
     if tamam_bolum_tekmi:
         print("tekden geldiğinin işareti olsun....")
@@ -1005,17 +1063,16 @@ def denetim_tamamla(request, pk=None):
 
     bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
     if not(bolumler_obj):
-        messages.success(request, 'Denetime ait bölüm yok')
-        return redirect('devam_liste')
-
+        mesaj = "tanımlı bölüm yok "
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     kontrol_degiskeni = True
     for bolum in bolumler_obj:
         if bolum.tamam == "H":
             kontrol_degiskeni = False
 
     if not(kontrol_degiskeni):
-        messages.success(request, 'Tamamlanmamış bölümler var')
-        return redirect('devam_liste')
+        mesaj = "tamamlanmamış bölümler var !"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
     #########################################################################
@@ -1051,6 +1108,7 @@ def denetim_tamamla(request, pk=None):
         bolum.net_adet = bolum_net
         bolum.toplam_puan = bolum_puan
         ortalama_puan = bolum_puan / bolum_net
+        ortalama_puan = ortalama_puan * 10
         print("ortalama puan ...", ortalama_puan)
         bolum.ortalama_puan = ortalama_puan
         bolum.save()
@@ -1064,6 +1122,7 @@ def denetim_tamamla(request, pk=None):
     denetim_obj.net_adet = denetim_net
     denetim_obj.toplam_puan = denetim_puan
     ortalama_puan = denetim_puan / denetim_net
+    ortalama_puan = ortalama_puan * 10
     print("ortalama puan ...", ortalama_puan)
     denetim_obj.ortalama_puan = ortalama_puan
     denetim_obj.save()
@@ -1074,14 +1133,29 @@ def denetim_tamamla(request, pk=None):
     denetim_adi = denetim_obj.denetim_adi
     proje = denetim_obj.proje
     rutin_planli = denetim_obj.rutin_planli
-    denetci = denetim_obj.denetci
+    denetci = denetim_obj.denetci.get_full_name()
     tipi = denetim_obj.tipi
-    yaratim_tarihi = denetim_obj.yaratim_tarihi
-    yaratan = denetim_obj.yaratan
-    hedef_baslangic = denetim_obj.hedef_baslangic
-    hedef_bitis = denetim_obj.hedef_bitis
-    gerc_baslangic = denetim_obj.gerc_baslangic
-    gerc_bitis = denetim_obj.gerc_bitis
+    yaratan = denetim_obj.yaratan.get_full_name()
+    if denetim_obj.yaratim_tarihi:
+        yaratim_tarihi = denetim_obj.yaratim_tarihi.strftime("%Y-%m-%d")
+    else:
+        yaratim_tarihi = None
+    if denetim_obj.hedef_baslangic:
+        hedef_baslangic = denetim_obj.hedef_baslangic.strftime("%Y-%m-%d")
+    else:
+        hedef_baslangic = None
+    if denetim_obj.hedef_bitis:
+        hedef_bitis = denetim_obj.hedef_bitis.strftime("%Y-%m-%d")
+    else:
+        hedef_bitis = None
+    if denetim_obj.gerc_baslangic:
+        gerc_baslangic = denetim_obj.gerc_baslangic.strftime("%Y-%m-%d")
+    else:
+        gerc_baslangic = None
+    if denetim_obj.gerc_bitis:
+        gerc_bitis = denetim_obj.gerc_bitis.strftime("%Y-%m-%d")
+    else:
+        gerc_bitis = None
     durum = denetim_obj.durum
     rutindenetci = denetim_obj.rutindenetci
     takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
@@ -1107,7 +1181,11 @@ def denetim_tamamla(request, pk=None):
     dict_bol_detay = dict(d)
     print("************************")
     print(dict_bol_detay)
-    context = {'dict_bol_detay':dict_bol_detay,
+    goster = str(round(ortalama_puan,0))
+    print("göster....", goster)
+    kalan = str(100 - round(ortalama_puan,0))
+    print("kalan...", kalan)
+    context = { 'dict_bol_detay':dict_bol_detay,
                 'takipciler': takipciler,
                 'denetim_adi': denetim_adi,
                 'proje' : proje,
@@ -1126,6 +1204,8 @@ def denetim_tamamla(request, pk=None):
                 'toplam_puan' : denetim_puan,
                 'ortalama_puan' : ortalama_puan,
                 'pk' : denetim_no,
+                'goster' : goster,
+                'kalan' : kalan,
                 }
     #return render(request, 'islem/teksayfa_sil_soru.html', context )
     return render(request, 'islem/denetim_tamamla_sor.html', context )
@@ -1144,6 +1224,7 @@ def denetim_tamamla_kesin(request, pk=None):
     denetim_obj = denetim.objects.get(id=pk)
     print("seçilen denetim kesin ...", denetim_obj)
     denetim_obj.durum = "C"
+    denetim_obj.gerc_bitis = datetime.datetime.now()
     denetim_obj.save()
     return redirect('devam_liste' )
 
@@ -3422,9 +3503,9 @@ def raporlar_ilerle(request, pk=None):
 @login_required
 def rapor_yazisi(request, pk=None):
     # if this is a POST request we need to process the form data
+    kullanan = request.user
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        kullanan = request.user.id
         form = YaziForm(request.POST, kullanan=kullanan)
         print("denetimi seçti gözlemci seçimi için...")
         # check whether it's valid:
@@ -3436,6 +3517,7 @@ def rapor_yazisi(request, pk=None):
             print ("yazi", yazi)
             kaydetme_obj = denetim.objects.get(id=denetim_no)
             kaydetme_obj.rapor_yazi = yazi
+            kaydetme_obj.yazi_varmi = "E"
             kaydetme_obj.save()
             return redirect('index')
         else:
@@ -3446,8 +3528,6 @@ def rapor_yazisi(request, pk=None):
     # if a GET (or any other method) we'll create a blank form
     else:
         #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
-        kullanan = request.user.id
-        print("kullanan  ..", kullanan)
         form = YaziForm(kullanan=kullanan)
         return render(request, 'islem/rapor_yazisi.html', {'form': form,})
 
@@ -4193,9 +4273,9 @@ def spv_listesi(request, pk=None):
 
     for spv in spv_obj:
         kisi = spv.spv_yetkilisi.id
-        kisi_obj = Profile.objects.get(id=kisi)
+        kisi_obj = User.objects.get(id=kisi)
         print("kişi object...", kisi_obj)
-        kisi_sirket = kisi_obj.sirket
+        kisi_sirket = kisi_obj.profile.sirket
         print("kişi şirket..", kisi_sirket)
         if kisi_sirket:
             if kisi_sirket.turu == "P":
@@ -4209,7 +4289,246 @@ def spv_listesi(request, pk=None):
     return render(request, 'islem/spv_list.html', context )
 
 
+
+@login_required
+def spv_yarat(request, pk=None):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    spvler_obj = Profile.objects.filter(denetim_grup_yetkilisi="E")
+
+    serbest_spv_list = []
+    for spv in spvler_obj:
+        if spv.sirket.turu == "D":
+            usr_obj = spv.user
+            serbest_spv_list.append(usr_obj)
+    print("serbest denetci...", serbest_spv_list)
+
+    spv_obj = spv_yetkilisi.objects.filter(sirket=sirket)
+    grupdisi_list = []
+    for spv in spv_obj:
+        kisi = spv.spv_yetkilisi.id
+        kisi_obj = User.objects.get(id=kisi)
+        print("kişi object...", kisi_obj)
+        kisi_sirket = kisi_obj.profile.sirket
+        print("kişi şirket..", kisi_sirket)
+        if kisi_sirket:
+            if kisi_sirket.turu == "D":
+                grupdisi_list.append(kisi_obj)
+    print("grup dışı list  dışarıdan şirkete atanmış olanlar.......", grupdisi_list)
+
+    kalan_list = list(set(serbest_spv_list) - set(grupdisi_list))
+
+    print("kontrolden sonra serbest denetci...", kalan_list)
+
+    if not kalan_list:
+        mesaj = "eklenecek süpervizör yok...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        #form = SpvForm(request.POST, serbest_spv=kalan_list)
+        form = SpvForm(request.POST)
+        print("spvform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            spv_yetkili = request.POST.getlist('spv', "")
+            print("spv yetkili....", spv_yetkili)
+            for x in spv_yetkili:
+                kaydetme_obj = spv_yetkilisi(spv_yetkilisi_id=x, sirket_id=sirket.id)
+                kaydetme_obj.save()
+            return redirect('spv_listesi')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/spv_form.html', {'form': form,})
+    # if a GET (or any other method) we'll create a blank form
+    else:
+
+        #form = SpvForm(serbest_spv=kalan_list)
+        form = SpvForm()
+        return render(request, 'islem/spv_form.html', {'form': form,})
+
+
+
+
+@login_required
+def spv_listesi_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    user_obj = User.objects.get(id=pk)
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    spv_obj = spv_yetkilisi.objects.filter(spv_yetkilisi=user_obj.id).filter(sirket=sirket)
+    print("spv obj....", spv_obj)
+    print("spv listesi sil içinden spv obj..", spv_obj)
+    context = {'spv_obj' : spv_obj,
+              }
+    return render(request, 'islem/spv_sil_soru.html', context )
+
+
+
+@login_required
+def spv_listesi_sil_kesin(request, pk=None):
+    user_obj = User.objects.get(id=pk)
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    spv_obj = spv_yetkilisi.objects.filter(spv_yetkilisi=user_obj.id).filter(sirket=sirket)
+    #object = get_object_or_404(spv_yetkilisi, pk=pk)
+    try:
+        spv_obj.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
+    return redirect('spv_listesi')
+
+
+
+
+
+
+
+
 #------------------------------------------------------------------------------------
+
+
+
+
+@login_required
+def den_listesi(request, pk=None):
+    secili_sirket = request.user.profile.sirket
+    print("işte kişinin şirketi...", secili_sirket)
+    if not secili_sirket:
+        mesaj = "kişinin bağlı olduğu şirket yok...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    den_obj = den_yetkilisi.objects.filter(sirket=secili_sirket)
+    grup_list = []
+    grupdisi_list = []
+
+    for den in den_obj:
+        kisi = den.den_yetkilisi.id
+        kisi_obj = User.objects.get(id=kisi)
+        print("kişi object...", kisi_obj)
+        kisi_sirket = kisi_obj.profile.sirket
+        print("kişi şirket..", kisi_sirket)
+        if kisi_sirket:
+            if kisi_sirket.turu == "P":
+                grup_list.append(kisi_obj)
+            else:
+                grupdisi_list.append(kisi_obj)
+
+    print("grup list..", grup_list)
+    print("grup dışı list..", grupdisi_list)
+    context = {'grup_list': grup_list, 'grupdisi_list': grupdisi_list}
+    return render(request, 'islem/den_list.html', context )
+
+
+
+@login_required
+def den_yarat(request, pk=None):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    denler_obj = Profile.objects.filter(denetci="E")
+
+    serbest_den_list = []
+    for den in denler_obj:
+        if den.sirket.turu == "D":
+            usr_obj = den.user
+            serbest_den_list.append(usr_obj)
+    print("serbest denetci...", serbest_den_list)
+
+    den_obj = den_yetkilisi.objects.filter(sirket=sirket)
+    grupdisi_list = []
+    for den in den_obj:
+        kisi = den.den_yetkilisi.id
+        kisi_obj = User.objects.get(id=kisi)
+        print("kişi object...", kisi_obj)
+        kisi_sirket = kisi_obj.profile.sirket
+        print("kişi şirket..", kisi_sirket)
+        if kisi_sirket:
+            if kisi_sirket.turu == "D":
+                grupdisi_list.append(kisi_obj)
+    print("grup dışı list  dışarıdan şirkete atanmış olanlar.......", grupdisi_list)
+
+    kalan_list = list(set(serbest_den_list) - set(grupdisi_list))
+
+    print("kontrolden sonra serbest denetci...", kalan_list)
+
+    if not kalan_list:
+        mesaj = "eklenecek süpervizör yok...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        #form = SpvForm(request.POST, serbest_spv=kalan_list)
+        form = DenForm(request.POST)
+        print("denform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            den_yetkili = request.POST.getlist('den', "")
+            print("den yetkili....", den_yetkili)
+            for x in den_yetkili:
+                kaydetme_obj = den_yetkilisi(den_yetkilisi_id=x, sirket_id=sirket.id)
+                kaydetme_obj.save()
+            return redirect('den_listesi')
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/den_form.html', {'form': form,})
+    # if a GET (or any other method) we'll create a blank form
+    else:
+
+        #form = SpvForm(serbest_spv=kalan_list)
+        form = SpvForm()
+        return render(request, 'islem/den_form.html', {'form': form,})
+
+
+
+
+@login_required
+def den_listesi_sil(request, pk=None):
+    # if this is a POST request we need to process the form data
+    user_obj = User.objects.get(id=pk)
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    den_obj = den_yetkilisi.objects.filter(den_yetkilisi=user_obj.id).filter(sirket=sirket)
+    print("den object....", den_obj)
+    print("den listesi sil içinden den obj..", den_obj)
+    context = {'den_obj' : den_obj,
+              }
+    return render(request, 'islem/den_sil_soru.html', context )
+
+
+
+@login_required
+def den_listesi_sil_kesin(request, pk=None):
+    user_obj = User.objects.get(id=pk)
+    kullanici = request.user
+    sirket = kullanici.profile.sirket
+    den_obj = den_yetkilisi.objects.filter(den_yetkilisi=user_obj.id).filter(sirket=sirket)
+    #object = get_object_or_404(spv_yetkilisi, pk=pk)
+    try:
+        den_obj.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
+    return redirect('den_listesi')
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------------
+
+
+
 
 
 
@@ -6077,6 +6396,97 @@ class detayautocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
+class spvautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return detay.objects.none()
+        kullanici = self.request.user
+        sirket = kullanici.profile.sirket
+        spvler_obj = Profile.objects.filter(denetim_grup_yetkilisi="E")
+
+        serbest_spv_list = []
+        for spv in spvler_obj:
+            if spv.sirket.turu == "D":
+                usr_obj = spv.user
+                serbest_spv_list.append(usr_obj)
+
+        spv_obj = spv_yetkilisi.objects.filter(sirket=sirket)
+        grupdisi_list = []
+        for spv in spv_obj:
+            kisi = spv.spv_yetkilisi.id
+            kisi_obj = User.objects.get(id=kisi)
+            print("kişi object...", kisi_obj)
+            kisi_sirket = kisi_obj.profile.sirket
+            print("kişi şirket..", kisi_sirket)
+            if kisi_sirket:
+                if kisi_sirket.turu == "D":
+                    grupdisi_list.append(kisi_obj)
+
+        kalan_list = list(set(serbest_spv_list) - set(grupdisi_list))
+
+        id_s = []
+        for x in kalan_list:
+            id_s.append(x.id)
+        print("işte id ler...", id_s)
+        ser_spv_obj = User.objects.filter(pk__in=id_s)
+        print("seçili liste sonunda...", ser_spv_obj)
+        return ser_spv_obj
+
+    def get_result_label(self, item):
+        str1 = str(item.get_full_name())
+        str2 = str(item.profile.sirket)
+        send_str = str1 + " - " + str2
+        return send_str
+
+
+
+class denautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return detay.objects.none()
+        kullanici = self.request.user
+        sirket = kullanici.profile.sirket
+        denler_obj = Profile.objects.filter(denetci="E")
+
+        serbest_den_list = []
+        for den in denler_obj:
+            if den.sirket.turu == "D":
+                usr_obj = den.user
+                serbest_den_list.append(usr_obj)
+
+        den_obj = den_yetkilisi.objects.filter(sirket=sirket)
+        grupdisi_list = []
+        for den in den_obj:
+            kisi = den.den_yetkilisi.id
+            kisi_obj = User.objects.get(id=kisi)
+            print("kişi object...", kisi_obj)
+            kisi_sirket = kisi_obj.profile.sirket
+            print("kişi şirket..", kisi_sirket)
+            if kisi_sirket:
+                if kisi_sirket.turu == "D":
+                    grupdisi_list.append(kisi_obj)
+
+        kalan_list = list(set(serbest_den_list) - set(grupdisi_list))
+
+        id_s = []
+        for x in kalan_list:
+            id_s.append(x.id)
+        print("işte id ler...", id_s)
+        ser_den_obj = User.objects.filter(pk__in=id_s)
+        print("seçili liste sonunda...", ser_den_obj)
+        return ser_den_obj
+
+    def get_result_label(self, item):
+        str1 = str(item.get_full_name())
+        str2 = str(item.profile.sirket)
+        send_str = str1 + " - " + str2
+        return send_str
+
+
+
+
 class tipiautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
@@ -6204,7 +6614,7 @@ def popup_notif(request):
 
 
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
-from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list
+from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list, get_sy_list
 from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms, rapor_verisi_hazirla
 
 
@@ -7286,6 +7696,213 @@ def mk_ariza_list(request):
         print("buraya geldi...şirket merkez yetkilisi değil...")
         mesaj = "kişi bu işlem için yetkili değil..."
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+#--------------------------------------------------------------------------------------------------
+
+@login_required
+def sayi_list(request, pk=None):
+    user = request.user
+    test_url = str(request.get_full_path)
+    print("işte deneme url si.....", test_url)
+    src_str = '?page'
+    deger = test_url.find(src_str)
+    if deger == -1:
+        ilk_arama = True
+    else:
+        ilk_arama = False
+
+    print("değer ....", deger)
+    print("ilk_arama", ilk_arama)
+
+    if proje_varmi_kontrol(request):
+        print("proje var mı kontrolden geçtik.....")
+        proje = user.profile.proje
+        sy2_list = request.session.get('rs_sy_list')
+
+        if not (sy2_list) or ilk_arama:
+            sy_list = get_sy_list(request)
+            rs_sy_list = []
+            for x in sy_list:
+                temp = {}
+                temp['yer'] = x['yer']
+                temp['adet'] = x['adet']
+                temp['proje'] = x['proje']
+                temp['gelen_tarih'] = str(x['gelen_tarih'])
+                rs_sy_list.append(temp)
+            request.session['rs_sy_list'] = rs_sy_list
+        else:
+            rs_okuma = True
+            print(" rs okuma....", rs_okuma)
+            sy_list = []
+            for x in sy2_list:
+                temp = {}
+                temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                temp['yer'] = x['yer']
+                temp['adet'] = x['adet']
+                temp['proje'] = x['proje']
+                sy_list.append(temp)
+
+        paginator = Paginator(sy_list, 25)
+        page = request.GET.get('page')
+
+        try:
+            n = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            n = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            n = paginator.page(paginator.num_pages)
+
+        print("işte sayfalanmış liste...", n)
+        return render(request, 'islem/sayi_list.html', {'sayi_list': n,})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+@login_required
+def sayi_create(request, pk=None):
+    t_stamp = str(datetime.datetime.now())
+    tipi = "1"
+    proje = "1"
+    adet = "40"
+    print("okunan zaman..sayi create.............", t_stamp)
+    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/sayi_list/",
+        json={"mac_no":12345, "tipi": tipi, "proje": proje, "adet": adet, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+    print("işte response....", response)
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('sayi_list')
+
+
+
+
+@login_required
+def mk_sayi_list(request):
+    user = request.user
+    if sirket_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        if request.method == "POST":
+            form = SirketIcinProjeForm(request.POST, sirket=sirket)
+            if form.is_valid():
+                proje = request.POST.get('proje', "")
+                print(" proje form okunduktan sonra post...", proje)
+
+                sy_list = request.session.get('mk_sy_list')
+                mk_proje = request.session.get('mk_sy_proje')
+
+                if mk_proje == proje:
+                    sy2_list = []
+                    for x in sy_list:
+                        temp = {}
+                        temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                        temp['adet'] = x['adet']
+                        temp['proje'] = x['proje']
+                        temp['yer'] = x['yer']
+                        sy2_list.append(temp)
+
+                else:
+                    bugun = datetime.datetime.now()
+                    yedigun = datetime.timedelta(7,0,0)
+                    yedigun_once = bugun - yedigun
+                    sayi_obj = Sayi_Data.objects.filter(proje=proje).filter(timestamp__gt=yedigun_once).order_by("-id")
+                    sy_list = []
+                    sy2_list = []
+                    for x in sayi_obj:
+                        temp = {}
+                        temp2 = {}
+                        temp['gelen_tarih'] = x.gelen_tarih
+                        mac_no = x.mac_no
+                        yer_obj = yer.objects.filter(mac_no=mac_no).first()
+                        if yer_obj:
+                            temp['yer'] = yer_obj.yer_adi
+                        else:
+                            temp['yer'] = mac_no
+
+                        temp['proje'] = x.proje.proje_adi
+
+                        adet = x.adet
+                        print("adet", adet)
+
+                        temp['adet'] = adet
+
+                        temp2['gelen_tarih'] = str(temp['gelen_tarih'])
+                        temp2['adet'] = temp['adet']
+                        temp2['proje'] = temp['proje']
+                        temp2['yer'] = temp['yer']
+                        sy2_list.append(temp)
+                        sy_list.append(temp2)
+
+
+                    request.session['mk_sy_list'] = sy_list
+                    request.session['mk_sy_proje'] = proje
+
+
+                paginator = Paginator(sy2_list, 25)
+                page = request.GET.get('page')
+                try:
+                    n = paginator.page(page)
+                except PageNotAnInteger:
+                    # If page is not an integer, deliver first page.
+                    n = paginator.page(1)
+                except EmptyPage:
+                    # If page is out of range (e.g. 9999), deliver last page of results.
+                    n = paginator.page(paginator.num_pages)
+                print("işte sayfalanmış liste...", n)
+
+                return render(request, 'islem/mk_sayi_list.html', {'form': form, 'mk_sayi_list': n})
+            else:
+                print("form is invalid.....")
+                return redirect('mk_sayi_list')
+        else:
+            sy_list = request.session.get('mk_sy_list')
+            mk_proje = request.session.get('mk_sy_proje')
+            sy2_list = []
+            if sy_list:
+                for x in sy_list:
+                    temp = {}
+                    temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
+                    temp['adet'] = x['adet']
+                    temp['proje'] = x['proje']
+                    temp['yer'] = x['yer']
+                    sy2_list.append(temp)
+                #print("işte alması gereken m2 list..!!!!!!!!!!!!!!!!!!!!!!!!", m2_list)
+            paginator = Paginator(sy2_list, 25)
+            page = request.GET.get('page')
+            try:
+                n = paginator.page(page)
+            except PageNotAnInteger:
+                # If page is not an integer, deliver first page.
+                n = paginator.page(1)
+            except EmptyPage:
+                # If page is out of range (e.g. 9999), deliver last page of results.
+                n = paginator.page(paginator.num_pages)
+
+            form = SirketIcinProjeForm(sirket=sirket)
+            form.fields["proje"].initial = mk_proje
+            print("get içinde mi.....")
+            #n = ""
+            return render(request, 'islem/mk_sayi_list.html', {'form': form, 'mk_sayi_list': n})
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+#------------------------------------------------------------------------------------------------------
+
+
+
 
 
 @login_required

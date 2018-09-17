@@ -110,7 +110,8 @@ class Profile(models.Model):
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_alan_sefi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_proje_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
-    operasyon_merkezyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    opr_merkez_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    opr_admin = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     isletme_projeyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     profil_resmi = models.ImageField(upload_to='xyz/profile_resmi/%Y/%m/%d/',blank=True, null=True,)
     def __str__(self):
@@ -122,18 +123,6 @@ class Profile(models.Model):
 # operasyon elemanları şu andaki sistemde sadece rfid içinde isim olarak tutuluyor, sisteme user kayıtları yok
 #
 
-"""
-@receiver(pre_save, sender=User)
-def check_sirket(sender,instance,**kwargs):
-    print("kullanıcı şirketi ", instance.profile.sirket)
-    if instance.profile.sirket == None:
-        print("olmadı burada.........")
-        raise Exception('Şirket tanımlanmadı...')
-        #raise forms.ValidationError("e-posta mevcut...")
-    else:
-        print("check şirket pass...")
-        pass
-"""
 
 
 @receiver(post_save, sender=User)
@@ -143,14 +132,11 @@ def create_user_profile(sender, instance, created, **kwargs):
         profile_created = True
         print("işte profile nesnesi created...")
         Profile.objects.create(user=instance)
-    #request.session['profile_created'] = profile_created
-    #print("profile created...", profile_created)
+
 
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    #profile_created = request.session.get('profile_created')
-    #print("save içinden profile created...", profile_created)
     if  instance.profile.sirket == None:
         print("şirket girilmemiş....")
     else:
@@ -163,41 +149,42 @@ def save_user_profile(sender, instance, **kwargs):
             print("şirketler...", sirketler, "şirketlerin sayısı..", sirketler.count())
             if instance.profile.denetim_grup_yetkilisi == "E":
                 for secilen in sirketler:
-                    kaydet_obj = spv_yetkilisi(sirket_id=secilen.id, spv_yetkilisi_id=instance.profile.id)
-                    kaydet_obj.save()
-            else:
-                for secilen in sirketler:
-                    silme_obj = spv_yetkilisi.objects.filter(spv_yetkilisi_id=instance.profile.id)
-                    if silme_obj:
-                        silme_obj.delete()
-
-    instance.profile.save()
-
-
-"""
-@receiver(post_save, sender=Profile)
-def spv_duzenle(sender, instance, **kwargs):
-    #profile_created = request.session.get('profile_created')
-    if  instance.sirket == None:
-        print("şirket girilmemiş....")
-    else:
-        if instance.sirket.turu == "D":
-            pass
-        else:
-            grup = instance.sirket.grubu
-            print("işte grup...", grup)
-            sirketler = sirket.objects.filter(grubu=grup.id)
-            print("şirketler...", sirketler, "şirketlerin sayısı..", sirketler.count())
-            if instance.denetim_grup_yetkilisi == "E":
-                for secilen in sirketler:
-                    kaydet_obj = spv_yetkilisi(sirket_id=secilen.id, spv_yetkilisi_id=instance.id)
-                    kaydet_obj.save()
+                    print("seçilen şirket...", secilen)
+                    print("spv yetkilisi...", instance.profile)
+                    print("spv yetkilisi id...", instance.profile.id)
+                    print("spv yetkilisi user id..", instance.id)
+                    varmi_obj = spv_yetkilisi.objects.filter(sirket=secilen.id).filter(spv_yetkilisi=instance.id)
+                    if varmi_obj:
+                        pass
+                    else:
+                        kaydet_obj = spv_yetkilisi(sirket_id=secilen.id, spv_yetkilisi_id=instance.id)
+                        kaydet_obj.save()
             else:
                 for secilen in sirketler:
                     silme_obj = spv_yetkilisi.objects.filter(spv_yetkilisi_id=instance.id)
                     if silme_obj:
                         silme_obj.delete()
-"""
+
+            if instance.profile.denetci == "E":
+                for secilen in sirketler:
+                    print("seçilen şirket...", secilen)
+                    print("den yetkilisi...", instance.profile)
+                    print("den yetkilisi id...", instance.profile.id)
+                    print("den yetkilisi user id..", instance.id)
+                    varmi_obj = den_yetkilisi.objects.filter(sirket=secilen.id).filter(den_yetkilisi=instance.id)
+                    if varmi_obj:
+                        pass
+                    else:
+                        kaydet_obj = den_yetkilisi(sirket_id=secilen.id, den_yetkilisi_id=instance.id)
+                        kaydet_obj.save()
+            else:
+                for secilen in sirketler:
+                    silme_obj = den_yetkilisi.objects.filter(den_yetkilisi_id=instance.id)
+                    if silme_obj:
+                        silme_obj.delete()
+
+    instance.profile.save()
+
 
 
 
@@ -225,7 +212,16 @@ class spv_yetkilisi(models.Model):
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
     spv_yetkilisi = models.ForeignKey(User, related_name='spv_yetkilisi', on_delete=models.CASCADE)
     def __str__(self):
-        return(self.spv_yetkilisi.username)
+        return '%s-%s' % (self.spv_yetkilisi.username, self.sirket)
+
+
+
+class den_yetkilisi(models.Model):
+    sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
+    den_yetkilisi = models.ForeignKey(User, related_name='den_yetkilisi', on_delete=models.CASCADE)
+    def __str__(self):
+        return '%s-%s' % (self.den_yetkilisi.username, self.sirket)
+
 
 
 
