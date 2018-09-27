@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+      <h3>Sistem Yöneticisi Listesine Ekle</h3>
+
+      <p>  <b> Adı   : </b>  &emsp; {{ user_obj.user.get_full_name }}</p>
+      <p>  <b> Şirket: </b>  &emsp; {{ user_obj.sirket }}</p>
+
+      <p>Bu yetkiliyi sistem yöneticisi listesine eklemek istediğinizden emin misiniz ???: </p>
+
+      <form action="" method="POST">
+        {% csrf_token %}
+      <a href="kesin"> Evet </a>
+      </form>
+
+{% endblock %}

@@ -3,252 +3,613 @@
 
 {% block content %}
 
-
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-     <style type="text/css">
-td.block
-{
-border: 1px solid black;
-}
-</style>
-<table style="width: 100%;">
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['line']});
-      google.charts.setOnLoadCallback(drawChart);
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Datepicker - Default functionality</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-    function drawChart() {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('number', 'Day');
-      data.addColumn('number', 'Alpha AVM');
-      data.addColumn('number', 'Beta Hospital');
-      data.addColumn('number', 'Cloud Residence');
 
-      data.addRows([
-        [1,  37.8, 80.8, 41.8],
-        [2,  30.9, 69.5, 32.4],
-        [3,  25.4,   57, 25.7],
-        [4,  11.7, 18.8, 10.5],
-        [5,  11.9, 17.6, 10.4],
-        [6,   8.8, 13.6,  7.7],
-        [7,   7.6, 12.3,  9.6],
-        [8,  12.3, 29.2, 10.6],
-        [9,  16.9, 42.9, 14.8],
-        [10, 12.8, 30.9, 11.6],
-        [11,  5.3,  7.9,  4.7],
-        [12,  6.6,  8.4,  5.2],
-        [13,  4.8,  6.3,  3.6],
-        [14,  4.2,  6.2,  3.4]
-      ]);
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js'> </script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  -->
 
-      var options = {
-        chart: {
-          title: 'Denetimlerin Genel Durumu',
-          subtitle: 'Puan ortalaması'
-        },
 
-               height: 350,
-               axes: {
-                 x: {
-                   0: {side: 'top'}
-                 }
-               }
+  <script>
+  $(function() {
+  $.datepicker.regional['tr'] = {
+    monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+    'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+    monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+    'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+    weekHeader: 'Hf', weekStatus: '',
+    dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+    dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+    dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+    dateFormat: 'yy-mm-dd', firstDay: 1,
+    prevText: 'Önce',
+    nextText: 'Sonra',
+    isRTL: false};
+  $.datepicker.setDefaults($.datepicker.regional['tr']);
+  $( "#datepicker_1" ).datepicker()
+  $( "#datepicker_2" ).datepicker()
+  } );
+  </script>
 
-      };
 
-      var chart = new google.charts.Line(document.getElementById('line_top_x'));
+  <script>
+  function sakla(){
+    var x = document.getElementById("div_proje");
+    var y = document.getElementById("div_canvas");
+    var z = document.getElementById("div_table");
+    x.style.display = "none";
+    y.style.display = "none";
+    z.style.display = "none";
+  }
+  </script>
 
-      chart.draw(data, google.charts.Line.convertOptions(options));
+
+
+  <script>
+  function goster(){
+    //alert("göster.....................");
+    var ilk_tarih = document.getElementById('datepicker_1').value;
+    var son_tarih = document.getElementById('datepicker_2').value;
+    //alert("datepicker-1............"+ilk_tarih);
+    //alert("datepicker-2............"+son_tarih);
+
+    if (ilk_tarih=="" || son_tarih=="")
+      {alert("eksik veri girdiniz!");
+       return;}
+
+    if (ilk_tarih > son_tarih)
+      {alert("tarih sıralaması yanlış!");
+       return;}
+
+
+
+    var x = document.getElementById("div_proje");
+    var y = document.getElementById("div_canvas");
+    var z = document.getElementById("div_table");
+    x.style.display = "block";
+    y.style.display = "block";
+    z.style.display = "block";
+
+    //dataChart(proje, ilk_tarih, son_tarih);
+    dataChart(ilk_tarih, son_tarih);
+
+  }
+  </script>
+
+
+  <script>
+  function setChart_3(data_1, data_2, data_3, options_1, options_2, options_3){
+      alert("buraya da geldi  setchart3()..................");
+      alert("data 1  "+data_1);
+      alert("data 2  "+data_2);
+      alert("data 3  "+data_3);
+
+      var ctx1 = document.getElementById("myChart1");
+      var ctx2 = document.getElementById("myChart2");
+      var ctx3 = document.getElementById("myChart3");
+
+      var myChart1 = new Chart(ctx1, {
+      type: 'pie',
+      data: data_1,
+      options: options_1,
+      });   // end chart............
+
+      var myChart2 = new Chart(ctx2, {
+      type: 'pie',
+      data: data_2,
+      options: options_2,
+      });   // end chart............
+
+      var myChart3 = new Chart(ctx3, {
+      type: 'pie',
+      data: data_3,
+      options: options_3,
+      });   // end chart............
+
+  }  // end ************  function  set chart  ****************
+  </script>
+
+
+  <script>
+  function setChart_2(data_1, data_2, options_1, options_2){
+      alert("buraya da geldi  setchart2()..................");
+      alert("data 1  "+data_1);
+      alert("data 2  "+data_2);
+
+      var ctx1 = document.getElementById("myChart1");
+      var ctx2 = document.getElementById("myChart2");
+
+      var myChart1 = new Chart(ctx1, {
+      type: 'pie',
+      data: data_1,
+      options: options_1,
+      });   // end chart............
+
+      var myChart2 = new Chart(ctx2, {
+      type: 'pie',
+      data: data_2,
+      options: options_2,
+      });   // end chart............
+
+
+  }  // end ************  function  set chart  ****************
+  </script>
+
+
+  <script>
+  function setChart_1(data_1, options_1){
+      alert("buraya da geldi  setchart1()..................");
+      alert("data 1  "+data_1);
+      var ctx1 = document.getElementById("myChart1");
+
+      var myChart1 = new Chart(ctx1, {
+      type: 'pie',
+      data: data_1,
+      options: options_1,
+      });   // end chart............
+
+
+  }  // end ************  function  set chart  ****************
+  </script>
+
+
+  <script>
+  function setbar_Chart(labels_b, defaultData_b){
+      alert("buraya da geldi  setchart()..................");
+      alert("label_b..."+labels_b);
+      alert("default data b.."+defaultData_b);
+
+
+
+
+
+      var ctx4 = document.getElementById("myChart4");
+
+      var myChart4 = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: labels_b,
+                datasets: [{
+                    label: 'Memnuniyetsizlik Sebepleri',
+                    data: defaultData_b,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255,99,132,1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                            //min: 30
+                        }
+                    }]
+                }
+            }
+          });  //  end  new chart......
+
+
+          $("#s1").text(data.seb_1);
+          $("#s2").text(data.seb_2);
+          $("#s3").text(data.seb_3);
+          $("#s4").text(data.seb_4);
+          $("#s5").text(data.seb_5);
+          $("#s6").text(data.seb_6);
+          $("#st").text(data.seb_toplam);
+          $("#sy1").text("%"+data.s_yuzde_1);
+          $("#sy2").text("%"+data.s_yuzde_2);
+          $("#sy3").text("%"+data.s_yuzde_3);
+          $("#sy4").text("%"+data.s_yuzde_4);
+          $("#sy5").text("%"+data.s_yuzde_5);
+          $("#sy6").text("%"+data.s_yuzde_6);
+
+
+  }  // end ************  function  set bar  chart  ****************
+  // var ctx = document.getElementById("myChart");
+  </script>
+
+
+
+
+
+  <script>
+  $(document).ready(function(){
+    alert(" ana menu mky... document ready....");
+    mem_veri_list = {{ mem_veri_list|safe }};
+    a_list = {{ a_list|safe }};
+    b_list = {{ b_list|safe }};
+    c_list = {{ c_list|safe }};
+    sayi = {{ sayi|safe }};
+
+
+    alert("a_list    "+a_list[0]);
+    alert("b_list    "+b_list[0]);
+    alert("c_list    "+c_list[0]);
+    //alert("deneme...."+a_list[0].proje);
+    //alert("deneme...."+a_list[0].m_yuzde_1);
+    alert(" sayı    "+sayi);
+
+    var data_1 = {
+        labels: a_list[0].labels_1,
+        datasets: [{
+            label: a_list[0].proje,
+            data: a_list[0].default_1,
+            backgroundColor: [
+                'rgba(0, 255, 0, 0.6)',
+                'rgba(255, 255, 0, 0.6)',
+                'rgba(255, 0, 0, 0.6)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+       }
+
+       var options_1 = {
+         segmentShowStroke : true,
+         segmentStrokeColor : "#fff",
+         segmentStrokeWidth : 2,
+         percentageInnerCutout : 50,
+         animationSteps : 100,
+         animationEasing : "easeOutBounce",
+         animateRotate : true,
+         animateScale : false,
+         responsive: true,
+         maintainAspectRatio: false,
+         showScale: true,
+         animateScale: true,
+         title: {
+           display: true,
+           text: a_list[0].proje,
+           }
+         }
+
+
+      if (sayi == 2 || sayi ==3)
+      {  alert("sayı  2  yada 3.....");
+        var data_2 = {
+            labels: b_list[0].labels_1,
+            datasets: [{
+                label: b_list[0].proje,
+                data: b_list[0].default_1,
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.6)',
+                    'rgba(255, 255, 0, 0.6)',
+                    'rgba(255, 0, 0, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+          }
+
+
+                    var options_2 = {
+                      segmentShowStroke : true,
+                      segmentStrokeColor : "#fff",
+                      segmentStrokeWidth : 2,
+                      percentageInnerCutout : 50,
+                      animationSteps : 100,
+                      animationEasing : "easeOutBounce",
+                      animateRotate : true,
+                      animateScale : false,
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      showScale: true,
+                      animateScale: true,
+                      title: {
+                        display: true,
+                        text: b_list[0].proje,
+                        }
+                      }
+
+       }  //if sayi 2 yada 3
+
+       if (sayi ==3)
+       {  alert("sayı  3.....");
+         var data_3 = {
+             labels: c_list[0].labels_1,
+             datasets: [{
+                 label: c_list[0].proje,
+                 data: c_list[0].default_1,
+                 backgroundColor: [
+                     'rgba(0, 255, 0, 0.6)',
+                     'rgba(255, 255, 0, 0.6)',
+                     'rgba(255, 0, 0, 0.6)'
+                 ],
+                 borderColor: [
+                     'rgba(54, 162, 235, 1)',
+                     'rgba(255, 206, 86, 1)',
+                     'rgba(255, 159, 64, 1)'
+                 ],
+                 borderWidth: 1
+             }]
+          }
+
+          var options_3 = {
+            segmentShowStroke : true,
+            segmentStrokeColor : "#fff",
+            segmentStrokeWidth : 2,
+            percentageInnerCutout : 50,
+            animationSteps : 100,
+            animationEasing : "easeOutBounce",
+            animateRotate : true,
+            animateScale : false,
+            responsive: true,
+            maintainAspectRatio: false,
+            showScale: true,
+            animateScale: true,
+            title: {
+              display: true,
+              text: c_list[0].proje,
+              }
+            }
+
+        }  // if sayı 3 se
+
+
+
+
+
+
+
+
+
+    if (sayi == 1)
+    {
+      alert("a 1....");
+      setChart_1(data_1, options_1);
+
+      $("#my1_1").text("%"+a_list[0].m_yuzde_1);
+      $("#my2_1").text("%"+a_list[0].m_yuzde_2);
+      $("#my3_1").text("%"+a_list[0].m_yuzde_3);
+
+      var link = document.getElementById("div_c2");
+      link.style.display = 'none'; //or
+      var link2 = document.getElementById("div_t2");
+      link2.style.display = 'none'; //or
+
+      var link3 = document.getElementById("div_c3");
+      link3.style.display = 'none'; //or
+      var link4 = document.getElementById("div_t3");
+      link4.style.display = 'none'; //or
+
     }
-    </script>
-  </table>
-   </head>
+
+    if (sayi == 2)
+    {
+      alert("a 2.....");
+      alert("data 1", data_1);
+      alert("data 2", data_2);
+      alert("options 1 ", options_1);
+      alert("options 2 ", options_2);
+
+      setChart_2(data_1, data_2, options_1, options_2);
+
+      $("#my1_1").text("%"+a_list[0].m_yuzde_1);
+      $("#my2_1").text("%"+a_list[0].m_yuzde_2);
+      $("#my3_1").text("%"+a_list[0].m_yuzde_3);
+      $("#my1_2").text("%"+b_list[0].m_yuzde_1);
+      $("#my2_2").text("%"+b_list[0].m_yuzde_2);
+      $("#my3_2").text("%"+b_list[0].m_yuzde_3);
+
+      var link = document.getElementById("div_c3");
+      link.style.display = 'none'; //or
+      var link2 = document.getElementById("div_t3");
+      link2.style.display = 'none'; //or
 
 
-   <h4>Bekleyen denetimler </h4>
+    }
 
-   {% if secili_denetimler %}
-   <ul>
-
-     {% for denetim in secili_denetimler %}
-       <li>
-         <a href="/islem/denetim/{{denetim.id}}">{{ denetim.denetim_adi }} </a>  &emsp; <a> {{ denetim.hedef_baslangic|date:"d/m/Y" }}</a>
-       </li>
-       {% endfor %}
-       <p> </p>
-     </ul>
-   {% else %}
-     <p>Kayıtlı bekleyen denetim yok ....</p>
-     <p> </p>
-   {% endif %}
-
-
-   
-<div class="col-lg-12">
-        <div class="card-group">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="m-b-0"><i class="mdi mdi-checkbox-blank-circle-outline text-info"></i></h2>
-                            <h3 class="">{{ num_tipi }}</h3>
-                            <h6 class="card-subtitle">Yeni Eklenen Denetimler</h6></div>
-                        <div class="col-12">
-                            <div class="progress">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 24%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    if (sayi == 3)
+    {
+      alert("a 3.....");
+      setChart_3(data_1, data_2, data_3, options_1, options_2, options_3);
+      $("#my1_1").text("%"+a_list[0].m_yuzde_1);
+      $("#my2_1").text("%"+a_list[0].m_yuzde_2);
+      $("#my3_1").text("%"+a_list[0].m_yuzde_3);
+      $("#my1_2").text("%"+b_list[0].m_yuzde_1);
+      $("#my2_2").text("%"+b_list[0].m_yuzde_2);
+      $("#my3_2").text("%"+b_list[0].m_yuzde_3);
+      $("#my1_3").text("%"+c_list[0].m_yuzde_1);
+      $("#my2_3").text("%"+c_list[0].m_yuzde_2);
+      $("#my3_3").text("%"+c_list[0].m_yuzde_3);
 
 
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="m-b-0"><i class="mdi mdi-checkbox-marked-circle-outline text-success"></i></h2>
-                            <h3 class="">{{ num_bolum }}</h3>
-                            <h6 class="card-subtitle">Devam Eden Denetimler</h6></div>
-                        <div class="col-12">
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 54%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    }
 
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="m-b-0" ><i class="mdi mdi-check-circle-outline text-purple"></i></h2>
-                            <h3 class="">{{ num_detay }}</h3>
-                            <h6 class="card-subtitle">Tamamlanan Denetimler</h6></div>
-                        <div class="col-12">
-                            <div class="progress">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 13%; height: 6px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    //sakla()
+  })
+  </script>
 
+
+
+</head>
+
+<body>
+
+</br>
+</br>
+<h4>   Proje Memnuniyetleri  </h4>
+</br>
+</br>
+
+
+<h3 id="div_proje"> </h3>
+
+<div class='row' id="div_canvas" >
+
+        <div id="div_c1" class='col-md-4 chart-container' style="position: relative; margin-top: 80px;">
+            <canvas id="myChart1"></canvas>
+        </div>
+
+        <div id="div_c2" class='col-md-4 chart-container' style="position:relative; margin-top: 80px;"  >
+            <canvas id="myChart2"></canvas>
+        </div>
+
+        <div id="div_c3" class='col-md-4 chart-container' style="position:relative; margin-top: 80px;"  >
+            <canvas id="myChart3"></canvas>
         </div>
 
 
-
-        <div class="row">
-            <div class="col-lg-8 col-xlg-9">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="d-flex flex-wrap">
-                                    <div>
-                                        <h4 class="card-title">Denetim Analizi</h4>
-                                    </div>
-                                    <div class="ml-auto">
-                                        <ul class="list-inline">
-                                            <li>
-                                                <h6 class="text-muted  text-info"><i class="fa fa-circle font-10 m-r-10"></i>Yeni Eklenenler</h6> </li>
-
-                    <li>
-                                                <h6 class="text-muted text-success"><i class="fa fa-circle font-10 m-r-10 "></i>Devam Edenler</h6> </li>
-                    <li>
-                                                <h6 class="text-purple"><i class="fa fa-circle font-10 m-r-10 "></i>Tamamlananlar</h6> </li>
-
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div id="earning" style="height: 355px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-<!--
-            <div class="col-lg-4 col-xlg-3">
-                <div class="card card-inverse card-info">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <div class="m-r-20 align-self-center">
-                                <h1 class="text-white"><i class="mdi mdi-city"></i></h1></div>
-                            <div>
-                                <h3 class="card-title">Grup</h3>
-                                <h6 class="card-subtitle">Sisteme Kayıtlı Grup Bilgileri</h6> </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 align-self-center">
-                                <h2 class="font-light text-white">Kayıtlı {{ num_grup }} Grup</h2>
-                            </div>
-                            <div class="col-6 p-t-10 p-b-20 text-right">
-                                <div class="spark-count" style="height:65px"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card card-inverse card-success">
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <div class="m-r-20 align-self-center">
-                                <h1 class="text-white"><i class="mdi mdi-clipboard-text"></i></h1></div>
-                            <div>
-                                <h3 class="card-title">Şirket</h3>
-                                <h6 class="card-subtitle">Sisteme Kayıtlı Şirket Bilgileri</h6> </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 align-self-center">
-                                <h2 class="font-light text-white">Kayıtlı {{ num_sirket }} Şirket</h2>
-                            </div>
-                            <div class="col-6 p-t-10 p-b-20 text-right align-self-center">
-                                <div class="spark-count2" style="height:65px"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex no-block">
-                            <h4 class="card-title">Görev Uyarıları<br/><small class="text-muted">Sisteme Kayıtlı Görev Uyarıları</small></h4>
-                            <div class="ml-auto">
-                                <select class="custom-select">
-                                    <option selected="">Ocak 2018</option>
-                                    <option value="1">Şubat 2018</option>
-                                    <option value="2">Mart 2018</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
--->
-<div id="line_top_x"></div>
-
-    </div>
-</div>
-<footer class="footer"> © 2018 Ez-Check&#169; - Her Hakkı Saklıdır. </footer>
 </div>
 
 
 
+<div class='row' id="div_table" >
+
+  <div id="div_t1" class='col-md-4' style="position: relative; margin-top: 80px;">
+      <table >
+              <tr>
+                <th></th>
+                <th>Çok Memnun  &emsp;  &emsp; </th>
+                <th>Memnun   &emsp; &emsp;  </th>
+                <th>Memnun Değil   &emsp;  &emsp; </th>
+              </tr>
+
+              <tr>
+                <td align="center">&emsp; &emsp; </td>
+                <td id="my1_1" align="center">... </td>
+                <td id="my2_1" align="center">... </td>
+                <td id="my3_1" align="center">...  </td>
+              </tr>
+
+      </table>
+  </div>
+
+  <div id="div_t2" class='col-md-4' style="position: relative; margin-top: 80px;">
+      <table >
+              <tr>
+                <th></th>
+                <th>Çok Memnun  &emsp;  &emsp; </th>
+                <th>Memnun   &emsp; &emsp;  </th>
+                <th>Memnun Değil   &emsp;  &emsp; </th>
+              </tr>
+
+              <tr>
+                <td align="center">&emsp; &emsp; </td>
+                <td id="my1_2" align="center">... </td>
+                <td id="my2_2" align="center">... </td>
+                <td id="my3_2" align="center">...  </td>
+              </tr>
+
+      </table>
+  </div>
+
+  <div id="div_t3" class='col-md-4' style="position: relative; margin-top: 80px;">
+      <table >
+              <tr>
+                <th></th>
+                <th>Çok Memnun  &emsp;  &emsp; </th>
+                <th>Memnun   &emsp; &emsp;  </th>
+                <th>Memnun Değil   &emsp;  &emsp; </th>
+              </tr>
+
+              <tr>
+                <td align="center">&emsp; &emsp; </td>
+                <td id="my1_3" align="center">... </td>
+                <td id="my2_3" align="center">... </td>
+                <td id="my3_3" align="center">...  </td>
+              </tr>
+
+      </table>
+  </div>
+
+
+</div>
+
+
+</br>
+</br>
+</br>
+
+
+<div class='row' id="div_canvas2">
+
+        <div class='col-md-3 chart-container' style="position:relative; margin-top: 80px;"  >
+        </div>
+
+        <div class='col-md-6 chart-container' style="position:relative; margin-top: 80px;"  >
+            <canvas id="myChart4"></canvas>
+
+            <table>
+                    <tr>
+                      <th></th>
+                      <th>Sabunluk &emsp; </th>
+                      <th>Lavabo &emsp;   </th>
+                      <th>Havlu &emsp;   </th>
+                      <th>Koku &emsp;  </th>
+                      <th>Tuvalet &emsp;  </th>
+                      <th>T.Kağıdı &emsp;  </th>
+                      <th>Toplam &emsp;   </th>
+                    </tr>
+
+                    <tr>
+                      <td align="center">&emsp; Adet &emsp;</td>
+                      <td id="s1" align="center">... </td>
+                      <td id="s2" align="center">... </td>
+                      <td id="s3" align="center">...  </td>
+                      <td id="s4" align="center">... </td>
+                      <td id="s5" align="center">... </td>
+                      <td id="s6" align="center">...  </td>
+                      <td id="st" align="center">...  </td>
+                    </tr>
+
+
+                    <tr>
+                      <td align="center"> &emsp;Yüzde &emsp;</td>
+                      <td id="sy1" align="center">... </td>
+                      <td id="sy2" align="center">... </td>
+                      <td id="sy3" align="center">...  </td>
+                      <td id="sy4" align="center">... </td>
+                      <td id="sy5" align="center">... </td>
+                      <td id="sy6" align="center">...  </td>
+                      <td align="center"> - </td>
+                    </tr>
+
+            </table>
+
+
+        </div>
+
+</div>
 
 
 
-
-
-
-
+</body>
+</html>
 
 
 {% endblock %}

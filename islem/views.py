@@ -18,7 +18,7 @@ from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, SonucResimForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
-from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, MacnoYerForm, PAForm, DuzenleDenetimSecForm
+from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, SirketSecForm, MacnoYerForm, PAForm, DuzenleDenetimSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm, SpvForm, DenForm
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
@@ -382,15 +382,46 @@ def index(request):
         #
 
         proje_sayisi = projeler.count()
+        oran_mem_list = []
+        for p in projeler:
+            a_list = []
+            oran_mem = oran_memnuniyet(request, deger=p.id)
+            a_list.append(oran_mem)
+            a_list.append(p.id)
+            oran_mem_list.append(a_list)
+
+        print("işte proje sayısı...", proje_sayisi)
+        print("işte ortalama değer listesi...", oran_mem_list)
+
+        oran_mem_list.sort(reverse=True)
+        print("oran mem list...  sorttan sonra...", oran_mem_list)
+
+        mem_veri_list = ana_menu_mky_hazirla(request, oran_mem_list=oran_mem_list)
+        a_list = b_list = c_list = []
+        sayi = len(mem_veri_list)
+        print("işte array sayısı...", sayi)
+        if sayi == 3:
+            a_list = mem_veri_list[0]
+            b_list = mem_veri_list[1]
+            c_list = mem_veri_list[2]
+        elif sayi == 2:
+            a_list = mem_veri_list[0]
+            b_list = mem_veri_list[1]
+        else:
+            a_list = mem_veri_list[0]
 
 
+        print(" a list", a_list)
+        print(" b list", b_list)
+        print(" c list", c_list)
 
 
-        secili_denetimler = None
         return render(request, 'ana_menu_mky.html',
-            context={
-            'secili_denetimler': secili_denetimler,
-            },
+            context={'mem_veri_list': mem_veri_list,
+                      'a_list': a_list,
+                       'b_list': b_list,
+                        'c_list': c_list,
+                         'sayi': sayi},
         )
 
     if kullanici.opr_proje_yon == "E"  or  kullanici.opr_alan_sefi == "E":
@@ -4386,6 +4417,105 @@ def spv_listesi_sil_kesin(request, pk=None):
 
 
 
+#------------------------------------------------------------------------------------
+
+@login_required
+def opr_admin(request, pk=None):
+
+    if not request.user.is_superuser:
+        mesaj = "kullanıcı sistem yöneticisi değil...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        form = SirketSecForm(request.POST)
+        print("şirketform okundu...")
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid....")
+            gelen_sirket = request.POST.get('sirket', "")
+            print("sirket....", sirket)
+            secili_sirket = sirket.objects.get(id=gelen_sirket)
+            kisi_listesi = Profile.objects.filter(sirket=gelen_sirket)
+            if not kisi_listesi:
+                mesaj = "bu şirkete ait kullanıcı yok...!!"
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+            opr_admin_list = kisi_listesi.filter(opr_admin="E")
+            kisi_list = kisi_listesi.filter(opr_admin="H")
+            contx_dict = {'kisi_list': kisi_list, 'opr_admin_list': opr_admin_list, 'sirket': secili_sirket}
+            return render(request, 'islem/sirket_kisi_list.html', contx_dict)
+        else:
+            print(" geçerli değil............")
+            return render(request, 'islem/sirket_form.html', {'form': form,})
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #form = SpvForm(serbest_spv=kalan_list)
+        form = SirketSecForm()
+        return render(request, 'islem/sirket2_form.html', {'form': form,})
+
+
+
+
+@login_required
+def opr_admin_ekle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    user_obj = get_object_or_404(Profile, pk=pk)
+    if user_obj.opr_admin == "E":
+        mesaj = "bu kişi zaten şirket sistem yöneticisi...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    print("user profile obj....", user_obj)
+    context = {'user_obj' : user_obj,
+              }
+    return render(request, 'islem/opr_admin_ekle_soru.html', context )
+
+
+
+@login_required
+def opr_admin_ekle_kesin(request, pk=None):
+    #user_obj = Profile.objects.get(id=pk)
+    user_obj = get_object_or_404(Profile, pk=pk)
+    if user_obj.opr_admin == "E":
+        mesaj = "bu kişi zaten şirket sistem yöneticisi...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    user_obj.opr_admin = "E"
+    user_obj.save()
+    return redirect('opr_admin')
+
+
+
+
+
+
+@login_required
+def opr_admin_kaldir(request, pk=None):
+    # if this is a POST request we need to process the form data
+    user_obj = get_object_or_404(Profile, pk=pk)
+    if user_obj.opr_admin == "E":
+        mesaj = "bu kişi zaten şirket sistem yöneticisi...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    print("user profile obj....", user_obj)
+    context = {'user_obj' : user_obj,
+              }
+    return render(request, 'islem/opr_admin_kaldir_soru.html', context )
+
+
+
+
+@login_required
+def opr_admin_kaldir_kesin(request, pk=None):
+    user_obj = get_object_or_404(Profile, pk=pk)
+    if user_obj.opr_admin == "H":
+        mesaj = "bu kişi zaten şirket sistem yöneticisi  değil...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    print("user profile obj....", user_obj)
+    user_obj.opr_admin = "H"
+    user_obj.save()
+    return redirect('opr_admin')
+
+
 
 
 
@@ -6507,6 +6637,15 @@ class zonautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(zon_adi__icontains=self.q)
         return qs
 
+class sirket2autocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return proje.objects.none()
+        qs = sirket.objects.all().order_by('sirket_adi')
+        if self.q:
+            qs = qs.filter(sirket_adi__icontains=self.q)
+        return qs
 
 
 class projeautocomplete(autocomplete.Select2QuerySetView):
@@ -6616,6 +6755,7 @@ def popup_notif(request):
 from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list, get_sy_list
 from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms, rapor_verisi_hazirla
+from islem.services import oran_memnuniyet, ana_menu_mky_hazirla, mem_veri_hazirla
 
 
 
@@ -6693,7 +6833,7 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
+    proje = "3"
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)

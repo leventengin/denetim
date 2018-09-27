@@ -123,7 +123,7 @@ def get_data(request, *args, **kwargs):
     }
     return JsonResponse(data) # http response
 
-
+import operator
 
 def get_data_krs(request, *args, **kwargs):
 
@@ -159,11 +159,15 @@ def get_data_krs(request, *args, **kwargs):
             m_obj_y3 = round(m_obj_c3/m_obj_toplam*100, 0)
         else:
             m_obj_y1 = m_obj_y2 = m_obj_y3 = 0
-        
+
         sayi = sayi + 1
-        memnuniyet_toplam = memnuniyet_toplam + m_obj_c1
+        memnuniyet_toplam = memnuniyet_toplam + m_obj_c1 + m_obj_c2
         genel_toplam = genel_toplam + m_obj_toplam
+        memnun_yuzdesi = round((m_obj_y1 + m_obj_y2), 0)
+        memnun_yuzdesi = int(memnun_yuzdesi)
+        print("memnun yüzdesi....", memnun_yuzdesi)
         data_row = {
+                "memnun_yuzdesi": memnun_yuzdesi,
                 "mem_toplam": m_obj_toplam,
                 "mem_1": m_obj_c1,
                 "mem_2": m_obj_c2,
@@ -172,19 +176,24 @@ def get_data_krs(request, *args, **kwargs):
                 "yuzde_1": m_obj_y1,
                 "yuzde_2": m_obj_y2,
                 "yuzde_3": m_obj_y3,
+                "proje": proje_adi,
         }
         label_row = {
                 "proje": proje_adi,
         }
+
         data_list.append(data_row)
-        label_list.append(label_row)
     if sayi != 0 and genel_toplam !=0:
         ortalama = round(memnuniyet_toplam/genel_toplam*100, 0)
     else:
         ortalama = 0
     # sort data_list.....
-    data_list = sorted(data_list, key=itemgetter('mem_1'))
-    data = {"data_list": data_list, "label_list": label_list, "ortalama": ortalama, "sayi": sayi}
+    print("data list before sorting...", data_list)
+    #data_list.sort(key=operator.itemgetter('memnun_yuzdesi'))
+    data_list = sorted(data_list, key=lambda k: k['memnun_yuzdesi'], reverse=True)
+    print("data list after sorting....", data_list)
+
+    data = {"data_list": data_list, "ortalama": ortalama, "sayi": sayi}
     print("data list ....", data_list)
     return JsonResponse(data) # http response
 

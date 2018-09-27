@@ -150,11 +150,14 @@ class Ikili_Deneme_Form(forms.Form):
 
 
 
-
 class ProjeSecForm(forms.Form):
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),
                  widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
 
+
+class SirketSecForm(forms.Form):
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),
+                 widget=autocomplete.ModelSelect2(url='sirket2-autocomplete'), required=False)
 
 
 class SoruListesiForm(forms.Form):

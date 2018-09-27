@@ -22,7 +22,7 @@ from django.utils.translation import get_language
 
 from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
 from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, spvautocomplete
-from .views import zonautocomplete, denetciautocomplete, projeautocomplete
+from .views import zonautocomplete, denetciautocomplete, projeautocomplete, sirket2autocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
 from .views import sirketautocomplete, sirketprojeautocomplete, spvautocomplete, denautocomplete
@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
     url(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
     url(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
+    url(r'^sirket2-autocomplete/$', sirket2autocomplete.as_view(),name='sirket2-autocomplete',),
     url(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
     url(r'^rutindenetim-autocomplete/$', rutindenetimautocomplete.as_view(),name='rutindenetim-autocomplete',),
     url(r'^list_tipi-autocomplete/$', list_tipiautocomplete.as_view(),name='list_tipi-autocomplete',),
@@ -262,6 +263,12 @@ urlpatterns = [
     url(r'^den_listesi/yarat/$', views.den_yarat, name='den_yarat'),
     url(r'^den_listesi/(?P<pk>\d+)/sil/$', views.den_listesi_sil, name='den_listesi_sil'),
     url(r'^den_listesi/(?P<pk>\d+)/sil/kesin/$', views.den_listesi_sil_kesin, name='den_listesi_sil_kesin'),
+
+    url(r'^opr_admin/$', views.opr_admin, name='opr_admin'),
+    url(r'^opr_admin/(?P<pk>\d+)/ekle/$', views.opr_admin_ekle, name='opr_admin_ekle'),
+    url(r'^opr_admin/(?P<pk>\d+)/ekle/kesin/$', views.opr_admin_ekle_kesin, name='opr_admin_ekle_kesin'),
+    url(r'^opr_admin/(?P<pk>\d+)/kaldir/$', views.opr_admin_kaldir, name='opr_admin_kaldir'),
+    url(r'^opr_admin/(?P<pk>\d+)/kaldir/kesin/$', views.opr_admin_kaldir_kesin, name='opr_admin_kaldir_kesin'),
 
     # detay urlleri aşağıda....
     url(r'^detay/$', views.DetayListView.as_view(), name='detay'),

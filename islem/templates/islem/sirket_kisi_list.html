@@ -1,0 +1,79 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h4>Sirket Sistem Yöneticisi Listesi</h4>
+    <p> </p>
+    <h4> Şirket...:&emsp; {{ sirket }} </h4>
+    </br>
+    </br>
+    <!-- <h4>Grup içinden planlayıcılar:</h4>  -->
+
+    {% if opr_admin_list %}
+
+        <table cellspacing="10" cellpadding="0">
+              <tr>
+                <th></th>
+                <th> &emsp;&emsp; </th>
+                <th>Kullanıcı Adı</th>
+                <th> &emsp;&emsp; </th>
+                <th>Adı</th>
+                <th> &emsp;&emsp; </th>
+                <th>Mail Adresi</th>
+              </tr>
+
+            {% for opr_admin in opr_admin_list %}
+                <tr >
+                  <td> <a href="{{opr_admin.id}}/kaldir"><span class='glyphicon glyphicon-remove'></span></a> </td>
+                  <td> &emsp;&emsp; </td>
+                  <td> {{ opr_admin.user.get_username  }}  </td>
+                  <td> &emsp;&emsp; </td>
+                  <td> {{ opr_admin.user.get_full_name  }}  </td>
+                  <td> &emsp;&emsp; </td>
+                  <td>{{ opr_admin.user.email }}  </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    {% else %}
+      <p>Tanımlı sistem yöneticisi yok...  </p>
+    {% endif %}
+
+    <p>  &emsp; </p>
+
+    {% if kisi_list %}
+
+    <h4>Diğer kullanıcılar</h4>
+          <table cellspacing="10" cellpadding="0">
+                    <tr>
+                      <th></th>
+                      <th> &emsp;&emsp; </th>
+                      <th>Kullanıcı Adı</th>
+                      <th> &emsp;&emsp; </th>
+                      <th>Adı</th>
+                      <th> &emsp;&emsp; </th>
+                      <th>Mail Adresi</th>
+                    </tr>
+              {% for kisi in kisi_list %}
+                  <tr >
+                    <td> <a href="{{kisi.id}}/ekle"><span class='glyphicon glyphicon-plus'></span></a> </td>
+                    <td> &emsp;&emsp; </td>
+                    <td> <a> {{ kisi.user.get_username  }} </a> </td>
+                    <td> &emsp;&emsp; </td>
+                    <td> <a> {{ kisi.user.get_full_name  }} </a> </td>
+                    <td> &emsp;&emsp; </td>
+                    <td> <a>  {{ kisi.user.email }}  </a> </td>
+                  </tr>
+              {% endfor %}
+          </table>
+
+    {% else %}
+      <p>Listede sistem yöneticisi olmayan kullanıcı yok... </p>
+    {% endif %}
+  </br>
+  </br>
+
+
+
+
+{% endblock %}

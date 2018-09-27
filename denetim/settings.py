@@ -206,7 +206,7 @@ LOGIN_REDIRECT_URL = '/islem/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
-ADR_LOCAL = '127.0.0.1'
+ADR_LOCAL = '127.0.0.1:7000'
 #ADR_LOCAL = '37.148.210.226'
 #ADR_LOCAL = '172.104.239.247'
 

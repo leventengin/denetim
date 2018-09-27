@@ -91,13 +91,13 @@
 
   <script>
   function dataChart(ilk_tarih, son_tarih){
-    alert("buraya da geldi.....datachart()......!!!!!");
+    //alert("buraya da geldi.....datachart()......!!!!!");
     var endpoint = '/charts/api/data/';
     var defaultData = [];
     var labels = [];
     var proje = null;
-    alert("ilk_tarih..."+ilk_tarih);
-    alert("son tarih..."+son_tarih);
+    //alert("ilk_tarih..."+ilk_tarih);
+    //alert("son tarih..."+son_tarih);
     $.ajax({
         method: "GET",
         url: endpoint,
@@ -112,7 +112,7 @@
          },
 
         success: function(data){
-            alert("gelen data..."+data)
+            //alert("gelen data..."+data)
             labels_1 = data.labels_1;
             defaultData_1 = data.default_1;
             labels_2 = data.labels_2;
@@ -138,7 +138,11 @@
             $("#sy4").text("%"+data.s_yuzde_4);
             $("#sy5").text("%"+data.s_yuzde_5);
             $("#sy6").text("%"+data.s_yuzde_6);
-            setChart(labels_1, defaultData_1, labels_2, defaultData_2);
+            if (data.mem_toplam > 0)
+               { setChart(labels_1, defaultData_1, labels_2, defaultData_2); }
+               else
+                  { alert(" belirtilen tarih aralığında değer yok ");  }
+            
         },
         error: function(error_data){
             console.log("error");
@@ -150,11 +154,11 @@
 
   <script>
   function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
-      alert("buraya da geldi  setchart()..................");
-      alert("label_1..."+labels_1);
-      alert("default data 1.."+defaultData_1);
-      alert("label_2..."+labels_2);
-      alert("default data 2.."+defaultData_2);
+      //alert("buraya da geldi  setchart()..................");
+      //alert("label_1..."+labels_1);
+      //alert("default data 1.."+defaultData_1);
+      //alert("label_2..."+labels_2);
+      //alert("default data 2.."+defaultData_2);
       var ctx = document.getElementById("myChart");
       //ctx.textAlign = "center";
       //ctx.canvas.width = 300;
