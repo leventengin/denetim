@@ -4671,7 +4671,12 @@ import copy
 def yer_detay_gecici(request, pk=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
-    return render(request, 'islem/yer_detay.html', {'yer': yer_obj, })
+    opr_obj = plan_opr_gun.objects.filter(yer=pk)
+    den_obj = plan_den_gun.objects.filter(yer=pk)
+    print("opr obj....", opr_obj)
+    print("den obj....", den_obj)
+    context = {'yer': yer_obj, 'opr_obj': opr_obj, 'den_obj':den_obj}
+    return render(request, 'islem/yer_detay.html', context)
 
 
 
@@ -8525,10 +8530,11 @@ def list_notification(request):
     #n = Notification.objects.all()
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(14,0,0)
     yedigun_once = bugun - yedigun
     print("yedi gün önce ...............", yedigun_once)
-    n_list = Notification.objects.filter(viewed=False).filter(timestamp__gt=yedigun_once).filter(proje=proje).order_by("-id")
+    #liste proje bazından kişi bazına çevrildi...1 ekim 2018...
+    n_list = Notification.objects.filter(viewed=False).filter(timestamp__gt=yedigun_once).filter(kisi=request.user.id).order_by("-id")
     #contact_list = Contacts.objects.all()
     paginator = Paginator(n_list, 25)
     page = request.GET.get('page')

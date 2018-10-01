@@ -31,5 +31,25 @@
 
   </table>
 
+</br></br></br>
+Planlı Operasyonlar</br>
+---------------------</br>
+{% if opr_obj %}
+    {% for opr in opr_obj %}
+      {{ opr.gun }} ---   {{ opr.zaman }} </br>
+    {%  endfor %}
+{% else %}
+veri yok...</br>
+{% endif %}
+</br>
+Planlı Denetimler</br>
+--------------------</br>
+{% if den_obj %}
+  {% for den in den_obj %}
+    {{ den.gun }} ---   {{ den.zaman }} </br>
+  {%  endfor %}
+{% else %}
+veri yok...</br>
+{% endif %}
 
 {% endblock %}

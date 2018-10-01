@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
-
+import datetime
 
 def show_notification(request, notification_id):
     n = Notification.objects.get(id=notification_id)
@@ -20,7 +20,8 @@ def delete_notification(request, notification_id):
 def create_notification(request):
     print("create notification kısmı...")
     print("request.user.id", request.user.id)
-    Notification.objects.create(user_id=request.user.id,
+    Notification.objects.create(kisi_id=request.user.id,
+                                proje_id=1,
                                 title="8 nisan uyarı  1",
                                 message="8 nisan uyarı...111")
     return redirect('index')
@@ -32,10 +33,10 @@ def list_notification(request):
     #n = Notification.objects.all()
     bugun = datetime.datetime.now()
     yedigun = datetime.timedelta(7,0,0)
-    fark_yedigun = bugun - yedigun
+    yedigun_once = bugun - yedigun
     print(bugun)
-    print(fark_yedigun)
-    n_list = Notification.objects.filter(viewed=False).filter(timestamp > fark_yedigun).order_by("-id")
+    print(yedigun_once)
+    n_list = Notification.objects.filter(kisi_id=request.user.id).filter(timestamp__gt=yedigun_once).order_by("-id")
     #contact_list = Contacts.objects.all()
     paginator = Paginator(n_list, 20)
     page = request.GET.get('page')
@@ -48,4 +49,4 @@ def list_notification(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         n = paginator.page(paginator.num_pages)
     print("işte sayfalanmış liste...", n)
-    return render_to_response('islem/bildirimler.html', {'notification_list': n})
+    return render_to_response('islem/bildirimler_genel.html', {'notification_list': n})

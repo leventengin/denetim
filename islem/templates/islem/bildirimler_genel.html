@@ -1,0 +1,64 @@
+
+
+
+{% extends "base_generic.html" %}
+
+
+{% block content %}
+
+    <h4> Bildirimler </h4>
+    <p> </p>
+    {% if notification_list %}
+
+    <div class="pagination">
+
+      <ul>
+        <span class="current">
+            <table  id="table_id">
+
+                {% for n in notification_list %}
+
+                    <tr>
+                      <td> <a> {{ n.timestamp|date:" d/m/Y - H:i" }} </a> </td>
+                      <td>   &emsp;  </td>
+                      <td>  <a> {{ n.proje }} </a> </td>
+                      <td>   &emsp;  </td>
+                      <td>  <a> {{ n.message }} </a> </td>
+
+                    </tr>
+
+                {% endfor %}
+            </table>
+
+          </span>
+
+            <p> </p>
+          </ul>
+    </div>
+
+    {% else %}
+          <p> gelen bildirim yok !!!!!....</p>
+          <p> </p>
+    {% endif %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if notification_list.has_previous %}
+                <a href="?page=1">&laquo; ilk</a>
+                <a href="?page={{ notification_list.previous_page_number }}">önceki</a>
+            {% endif %}
+
+            <span class="current">
+                sf {{ notification_list.number }} / {{ notification_list.paginator.num_pages }}
+            </span>
+
+            {% if notification_list.has_next %}
+                <a href="?page={{ notification_list.next_page_number }}">sonraki</a>
+                <a href="?page={{ notification_list.paginator.num_pages }}">son &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+
+
+{% endblock %}

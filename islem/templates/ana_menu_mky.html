@@ -43,48 +43,23 @@
 
 
   <script>
-  function sakla(){
-    var x = document.getElementById("div_proje");
-    var y = document.getElementById("div_canvas");
-    var z = document.getElementById("div_table");
-    x.style.display = "none";
-    y.style.display = "none";
-    z.style.display = "none";
-  }
-  </script>
-
-
-
-  <script>
-  function goster(){
-    //alert("göster.....................");
-    var ilk_tarih = document.getElementById('datepicker_1').value;
-    var son_tarih = document.getElementById('datepicker_2').value;
-    //alert("datepicker-1............"+ilk_tarih);
-    //alert("datepicker-2............"+son_tarih);
-
-    if (ilk_tarih=="" || son_tarih=="")
-      {alert("eksik veri girdiniz!");
-       return;}
-
-    if (ilk_tarih > son_tarih)
-      {alert("tarih sıralaması yanlış!");
-       return;}
-
-
-
-    var x = document.getElementById("div_proje");
-    var y = document.getElementById("div_canvas");
-    var z = document.getElementById("div_table");
-    x.style.display = "block";
-    y.style.display = "block";
-    z.style.display = "block";
-
-    //dataChart(proje, ilk_tarih, son_tarih);
-    dataChart(ilk_tarih, son_tarih);
+  function goster(a){
+    alert("gelen a....."+a);
+    var link1 = document.getElementById("div_c4");
+    link1.style.display = ''; //or
+    var link2 = document.getElementById("div_t4");
+    link2.style.display = ''; //or
+    a_list = {{ a_list|safe }};
+    b_list = {{ b_list|safe }};
+    c_list = {{ c_list|safe }};
+    if (a == 1) { setbar_Chart(a_list[0])};
+    if (a == 2) { setbar_Chart(b_list[0])};
+    if (a == 3) { setbar_Chart(c_list[0])};
 
   }
   </script>
+
+
 
 
   <script>
@@ -164,24 +139,22 @@
 
 
   <script>
-  function setbar_Chart(labels_b, defaultData_b){
-      alert("buraya da geldi  setchart()..................");
-      alert("label_b..."+labels_b);
-      alert("default data b.."+defaultData_b);
-
-
-
-
+  function setbar_Chart(data){
+      alert("buraya da geldi  setbar chart()..................");
+      alert("gelen list..."+data);
+      alert("gelen proje.."+data.proje);
 
       var ctx4 = document.getElementById("myChart4");
-
+      ctx4.width = 800;
+      ctx4.height = 200;
+      var proje_sebep = data.proje+"  -  Memnuniyetsilik Sebepleri";
       var myChart4 = new Chart(ctx4, {
             type: 'bar',
             data: {
-                labels: labels_b,
+                labels: data.labels_2,
                 datasets: [{
-                    label: 'Memnuniyetsizlik Sebepleri',
-                    data: defaultData_b,
+                    label: proje_sebep,
+                    data: data.default_2,
                     backgroundColor: [
                         'rgba(54, 162, 235, 0.8)',
                         'rgba(255, 206, 86, 0.8)',
@@ -203,6 +176,7 @@
             },
             options: {
                 maintainAspectRatio: false,
+                responsive: true,
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -406,6 +380,11 @@
       var link4 = document.getElementById("div_t3");
       link4.style.display = 'none'; //or
 
+      var link5 = document.getElementById("div_c4");
+      link5.style.display = 'none'; //or
+      var link6 = document.getElementById("div_t4");
+      link6.style.display = 'none'; //or
+
     }
 
     if (sayi == 2)
@@ -429,7 +408,10 @@
       link.style.display = 'none'; //or
       var link2 = document.getElementById("div_t3");
       link2.style.display = 'none'; //or
-
+      var link3 = document.getElementById("div_c4");
+      link3.style.display = 'none'; //or
+      var link4 = document.getElementById("div_t4");
+      link4.style.display = 'none'; //or
 
     }
 
@@ -447,6 +429,10 @@
       $("#my2_3").text("%"+c_list[0].m_yuzde_2);
       $("#my3_3").text("%"+c_list[0].m_yuzde_3);
 
+      var link3 = document.getElementById("div_c4");
+      link3.style.display = 'none'; //or
+      var link4 = document.getElementById("div_t4");
+      link4.style.display = 'none'; //or
 
     }
 
@@ -471,18 +457,17 @@
 
 <div class='row' id="div_canvas" >
 
-        <div id="div_c1" class='col-md-4 chart-container' style="position: relative; margin-top: 80px;">
+        <div id="div_c1" class='col-md-4 chart-container' onclick="goster(1)" style="position: relative; margin-top: 80px;">
             <canvas id="myChart1"></canvas>
         </div>
 
-        <div id="div_c2" class='col-md-4 chart-container' style="position:relative; margin-top: 80px;"  >
+        <div id="div_c2" class='col-md-4 chart-container' onclick="goster(2)" style="position:relative; margin-top: 80px;" >
             <canvas id="myChart2"></canvas>
         </div>
 
-        <div id="div_c3" class='col-md-4 chart-container' style="position:relative; margin-top: 80px;"  >
+        <div id="div_c3" class='col-md-4 chart-container' onclick="goster(3)" style="position:relative; margin-top: 80px;" >
             <canvas id="myChart3"></canvas>
         </div>
-
 
 </div>
 
@@ -556,14 +541,27 @@
 </br>
 
 
-<div class='row' id="div_canvas2">
+
+<div class='row' id="div_canvas4">
+  <div class='col-md-12'  >
 
         <div class='col-md-3 chart-container' style="position:relative; margin-top: 80px;"  >
         </div>
 
-        <div class='col-md-6 chart-container' style="position:relative; margin-top: 80px;"  >
+        <div id="div_c4" class='col-md-6 chart-container' style="position:relative; margin-top: 80px;"  >
             <canvas id="myChart4"></canvas>
+        </div>
 
+  </div>
+
+
+</div>
+
+<div class='row' id="div_table4">
+
+        <div class='col-md-3 chart-container' style="position:relative; margin-top: 80px;"  >
+        </div>
+        <div id="div_t4" class='col-md-6 chart-container' style="position:relative; margin-top: 80px;"  >
             <table>
                     <tr>
                       <th></th>
@@ -600,11 +598,10 @@
                     </tr>
 
             </table>
-
-
         </div>
 
 </div>
+
 
 
 

@@ -109,6 +109,7 @@ class Profile(models.Model):
     denetci = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     denetim_grup_yetkilisi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_alan_sefi = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    opr_teknik = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_proje_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_merkez_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_admin = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
@@ -295,9 +296,6 @@ class yer(models.Model):
         return '%s-%s' % (self.mac_no, self.proje_alanlari)
 
 
-
-
-
 class plan_opr_gun(models.Model):
     yer = models.ForeignKey(yer, on_delete=models.PROTECT)
     gun = models.CharField(max_length=3, choices=GUNLER)
@@ -311,6 +309,7 @@ class plan_den_gun(models.Model):
     zaman = models.TimeField()
     def __str__(self):
         return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
+
 
 class ariza_tipi(models.Model):
     ariza_tipi = models.CharField(max_length=200)
