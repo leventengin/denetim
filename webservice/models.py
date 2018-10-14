@@ -87,8 +87,9 @@ class Ariza_Data(models.Model):
     p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
     yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
+    rfid_kapat  = models.CharField(max_length=20)
     sebep       = models.CharField(max_length=2)
-    kapat       = models.CharField(max_length=2)
+    progress    = models.CharField(max_length=2)
     gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 

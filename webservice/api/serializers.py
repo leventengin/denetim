@@ -106,8 +106,9 @@ class ArizaSerializer(serializers.ModelSerializer):
             'proje',
             'mac_no',
             'rfid_no',
+            'rfid_kapat',
             'sebep',
-            'kapat',
+            'progress',
             'gelen_tarih',
             'timestamp',
         ]
