@@ -7,13 +7,12 @@
 
       <h3>Yer Operasyon Zamanı Sil</h3>
 
-      <p>Bu operasyon zamanını silmek istediğinizden emin misiniz ???: </p>
+      <p>Bu operasyon zamanını silmek istediğinizden emin misiniz: </p>
 
-      <p>  <b> id   : </b>  &emsp;   {{ sil_id }}</p>
-      <p>  <b> Yer  : </b>  &emsp;   {{ sil_yer }}</p>
-      <p>  <b> Gün  : </b>  &emsp;   {{ sil_gün }}</p>
-      <p>  <b> Zaman: </b>  &emsp;   {{ sil_zaman }}</p>
-
+      <p>  <b> Yer  : </b>  &emsp;   {{ opr_plan_obj.yer }}</p>
+      <p>  <b> Gün  : </b>  &emsp;   {{ opr_plan_obj.gun }}</p>
+      <p>  <b> Zaman: </b>  &emsp;   {{ opr_plan_obj.zaman }}</p>
+      </br>
       <form action="" method="POST">
         {% csrf_token %}
       <a href="kesin"> Evet sil... </a>

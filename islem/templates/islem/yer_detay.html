@@ -13,43 +13,175 @@
       <td>{{ yer.proje_alanlari }}</td>
     </tr>
     <tr>
-      <td> &emsp; </td>
-    </tr>
-    <tr>
       <td><b>Adı:</b></td>
       <td> &emsp; </td>
       <td>{{ yer.yer_adi }}</td>
-    </tr>
-    <tr>
-      <td> &emsp; </td>
     </tr>
     <tr>
       <td><b>Mac No:</b></td>
       <td> &emsp; </td>
       <td>{{ yer.mac_no }}</td>
     </tr>
-
+    <tr>
+      <td><b>İşlem Süresi:</b></td>
+      <td> &emsp; </td>
+      <td>{{ yer.opr_sure | time:" H:i"}}</td>
+    </tr>
   </table>
 
-</br></br></br>
-Planlı Operasyonlar</br>
----------------------</br>
-{% if opr_obj %}
-    {% for opr in opr_obj %}
-      {{ opr.gun }} ---   {{ opr.zaman }} </br>
-    {%  endfor %}
-{% else %}
-veri yok...</br>
-{% endif %}
+
 </br>
-Planlı Denetimler</br>
---------------------</br>
-{% if den_obj %}
-  {% for den in den_obj %}
-    {{ den.gun }} ---   {{ den.zaman }} </br>
-  {%  endfor %}
-{% else %}
-veri yok...</br>
-{% endif %}
+</br>
+
+   <h5> Operasyon Zamanları</h5>
+
+   {% if o_list %}
+   <ul>
+     <table>
+       <tr>
+         <th>Pazartesi   &emsp;   &emsp; </th>
+         <th>Salı       &emsp;   &emsp;  </th>
+         <th>Çarşamba     &emsp;  &emsp; </th>
+         <th>Perşembe    &emsp;   &emsp; </th>
+         <th>Cuma        &emsp;  &emsp;  </th>
+         <th>Cumartesi   &emsp;  &emsp;  </th>
+         <th>Pazar     &emsp;   &emsp;   </th>
+       </tr>
+       {% for o in o_list %}
+         <tr>
+           <td>  {% if o.0  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.0.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.0.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.0.1.zaman | time:" H:i" }}    &emsp;  &emsp;
+                  {% endif %} </td>
+           <td>  {% if o.1  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.1.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.1.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.1.1.zaman | time:" H:i" }}  &emsp;   &emsp;
+                  {% endif %} </td>
+           <td>  {% if o.2  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.2.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.2.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.2.1.zaman | time:" H:i" }}   &emsp;   &emsp;
+                 {% endif %}</td>
+           <td>  {% if o.3  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.3.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.3.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.3.1.zaman | time:" H:i" }}   &emsp;   &emsp;
+                  {% endif %} </td>
+           <td>  {% if o.4  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.4.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.4.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.4.1.zaman | time:" H:i" }}   &emsp;   &emsp;
+                  {% endif %} </td>
+           <td>  {% if o.5  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.5.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.5.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.5.1.zaman | time:" H:i" }}   &emsp;   &emsp;
+                  {% endif %} </td>
+           <td>  {% if o.6  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{o.6.1.id}}/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{o.6.1.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{o.6.1.zaman | time:" H:i" }}    &emsp;  &emsp;
+                  {% endif %} </td>
+         </tr>
+       {% endfor %}
+     </table>
+     <br>
+     <p> </p>
+     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_operasyon_ekle' yer.id %}'">Ekle</button>
+   </ul>
+   {% else %}
+     <p> işlem zamanları planlanmamış....</p>
+     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_operasyon_planla' yer.id %}'">Planla</button>
+     <p> </p>
+     <p> </p>
+     <p> </p>
+     <p> </p>
+
+   {% endif %}
+ </br>
+ </br>
+
+
+   <h5> Denetim Zamanları</h5>
+
+   {% if d_list %}
+   <ul>
+     <table>
+       <tr>
+         <th>Pazartesi   &emsp;   &emsp; </th>
+         <th>Salı       &emsp;   &emsp;  </th>
+         <th>Çarşamba     &emsp;  &emsp; </th>
+         <th>Perşembe    &emsp;   &emsp; </th>
+         <th>Cuma        &emsp;  &emsp;  </th>
+         <th>Cumartesi   &emsp;  &emsp;  </th>
+         <th>Pazar     &emsp;   &emsp;   </th>
+       </tr>
+       {% for d in d_list %}
+         <tr>
+           <td>  {% if d.0  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.0.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.0.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.0.1.zaman | time:" H:i" }}    &emsp;  &emsp; {% endif %}</td>
+           <td>  {% if d.1  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.1.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.1.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.1.1.zaman | time:" H:i" }}  &emsp;   &emsp;  {% endif %}</td>
+           <td>  {% if d.2  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.2.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.2.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.2.1.zaman | time:" H:i" }}   &emsp;   &emsp;
+                  {% endif %} </td>
+           <td>  {% if d.3  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.3.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.3.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.3.1.zaman | time:" H:i" }}   &emsp;   &emsp; {% endif %} </td>
+           <td>  {% if d.4  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.4.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.4.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.4.1.zaman | time:" H:i" }}   &emsp;   &emsp; {% endif %}</td>
+           <td>  {% if d.5  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.5.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.5.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.5.1.zaman | time:" H:i" }}   &emsp;   &emsp; {% endif %}</td>
+           <td>  {% if d.6  == None %} <a>  </a>
+                 {% else %}
+                 <a href="{{d.6.1.id}}/den/delete"><span class='glyphicon glyphicon-remove'></span></a>
+                 <a href="{{d.6.1.id}}/den/update"><span class='glyphicon glyphicon-pencil'></span></a>
+                 -{{d.6.1.zaman | time:" H:i" }}    &emsp;  &emsp; {% endif %}</td>
+         </tr>
+       {% endfor %}
+     </table>
+   </br>
+     <p> </p>
+     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_denetim_ekle' yer.id %}'">Ekle</button>
+   </ul>
+   {% else %}
+     <p> denetim zamanları planlanmamış....</p>
+     <button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'yer_denetim_planla' yer.id %}'">Planla</button>
+     <p> </p>
+     <p> </p>
+     <p> </p>
+     <p> </p>
+
+   {% endif %}
+ </br>
+ </br>
+
+
 
 {% endblock %}

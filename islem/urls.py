@@ -79,6 +79,9 @@ urlpatterns = [
     #url(r'^qrcode/(?P<pk>\d+)$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
     url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
 
+    url(r'^dosyalari_duzenle/$', views.dosyalari_duzenle, name='dosyalari_duzenle'),
+
+
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
     url(r'^bolum_sec/secilen_bolumu_kaydet/$', views.secilen_bolumu_kaydet, name='secilen_bolumu_kaydet'),
     url(r'^bolum_sec/detay_islemleri_baslat/$', views.detay_islemleri_baslat, name='detay_islemleri_baslat'),
@@ -296,22 +299,31 @@ urlpatterns = [
     url(r'^rfid/(?P<pk>\d+)/delete/$', views.rfid_dosyasi_sil, name='rfid_dosyasi_sil'),
     url(r'^rfid/(?P<pk>\d+)/delete/kesin/$', views.rfid_dosyasi_sil_kesin, name='rfid_dosyasi_sil_kesin'),
 
+    #proje elemanlarının tanımlanmasına yönelik url ler aşağıda...
+    url(r'^eleman/$', views.eleman_listele, name='eleman_listele'),
+    url(r'^eleman/(?P<pk>\d+)$', views.eleman_detay, name='eleman_detay'),
+    url(r'^eleman/create/$', views.eleman_yarat, name='eleman_yarat'),
+    url(r'^eleman/(?P<pk>\d+)/update/$', views.eleman_duzenle, name='eleman_duzenle'),
+    url(r'^eskibul/$', views.eleman_eskibul, name='eleman_eskibul'),
+    #url(r'^eleman/eskibul/(?P<pk>\d+)$', views.eleman_eskibul_detay, name='eleman_eskibul_detay'),
+    url(r'^eskibul/(?P<pk>\d+)/kesin/$', views.eleman_eskibul_kesin, name='eleman_eskibul_kesin'),
+
+
     # yer urlleri aşağıda....
     url(r'^yer/$', views.yer_listele, name='yer_listele'),
-    #url(r'^yer/(?P<pk>\d+)$', views.yer_detay, name='yer_detay'),
-    url(r'^yer/(?P<pk>\d+)$', views.yer_detay_gecici, name='yer_detay_gecici'),
-    url(r'^yer/(?P<pk>\d+)/zaman_planla/$', views.yer_zaman_planla, name='yer_zaman_planla'),
-    url(r'^yer/(?P<pk>\d+)/denetim_planla/$', views.yer_denetim_planla, name='yer_denetim_planla'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/$', views.yer_zaman_duzenle, name='yer_zaman_duzenle'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/js/$', views.yer_zaman_duzenle_js, name='yer_zaman_duzenle_js'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/create/$', views.yer_zaman_duzenle_create, name='yer_zaman_duzenle_create'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/update/$', views.yer_zaman_duzenle_update, name='yer_zaman_duzenle_update'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/delete/$', views.yer_zaman_duzenle_delete, name='yer_zaman_duzenle_delete'),
-    url(r'^yer/(?P<pk>\d+)/zaman_duzenle/delete/kesin/$', views.yer_zaman_duzenle_kesin, name='yer_zaman_duzenle_kesin'),
-    url(r'^yer/(?P<pk>\d+)/denetim_duzenle/$', views.yer_denetim_duzenle, name='yer_denetim_duzenle'),
-    #url(r'^yer/create/$', views.YerCreate.as_view(), name='yer_create'),
+    url(r'^yer/(?P<pk>\d+)/$', views.yer_detay, name='yer_detay'),
+    url(r'^yer/(?P<pk>\d+)/yer_operasyon_ekle/$', views.yer_operasyon_ekle, name='yer_operasyon_ekle'),
+    url(r'^yer/(?P<pk>\d+)/yer_operasyon_planla/$', views.yer_operasyon_planla, name='yer_operasyon_planla'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/update/$', views.yer_operasyon_duzenle, name='yer_operasyon_duzenle'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/delete/$', views.yer_operasyon_sil, name='yer_operasyon_sil'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/delete/kesin/$', views.yer_operasyon_sil_kesin, name='yer_operasyon_sil_kesin'),
+    url(r'^yer/(?P<pk>\d+)/yer_denetim_ekle/$', views.yer_denetim_ekle, name='yer_denetim_ekle'),
+    url(r'^yer/(?P<pk>\d+)/yer_denetim_planla/$', views.yer_denetim_duzenle, name='yer_denetim_planla'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/update/$', views.yer_denetim_duzenle, name='yer_denetim_duzenle'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/delete/$', views.yer_denetim_sil, name='yer_denetim_sil'),
+    url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/delete/kesin/$', views.yer_denetim_sil_kesin, name='yer_denetim_sil_kesin'),
+
     url(r'^yer/create/$', views.yer_yarat, name='yer_yarat'),
-    #url(r'^yer/(?P<pk>\d+)/update/$', views.YerUpdate.as_view(), name='yer_update'),
     url(r'^yer/(?P<pk>\d+)/update/$', views.yer_duzenle, name='yer_duzenle'),
     url(r'^yer/(?P<pk>\d+)/delete/$', views.yer_sil, name='yer_sil'),
     url(r'^yer/(?P<pk>\d+)/delete/kesin/$', views.yer_sil_kesin, name='yer_sil_kesin'),

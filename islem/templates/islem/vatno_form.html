@@ -1,0 +1,121 @@
+
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+
+
+
+<script>
+      $(document).ready(function(){
+                  //alert ( "...doc ready  çalıştı...");
+                  var el_varmi = {{ varmi | safe }};
+                  var x = document.getElementById("div_ta");
+                  //alert("eleman id "+el_varmi);
+                  if (el_varmi == "")
+                  {
+                    //alert(" null...");
+                    x.style.display = "none";
+                  }
+                  else {
+                    //alert("not null");
+                    var calis = {{ ac | safe }};
+                    //alert("çalış..."+calis);
+                    if (calis == "E"){
+                      document.getElementById("akca").innerHTML = "Aktif çalışıyor";
+                    }
+                    else {
+                      document.getElementById("akca").innerHTML = "Önceden çalışmış";
+                    }
+                    x.style.display = "block";
+                  }
+              });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+<h4> Eleman Arama</h4>
+
+<p> &emsp; </p>
+
+<form action="" method="POST"  id="eleman_form"  >
+    {% csrf_token %}
+
+    {{ form.as_table }}
+
+    <!-- <input type="button" onclick="kaydet()" value="kaydet"> -->
+    <input type="submit" value="ara" />
+
+</form>
+
+</br>
+{{  mesaj  }}
+
+</br>
+</br>
+
+
+ <div id="div_ta">
+
+<table id="table_table">
+
+  <tr>
+    <td><b>Adı:</b></td>
+    <td> &emsp; </td>
+    <td>{{ e.adi }}</td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+  <tr>
+    <td><b>Soyadı:</b></td>
+    <td> &emsp; </td>
+    <td>{{ e.soyadi }}</td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+  <tr>
+    <td><b>Vatandaşlık No:</b></td>
+    <td> &emsp; </td>
+    <td>{{ e.kull_adi }}</td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+  <tr>
+    <td><b>Çalışma Durumu:</b></td>
+    <td> &emsp; </td>
+    <td id="akca"> . </td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+  <tr>
+    <td><b>Şirket:</b></td>
+    <td> &emsp; </td>
+    <td>{{ e.sirket }}</td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+  <tr>
+    <td><b>Proje:</b></td>
+    <td> &emsp; </td>
+    <td>{{ e.proje }}</td>
+  </tr>
+  <tr>
+    <td> &emsp; </td>
+  </tr>
+
+
+</table>
+</br>
+<p> bu kişiyi tekrar çalışan olarak almak kaydetmek istediğinizden emin misiniz.. </p>
+<a href="{{e.id}}/kesin"> Evet kaydet </a>
+</div>
+
+{% endblock %}

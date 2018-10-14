@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
-from islem.models import proje_alanlari, yer, proje, User
+from islem.models import proje_alanlari, yer, proje, User, eleman
 from rest_framework.reverse import reverse as api_reverse
 
 import datetime
@@ -19,6 +19,8 @@ class Memnuniyet(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     oy          = models.CharField(max_length=1)
     sebep       = models.CharField(max_length=2)
     gelen_tarih = models.DateTimeField()
@@ -39,6 +41,8 @@ class Operasyon_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
     bas_tarih   = models.DateTimeField()
     son_tarih   = models.DateTimeField()
@@ -59,6 +63,8 @@ class Denetim_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
     kod         = models.CharField(max_length=8)
     gelen_tarih = models.DateTimeField()
@@ -78,8 +84,11 @@ class Ariza_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     rfid_no     = models.CharField(max_length=20)
     sebep       = models.CharField(max_length=2)
+    kapat       = models.CharField(max_length=2)
     gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 
@@ -100,6 +109,8 @@ class Sayi_Data(models.Model):
     mac_no      = models.CharField(max_length=20)
     tipi        = models.CharField(max_length=2)
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     adet        = models.CharField(max_length=20)
     gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
@@ -118,7 +129,8 @@ class Sayi_Data(models.Model):
 
 OPERASYONDIGER = (
 ('O', 'Operasyon'),
-('D', 'Diğer'),
+('T', 'Teknik'),
+('D', 'Proje Yönetim'),
 )
 
 
@@ -127,9 +139,10 @@ class rfid_dosyasi(models.Model):
     rfid_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     rfid_tipi = models.CharField(max_length=1, choices=OPERASYONDIGER)
-    calisan = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
-    adi = models.CharField(max_length=20, null=True, blank=True)
-    soyadi = models.CharField(max_length=20, null=True, blank=True)
+    kullanici = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True)
+    eleman = models.ForeignKey('islem.eleman', on_delete=models.PROTECT, null=True, blank=True)
+    adi = models.CharField(max_length=30, null=True, blank=True)
+    soyadi = models.CharField(max_length=30, null=True, blank=True)
 
     def __str__(self):
         return '%s-%s' % (self.rfid_no, self.proje)
@@ -144,16 +157,16 @@ class rfid_dosyasi(models.Model):
 
 @receiver(pre_save, sender=rfid_dosyasi)
 def isim_ekle(sender,instance,**kwargs):
+    print("rfid isim ekle....")
     rfid_tipi = instance.rfid_tipi
-    if rfid_tipi == "D":
-        kisi_obj = User.objects.get(id=instance.calisan.id)
+    if (rfid_tipi == "D" or rfid_tipi == "T"):
+        kisi_obj = User.objects.get(id=instance.kullanici.id)
         instance.adi = kisi_obj.first_name
         instance.soyadi = kisi_obj.last_name
-        #instance.adi = instance.calisan.id.first_name
-        #instance.soyadi = instance.calisan.id.first_name
     else:
-        pass
-
+        kisi_obj = eleman.objects.get(id=instance.eleman.id)
+        instance.adi = kisi_obj.adi
+        instance.soyadi = kisi_obj.soyadi
 
 
 
@@ -169,12 +182,14 @@ def create_rfid_yeni(sender, instance, **kwargs):
     for alan in alan_obj:
         yer_obj = yer.objects.filter(proje_alanlari=alan)
         for deger in yer_obj:
-            yer_updown_obj = yer_updown.objects.filter(mac_no=deger.mac_no).first()
+            yer_updown_obj = yer_updown.objects.filter(yer=deger).first()
             if yer_updown_obj:
                 mac_no = deger.mac_no
                 alive_x = yer_updown_obj.alive_time
                 kaydetme_obj = yer_updown(id=yer_updown_obj.id,
                                           proje=proje,
+                                          p_alani_id=alan.id,
+                                          yer_id=deger.id,
                                           mac_no=mac_no,
                                           degis="E",
                                           alive_time=alive_x)
@@ -182,6 +197,8 @@ def create_rfid_yeni(sender, instance, **kwargs):
             else:
                 mac_no = deger.mac_no
                 kaydetme_obj = yer_updown(proje=proje,
+                                          p_alani_id=alan.id,
+                                          yer_id=deger.id,
                                           mac_no=mac_no,
                                           degis="E")
                 kaydetme_obj.save()
@@ -191,23 +208,27 @@ def create_rfid_yeni(sender, instance, **kwargs):
 @receiver(post_save, sender=yer)
 def create_yerupdown_yeni(sender, instance, **kwargs):
     print("receiver post save rfid...............")
-    yer_id = instance.id
-    yer_obj = yer.objects.get(id=yer_id)
+    yer_id_x = instance.id
+    yer_obj = yer.objects.get(id=yer_id_x)
     proje_alani = yer_obj.proje_alanlari.id
     print("proje alanı...", proje_alani)
     proje = proje_alanlari.objects.get(id=proje_alani).proje.id
     mac_no_x = instance.mac_no
+    yer_updown_obj = yer_updown.objects.filter(yer=yer_id).first()
 
-    yer_updown_obj = yer_updown.objects.filter(mac_no=mac_no_x).first()
     if yer_updown_obj:
         kaydetme_obj = yer_updown(id=yer_updown_obj.id,
                                   proje_id=proje,
+                                  p_alani_id=proje_alani,
+                                  yer_id=yer_id_x,
                                   mac_no=mac_no_x,
                                   degis="E",
                                   alive_time=yer_updown_obj.alive_time)
         kaydetme_obj.save()
     else:
         kaydetme_obj = yer_updown(proje_id=proje,
+                                  p_alani_id=proje_alani,
+                                  yer_id=yer_id_x,
                                   mac_no=mac_no_x,
                                   degis="E")
         kaydetme_obj.save()
@@ -223,10 +244,12 @@ EVETHAYIR = (
 class yer_updown(models.Model):
     mac_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
+    p_alani = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
+    yer = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     degis = models.CharField(max_length=1, choices=EVETHAYIR, default="E")
     alive_time = models.DateTimeField(blank=True, null=True)
     def __str__(self):
-        return '%s-%s' % (self.mac_no, self.proje)
+        return '%s-%s-%s' % (self.proje, self.yer, self.mac_no)
 
     @property
     def owner(self):

@@ -52,6 +52,7 @@ from .models import yer
 from .models import proje_alanlari
 from .models import plan_opr_gun
 from .models import plan_den_gun
+from .models import eleman
 from notification.models import Notification
 from webservice.models import rfid_dosyasi
 from webservice.models import yer_updown
@@ -78,5 +79,7 @@ admin.site.register(proje_alanlari)
 admin.site.register(plan_opr_gun)
 admin.site.register(plan_den_gun)
 admin.site.register(Notification)
+admin.site.register(eleman)
+
 #admin.site.register(rfid_dosyasi)
 #admin.site.register(yer_updown)

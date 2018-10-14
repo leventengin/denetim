@@ -1,0 +1,21 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+      <h3>YerDenetim Zamanı Sil</h3>
+
+      <p>Bu denetim zamanını silmek istediğinizden emin misiniz: </p>
+
+      <p>  <b> Yer  : </b>  &emsp;   {{ den_plan_obj.yer }}</p>
+      <p>  <b> Gün  : </b>  &emsp;   {{ den_plan_obj.gun }}</p>
+      <p>  <b> Zaman: </b>  &emsp;   {{ den_plan_obj.zaman }}</p>
+      </br>
+      <form action="" method="POST">
+        {% csrf_token %}
+      <a href="kesin"> Evet sil... </a>
+      </form>
+
+{% endblock %}

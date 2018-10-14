@@ -1,0 +1,30 @@
+
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+
+<h4> Eleman Kayıt</h4>
+
+<p> &emsp; </p>
+
+<form action="" method="POST"  id="eleman_form"  >
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <!-- <input type="button" onclick="kaydet()" value="kaydet"> -->
+    <input type="submit" value="kaydet" />
+
+</form>
+
+{{  mesaj  }}
+
+
+
+
+
+
+{% endblock %}

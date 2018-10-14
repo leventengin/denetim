@@ -1,0 +1,29 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+
+
+
+    <h3>Denetim Zamanı Düzenle</h3>
+
+    <p><strong>Yer Adı:</strong> {{ plan_den_obj.yer }}</p>
+    <p> </p>
+    <p><strong>Gün    :</strong> {{ plan_den_obj.gun }}</p>
+    <p> </p>
+
+    <form  action="" method="POST">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+
+        <input type="submit" value="kaydet" />
+
+    </form>
+
+
+
+{% endblock %}

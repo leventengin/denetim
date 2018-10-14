@@ -1,0 +1,42 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h3>Proje Elemanları Listesi</h3>
+
+    {% if eleman_obj %}
+    <ul>
+
+
+      <table  id="table_id">
+
+          {% for el in eleman_obj %}
+
+              <tr class="yn" >
+                <td> <a href="{{el.id}}/update"><span class='glyphicon glyphicon-pencil'></span></a> </td>
+                <td>   &emsp;  </td>
+                <td> <a href="{{el.id}}"> {{ el.adi }} </a> </td>
+                <td>   &emsp;  </td>
+                <td> {{el.soyadi }}   </td>
+                <td>   &emsp;  </td>
+                <td> {{el.kull_adi }}  </td>
+                <td>   &emsp;  </td>
+              </tr>
+
+          {% endfor %}
+      </table>
+
+
+
+
+      <p> </p>
+      <a href="/islem/eleman/create"> Eleman Ekle </a>
+    </ul>
+    {% else %}
+      <p>Kayıtlı kişi yok ....</p>
+      <p> </p>
+      <a href="/islem/eleman/create"> Eleman Ekle </a>
+    {% endif %}
+
+{% endblock %}

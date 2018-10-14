@@ -1,8 +1,8 @@
 ""
 from django import forms
 from django.forms import ModelForm
-from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil, sonuc_resim
-from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun, yer, proje_alanlari
+from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil, sonuc_resim, eleman, User
+from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun, plan_den_gun, yer, proje_alanlari
 from webservice.models import rfid_dosyasi
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
@@ -48,9 +48,9 @@ from django.utils.encoding import force_text
 
 OPERASYONDIGER = (
 ('O', 'Operasyon'),
-('D', 'Diğer'),
+('T', 'Teknik'),
+('D', 'Proje Yönetim'),
 )
-
 
 EVETHAYIR = (
 ('E', 'Evet'),
@@ -238,20 +238,8 @@ class SonucForm(forms.ModelForm):
             'ikilik': "Puan",
         }
     def __init__(self, *args, **kwargs):
-        #puanlama_turu = kwargs.pop("puanlama_turu")
-        #detay_obj = kwargs.pop("detay_obj")
         super(SonucForm, self).__init__(*args, **kwargs)
-        #print("puanlama türü initial içinden..:", puanlama_turu)
-        #print("detay obje initial içinden..:", detay_obj)
         puanlama_turu = self.instance.puanlama_turu
-        """
-        if detay_obj:
-            self.fields['onluk'] = detay_obj.onluk
-            self.fields['beslik'] = detay_obj.beslik
-            self.fields['ikilik'] = detay_obj.ikilik
-            self.fields['denetim_disi'] = detay_obj.denetim_disi
-        self.instance.fields['puanlama_turu'].value = puanlama_turu
-        """
         if puanlama_turu=="A":
             self.fields['beslik'].widget = forms.HiddenInput()
             self.fields['ikilik'].widget = forms.HiddenInput()
@@ -282,15 +270,7 @@ class SonucResimForm(forms.ModelForm):
     class Meta:
         model = sonuc_resim
         fields = ( 'sonuc_detay', 'foto',)
-        """
-        fields = ( 'foto', 'resim_kalktimi',)
-        widgets = {
-            'resim_kalktimi' : forms.HiddenInput(),
-        }
-        labels = {
-            'foto' : "Foto",
-        }
-        """
+
     def clean(self):
         cleaned_data = super(SonucResimForm, self).clean()
         cc_foto = cleaned_data.get("sonuc_detay")
@@ -354,11 +334,57 @@ class ZonForm(forms.Form):
 
 
 
-class GunForm(forms.Form):
-    gun = forms.ChoiceField(choices=GUNLER, widget=forms.Select, label="Gün Seçiniz:")
+class GunDenForm(forms.ModelForm):
+    class Meta:
+        model = plan_den_gun
+        fields = ( 'gun', 'zaman',)
+        labels = {
+            'gun': "Gün giriniz",
+            'zaman' : "Saat giriniz",
+        }
+        help_texts = {
+            'gun': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+        }
 
-#class SaatForm(forms.Form):
-#    saat = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
+    def clean(self):
+        cleaned_data = super(GunDenForm, self).clean()
+        cc_gun = cleaned_data.get("gun")
+        cc_zaman = cleaned_data.get("zaman")
+        print("cc gun - cc zaman", cc_gun, "-", cc_zaman)
+
+class GunForm(forms.ModelForm):
+    class Meta:
+        model = plan_opr_gun
+        fields = ( 'gun', 'zaman',)
+        labels = {
+            'gun': "Gün giriniz",
+            'zaman' : "Saat giriniz",
+        }
+        help_texts = {
+            'gun': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+        }
+
+    def clean(self):
+        cleaned_data = super(GunForm, self).clean()
+        cc_gun = cleaned_data.get("gun")
+        cc_zaman = cleaned_data.get("zaman")
+        print("cc gun - cc zaman", cc_gun, "-", cc_zaman)
+
+class SaatDenForm(forms.ModelForm):
+    class Meta:
+        model = plan_den_gun
+        fields = ( 'zaman',)
+        labels = {
+            'zaman' : "Saat giriniz:",
+        }
+        help_texts = {
+            'zaman': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+        }
+    def clean(self):
+        cleaned_data = super(SaatDenForm, self).clean()
+        cc_zaman = cleaned_data.get("zaman")
+        print("cc zaman", cc_zaman)
+
 
 class SaatForm(forms.ModelForm):
     class Meta:
@@ -367,6 +393,9 @@ class SaatForm(forms.ModelForm):
         labels = {
             'zaman' : "Saat giriniz:",
         }
+        help_texts = {
+            'zaman': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+        }
     def clean(self):
         cleaned_data = super(SaatForm, self).clean()
         cc_zaman = cleaned_data.get("zaman")
@@ -374,26 +403,34 @@ class SaatForm(forms.ModelForm):
 
 
 
-
 class YerForm(forms.ModelForm):
     class Meta:
         model = yer
-        fields = ( 'proje_alanlari', 'yer_adi', 'mac_no', 'opr_basl', 'opr_son', 'opr_delta', 'den_basl', 'den_son', 'den_delta')
+        fields = ( 'proje_alanlari', 'yer_adi', 'mac_no', 'opr_basl', 'opr_son', 'opr_delta', 'den_basl', 'den_son', 'den_delta', 'opr_sure',)
         labels = {
             'proje_alanlari' : 'Proje Alanı:',
             'yer_adi' : 'Yer Adı:',
             'mac_no': 'Mac No:',
-            'opr_basl': 'Opr Başlangıç:',
-            'opr_son': 'Opr Son:',
-            'opr_delta': 'Opr Aralık',
-            'den_basl': 'Den Başlangıç:',
-            'den_son': 'Den Son:',
-            'den_delta': 'Den Aralık',
+            'opr_basl': 'Operasyon Başlangıç Saati:',
+            'opr_son': 'Son Operasyon Saati:',
+            'opr_delta': 'Operasyon Arası Süre:',
+            'den_basl': 'Denetim Başlangıç Saati:',
+            'den_son': 'Son Denetim Saati:',
+            'den_delta': 'Denetim Arasi Süre:',
+            'opr_sure': 'Öngörülen Operasyon Süresi:  ',
         }
+        help_texts = {
+            'mac_no': _('zamanları ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+        }
+        error_messages = {
+            'yer_adi': { 'required': 'This writer name is too long' },
+        }
+
 
     def clean(self):
         cleaned_data = super(YerForm, self).clean()
         cc_pa = cleaned_data.get("proje_alanlari")
+        print("proje alanları....", cc_pa)
         cc_yer_adi = cleaned_data.get("yer_adi")
         cc_mac_no = cleaned_data.get("mac_no")
         cc_opr_basl = cleaned_data.get("opr_basl")
@@ -437,57 +474,106 @@ class PAForm(forms.ModelForm):
         self.fields['proje'].queryset = proje_obj
 
 
+import re
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 class RfidForm(forms.ModelForm):
     class Meta:
         model = rfid_dosyasi
-        fields = ( 'rfid_no', 'proje', 'rfid_tipi', 'calisan', 'adi', 'soyadi')
+        fields = ( 'rfid_no', 'proje', 'rfid_tipi', 'kullanici', 'eleman',)
         labels = {
             'rfid_no': 'RFID No',
             'proje' : 'Proje Adı:',
             'rfid_tipi' : 'RFID Tipi:',
-            'çalışan': 'Kullanıcı:',
-            'adi' : 'Adı:',
-            'soyadi' : 'Soyadı:',
+            'kullanici': 'Kullanıcı:',
+            'eleman': 'Çalışan',
         }
 
+
     def __init__(self, *args, **kwargs):
-        kullanici = kwargs.pop("kullanici")
+        kullan = kwargs.pop("kullan")
         super(RfidForm, self).__init__(*args, **kwargs)
-        prj = kullanici.profile.proje
+        prj = kullan.profile.proje
         print("işte yer form init içinden proje...", prj)
         proje_obj = proje.objects.filter(id=prj.id)
         print("işte  proje objesi.....", proje_obj)
         self.fields['proje'].queryset = proje_obj
+        profile_obj = Profile.objects.filter(proje=prj)
+        p_list = []
+        for prof in profile_obj:
+            p_list.append(prof.user.id)
+        print("kullancı id listesi...", p_list)
+        usr_obj = User.objects.all()
+        #usr_obj = User.objects.get(Q(id in p_list))
+        usr_obj = usr_obj.filter(Q(id__in =  p_list))
+        print("user object with p list...", usr_obj)
+        self.fields['kullanici'].queryset = usr_obj
+        eleman_obj = eleman.objects.filter(proje=prj).filter(aktifcalisan="E")
+        self.fields['eleman'].queryset = eleman_obj
 
     def clean(self):
         cleaned_data = super(RfidForm, self).clean()
         rfid_no = cleaned_data.get('rfid_no')
         proje = cleaned_data.get('proje')
         rfid_tipi = cleaned_data.get('rfid_tipi')
-        calisan = cleaned_data.get('calisan')
-        adi = cleaned_data.get('adi')
-        soyadi = cleaned_data.get('soyadi')
+        kullanici = cleaned_data.get('kullanici')
+        eleman = cleaned_data.get('eleman')
+
 
         print("cc rfid no", rfid_no)
         print("cc proje", proje)
         print("cc rfid tipi", rfid_tipi)
-        print("cc çalışan", calisan)
-        print("cc adi", adi)
-        print("cc soyadi", soyadi)
+        print("cc kullanici", kullanici)
+        print("cc eleman", eleman)
 
-        if (rfid_tipi == "O") and (adi == ""):
-            print(" ne oluyor burada....")
-            raise forms.ValidationError("isim alanı boş olamaz.... ")
-
-        if (rfid_tipi == "O") and (adi == ""  or  soyadi == ""):
-            print(" ne oluyor burada....")
-            raise forms.ValidationError("soyad alanı boş olamaz.... ")
-
-        if (rfid_tipi == "D") and (calisan == None):
+        if (rfid_tipi == "D" or rfid_tipi == "T") and (kullanici == None):
             print("yoksa burada.........")
             raise forms.ValidationError("kullanıcı alanı boş olamaz...")
+        if (rfid_tipi == "O") and (eleman == None):
+            print("yoksa burada..222.......")
+            raise forms.ValidationError("eleman alanı boş olamaz...")
+
+        return cleaned_data
+
+
+        """
+        qs =User.objects.none()
+        if profile_obj:
+            for prof in profile_obj:
+                print("profile id..", prof.id)
+                # burada çözmek lazım....
+                us_id = prof.user.id
+                print("user id kaç bulundu...", us_id)
+                qx = User.objects.filter(id=us_id).first()
+                print("qx...", qx)
+                qs = qs.union(qx)
+        print("qs filtre öncesi..", qs)
+        """
+
+
+class ElemanForm(forms.ModelForm):
+    class Meta:
+        model = eleman
+        fields = ( 'adi', 'soyadi', 'kull_adi', 'aktifcalisan')
+        labels = {
+            'adi': 'Adı:',
+            'soyadi' : 'Soyadı:',
+            'kull_adi' : 'Vatandaşlık No:',
+            'aktifcalisan': 'Çalışma Durumu:'
+        }
+
+    def clean(self):
+        cleaned_data = super(ElemanForm, self).clean()
+        cc_adi = cleaned_data.get('adi')
+        cc_soyadi = cleaned_data.get('soyadi')
+        cc_kullanici = cleaned_data.get('kull_adi')
+
+        print("cc adi", cc_adi)
+        print("cc soyadi", cc_soyadi)
+        print("cc soyadi", cc_kullanici)
 
         return cleaned_data
 
@@ -496,8 +582,13 @@ class RfidForm(forms.ModelForm):
 
 
 
-
-
+class VatandaslikForm(forms.Form):
+    vatno = forms.CharField(label='Vatandaşlık No:', widget=forms.TextInput(attrs={'class':'special', 'size': '10'}))
+    def clean(self):
+        cleaned_data = super(VatandaslikForm, self).clean()
+        cc_vatno = cleaned_data.get('vatno')
+        print("cc vatno", cc_vatno)
+        return cleaned_data
 
 
 

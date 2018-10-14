@@ -21,9 +21,15 @@ ACIKKAPANDI = (
 ('K', 'Kapandı'),
 )
 
+AKTIFCALISAN = (
+('E', 'Aktif Çalışan'),
+('H', 'Ayrıldı'),
+)
+
 OPERASYONDIGER = (
 ('O', 'Operasyon'),
-('D', 'Diğer'),
+('T', 'Teknik'),
+('D', 'Proje Yönetim'),
 )
 
 DENETCIPROJE = (
@@ -114,6 +120,7 @@ class Profile(models.Model):
     opr_merkez_yon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     opr_admin = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
     isletme_projeyon = models.CharField(max_length=1, choices=EVETHAYIR, default="H")
+    aktifcalisan = models.CharField(max_length=1, choices=AKTIFCALISAN, default="E")
     profil_resmi = models.ImageField(upload_to='xyz/profile_resmi/%Y/%m/%d/',blank=True, null=True,)
     def __str__(self):
         return(self.user.username)
@@ -209,6 +216,8 @@ def check_email(sender,instance,**kwargs):
             pass
 
 
+
+
 class spv_yetkilisi(models.Model):
     sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
     spv_yetkilisi = models.ForeignKey(User, related_name='spv_yetkilisi', on_delete=models.CASCADE)
@@ -256,12 +265,6 @@ class detay(models.Model):
         return '%s-%s-%s' % (self.bolum.bolum_adi, self.detay_kodu, self.detay_adi)
         #return(self.detay_adi)
 
-"""
-class proje_tipi(models.Model):
-    p_tipi = models.CharField(max_length=200)
-    def __str__(self):
-        return(self.p_tipi)
-"""
 
 
 class proje(models.Model):
@@ -292,8 +295,9 @@ class yer(models.Model):
     den_basl = models.TimeField(default=datetime.time(10,0))
     den_son = models.TimeField(default=datetime.time(22,0))
     den_delta = models.TimeField(default=datetime.time(2,0))
+    opr_sure = models.TimeField(default=datetime.time(0,10))
     def __str__(self):
-        return '%s-%s' % (self.mac_no, self.proje_alanlari)
+        return '%s-%s' % (self.yer_adi, self.mac_no)
 
 
 class plan_opr_gun(models.Model):
@@ -309,6 +313,22 @@ class plan_den_gun(models.Model):
     zaman = models.TimeField()
     def __str__(self):
         return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
+
+
+
+
+class eleman(models.Model):
+    sirket = models.ForeignKey(sirket, on_delete=models.PROTECT)
+    proje = models.ForeignKey(proje, on_delete=models.PROTECT)
+    adi = models.CharField(max_length=50)
+    soyadi = models.CharField(max_length=50)
+    aktifcalisan = models.CharField(max_length=1, choices=AKTIFCALISAN, default="E")
+    kull_adi = models.CharField(max_length=11)
+    def __str__(self):
+        return '%s-%s' % (self.adi, self.soyadi)
+
+
+
 
 
 class ariza_tipi(models.Model):

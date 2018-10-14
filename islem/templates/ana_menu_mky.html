@@ -44,7 +44,7 @@
 
   <script>
   function goster(a){
-    alert("gelen a....."+a);
+    //alert("gelen a....."+a);
     var link1 = document.getElementById("div_c4");
     link1.style.display = ''; //or
     var link2 = document.getElementById("div_t4");
@@ -64,10 +64,10 @@
 
   <script>
   function setChart_3(data_1, data_2, data_3, options_1, options_2, options_3){
-      alert("buraya da geldi  setchart3()..................");
-      alert("data 1  "+data_1);
-      alert("data 2  "+data_2);
-      alert("data 3  "+data_3);
+      //alert("buraya da geldi  setchart3()..................");
+      //alert("data 1  "+data_1);
+      //alert("data 2  "+data_2);
+      //alert("data 3  "+data_3);
 
       var ctx1 = document.getElementById("myChart1");
       var ctx2 = document.getElementById("myChart2");
@@ -97,9 +97,9 @@
 
   <script>
   function setChart_2(data_1, data_2, options_1, options_2){
-      alert("buraya da geldi  setchart2()..................");
-      alert("data 1  "+data_1);
-      alert("data 2  "+data_2);
+      //alert("buraya da geldi  setchart2()..................");
+      //alert("data 1  "+data_1);
+      //alert("data 2  "+data_2);
 
       var ctx1 = document.getElementById("myChart1");
       var ctx2 = document.getElementById("myChart2");
@@ -123,10 +123,9 @@
 
   <script>
   function setChart_1(data_1, options_1){
-      alert("buraya da geldi  setchart1()..................");
-      alert("data 1  "+data_1);
+      //alert("buraya da geldi  setchart1()..................");
+      //alert("data 1  "+data_1);
       var ctx1 = document.getElementById("myChart1");
-
       var myChart1 = new Chart(ctx1, {
       type: 'pie',
       data: data_1,
@@ -140,9 +139,9 @@
 
   <script>
   function setbar_Chart(data){
-      alert("buraya da geldi  setbar chart()..................");
-      alert("gelen list..."+data);
-      alert("gelen proje.."+data.proje);
+      //alert("buraya da geldi  setbar chart()..................");
+      //alert("gelen list..."+data);
+      //alert("gelen proje.."+data.proje);
 
       var ctx4 = document.getElementById("myChart4");
       ctx4.width = 800;
@@ -214,7 +213,7 @@
 
   <script>
   $(document).ready(function(){
-    alert(" ana menu mky... document ready....");
+    //alert(" ana menu mky... document ready....");
     mem_veri_list = {{ mem_veri_list|safe }};
     a_list = {{ a_list|safe }};
     b_list = {{ b_list|safe }};
@@ -222,12 +221,12 @@
     sayi = {{ sayi|safe }};
 
 
-    alert("a_list    "+a_list[0]);
-    alert("b_list    "+b_list[0]);
-    alert("c_list    "+c_list[0]);
+    //alert("a_list    "+a_list[0]);
+    //alert("b_list    "+b_list[0]);
+    //alert("c_list    "+c_list[0]);
     //alert("deneme...."+a_list[0].proje);
     //alert("deneme...."+a_list[0].m_yuzde_1);
-    alert(" sayı    "+sayi);
+    //alert(" sayı    "+sayi);
 
     var data_1 = {
         labels: a_list[0].labels_1,
@@ -269,7 +268,7 @@
 
 
       if (sayi == 2 || sayi ==3)
-      {  alert("sayı  2  yada 3.....");
+      {  //alert("sayı  2  yada 3.....");
         var data_2 = {
             labels: b_list[0].labels_1,
             datasets: [{
@@ -312,7 +311,7 @@
        }  //if sayi 2 yada 3
 
        if (sayi ==3)
-       {  alert("sayı  3.....");
+       {  //alert("sayı  3.....");
          var data_3 = {
              labels: c_list[0].labels_1,
              datasets: [{
@@ -363,7 +362,7 @@
 
     if (sayi == 1)
     {
-      alert("a 1....");
+      //alert("a 1....");
       setChart_1(data_1, options_1);
 
       $("#my1_1").text("%"+a_list[0].m_yuzde_1);
@@ -389,11 +388,11 @@
 
     if (sayi == 2)
     {
-      alert("a 2.....");
-      alert("data 1", data_1);
-      alert("data 2", data_2);
-      alert("options 1 ", options_1);
-      alert("options 2 ", options_2);
+      //alert("a 2.....");
+      //alert("data 1", data_1);
+      //alert("data 2", data_2);
+      //alert("options 1 ", options_1);
+      //alert("options 2 ", options_2);
 
       setChart_2(data_1, data_2, options_1, options_2);
 
@@ -417,7 +416,7 @@
 
     if (sayi == 3)
     {
-      alert("a 3.....");
+      //alert("a 3.....");
       setChart_3(data_1, data_2, data_3, options_1, options_2, options_3);
       $("#my1_1").text("%"+a_list[0].m_yuzde_1);
       $("#my2_1").text("%"+a_list[0].m_yuzde_2);

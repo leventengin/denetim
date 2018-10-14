@@ -14,15 +14,16 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon, yer, proje_alanlari
 from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
-from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi
+from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi, eleman
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, SonucResimForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
 from islem.forms import DenetimForm,  IkiliSecForm, ProjeSecForm, SirketSecForm, MacnoYerForm, PAForm, DuzenleDenetimSecForm
 from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, SirketIcinProjeForm, SpvForm, DenForm
-from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, SaatForm
+from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, GunDenForm, SaatForm, SaatDenForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
+from islem.forms import ElemanForm, VatandaslikForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -363,14 +364,18 @@ def index(request):
     print("kisi", kisi)
     kullanici = Profile.objects.get(user=kisi)
     print("kullanıcı", kullanici)
+    sirket = kullanici.sirket
+    print("şirketi....", sirket)
+    if not sirket:
+        if kisi.is_superuser:
+            pass
+        else:
+            mesaj = "kişiye tanımlı şirket yok "
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
     if kullanici.opr_merkez_yon == "E":
         print(" merkez yöneticisi   evet....")
-        sirket = kullanici.sirket
-        print("şirketi....", sirket)
-        if not sirket:
-            mesaj = "kişiye tanımlı şirket yok "
-            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
         projeler = proje.objects.filter(sirket=sirket)
         if not projeler:
             mesaj = "şirkete tanımlı proje yok "
@@ -425,26 +430,56 @@ def index(request):
         )
 
     if kullanici.opr_proje_yon == "E"  or  kullanici.opr_alan_sefi == "E":
-        print(" denetçi   evet....")
-        acik_denetimler = denetim.objects.filter(durum="A")
-        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
-        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
-        return render(request, 'ana_menu_opy.html',
+        print("operasyon prj yön yada alan şefi..  evet....")
+        sirket = request.user.profile.sirket
+        print("şirket", sirket)
+        if sirket == None:
+            print("kişiye atanmış şirket yok")
+            mesaj = "kişiye atanmış şirket yok..."
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        index_data = index_hazirla_proje(request)
+        print("işte index data...", index_data)
+        return render(request, 'ana_menu_proje.html',
             context={
-            'secili_denetimler': secili_denetimler,
+            'index_data': index_data,
             },
         )
 
     if kullanici.isletme_projeyon == "E":
-        print(" denetçi   evet....")
-        acik_denetimler = denetim.objects.filter(durum="A")
-        acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
-        secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
-        return render(request, 'ana_menu_ipy.html',
+        print("operasyon prj yön yada alan şefi..  evet....")
+        sirket = request.user.profile.sirket
+        print("şirket", sirket)
+        if sirket == None:
+            print("kişiye atanmış şirket yok")
+            mesaj = "kişiye atanmış şirket yok..."
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        index_data = index_hazirla_proje(request)
+        print("işte index data...", index_data)
+        return render(request, 'ana_menu_proje.html',
             context={
-            'secili_denetimler': secili_denetimler,
+            'index_data': index_data,
             },
         )
+
+    if kullanici.opr_teknik == "E":
+        print("operasyon teknik şefi..  evet....")
+        sirket = request.user.profile.sirket
+        print("şirket", sirket)
+        if sirket == None:
+            print("kişiye atanmış şirket yok")
+            mesaj = "kişiye atanmış şirket yok..."
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        index_data = index_hazirla_proje(request)
+        print("işte index data...", index_data)
+        return render(request, 'ana_menu_proje.html',
+            context={
+            'index_data': index_data,
+            },
+        )
+
 
     if kullanici.denetim_grup_yetkilisi == "E":
         print(" denetçi   evet....")
@@ -480,7 +515,12 @@ def index(request):
             },
         )
 
-
+    if kisi.is_superuser:
+        mesaj = "super user.....! "
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    else:
+        mesaj = "kişiye tanımlanmış bir görev yok...! "
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
 
 #------------------------------------------------------------------------------
@@ -4668,14 +4708,306 @@ import copy
 
 
 @login_required
-def yer_detay_gecici(request, pk=None):
+def yer_detay(request, pk=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
     opr_obj = plan_opr_gun.objects.filter(yer=pk)
     den_obj = plan_den_gun.objects.filter(yer=pk)
     print("opr obj....", opr_obj)
     print("den obj....", den_obj)
-    context = {'yer': yer_obj, 'opr_obj': opr_obj, 'den_obj':den_obj}
+    o_pzt_arr = []
+    o_sal_arr = []
+    o_car_arr = []
+    o_per_arr = []
+    o_cum_arr = []
+    o_cmt_arr = []
+    o_paz_arr = []
+    d_pzt_arr = []
+    d_sal_arr = []
+    d_car_arr = []
+    d_per_arr = []
+    d_cum_arr = []
+    d_cmt_arr = []
+    d_paz_arr = []
+
+
+    pzt_obj = opr_obj.filter(gun="Pzt")
+    print("pzt obj........................................", pzt_obj)
+    sal_obj = opr_obj.filter(gun="Sal")
+    print("sal obj........................................", sal_obj)
+    car_obj = opr_obj.filter(gun="Çar")
+    print("car obj........................................", car_obj)
+    per_obj = opr_obj.filter(gun="Per")
+    print("per obj........................................", per_obj)
+    cum_obj = opr_obj.filter(gun="Cum")
+    print("cum obj........................................", cum_obj)
+    cmt_obj = opr_obj.filter(gun="Cmt")
+    print("cmt obj........................................", cmt_obj)
+    paz_obj = opr_obj.filter(gun="Paz")
+    print("paz obj........................................", paz_obj)
+
+    pzt_oc = pzt_obj.count()
+    sal_oc = sal_obj.count()
+    car_oc = car_obj.count()
+    per_oc = per_obj.count()
+    cum_oc = cum_obj.count()
+    cmt_oc = cmt_obj.count()
+    paz_oc = paz_obj.count()
+
+    max_oc = pzt_oc
+    if sal_oc > max_oc:
+        max_oc = sal_oc
+    if car_oc > max_oc:
+        max_oc = car_oc
+    if per_oc > max_oc:
+        max_oc = per_oc
+    if cum_oc > max_oc:
+        max_oc = cum_oc
+    if cmt_oc > max_oc:
+        max_oc = cmt_oc
+    if paz_oc > max_oc:
+        max_oc = paz_oc
+
+    print("en yüksek işlem sayısı...", max_oc)
+
+    for pzt in pzt_obj:
+        temp=[pzt.zaman, pzt]
+        o_pzt_arr.append(temp)
+    o_pzt_arr.sort()
+    fark = max_oc - pzt_oc
+    if fark != 0:
+        while fark !=0:
+            o_pzt_arr.append(None)
+            fark = fark - 1
+
+    for sal in sal_obj:
+        temp=[sal.zaman, sal]
+        o_sal_arr.append(temp)
+    o_sal_arr.sort()
+    fark = max_oc - sal_oc
+    if fark != 0:
+        while fark !=0:
+            o_sal_arr.append(None)
+            fark = fark - 1
+
+    for car in car_obj:
+        temp=[car.zaman, car]
+        o_car_arr.append(temp)
+    o_car_arr.sort()
+    fark = max_oc - car_oc
+    if fark != 0:
+        while fark !=0:
+            o_car_arr.append(None)
+            fark = fark - 1
+
+    for per in per_obj:
+        temp=[per.zaman, per]
+        o_per_arr.append(temp)
+    o_per_arr.sort()
+    fark = max_oc - per_oc
+    if fark != 0:
+        while fark !=0:
+            o_per_arr.append(None)
+            fark = fark - 1
+
+    for cum in cum_obj:
+        temp=[cum.zaman, cum]
+        o_cum_arr.append(temp)
+    o_cum_arr.sort()
+    fark = max_oc - cum_oc
+    if fark != 0:
+        while fark !=0:
+            o_cum_arr.append(None)
+            fark = fark - 1
+
+    for cmt in cmt_obj:
+        temp=[cmt.zaman, cmt]
+        o_cmt_arr.append(temp)
+    o_cmt_arr.sort()
+    fark = max_oc - cmt_oc
+    if fark != 0:
+        while fark !=0:
+            o_cmt_arr.append(None)
+            fark = fark - 1
+
+    for paz in paz_obj:
+        temp=[paz.zaman, paz]
+        o_paz_arr.append(temp)
+    o_paz_arr.sort()
+    fark = max_oc - paz_oc
+    if fark != 0:
+        while fark !=0:
+            o_paz_arr.append(None)
+            fark = fark - 1
+
+    print("pzt list...bakalım...", o_pzt_arr)
+    print("sal list...bakalım...", o_sal_arr)
+    print("car list...bakalım...", o_car_arr)
+    print("per list...bakalım...", o_per_arr)
+    print("cum list...bakalım...", o_cum_arr)
+    print("cmt list...bakalım...", o_cmt_arr)
+    print("paz list...bakalım...", o_paz_arr)
+
+
+    o_list = []
+    i = 0
+    while i < max_oc:
+        g_list = []
+        g_list.append(o_pzt_arr[i])
+        g_list.append(o_sal_arr[i])
+        g_list.append(o_car_arr[i])
+        g_list.append(o_per_arr[i])
+        g_list.append(o_cum_arr[i])
+        g_list.append(o_cmt_arr[i])
+        g_list.append(o_paz_arr[i])
+        o_list.append(g_list)
+        i = i + 1
+
+    print("işte o list...sonunda..", o_list)
+
+
+
+    pzt_obj = den_obj.filter(gun="Pzt")
+    print("pzt obj........................................", pzt_obj)
+    sal_obj = den_obj.filter(gun="Sal")
+    print("sal obj........................................", sal_obj)
+    car_obj = den_obj.filter(gun="Çar")
+    print("car obj........................................", car_obj)
+    per_obj = den_obj.filter(gun="Per")
+    print("per obj........................................", per_obj)
+    cum_obj = den_obj.filter(gun="Cum")
+    print("cum obj........................................", cum_obj)
+    cmt_obj = den_obj.filter(gun="Cmt")
+    print("cmt obj........................................", cmt_obj)
+    paz_obj = den_obj.filter(gun="Paz")
+    print("paz obj........................................", paz_obj)
+
+    pzt_dc = pzt_obj.count()
+    sal_dc = sal_obj.count()
+    car_dc = car_obj.count()
+    per_dc = per_obj.count()
+    cum_dc = cum_obj.count()
+    cmt_dc = cmt_obj.count()
+    paz_dc = paz_obj.count()
+
+    max_dc = pzt_dc
+    if sal_dc > max_dc:
+        max_dc = sal_dc
+    if car_dc > max_dc:
+        max_dc = car_dc
+    if per_dc > max_dc:
+        max_dc = per_dc
+    if cum_dc > max_dc:
+        max_dc = cum_dc
+    if cmt_dc > max_dc:
+        max_dc = cmt_dc
+    if paz_dc > max_dc:
+        max_dc = paz_dc
+
+    print("en yüksek denetim sayısı...", max_dc)
+
+    for pzt in pzt_obj:
+        temp=[pzt.zaman, pzt]
+        d_pzt_arr.append(temp)
+    d_pzt_arr.sort()
+    fark = max_dc - pzt_dc
+    if fark != 0:
+        while fark !=0:
+            d_pzt_arr.append(None)
+            fark = fark - 1
+
+    for sal in sal_obj:
+        temp=[sal.zaman, sal]
+        d_sal_arr.append(temp)
+    d_sal_arr.sort()
+    fark = max_dc - sal_dc
+    if fark != 0:
+        while fark !=0:
+            d_sal_arr.append(None)
+            fark = fark - 1
+
+    for car in car_obj:
+        temp=[car.zaman, car]
+        d_car_arr.append(temp)
+    d_car_arr.sort()
+    fark = max_dc - car_dc
+    if fark != 0:
+        while fark !=0:
+            d_car_arr.append(None)
+            fark = fark - 1
+
+    for per in per_obj:
+        temp=[per.zaman, per]
+        d_per_arr.append(temp)
+    d_per_arr.sort()
+    fark = max_dc - per_dc
+    if fark != 0:
+        while fark !=0:
+            d_per_arr.append(None)
+            fark = fark - 1
+
+    for cum in cum_obj:
+        temp=[cum.zaman, cum]
+        d_cum_arr.append(temp)
+    d_cum_arr.sort()
+    fark = max_dc - cum_dc
+    if fark != 0:
+        while fark !=0:
+            d_cum_arr.append(None)
+            fark = fark - 1
+
+    for cmt in cmt_obj:
+        temp=[cmt.zaman, cmt]
+        d_cmt_arr.append(temp)
+    d_cmt_arr.sort()
+    fark = max_dc - cmt_dc
+    if fark != 0:
+        while fark !=0:
+            d_cmt_arr.append(None)
+            fark = fark - 1
+
+    for paz in paz_obj:
+        temp=[paz.zaman, paz]
+        d_paz_arr.append(temp)
+    d_paz_arr.sort()
+    fark = max_dc - paz_dc
+    if fark != 0:
+        while fark !=0:
+            d_paz_arr.append(None)
+            fark = fark - 1
+
+    print("pzt list...bakalım...", d_pzt_arr)
+    print("sal list...bakalım...", d_sal_arr)
+    print("car list...bakalım...", d_car_arr)
+    print("per list...bakalım...", d_per_arr)
+    print("cum list...bakalım...", d_cum_arr)
+    print("cmt list...bakalım...", d_cmt_arr)
+    print("paz list...bakalım...", d_paz_arr)
+
+
+    d_list = []
+    i = 0
+    while i < max_dc:
+        g_list = []
+        g_list.append(d_pzt_arr[i])
+        g_list.append(d_sal_arr[i])
+        g_list.append(d_car_arr[i])
+        g_list.append(d_per_arr[i])
+        g_list.append(d_cum_arr[i])
+        g_list.append(d_cmt_arr[i])
+        g_list.append(d_paz_arr[i])
+        d_list.append(g_list)
+        i = i + 1
+
+    print("işte d list...sonunda..", d_list)
+
+
+    context = {'yer': yer_obj,
+               'o_list': o_list,
+               'd_list': d_list,
+               'max_oc': max_oc,
+               'max_dc': max_dc,
+               }
     return render(request, 'islem/yer_detay.html', context)
 
 
@@ -4684,284 +5016,132 @@ def yer_detay_gecici(request, pk=None):
 
 
 
-@login_required
-@transaction.atomic
-def yer_detay(request, pk=None):
-    yer_obj = yer.objects.get(id=pk)
-    print("yer objesi...", yer_obj)
-    plan_opr_gun_obj = plan_opr_gun.objects.filter(yer=pk)
-    print("plan gün obj..", plan_opr_gun_obj)
-    pzt_list = []
-    sal_list = []
-    car_list = []
-    per_list = []
-    cum_list = []
-    cmt_list = []
-    paz_list = []
-    a = []
-    max_cnt = 0
-
-    if plan_opr_gun_obj:
-        pzt_obj = plan_opr_gun.objects.filter(gun='Pzt')
-        sal_obj = plan_opr_gun.objects.filter(gun='Sal')
-        car_obj = plan_opr_gun.objects.filter(gun='Çar')
-        per_obj = plan_opr_gun.objects.filter(gun='Per')
-        cum_obj = plan_opr_gun.objects.filter(gun='Cum')
-        cmt_obj = plan_opr_gun.objects.filter(gun='Cmt')
-        paz_obj = plan_opr_gun.objects.filter(gun='Paz')
-        pzt_cnt = pzt_obj.count()
-        sal_cnt = sal_obj.count()
-        car_cnt = car_obj.count()
-        per_cnt = per_obj.count()
-        cum_cnt = cum_obj.count()
-        cmt_cnt = cmt_obj.count()
-        paz_cnt = paz_obj.count()
-
-
-        print("adetler...", pzt_cnt, "-", sal_cnt, "-", car_cnt, "-", per_cnt, "-", cum_cnt, "-", cmt_cnt, "-", paz_cnt)
-
-        max_cnt = pzt_cnt
-        if sal_cnt > max_cnt:
-            max_cnt = sal_cnt
-        if car_cnt > max_cnt:
-            max_cnt = car_cnt
-        if per_cnt > max_cnt:
-            max_cnt = per_cnt
-        if cum_cnt > max_cnt:
-            max_cnt = cum_cnt
-        if cmt_cnt > max_cnt:
-            max_cnt = cmt_cnt
-        if paz_cnt > max_cnt:
-            max_cnt = paz_cnt
-
-        for pzt in pzt_obj:
-            pzt_list.append(pzt.zaman)
-        for sal in sal_obj:
-            sal_list.append(sal.zaman)
-        for car in car_obj:
-            car_list.append(car.zaman)
-        for per in per_obj:
-            per_list.append(per.zaman)
-        for cum in cum_obj:
-            cum_list.append(cum.zaman)
-        for cmt in cmt_obj:
-            cmt_list.append(cmt.zaman)
-        for paz in paz_obj:
-            paz_list.append(paz.zaman)
-
-        print("pzt list", pzt_list)
-        print("sal list", sal_list)
-        print("çar list", car_list)
-        print("per list", per_list)
-        print("cum list", cum_list)
-        print("cmt list", cmt_list)
-        print("paz list", paz_list)
-
-        print("pzt list 0", pzt_list[0])
-
-        a = []
-        row = []
-        for i in range(max_cnt):
-            print("i...", i)
-            row.append(pzt_list[i])
-            row.append(sal_list[i])
-            row.append(car_list[i])
-            row.append(per_list[i])
-            row.append(cum_list[i])
-            row.append(cmt_list[i])
-            row.append(paz_list[i])
-            print("i...", i,"row...", row)
-            a.append(row)
-            row = []
-
-        print("sonuc listesi template uygun ...", a)
-
-    print ("max count...", max_cnt)
-
-
-
-    plan_den_gun_obj = plan_den_gun.objects.filter(yer=pk)
-    print("plan gün obj..", plan_opr_gun_obj)
-    pzt_list = []
-    sal_list = []
-    car_list = []
-    per_list = []
-    cum_list = []
-    cmt_list = []
-    paz_list = []
-    b = []
-    max_cnt_den = 0
-
-    if plan_den_gun_obj:
-        pzt_obj = plan_den_gun.objects.filter(gun='Pzt')
-        sal_obj = plan_den_gun.objects.filter(gun='Sal')
-        car_obj = plan_den_gun.objects.filter(gun='Çar')
-        per_obj = plan_den_gun.objects.filter(gun='Per')
-        cum_obj = plan_den_gun.objects.filter(gun='Cum')
-        cmt_obj = plan_den_gun.objects.filter(gun='Cmt')
-        paz_obj = plan_den_gun.objects.filter(gun='Paz')
-        pzt_cnt = pzt_obj.count()
-        sal_cnt = sal_obj.count()
-        car_cnt = car_obj.count()
-        per_cnt = per_obj.count()
-        cum_cnt = cum_obj.count()
-        cmt_cnt = cmt_obj.count()
-        paz_cnt = paz_obj.count()
-
-
-        print("adetler...", pzt_cnt, "-", sal_cnt, "-", car_cnt, "-", per_cnt, "-", cum_cnt, "-", cmt_cnt, "-", paz_cnt)
-
-        max_cnt_den = pzt_cnt
-        if sal_cnt > max_cnt_den:
-            max_cnt_den = sal_cnt
-        if car_cnt > max_cnt_den:
-            max_cnt_den = car_cnt
-        if per_cnt > max_cnt_den:
-            max_cnt_den = per_cnt
-        if cum_cnt > max_cnt_den:
-            max_cnt_den = cum_cnt
-        if cmt_cnt > max_cnt_den:
-            max_cnt_den = cmt_cnt
-        if paz_cnt > max_cnt_den:
-            max_cnt_den = paz_cnt
-
-        for pzt in pzt_obj:
-            pzt_list.append(pzt.zaman)
-        for sal in sal_obj:
-            sal_list.append(sal.zaman)
-        for car in car_obj:
-            car_list.append(car.zaman)
-        for per in per_obj:
-            per_list.append(per.zaman)
-        for cum in cum_obj:
-            cum_list.append(cum.zaman)
-        for cmt in cmt_obj:
-            cmt_list.append(cmt.zaman)
-        for paz in paz_obj:
-            paz_list.append(paz.zaman)
-
-        print("pzt list", pzt_list)
-        print("sal list", sal_list)
-        print("çar list", car_list)
-        print("per list", per_list)
-        print("cum list", cum_list)
-        print("cmt list", cmt_list)
-        print("paz list", paz_list)
-
-        print("pzt list 0", pzt_list[0])
-
-        b = []
-        row = []
-        for i in range(max_cnt_den):
-            print("i...", i)
-            row.append(pzt_list[i])
-            row.append(sal_list[i])
-            row.append(car_list[i])
-            row.append(per_list[i])
-            row.append(cum_list[i])
-            row.append(cmt_list[i])
-            row.append(paz_list[i])
-            print("i...", i,"row...", row)
-            b.append(row)
-            row = []
-
-        print("sonuc listesi template uygun ...", a)
-
-    print ("max count denetim..", max_cnt_den)
-
-    return render(request, 'islem/yer_detail.html', {'yer': yer_obj,
-                                                     'a': a,
-                                                     'max_cnt': max_cnt,
-                                                     'b': b,
-                                                     'max_cnt_den': max_cnt_den})
-
-
-
-
 
 import time
 
+
+
 @login_required
 @transaction.atomic
-def yer_zaman_planla(request, pk=None):
+def yer_operasyon_planla(request, pk=None):
+    # eski takılan yada yeniden planlanacak yerler için....
+    print("operasyon planlama için gelen id...", pk)
+    yer_obj = yer.objects.get(id=pk)
+    print("valid-- operasyon dilimleri", yer_obj.opr_basl, "-", yer_obj.opr_son, "-", yer_obj.opr_delta)
+    # burada günlük operasyon ve denetim dosyası oluşturulacak.....
+    gun_arr = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz',]
+    i = 0
+    while i < 7:
+        h1, m1, s1 = yer_obj.opr_basl.hour, yer_obj.opr_basl.minute, yer_obj.opr_basl.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        saat = datetime.timedelta(0,total_sec,0)
+        h1, m1, s1 = yer_obj.opr_delta.hour, yer_obj.opr_delta.minute, yer_obj.opr_delta.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        fark_opr = datetime.timedelta(0,total_sec,0)
+        h1, m1, s1 = yer_obj.opr_son.hour, yer_obj.opr_son.minute, yer_obj.opr_son.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        son_saat = datetime.timedelta(0,total_sec,0)
+        print("işte saat, fark ve son saat.. timedelta olarak...", saat, "-", fark_opr, "-", son_saat)
+        while saat <= son_saat:
+            saniyeler = saat.seconds
+            h1 = saniyeler // 3600
+            k1 = saniyeler % 3600
+            m1 = k1 // 60
+            s1 = k1 % 60
+            print("hesaplanan time değerleri saniyeden dönüştürme..", h1, "-", m1, "-", s1)
+            kay_saat = datetime.time(h1,m1,s1)
+            print("kaydetme saati...", kay_saat)
+            kaydetme_obj = plan_opr_gun(yer_id=yer_obj.id, gun=gun_arr[i], zaman=kay_saat)
+            kaydetme_obj.save()
+            print("kaydetme objedeki saat...", saat)
+            saat = saat + fark_opr
+        i = i + 1
+        return redirect('yer_detay', pk=pk)
+
+
+
+@login_required
+def yer_operasyon_ekle(request, pk=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
 
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = GunForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.yer = yer_obj
+            post.save()
+            messages.success(request, 'Operasyon saati kaydedildi')
+            return redirect('yer_detay', pk=pk)
+        else:
+            messages.success(request, 'Formda uygunsuzluk var')
+            return render(request, 'islem/yer_operasyon_yarat.html', {'form': form, 'yer_obj':yer_obj})
 
-    #st_time = datetime.time(10,0,0)
-    st_time = yer_obj.opr_basl
-    print("st time..", st_time)
-    h = st_time.hour
-    m = st_time.minute
-    s = st_time.second
-    total_seconds = 3600*h + 60*m + s
-
-    #end_time = datetime.time(22,0,0)
-    end_time = yer_obj.opr_son
-    print("end time ..", end_time)
-    h = end_time.hour
-    m = end_time.minute
-    s = end_time.second
-    final_seconds = 3600*h + 60*m + s
-
-    #time_delta = datetime.time(0,30,0)
-    time_delta = yer_obj.opr_delta
-    print("time delta ..", time_delta)
-
-    while total_seconds < final_seconds:
-        n = 0
-        while n < 7:
-            if n == 0:
-                gun = 'Pzt'
-            if n == 1:
-                gun = 'Sal'
-            if n == 2:
-                gun = 'Çar'
-            if n == 3:
-                gun = 'Per'
-            if n == 4:
-                gun = 'Cum'
-            if n == 5:
-                gun = 'Cmt'
-            if n == 6:
-                gun = 'Paz'
-            print("yer obj id..", pk)
-            print("gun...", gun)
-            print("zaman ..", st_time)
-            kaydetme_obj = plan_opr_gun(yer_id=pk,
-                                    gun=gun,
-                                    zaman=st_time,
-                                    )
-            kaydetme_obj.save()
-            n = n + 1
-
-        #h, m, s = [int(i) for i in st_time.split(':')]
-        h1 = st_time.hour
-        m1 = st_time.minute
-        s1 = st_time.second
-        total_seconds = 3600*h1 + 60*m1 + s1
-        print(" total seconds toplamadan önce", total_seconds)
-        #h, m, s = [int(i) for i in time_delta.split(':')]
-        h2 = time_delta.hour
-        m2 = time_delta.minute
-        s2 = time_delta.second
-        add_seconds = 3600*h2 + 60*m2 + s2
-        print(" add seconds toplamadan önce", add_seconds)
-        total_seconds = total_seconds + add_seconds
-        print(" total seconds toplamadan sonra", total_seconds)
-        print(" final seconds ", final_seconds)
-        #st_time = str(datetime.timedelta(seconds=total_seconds))
-        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
-        h3 = total_seconds // 3600
-        remain = total_seconds % 3600
-        m3 = remain // 60
-        s3 = remain % 60
-        st_time = datetime.time(h3,m3,s3)
-        print("new st time..", st_time)
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = GunForm()
+        return render(request, 'islem/yer_operasyon_yarat.html', {'form': form, 'yer_obj':yer_obj})
 
 
-    messages.success(request, 'zaman planı yaratma işlemi gerçekleştirildi')
+
+@login_required
+def yer_operasyon_duzenle(request, pk=None, pk2=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    plan_opr_obj = plan_opr_gun.objects.get(id=pk2)
+    print("plan opr obj...", plan_opr_obj)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = SaatForm(request.POST, instance=plan_opr_obj)
+        # check whether it's valid:
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Operasyon saati kaydedildi')
+            return redirect('yer_detay', pk=pk)
+        else:
+            messages.success(request, 'Formda uygunsuzluk var')
+            return redirect('yer_operasyon_duzenle', pk=pk, pk2=pk2)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = SaatForm(instance=plan_opr_obj)
+        return render(request, 'islem/yer_operasyon_duzenle.html', {'form': form, 'plan_opr_obj':plan_opr_obj, })
+
+
+
+
+@login_required
+def yer_operasyon_sil(request, pk=None, pk2=None):
+    yer_obj = yer.objects.get(id=pk)
+    print("yer objesi...", yer_obj)
+    opr_plan_obj = plan_opr_gun.objects.get(id=pk2)
+    return render(request, 'islem/yer_opr_sil_soru.html', {'opr_plan_obj': opr_plan_obj,})
+
+
+
+@login_required
+def yer_operasyon_sil_kesin(request, pk=None, pk2=None):
+    print("tipi sil kesindeki pk:", pk)
+    #object = get_object_or_404(plan_opr_gun, pk=pk2)
+    object = plan_opr_gun.objects.get(id=pk2)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
     return redirect('yer_detay', pk=pk)
+
+
+
+#----------------------------------------------------------------------------------------------
+#   yer denetim işlemleri
 
 
 
@@ -4969,347 +5149,119 @@ def yer_zaman_planla(request, pk=None):
 @login_required
 @transaction.atomic
 def yer_denetim_planla(request, pk=None):
+    # eski takılan yada yeniden planlanacak yerler için....
+    print("operasyon planlama için gelen id...", pk)
     yer_obj = yer.objects.get(id=pk)
-    print("yer objesi...", yer_obj)
-
-
-    #st_time = datetime.time(10,0,0)
-    st_time = yer_obj.den_basl
-    print("st time..", st_time)
-    h = st_time.hour
-    m = st_time.minute
-    s = st_time.second
-    total_seconds = 3600*h + 60*m + s
-
-    #end_time = datetime.time(22,0,0)
-    end_time = yer_obj.den_son
-    print("end time ..", end_time)
-    h = end_time.hour
-    m = end_time.minute
-    s = end_time.second
-    final_seconds = 3600*h + 60*m + s
-
-    #time_delta = datetime.time(0,30,0)
-    time_delta = yer_obj.den_delta
-    print("time delta ..", time_delta)
-
-    while total_seconds < final_seconds:
-        n = 0
-        while n < 7:
-            if n == 0:
-                gun = 'Pzt'
-            if n == 1:
-                gun = 'Sal'
-            if n == 2:
-                gun = 'Çar'
-            if n == 3:
-                gun = 'Per'
-            if n == 4:
-                gun = 'Cum'
-            if n == 5:
-                gun = 'Cmt'
-            if n == 6:
-                gun = 'Paz'
-            print("yer obj id..", pk)
-            print("gun...", gun)
-            print("zaman ..", st_time)
-            kaydetme_obj = plan_den_gun(yer_id=pk,
-                                    gun=gun,
-                                    zaman=st_time,
-                                    )
+    print("valid-- operasyon dilimleri", yer_obj.opr_basl, "-", yer_obj.opr_son, "-", yer_obj.opr_delta)
+    # burada günlük operasyon ve denetim dosyası oluşturulacak.....
+    gun_arr = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz',]
+    i = 0
+    while i < 7:
+        h1, m1, s1 = yer_obj.opr_basl.hour, yer_obj.opr_basl.minute, yer_obj.opr_basl.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        saat = datetime.timedelta(0,total_sec,0)
+        h1, m1, s1 = yer_obj.opr_delta.hour, yer_obj.opr_delta.minute, yer_obj.opr_delta.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        fark_opr = datetime.timedelta(0,total_sec,0)
+        h1, m1, s1 = yer_obj.opr_son.hour, yer_obj.opr_son.minute, yer_obj.opr_son.second
+        print("okunan time değerleri...", h1, "-", m1, "-", s1)
+        total_sec = 3600*h1+60*m1+s1
+        son_saat = datetime.timedelta(0,total_sec,0)
+        print("işte saat, fark ve son saat.. timedelta olarak...", saat, "-", fark_opr, "-", son_saat)
+        while saat <= son_saat:
+            saniyeler = saat.seconds
+            h1 = saniyeler // 3600
+            k1 = saniyeler % 3600
+            m1 = k1 // 60
+            s1 = k1 % 60
+            print("hesaplanan time değerleri saniyeden dönüştürme..", h1, "-", m1, "-", s1)
+            kay_saat = datetime.time(h1,m1,s1)
+            print("kaydetme saati...", kay_saat)
+            kaydetme_obj = plan_den_gun(yer_id=yer_obj.id, gun=gun_arr[i], zaman=kay_saat)
             kaydetme_obj.save()
-            n = n + 1
+            print("kaydetme objedeki saat...", saat)
+            saat = saat + fark_opr
+        i = i + 1
+        return redirect('yer_detay', pk=pk)
 
-        #h, m, s = [int(i) for i in st_time.split(':')]
-        h1 = st_time.hour
-        m1 = st_time.minute
-        s1 = st_time.second
-        total_seconds = 3600*h1 + 60*m1 + s1
-        print(" total seconds toplamadan önce", total_seconds)
-        #h, m, s = [int(i) for i in time_delta.split(':')]
-        h2 = time_delta.hour
-        m2 = time_delta.minute
-        s2 = time_delta.second
-        add_seconds = 3600*h2 + 60*m2 + s2
-        print(" add seconds toplamadan önce", add_seconds)
-        total_seconds = total_seconds + add_seconds
-        print(" total seconds toplamadan sonra", total_seconds)
-        print(" final seconds ", final_seconds)
-        #st_time = str(datetime.timedelta(seconds=total_seconds))
-        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
-        h3 = total_seconds // 3600
-        remain = total_seconds % 3600
-        m3 = remain // 60
-        s3 = remain % 60
-        st_time = datetime.time(h3,m3,s3)
-        print("new st time..", st_time)
-
-
-    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi')
-    return redirect('yer_detay', pk=pk)
 
 
 @login_required
-@transaction.atomic
-def yer_zaman_duzenle(request, pk=None):
+def yer_denetim_ekle(request, pk=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
-    yer_adi = yer_obj.yer_adi
-    request.session['yer_opr_duzenle_yer'] = pk
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = GunForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print("günform valid....")
-            gun = request.POST.get('gun', "")
-            print("gün...", gun)
-            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
-            form = GunForm()
-            form.fields["gun"].initial = gun
-            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
-
-        else:
-            messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('yer_detay')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = GunForm()
-        gun = "Pzt"
-        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
-        form.fields["gun"].initial = gun
-        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
-
-
-
-@login_required
-@transaction.atomic
-def yer_zaman_duzenle_js(request, pk=None):
-    print("selam buraya geldik...yer zaman duzenle js")
-    kullanan = request.user.id
-    response_data ={}
-    if request.method == 'GET':
-        js_gun = request.GET.getlist('gun')
-        print("js gun..", js_gun)
-        request.session['yer_opr_duzenle_gun'] = js_gun
-    return HttpResponse(response_data, content_type='application/json')
-
-
-
-@login_required
-def yer_zaman_duzenle_create(request, pk=None):
-    yer_obj = yer.objects.get(id=pk)
-    print("yer objesi...", yer_obj)
-    yer_adi = yer_obj.yer_adi
-    yer_gun = request.session['yer_opr_duzenle_gun']
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = SaatForm(request.POST)
+        form = GunDenForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            print("saatform valid....")
-            saat = request.POST.get('saat', "")
-            print("saat..", saat)
-            kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
-            kaydetme_obj.save()
+            post = form.save(commit=False)
+            post.yer = yer_obj
+            post.save()
             messages.success(request, 'Operasyon saati kaydedildi')
-            return redirect('yer_zaman_duzenle', pk=pk)
+            return redirect('yer_detay', pk=pk)
         else:
-            print(" saat form valid değil !!!!!!!!!............")
             messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('yer_zaman_duzenle', pk=pk)
+            return render(request, 'islem/yer_denetim_yarat.html', {'form': form, 'yer_obj':yer_obj})
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = SaatForm()
-        return render(request, 'islem/yer_zaman_duzenle_create.html', {'form': form, 'yer_adi':yer_adi, 'yer_gun': yer_gun})
+        form = GunDenForm()
+        return render(request, 'islem/yer_denetim_yarat.html', {'form': form, 'yer_obj':yer_obj})
 
 
 
 @login_required
-def yer_zaman_duzenle_update(request, pk=None):
+def yer_denetim_duzenle(request, pk=None, pk2=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
-    yer_adi = yer_obj.yer_adi
-    yer_gun = request.session['yer_opr_duzenle_gun']
+    plan_den_obj = plan_den_gun.objects.get(id=pk2)
+    print("plan opr obj...", plan_den_obj)
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = SaatForm(request.POST)
+        form = SaatDenForm(request.POST, instance=plan_den_obj)
         # check whether it's valid:
         if form.is_valid():
-            print("saatform valid....")
-            saat = request.POST.get('saat', "")
-            print("saat..", saat)
-            kaydetme_obj = plan_opr_gun(yer=pk, gun=yer_gun, zaman=saat)
-            kaydetme_obj.save()
+            form.save()
             messages.success(request, 'Operasyon saati kaydedildi')
-            return redirect('yer_zaman_duzenle', pk=pk)
+            return redirect('yer_detay', pk=pk)
         else:
             messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('yer_zaman_duzenle', pk=pk)
+            return render(request, 'islem/yer_denetim_duzenle.html', {'form': form, 'plan_den_obj':plan_den_obj, })
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = SaatForm()
-        return render(request, 'islem/yer_zaman_duzenle_create.html', {'form': form, 'yer_adi':yer_adi, 'yer_gun': yer_gun})
+        form = SaatDenForm(instance=plan_den_obj)
+        return render(request, 'islem/yer_denetim_duzenle.html', {'form': form, 'plan_den_obj':plan_den_obj, })
 
 
 
 
 @login_required
-def yer_zaman_duzenle_delete(request, pk=None):
+def yer_denetim_sil(request, pk=None, pk2=None):
     yer_obj = yer.objects.get(id=pk)
     print("yer objesi...", yer_obj)
-    yer_adi = yer_obj.yer_adi
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = GunForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print("günform valid....")
-            gun = request.POST.get('gun', "")
-            print("gün...", gun)
-            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
-            form = GunForm()
-            form.fields["gun"].initial = gun
-            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
-
-        else:
-            messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('yer_detay')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = GunForm()
-        gun = "Pzt"
-        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
-        form.fields["gun"].initial = gun
-        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
+    den_plan_obj = plan_den_gun.objects.get(id=pk2)
+    return render(request, 'islem/yer_den_sil_soru.html', {'den_plan_obj': den_plan_obj,})
 
 
 
 @login_required
-def yer_zaman_duzenle_kesin(request, pk=None):
-    yer_obj = yer.objects.get(id=pk)
-    print("yer objesi...", yer_obj)
-    yer_adi = yer_obj.yer_adi
-
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = GunForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print("günform valid....")
-            gun = request.POST.get('gun', "")
-            print("gün...", gun)
-            opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun).order_by('zaman')
-            form = GunForm()
-            form.fields["gun"].initial = gun
-            return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
-
-        else:
-            messages.success(request, 'Formda uygunsuzluk var')
-            return redirect('yer_detay')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = GunForm()
-        gun = "Pzt"
-        opr_gun_obj = plan_opr_gun.objects.filter(yer=pk).filter(gun=gun)
-        form.fields["gun"].initial = gun
-        return render(request, 'islem/yer_zaman_duzenle.html', {'form': form, 'opr_gun_obj': opr_gun_obj, 'yer_adi':yer_adi})
-
-
-
-
-@login_required
-@transaction.atomic
-def yer_denetim_duzenle(request, pk=None):
-    yer_obj = yer.objects.get(id=pk)
-    print("yer objesi...", yer_obj)
-
-
-    #st_time = datetime.time(10,0,0)
-    st_time = yer_obj.den_basl
-    print("st time..", st_time)
-    h = st_time.hour
-    m = st_time.minute
-    s = st_time.second
-    total_seconds = 3600*h + 60*m + s
-
-    #end_time = datetime.time(22,0,0)
-    end_time = yer_obj.den_son
-    print("end time ..", end_time)
-    h = end_time.hour
-    m = end_time.minute
-    s = end_time.second
-    final_seconds = 3600*h + 60*m + s
-
-    #time_delta = datetime.time(0,30,0)
-    time_delta = yer_obj.den_delta
-    print("time delta ..", time_delta)
-
-    while total_seconds < final_seconds:
-        n = 0
-        while n < 7:
-            if n == 0:
-                gun = 'Pzt'
-            if n == 1:
-                gun = 'Sal'
-            if n == 2:
-                gun = 'Çar'
-            if n == 3:
-                gun = 'Per'
-            if n == 4:
-                gun = 'Cum'
-            if n == 5:
-                gun = 'Cmt'
-            if n == 6:
-                gun = 'Paz'
-            print("yer obj id..", pk)
-            print("gun...", gun)
-            print("zaman ..", st_time)
-            kaydetme_obj = plan_den_gun(yer_id=pk,
-                                    gun=gun,
-                                    zaman=st_time,
-                                    )
-            kaydetme_obj.save()
-            n = n + 1
-
-        #h, m, s = [int(i) for i in st_time.split(':')]
-        h1 = st_time.hour
-        m1 = st_time.minute
-        s1 = st_time.second
-        total_seconds = 3600*h1 + 60*m1 + s1
-        print(" total seconds toplamadan önce", total_seconds)
-        #h, m, s = [int(i) for i in time_delta.split(':')]
-        h2 = time_delta.hour
-        m2 = time_delta.minute
-        s2 = time_delta.second
-        add_seconds = 3600*h2 + 60*m2 + s2
-        print(" add seconds toplamadan önce", add_seconds)
-        total_seconds = total_seconds + add_seconds
-        print(" total seconds toplamadan sonra", total_seconds)
-        print(" final seconds ", final_seconds)
-        #st_time = str(datetime.timedelta(seconds=total_seconds))
-        #st_time = time.strftime('%H:%M:%S', time.gmtime(total_seconds))
-        h3 = total_seconds // 3600
-        remain = total_seconds % 3600
-        m3 = remain // 60
-        s3 = remain % 60
-        st_time = datetime.time(h3,m3,s3)
-        print("new st time..", st_time)
-
-
-    messages.success(request, 'denetim zaman planı yaratma işlemi gerçekleştirildi')
+def yer_denetim_sil_kesin(request, pk=None, pk2=None):
+    print("tipi sil kesindeki pk:", pk)
+    #object = get_object_or_404(plan_opr_gun, pk=pk2)
+    object = plan_den_gun.objects.get(id=pk2)
+    try:
+        object.delete()
+    except ProtectedError:
+        mesaj = "bağlantılı veri var,  silinemez...!!"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    messages.success(request, 'Başarıyla silindi')
     return redirect('yer_detay', pk=pk)
-
-
-
 
 
 
@@ -5634,7 +5586,7 @@ def yer_listele(request):
 
 
 
-
+@transaction.atomic
 @login_required
 def yer_yarat(request):
     # if this is a POST request we need to process the form data
@@ -5644,12 +5596,78 @@ def yer_yarat(request):
         form = YerForm(request.POST, kullanici=kullanici)
         # check whether it's valid:
         if form.is_valid():
-            print("valid")
             post = form.save(commit=False)
             post.save()
+            print("valid-- operasyon dilimleri", post.opr_basl, "-", post.opr_son, "-", post.opr_delta)
+            print("valid-- denetim dilimleri", post.den_basl, "-", post.den_son, "-", post.den_delta)
+            # burada günlük operasyon ve denetim dosyası oluşturulacak.....
+            gun_arr = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz',]
+            i = 0
+            while i < 7:
+                h1, m1, s1 = post.opr_basl.hour, post.opr_basl.minute, post.opr_basl.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                saat = datetime.timedelta(0,total_sec,0)
+                h1, m1, s1 = post.opr_delta.hour, post.opr_delta.minute, post.opr_delta.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                fark_opr = datetime.timedelta(0,total_sec,0)
+                h1, m1, s1 = post.opr_son.hour, post.opr_son.minute, post.opr_son.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                son_saat = datetime.timedelta(0,total_sec,0)
+                print("işte saat, fark ve son saat.. timedelta olarak...", saat, "-", fark_opr, "-", son_saat)
+                while saat <= son_saat:
+                    yer_obj = yer.objects.latest('id')
+                    saniyeler = saat.seconds
+                    h1 = saniyeler // 3600
+                    k1 = saniyeler % 3600
+                    m1 = k1 // 60
+                    s1 = k1 % 60
+                    print("hesaplanan time değerleri saniyeden dönüştürme..", h1, "-", m1, "-", s1)
+                    kay_saat = datetime.time(h1,m1,s1)
+                    print("kaydetme saati...", kay_saat)
+                    kaydetme_obj = plan_opr_gun(yer_id=yer_obj.id, gun=gun_arr[i], zaman=kay_saat)
+                    kaydetme_obj.save()
+                    print("kaydetme objedeki saat...", saat)
+                    saat = saat + fark_opr
+                i = i + 1
+
+            i = 0
+            while i < 7:
+                h1, m1, s1 = post.den_basl.hour, post.den_basl.minute, post.den_basl.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                saat = datetime.timedelta(0,total_sec,0)
+                h1, m1, s1 = post.den_delta.hour, post.den_delta.minute, post.den_delta.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                fark_opr = datetime.timedelta(0,total_sec,0)
+                h1, m1, s1 = post.den_son.hour, post.den_son.minute, post.den_son.second
+                print("okunan time değerleri...", h1, "-", m1, "-", s1)
+                total_sec = 3600*h1+60*m1+s1
+                son_saat = datetime.timedelta(0,total_sec,0)
+                print("işte saat, fark ve son saat.. timedelta olarak...", saat, "-", fark_opr, "-", son_saat)
+                while saat <= son_saat:
+                    yer_obj = yer.objects.latest('id')
+                    saniyeler = saat.seconds
+                    h1 = saniyeler // 3600
+                    k1 = saniyeler % 3600
+                    m1 = k1 // 60
+                    s1 = k1 % 60
+                    print("hesaplanan time değerleri saniyeden dönüştürme..", h1, "-", m1, "-", s1)
+                    kay_saat = datetime.time(h1,m1,s1)
+                    print("kaydetme saati...", kay_saat)
+                    kaydetme_obj = plan_den_gun(yer_id=yer_obj.id, gun=gun_arr[i], zaman=kay_saat)
+                    kaydetme_obj.save()
+                    print("kaydetme objedeki saat...", saat)
+                    saat = saat + fark_opr
+                i = i + 1
+
             messages.success(request, 'Başarıyla kaydetti')
             return redirect('yer_listele')
         else:
+            print ("hatalar...ha ha ha ")
             return render(request, 'islem/yer_form.html', {'form': form})
 
     # if a GET (or any other method) we'll create a blank form
@@ -5737,10 +5755,10 @@ def rfid_dosyasi_detay(request, pk=None):
 @login_required
 def rfid_dosyasi_yarat(request):
     # if this is a POST request we need to process the form data
-    kullanici = request.user
+    kullan = request.user
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = RfidForm(request.POST, kullanici=kullanici)
+        form = RfidForm(request.POST, kullan=kullan)
         # check whether it's valid:
         if form.is_valid():
             print("valid")
@@ -5753,7 +5771,7 @@ def rfid_dosyasi_yarat(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = RfidForm(kullanici=kullanici)
+        form = RfidForm(kullan=kullan)
         return render(request, 'islem/rfid_dosyasi_form.html', {'form': form,})
 
 
@@ -5761,11 +5779,11 @@ def rfid_dosyasi_yarat(request):
 @login_required
 def rfid_dosyasi_duzenle(request, pk=None):
     # if this is a POST request we need to process the form data
-    kullanici = request.user
+    kullan = request.user
     rfid_dosyasi_obj = get_object_or_404(rfid_dosyasi, pk=pk)
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = RfidForm(request.POST, kullanici=kullanici, instance=rfid_dosyasi_obj)
+        form = RfidForm(request.POST, kullan=kullan, instance=rfid_dosyasi_obj)
         # check whether it's valid:
         if form.is_valid():
             print("valid")
@@ -5778,7 +5796,7 @@ def rfid_dosyasi_duzenle(request, pk=None):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = RfidForm(kullanici=kullanici, instance=rfid_dosyasi_obj)
+        form = RfidForm(kullan=kullan, instance=rfid_dosyasi_obj)
         return render(request, 'islem/rfid_dosyasi_form.html', {'form': form,})
 
 
@@ -5802,6 +5820,204 @@ def rfid_dosyasi_sil_kesin(request, pk=None):
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
     messages.success(request, 'Başarıyla silindi')
     return redirect('rfid_dosyasi_listele')
+
+
+
+
+
+#---------------------------------------------------------------------------
+# Çalışan  dosya işlemleri....................
+
+
+@login_required
+def eleman_listele(request):
+    user = request.user
+    if proje_varmi_kontrol(request):
+        print("proje var mı kontrolden geçtik.")
+        proje = user.profile.proje
+        eleman_obj = eleman.objects.filter(proje=proje).filter(aktifcalisan="E").order_by("id")
+        return render(request, 'islem/eleman_list.html', {'eleman_obj': eleman_obj})
+
+    else:
+        print("buraya geldi...proje yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+@login_required
+def eleman_detay(request, pk=None):
+    eleman_obj = eleman.objects.get(pk=pk)
+    return render(request, 'islem/eleman_detail.html', {'eleman_obj': eleman_obj})
+
+
+
+
+@login_required
+def eleman_yarat(request):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    proje = kullanici.profile.proje
+    sirket = kullanici.profile.sirket
+
+    if not sirket:
+        mesaj="kullanıcının şirketi tanımlı değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    if not proje:
+        mesaj="kullanıcının projesi tanımlı değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ElemanForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid")
+            post = form.save(commit=False)
+            post.proje = proje
+            post.sirket = sirket
+            var_mi = eleman.objects.filter(kull_adi=post.kull_adi).filter(sirket=sirket)
+            var_count = var_mi.count()
+            print("var mı - sonucu...", var_mi, "sayısı", var_count)
+
+            if var_count > 1:
+                mesaj = "kişi birden çok kez kayıtlı !"
+                return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+            elif var_count == 1:
+                var_olan = var_mi.first()
+                print(" var olan kişinin projesi...", var_olan)
+
+                if var_olan.proje == proje:
+                    if var_olan.aktifcalisan == "E":
+                        mesaj = "kişi bu projede çalışmakta !"
+                        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+                    else:
+                        mesaj = "kişi bu projede çalışmış, tekrar aktif yapın !"
+                        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+                else:
+                    if var_olan.aktifcalisan == "E":
+                        mesaj = "kişi "+var_olan.proje +" projesinde çalışmakta  !"
+                        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+                    else:
+                        mesaj = "kişi "+var_olan.proje +" projesinde çalışmış, tekrar aktif yapın  !"
+                        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti')
+            return redirect('eleman_listele')
+        else:
+            mesaj = ""
+            return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ElemanForm()
+        mesaj = ""
+        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+
+
+
+@login_required
+def eleman_duzenle(request, pk=None):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    eleman_obj = get_object_or_404(eleman, pk=pk)
+    proje = kullanici.profile.proje
+    sirket = kullanici.profile.sirket
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ElemanForm(request.POST, instance=eleman_obj)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid")
+            post = form.save(commit=False)
+            post.proje = proje
+            post.sirket = sirket
+            if post.kull_adi != eleman_obj.kull_adi:
+                mesaj = " vatandaşlık numarası değiştirilemez..!"
+                return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+
+            post.save()
+            messages.success(request, 'Başarıyla kaydetti')
+            return redirect('eleman_listele')
+        else:
+            mesaj=""
+            return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ElemanForm(instance=eleman_obj)
+        mesaj = ""
+        return render(request, 'islem/eleman_form.html', {'form': form, 'mesaj': mesaj})
+
+
+
+@login_required
+def eleman_eskibul(request):
+    # if this is a POST request we need to process the form data
+    kullanici = request.user
+    #eleman_obj = get_object_or_404(eleman, pk=pk)
+    proje = kullanici.profile.proje
+    sirket = kullanici.profile.sirket
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = VatandaslikForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            print("valid")
+            vatno = request.POST.get('vatno', "")
+            print("vatno..........", vatno)
+            e = eleman.objects.filter(kull_adi=vatno).filter(aktifcalisan="H").first()
+            print("el object...", e)
+            if e:
+                mesaj = ""
+                varmi = json.dumps("x")
+                ac = json.dumps(e.aktifcalisan)
+                context = {'form': form, 'mesaj': mesaj, 'e': e, 'varmi': varmi, 'ac': ac}
+                return render(request, 'islem/vatno_form.html', context)
+            else:
+                mesaj = " aranan kişi eski çalışan değil !"
+                varmi = json.dumps("")
+                ac = json.dumps("")
+                context = {'form': form, 'mesaj': mesaj, 'e': e, 'varmi': varmi, 'ac': ac}
+                return render(request, 'islem/vatno_form.html', context)
+        else:
+            mesaj=""
+            e = None
+            varmi = json.dumps("")
+            ac = json.dumps("")
+            context = {'form': form, 'mesaj': mesaj, 'e': e, 'varmi': varmi, 'ac':ac}
+            print("context", context)
+            return render(request, 'islem/vatno_form.html', context)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        print("vatandaşlık get e geldi...")
+        form = VatandaslikForm()
+        mesaj = ""
+        e = None
+        varmi = json.dumps("")
+        ac = json.dumps("")
+        context = {'form': form, 'mesaj': mesaj, 'e': e, 'varmi': varmi, 'ac': ac}
+        return render(request, 'islem/vatno_form.html', context)
+
+
+
+
+@login_required
+def eleman_eskibul_kesin(request, pk=None):
+    print("eleman değiş  kesindeki pk:", pk)
+    object = get_object_or_404(eleman, pk=pk)
+    #  burada elemanın kaydını al ve update et
+    object.aktifcalisan = "E"
+    object.save()
+
+    messages.success(request, 'Başarıyla değiştirildi...')
+    return redirect('eleman_listele')
+
+
+
+
+
 
 
 #----------------------------------------------
@@ -6725,27 +6941,27 @@ def bildirim(request):
         selected = request.GET.get('selected', None)
         print("js bildirim içinden zaman...", datetime.datetime.now())
         response_data = ""
-        if (request.user.profile.opr_alan_sefi == "E"  or  request.user.profile.opr_proje_yon == "E" or request.user.profile.isletme_projeyon == "E"):
-            proje = request.user.profile.proje
-            print("proje", proje)
-            if proje == None:
-                pass
-            else:
-                bugun = datetime.datetime.now()
-                yedigun = datetime.timedelta(7,0,0)
-                yedigun_once = bugun - yedigun
-                print("yedi gün önce...", yedigun_once)
-                n = Notification.objects.filter(viewed=False).filter(proje=proje).filter(timestamp__gt=yedigun_once).values()
-                print("obje - dictionary...",n)
-                if n:
-                    n_list = list(n)
-                    for i in n_list:
-                        i['timestamp'] = str(i['timestamp'])
+        proje = request.user.profile.proje
+        kisi = request.user
+        print("proje", proje)
+        if proje == None:
+            pass
+        else:
+            bugun = datetime.datetime.now()
+            yedigun = datetime.timedelta(14,0,0)
+            yedigun_once = bugun - yedigun
+            print("yedi gün önce...", yedigun_once)
+            n = Notification.objects.filter(viewed=False).filter(kisi=kisi).filter(timestamp__gt=yedigun_once).values()
+            print("obje - dictionary...",n)
+            if n:
+                n_list = list(n)
+                for i in n_list:
+                    i['timestamp'] = str(i['timestamp'])
 
-                    print("liste hali...", n_list)
-                    response_data = {"response_data" : n_list}
-                    #print("response  data...", response_data)
-                    response_data = json.dumps(n_list)
+                print("liste hali...", n_list)
+                response_data = {"response_data" : n_list}
+                #print("response  data...", response_data)
+                response_data = json.dumps(n_list)
 
         return HttpResponse(response_data, content_type='application/json')
 
@@ -6757,7 +6973,13 @@ def popup_notif(request):
 
 
 
-from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol
+def dosyalari_duzenle(request):
+        dosya = "dosyalar düzenlenecek..."
+        return render(request, 'dosyalari_duzenle.html', {'dosya': dosya})
+
+
+
+from islem.services  import get_memnuniyet_list, get_rfid_list, proje_varmi_kontrol, sirket_varmi_kontrol, index_hazirla_proje
 from islem.services  import get_operasyon_list, get_denetim_saha_list, get_ariza_list, get_yerud_list, get_sy_list
 from islem.services import get_m_list, get_o_list, get_d_list, get_a_list, admin_kontrol, get_sms, rapor_verisi_hazirla
 from islem.services import oran_memnuniyet, ana_menu_mky_hazirla, mem_veri_hazirla

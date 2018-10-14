@@ -57,13 +57,13 @@
 
   <script>
   function goster(){
-    alert("göster.....................");
+    //alert("göster.....................");
     var proje = document.getElementById('id_proje').value;
     var ilk_tarih = document.getElementById('datepicker_1').value;
     var son_tarih = document.getElementById('datepicker_2').value;
-    alert("proje..."+proje);
-    alert("datepicker-1............"+ilk_tarih);
-    alert("datepicker-2............"+son_tarih);
+    //alert("proje..."+proje);
+    //alert("datepicker-1............"+ilk_tarih);
+    //alert("datepicker-2............"+son_tarih);
 
     if (proje=="" || ilk_tarih=="" || son_tarih=="")
       {alert("eksik veri girdiniz!");
@@ -93,13 +93,13 @@
 
   <script>
   function dataChart(proje, ilk_tarih, son_tarih){
-    alert("buraya da geldi.....datachart()......!!!!!");
+    //alert("buraya da geldi.....datachart()......!!!!!");
     var endpoint = '/charts/api/data/';
     var defaultData = [];
     var labels = [];
-    alert("proje..."+proje);
-    alert("ilk_tarih..."+ilk_tarih);
-    alert("son tarih..."+son_tarih);
+    //alert("proje..."+proje);
+    //alert("ilk_tarih..."+ilk_tarih);
+    //alert("son tarih..."+son_tarih);
     $.ajax({
         method: "GET",
         url: endpoint,
@@ -152,11 +152,11 @@
 
   <script>
   function setChart(labels_1, defaultData_1, labels_2, defaultData_2){
-      alert("buraya da geldi  setchart()..................");
-      alert("label_1..."+labels_1);
-      alert("default data 1.."+defaultData_1);
-      alert("label_2..."+labels_2);
-      alert("default data 2.."+defaultData_2);
+      //alert("buraya da geldi  setchart()..................");
+      //alert("label_1..."+labels_1);
+      //alert("default data 1.."+defaultData_1);
+      //alert("label_2..."+labels_2);
+      //alert("default data 2.."+defaultData_2);
       var ctx = document.getElementById("myChart");
       //ctx.textAlign = "center";
       //ctx.canvas.width = 300;

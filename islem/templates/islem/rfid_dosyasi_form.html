@@ -10,19 +10,22 @@
 function kaydet() {
    alert("kybele  .....");
    var rfid_tipi = document.getElementById("id_rfid_tipi").value;
-   var calisan = document.getElementById("id_calisan").value;
+   var kullanici = document.getElementById("id_kullanici").value;
+   var eleman = document.getElementById("id_eleman").value;
    var adi = document.getElementById("id_adi").value;
    var soyadi = document.getElementById("id_soyadi").value;
    alert("rfid tipi..."+rfid_tipi);
-   alert("çalisan.."+calisan);
+   alert("kullanici.."+kullanici);
+   alert("eleman.."+eleman);
    alert("adı.."+adi);
    alert("soyadi.."+soyadi);
+   /*
    if  ((rfid_tipi == "O") && ( adi == "" || soyadi == ""))
    {
       alert("isim alanlarını doldurmalisınız..!!");
 
    }
-
+   */
 
 }
 </script>
@@ -33,22 +36,23 @@ function kaydet() {
 function kaydet_2() {
    alert("kybele  .....");
    var rfid_tipi = document.getElementById("id_rfid_tipi").value;
-   var calisan = document.getElementById("id_calisan").value;
+   var kullanici = document.getElementById("id_kullanici").value;
+   var eleman = document.getElementById("id_eleman").value;
    var adi = document.getElementById("id_adi").value;
    var soyadi = document.getElementById("id_soyadi").value;
    alert("rfid tipi..."+rfid_tipi);
+   alert("kullanici..."+kullanici);
    alert("çalisan.."+calisan);
    alert("adı.."+adi);
    alert("soyadi.."+soyadi);
-   if (rfid_tipi == "O") &&  ((adi == "") || (soyadi == ""))
-        { alert("isim alanlarını doldurmalisınız..!!");}
 
-   else {
 
-         if (rfid_tipi == "D" &&  calisan == "") { alert("kullanıcı alanı dolu olmalı ..!!");}
-            else { document.getElementById("rfid_form").submit(); }
-   }
-
+     if ((rfid_tipi == "D" || rfid_tipi == "T") &&  kullanici == "")
+        { alert("kullanıcı alanı dolu olmalı ..!!");}
+        else
+            if ((rfid_tipi == "O") &&  eleman == "")
+                { alert("kullanıcı alanı dolu olmalı ..!!");}
+                else  { document.getElementById("rfid_form").submit(); }
 
 }
 </script>
@@ -58,21 +62,18 @@ function kaydet_2() {
   function degistir() {
       //alert("buraya da geldi...degistir .........");
        var x = document.getElementById("id_rfid_tipi").value;
-       var a = document.getElementById("id_calisan");
-       var b = document.getElementById("id_adi");
-       var c = document.getElementById("id_soyadi");
+       var a = document.getElementById("id_kullanici");
+       var b = document.getElementById("id_eleman");
+
        //alert("value"+x);
        if (x == "O") {
            a.value = "";
            a.disabled = true;
-           b.readOnly = false;
-           c.readOnly = false;
+           b.disabled = false;
        } else {
          a.disabled = false;
+         b.disabled = true;
          b.value = "";
-         c.value = ""
-         b.readOnly = true;
-         c.readOnly = true;
        }
   }
 </script>

@@ -13,6 +13,8 @@ class MemnuniyetSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
+            'p_alani',
+            'yer',
             'mac_no',
             'oy',
             'sebep',
@@ -41,6 +43,8 @@ class OperasyonSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
+            'p_alani'
+            'yer',
             'mac_no',
             'rfid_no',
             'bas_tarih',
@@ -69,6 +73,8 @@ class DenetimSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
+            'p_alani'
+            'yer',
             'mac_no',
             'rfid_no',
             'kod',
@@ -96,9 +102,12 @@ class ArizaSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
+            'p_alani'
+            'proje',
             'mac_no',
             'rfid_no',
             'sebep',
+            'kapat',
             'gelen_tarih',
             'timestamp',
         ]
@@ -122,6 +131,8 @@ class SayiSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
+            'p_alani',
+            'yer',
             'mac_no',
             'adet',
             'gelen_tarih',
@@ -170,8 +181,10 @@ class YerudSerializer(serializers.ModelSerializer):
         fields = [
             'url',
             'id',
-            'mac_no',
             'proje',
+            'p_alani',
+            'yer',
+            'mac_no',
             'degis',
             'alive_time',
         ]
