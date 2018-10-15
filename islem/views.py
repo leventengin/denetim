@@ -5597,6 +5597,14 @@ def yer_yarat(request):
         # check whether it's valid:
         if form.is_valid():
             post = form.save(commit=False)
+            mac_no_gelen = post.mac_no
+            yer_varmi_obj = yer.objects.filter(mac_no=man_no_gelen).first()
+            if yer_varmi_obj:
+                p_alani = yer_varmi_obj.proje_alanlari
+                proje = proje.objects.filter(proje_alanlari=p_alani).first()
+                mesaj = "bu mac-no şu anda tanımlı, proje:"+str(proje)+" proje alanı:"+str(p_alani)+" mac-no:"+str(mac_no_gelen)
+                return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
+
             post.save()
             print("valid-- operasyon dilimleri", post.opr_basl, "-", post.opr_son, "-", post.opr_delta)
             print("valid-- denetim dilimleri", post.den_basl, "-", post.den_son, "-", post.den_delta)
@@ -5668,12 +5676,14 @@ def yer_yarat(request):
             return redirect('yer_listele')
         else:
             print ("hatalar...ha ha ha ")
-            return render(request, 'islem/yer_form.html', {'form': form})
+            mesaj = ""
+            return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = YerForm(kullanici=kullanici)
-        return render(request, 'islem/yer_form.html', {'form': form,})
+        mesaj = ""
+        return render(request, 'islem/yer_form.html', {'form': form, 'mesaj':mesaj})
 
 
 
@@ -5682,6 +5692,9 @@ def yer_duzenle(request, pk=None):
     # if this is a POST request we need to process the form data
     kullanici = request.user
     yer_obj = get_object_or_404(yer, pk=pk)
+    ilk_mac = yer_obj.mac_no
+    print("yer obje ilk okumada....ilk mac ---------------",ilk_mac)
+
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = YerForm(request.POST, kullanici=kullanici, instance=yer_obj)
@@ -5689,16 +5702,33 @@ def yer_duzenle(request, pk=None):
         if form.is_valid():
             print("valid")
             post = form.save(commit=False)
+            mac_no_gelen = post.mac_no
+            print("mac no gelen --------++++++++++++++++++", mac_no_gelen)
+            yer_varmi_obj = yer.objects.filter(mac_no=mac_no_gelen).first()
+            print("++++++++++++++++++++++++++....yer_var mı:", yer_varmi_obj)
+            print("yer obje - mac no..........", yer_obj.mac_no)
+            if ilk_mac == mac_no_gelen:
+                print("passsssssss mı geçti  //////////////////")
+                pass
+            elif yer_varmi_obj:
+                print("yer var mı ya geldi....")
+                p_alani = yer_varmi_obj.proje_alanlari
+                proje_a = proje.objects.filter(proje_alanlari=p_alani).first()
+                mesaj = "bu mac-no şu anda tanımlı, proje:"+str(proje_a)+" /proje alanı:"+str(p_alani)+" /mac-no:"+str(mac_no_gelen)
+                return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
+
             post.save()
             messages.success(request, 'Başarıyla kaydetti')
             return redirect('yer_listele')
         else:
-            return render(request, 'islem/yer_form.html', {'form': form})
+            mesaj = ""
+            return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = YerForm(kullanici=kullanici, instance=yer_obj)
-        return render(request, 'islem/yer_form.html', {'form': form,})
+        mesaj = ""
+        return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
 
 
 

@@ -162,12 +162,25 @@ def isim_ekle(sender,instance,**kwargs):
     rfid_tipi = instance.rfid_tipi
     if (rfid_tipi == "D" or rfid_tipi == "T"):
         kisi_obj = User.objects.get(id=instance.kullanici.id)
+        print("işte kişi obj....", kisi_obj)
         instance.adi = kisi_obj.first_name
         instance.soyadi = kisi_obj.last_name
     else:
         kisi_obj = eleman.objects.get(id=instance.eleman.id)
+        print("işte kişi obj....", kisi_obj)
         instance.adi = kisi_obj.adi
         instance.soyadi = kisi_obj.soyadi
+
+
+"""
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    #profile_created = False
+    if created:
+        profile_created = True
+        print("işte profile nesnesi created...")
+        Profile.objects.create(user=instance)
+"""
 
 
 
@@ -182,9 +195,12 @@ def create_rfid_yeni(sender, instance, **kwargs):
 
     for alan in alan_obj:
         yer_obj = yer.objects.filter(proje_alanlari=alan)
+        print("bulunan yerler...", yer_obj)
         for deger in yer_obj:
             yer_updown_obj = yer_updown.objects.filter(yer=deger).first()
+            print("rfid değişimi sonrası sırayla bulunan yer updown objesi...", yer_updown_obj)
             if yer_updown_obj:
+                print("yer updown değiştiriyori rfid değişimi sonrası....")
                 mac_no = deger.mac_no
                 alive_x = yer_updown_obj.alive_time
                 kaydetme_obj = yer_updown(id=yer_updown_obj.id,
@@ -196,6 +212,8 @@ def create_rfid_yeni(sender, instance, **kwargs):
                                           alive_time=alive_x)
                 kaydetme_obj.save()
             else:
+                pass
+                """
                 mac_no = deger.mac_no
                 kaydetme_obj = yer_updown(proje=proje,
                                           p_alani_id=alan.id,
@@ -203,32 +221,34 @@ def create_rfid_yeni(sender, instance, **kwargs):
                                           mac_no=mac_no,
                                           degis="E")
                 kaydetme_obj.save()
-
+                """
 
 
 @receiver(post_save, sender=yer)
 def create_yerupdown_yeni(sender, instance, **kwargs):
-    print("receiver post save rfid...............")
+    print("receiver post save yer...............")
     yer_id_x = instance.id
-    yer_obj = yer.objects.get(id=yer_id_x)
-    proje_alani = yer_obj.proje_alanlari.id
-    print("proje alanı...", proje_alani)
-    proje = proje_alanlari.objects.get(id=proje_alani).proje.id
+    #yer_obj = yer.objects.get(id=yer_id_x)
+    proje_alani_x = instance.proje_alanlari.id
+    print("proje alanı...", proje_alani_x)
+    proje_x = proje_alanlari.objects.get(id=proje_alani_x).proje.id
     mac_no_x = instance.mac_no
-    yer_updown_obj = yer_updown.objects.filter(yer=yer_id).first()
-
+    yer_updown_obj = yer_updown.objects.filter(yer=yer_id_x).first()
+    print("yer updown obje filter sonrasında sakatlık var mı...", yer_updown_obj)
     if yer_updown_obj:
+        print("eski yer updown u değiştiriyor....")
         kaydetme_obj = yer_updown(id=yer_updown_obj.id,
-                                  proje_id=proje,
-                                  p_alani_id=proje_alani,
+                                  proje_id=proje_x,
+                                  p_alani_id=proje_alani_x,
                                   yer_id=yer_id_x,
                                   mac_no=mac_no_x,
                                   degis="E",
                                   alive_time=yer_updown_obj.alive_time)
         kaydetme_obj.save()
     else:
-        kaydetme_obj = yer_updown(proje_id=proje,
-                                  p_alani_id=proje_alani,
+        print("yeni yer updown yaratıyor.....")
+        kaydetme_obj = yer_updown(proje_id=proje_x,
+                                  p_alani_id=proje_alani_x,
                                   yer_id=yer_id_x,
                                   mac_no=mac_no_x,
                                   degis="E")
