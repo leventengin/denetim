@@ -1,7 +1,7 @@
 
 from django.db import models
 from webservice.models import Memnuniyet, Denetim_Data, Ariza_Data, rfid_dosyasi
-from islem.models import yer
+from islem.models import yer, Profile
 from django.contrib.auth.models import User, Group
 #from datetime import datetime, date
 import datetime

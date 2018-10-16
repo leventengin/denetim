@@ -80,6 +80,7 @@ urlpatterns = [
     url(r'^qrcode/qrcode_calistir_js/$', views.qrcode_calistir_js, name='qrcode_calistir_js'),
 
     url(r'^dosyalari_duzenle/$', views.dosyalari_duzenle, name='dosyalari_duzenle'),
+    url(r'^dosyalari_duzenle/kesin$', views.dosyalari_duzenle_kesin, name='dosyalari_duzenle_kesin'),
 
 
     url(r'^bolum_sec/$', views.denetim_bolum_sec, name='denetim_bolum_sec'),
@@ -318,7 +319,7 @@ urlpatterns = [
     url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/delete/$', views.yer_operasyon_sil, name='yer_operasyon_sil'),
     url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/delete/kesin/$', views.yer_operasyon_sil_kesin, name='yer_operasyon_sil_kesin'),
     url(r'^yer/(?P<pk>\d+)/yer_denetim_ekle/$', views.yer_denetim_ekle, name='yer_denetim_ekle'),
-    url(r'^yer/(?P<pk>\d+)/yer_denetim_planla/$', views.yer_denetim_duzenle, name='yer_denetim_planla'),
+    url(r'^yer/(?P<pk>\d+)/yer_denetim_planla/$', views.yer_denetim_planla, name='yer_denetim_planla'),
     url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/update/$', views.yer_denetim_duzenle, name='yer_denetim_duzenle'),
     url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/delete/$', views.yer_denetim_sil, name='yer_denetim_sil'),
     url(r'^yer/(?P<pk>\d+)/(?P<pk2>\d+)/den/delete/kesin/$', views.yer_denetim_sil_kesin, name='yer_denetim_sil_kesin'),

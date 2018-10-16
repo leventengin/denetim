@@ -1,0 +1,38 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+      <h3>Dosyalari düzenleme işlemi tamamlandı</h3>
+      </br>
+      </br>
+      <p>Sonuçlar: </p>
+      </br>
+      </br>
+      <p>Memnuniyet: </p>
+      <a>Düzenlenen...: {{ mem_count_var}} </a>
+      <a>Silinen......: {{ mem_count_sil}} </a>
+      </br>
+      <p>Operasyon Data: </p>
+      <a>Düzenlenen...: {{ opr_count_var}} </a>
+      <a>Silinen......: {{ opr_count_sil}} </a>
+      </br>
+      <p>Denetim Data: </p>
+      <a>Düzenlenen...: {{ den_count_var}} </a>
+      <a>Silinen......: {{ den_count_sil}} </a>
+      </br>
+      <p>Arıza Data: </p>
+      <a>Düzenlenen...: {{ arz_count_var}} </a>
+      <a>Silinen......: {{ arz_count_sil}} </a>
+      </br>
+      <p>Sayı Data: </p>
+      <a>Düzenlenen...: {{ say_count_var}} </a>
+      <a>Silinen......: {{ say_count_sil}} </a>
+      </br>
+
+
+
+
+{% endblock %}

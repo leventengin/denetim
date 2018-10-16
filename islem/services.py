@@ -423,6 +423,7 @@ def get_o_list(request):
 
 def get_d_list(request):
     proje = request.user.profile.proje
+    print("kontrol için proje...----------------------", proje)
     bugun = datetime.datetime.now()
     yedigun = datetime.timedelta(7,0,0)
     yedigun_once = bugun - yedigun

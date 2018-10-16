@@ -5059,7 +5059,7 @@ def yer_operasyon_planla(request, pk=None):
             print("kaydetme objedeki saat...", saat)
             saat = saat + fark_opr
         i = i + 1
-        return redirect('yer_detay', pk=pk)
+    return redirect('yer_detay', pk=pk)
 
 
 
@@ -5157,15 +5157,15 @@ def yer_denetim_planla(request, pk=None):
     gun_arr = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz',]
     i = 0
     while i < 7:
-        h1, m1, s1 = yer_obj.opr_basl.hour, yer_obj.opr_basl.minute, yer_obj.opr_basl.second
+        h1, m1, s1 = yer_obj.den_basl.hour, yer_obj.den_basl.minute, yer_obj.den_basl.second
         print("okunan time değerleri...", h1, "-", m1, "-", s1)
         total_sec = 3600*h1+60*m1+s1
         saat = datetime.timedelta(0,total_sec,0)
-        h1, m1, s1 = yer_obj.opr_delta.hour, yer_obj.opr_delta.minute, yer_obj.opr_delta.second
+        h1, m1, s1 = yer_obj.den_delta.hour, yer_obj.den_delta.minute, yer_obj.den_delta.second
         print("okunan time değerleri...", h1, "-", m1, "-", s1)
         total_sec = 3600*h1+60*m1+s1
         fark_opr = datetime.timedelta(0,total_sec,0)
-        h1, m1, s1 = yer_obj.opr_son.hour, yer_obj.opr_son.minute, yer_obj.opr_son.second
+        h1, m1, s1 = yer_obj.den_son.hour, yer_obj.den_son.minute, yer_obj.den_son.second
         print("okunan time değerleri...", h1, "-", m1, "-", s1)
         total_sec = 3600*h1+60*m1+s1
         son_saat = datetime.timedelta(0,total_sec,0)
@@ -5184,7 +5184,7 @@ def yer_denetim_planla(request, pk=None):
             print("kaydetme objedeki saat...", saat)
             saat = saat + fark_opr
         i = i + 1
-        return redirect('yer_detay', pk=pk)
+    return redirect('yer_detay', pk=pk)
 
 
 
@@ -5598,11 +5598,13 @@ def yer_yarat(request):
         if form.is_valid():
             post = form.save(commit=False)
             mac_no_gelen = post.mac_no
-            yer_varmi_obj = yer.objects.filter(mac_no=man_no_gelen).first()
+            yer_varmi_obj = yer.objects.filter(mac_no=mac_no_gelen).first()
+
             if yer_varmi_obj:
+                print("yer var mı yeni obj ++++++++++++++++++++++", yer_varmi_obj.mac_no)
                 p_alani = yer_varmi_obj.proje_alanlari
-                proje = proje.objects.filter(proje_alanlari=p_alani).first()
-                mesaj = "bu mac-no şu anda tanımlı, proje:"+str(proje)+" proje alanı:"+str(p_alani)+" mac-no:"+str(mac_no_gelen)
+                proje_a = proje.objects.filter(proje_alanlari=p_alani).first()
+                mesaj = "bu mac-no şu anda tanımlı, proje:"+str(proje_a)+" /proje alanı:"+str(p_alani)+" /mac-no:"+str(mac_no_gelen)
                 return render(request, 'islem/yer_form.html', {'form': form, 'mesaj': mesaj})
 
             post.save()
@@ -7002,10 +7004,113 @@ def popup_notif(request):
         return render(request, 'popup_notif.html', {'n_list': n_list})
 
 
-
 def dosyalari_duzenle(request):
-        dosya = "dosyalar düzenlenecek..."
-        return render(request, 'dosyalari_duzenle.html', {'dosya': dosya})
+        print("dosyaları düzenleye kadar geldi.....")
+        return render(request, 'islem/dosyalari_duzenle.html',)
+
+
+def dosyalari_duzenle_kesin(request):
+    dosya = "dosyalar düzenlenecek..."
+    # memnuniyet .....
+    mem_obj = Memnuniyet.objects.all()
+    mem_count_var = 0
+    mem_count_sil = 0
+    for mem in mem_obj:
+        mac_no_a = mem.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            mem.proje=proje_obj
+            mem.p_alani=alan_obj
+            mem.save()
+            mem_count_var = mem_count_var + 1
+        else:
+            mem.delete()
+            mem_count_sil = mem_count_sil + 1
+
+    #operasyon .....
+    opr_obj = Operasyon_Data.objects.all()
+    opr_count_var = 0
+    opr_count_sil = 0
+    for opr in opr_obj:
+        mac_no_a = opr.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            opr.proje=proje_obj
+            opr.p_alani=alan_obj
+            opr.save()
+            opr_count_var = opr_count_var + 1
+        else:
+            opr.delete()
+            opr_count_sil = opr_count_sil + 1
+
+    #denetim .....
+    den_obj = Denetim_Data.objects.all()
+    den_count_var = 0
+    den_count_sil = 0
+    for den in den_obj:
+        mac_no_a = den.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            den.proje=proje_obj
+            den.p_alani=alan_obj
+            den.save()
+            den_count_var = den_count_var + 1
+        else:
+            den.delete()
+            den_count_sil = den_count_sil + 1
+
+    #arıza.....
+    arz_obj = Ariza_Data.objects.all()
+    arz_count_var = 0
+    arz_count_sil = 0
+    for arz in arz_obj:
+        mac_no_a = arz.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            arz.proje=proje_obj
+            arz.p_alani=alan_obj
+            arz.save()
+            arz_count_var = arz_count_var + 1
+        else:
+            arz.delete()
+            arz_count_sil = arz_count_sil + 1
+
+    #sayı....
+    say_obj = Sayi_Data.objects.all()
+    say_count_var = 0
+    say_count_sil = 0
+    for say in say_obj:
+        mac_no_a = say.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            say.proje=proje_obj
+            say.p_alani=alan_obj
+            say.save()
+            say_count_var = say_count_var + 1
+        else:
+            say.delete()
+            say_count_sil = say_count_sil + 1
+
+
+    context = { 'mem_count_var': mem_count_var, 'mem_count_sil': mem_count_sil,
+                'den_count_var': den_count_var, 'den_count_sil': den_count_sil,
+                'opr_count_var': opr_count_var, 'opr_count_sil': opr_count_sil,
+                'say_count_var': say_count_var, 'say_count_sil': say_count_sil,
+                'arz_count_var': arz_count_var, 'arz_count_sil': arz_count_sil,
+                }
+
+
+    return render(request, 'islem/dosyalari_duzenle_kesin.html', context)
 
 
 
@@ -7090,12 +7195,14 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "3"
+    proje = "2"
+    p_alani = "1"
+    yer = "1"
     oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/memnuniyet_list/",
-        json={"mac_no":556644, "tipi": tipi, "proje": proje, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani , "yer": yer, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
@@ -7347,14 +7454,16 @@ def operasyon_list(request, pk=None):
 @login_required
 def operasyon_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
-    bas_tarih = str(datetime.datetime(2018, 6, 8, 13, 9, 45))
+    bas_tarih = str(datetime.datetime(2018, 10, 15, 13, 9, 45))
     tipi = "1"
-    proje = "1"
-    rfid_no = 34234
+    proje = "2"
+    p_alani = "1"
+    yer = "1"
+    rfid_no = "21414016072178"
     bild_tipi = "M"
     print("okunan zaman......operasyon create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/operasyon_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani , "yer": yer, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('operasyon_list')
@@ -7598,12 +7707,14 @@ def den_saha_list(request, pk=None):
 def den_saha_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
-    rfid_no = 34234
+    proje = "2"
+    p_alani = "1"
+    yer = "1"
+    rfid_no = "1741053721759"
     kod = "3"
     print("okunan zaman......denetim create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/denetim_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje,  "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('den_saha_list')
@@ -7943,15 +8054,20 @@ def ariza_list(request, pk=None):
 def ariza_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
-    rfid_no = "34234"
+    proje = "2"
+    p_alani = "1"
+    yer = "1"
+    rfid_no = "21414016072178"
+    rfid_kapat = "12345"
     sebep = "2"
-    print("okunan zaman......menuniyet create.............", t_stamp)
+    progress = "1"
+    print("okunan zaman......arıza create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/ariza_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "rfid_no": rfid_no, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":1234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "rfid_no": rfid_no, "rfid_kapat": rfid_kapat, "sebep": sebep, "progress": progress, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
+
 
 
 
@@ -8168,11 +8284,13 @@ def sayi_list(request, pk=None):
 def sayi_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
+    proje = "2"
+    p_alani = "1"
+    yer = "1"
     adet = "40"
     print("okunan zaman..sayi create.............", t_stamp)
-    response = requests.post("http://"+settings.ADR_LOCAL+":7000/ws/sayi_list/",
-        json={"mac_no":12345, "tipi": tipi, "proje": proje, "adet": adet, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/sayi_list/",
+        json={"mac_no":12345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "adet": adet, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     print("işte response....", response)
     response.json()
     print("status code..", response.status_code)

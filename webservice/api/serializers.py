@@ -43,7 +43,7 @@ class OperasyonSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
-            'p_alani'
+            'p_alani',
             'yer',
             'mac_no',
             'rfid_no',
@@ -73,7 +73,7 @@ class DenetimSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
-            'p_alani'
+            'p_alani',
             'yer',
             'mac_no',
             'rfid_no',
@@ -102,8 +102,8 @@ class ArizaSerializer(serializers.ModelSerializer):
             'id',
             'tipi',
             'proje',
-            'p_alani'
-            'proje',
+            'p_alani',
+            'yer',
             'mac_no',
             'rfid_no',
             'rfid_kapat',
@@ -160,7 +160,8 @@ class RfidSerializer(serializers.ModelSerializer):
             'rfid_no',
             'proje',
             'rfid_tipi',
-            'calisan',
+            'kullanici',
+            'eleman',
             'adi',
             'soyadi',
         ]
