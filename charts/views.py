@@ -198,6 +198,30 @@ def get_data_krs(request, *args, **kwargs):
     return JsonResponse(data) # http response
 
 
+def gunluk_yer(request, *args, **kwargs):
+    yer = request.GET.get('yer', None)
+    print("yer.............", yer)
+    kullanici_id = request.user.id
+    #tarih = datetime.datetime.now()
+    tarih = datetime.datetime(2018, 10, 15, 13, 9, 45)
+
+    m_obj = Memnuniyet.objects.filter(yer=yer).filter(gelen_tarih=tarih)
+
+
+
+    data = {"m_obj": m_obj,
+            "o_obj": o_obj,
+            "d_obj": d_obj,
+            "a_obj": a_obj,
+            "s_obj": s_obj,
+            "gun_opr_obj": gun_opr_obj,
+            "gun_den_obj": gun_den_obj,
+            }
+    print("data  ....", data)
+    return JsonResponse(data)
+
+
+
 
 class ChartData(APIView):
     authentication_classes = []

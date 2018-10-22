@@ -23,7 +23,7 @@ from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, Si
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, GunDenForm, SaatForm, SaatDenForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
-from islem.forms import ElemanForm, VatandaslikForm
+from islem.forms import ElemanForm, VatandaslikForm, YerSecForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -389,11 +389,13 @@ def index(request):
         proje_sayisi = projeler.count()
         oran_mem_list = []
         for p in projeler:
-            a_list = []
-            oran_mem = oran_memnuniyet(request, deger=p.id)
-            a_list.append(oran_mem)
-            a_list.append(p.id)
-            oran_mem_list.append(a_list)
+            mem_obj = Memnuniyet.objects.filter(proje=p)
+            if mem_obj:
+                a_list = []
+                oran_mem = oran_memnuniyet(request, deger=p.id)
+                a_list.append(oran_mem)
+                a_list.append(p.id)
+                oran_mem_list.append(a_list)
 
         print("işte proje sayısı...", proje_sayisi)
         print("işte ortalama değer listesi...", oran_mem_list)
@@ -7195,10 +7197,10 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "2"
+    proje = "3"
     p_alani = "1"
     yer = "1"
-    oy = "3"
+    oy = "1"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/memnuniyet_list/",
@@ -8057,13 +8059,14 @@ def ariza_create(request, pk=None):
     proje = "2"
     p_alani = "1"
     yer = "1"
+    num = "115"
     rfid_no = "21414016072178"
     rfid_kapat = "12345"
     sebep = "2"
     progress = "1"
     print("okunan zaman......arıza create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/ariza_list/",
-        json={"mac_no":1234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "rfid_no": rfid_no, "rfid_kapat": rfid_kapat, "sebep": sebep, "progress": progress, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":1234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "num": num, "rfid_no": rfid_no, "rfid_kapat": rfid_kapat, "sebep": sebep, "progress": progress, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')
@@ -8514,6 +8517,47 @@ def rapor_krs_memnuniyet(request):
 
 
 
+#---------------------yer bazında günlük analiz-------------------------------------
+
+@login_required
+def gunluk_yer(request, pk=None):
+    user = request.user
+    if proje_varmi_kontrol(request):
+        print("şirket var mı kontrolden geçtik.....")
+        sirket = user.profile.sirket
+        proje = user.profile.proje
+        if request.method == "POST":
+            form = YerSecForm(request.POST, proje=proje)
+            if form.is_valid():
+                yersec = request.POST.get('yersec', "")
+                tarih = datetime.datetime.now()
+                #tarih = datetime.datetime(12,12,12)
+
+
+                context = { 'form': form,
+                }
+                return render(request, 'islem/gunluk_yer.html', context )
+            else:
+                print("form is invalid.....")
+                return redirect('gunluk_yer')
+        else:
+
+            form = YerSecForm(proje=proje)
+            context = { 'form': form,
+                }
+            return render(request, 'islem/gunluk_yer.html', context)
+
+    else:
+        print("buraya geldi...şirket merkez yetkilisi değil...")
+        mesaj = "kişi bu işlem için yetkili değil..."
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+
+
+
+
+
 #--------------------------------------------------------------------------------------------------
 # rfid dosyası, web service işlemleri
 @login_required
@@ -8888,9 +8932,10 @@ def delete_notification(request, notification_id, page_id):
 def create_notification(request):
     print("create notification kısmı...")
     print("request.user.id", request.user.id)
-    Notification.objects.create(user_id=request.user.id,
-                                title="8 nisan uyarı  1",
-                                message="8 nisan uyarı...111")
+    Notification.objects.create(kisi_id=request.user.id,
+                                proje_id=2,
+                                title="title deneme......",
+                                message="mesaj deneme..........")
     return redirect('index')
 
 @login_required

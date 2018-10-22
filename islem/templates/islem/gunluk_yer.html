@@ -1,0 +1,227 @@
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script>
+  function sakla(){
+    var z = document.getElementById("div_table");
+    z.style.display = "none";
+  }
+  </script>
+
+
+
+  <script>
+  function goster(){
+    //alert("göster.....................");
+    var yer = document.getElementById('id_yersec').value;
+    if (yer=="")
+        {alert("yer seçilmedi...!"); return;}
+    var z = document.getElementById("div_table");
+    z.style.display = "block";
+    alert("yer...."+yer);
+    yukle(yer);
+    }
+  </script>
+
+
+
+  <script>
+  function yukle(yer){
+    alert("buraya da geldi.....yukle()......"+yer);
+    var endpoint = '/charts/api/gunluk_yer/';
+    //var defaultData = [];
+    //var labels = [];
+    //alert("ilk_tarih..."+ilk_tarih);
+    //alert("son tarih..."+son_tarih);
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        /*
+        dataType: "text",
+        */
+
+        data : {
+          'yer' : yer,
+         },
+
+        success: function(data){
+            alert("gelen data..."+data)
+            var data_list = data.data_list;
+            var ortalama = data.ortalama;
+            var sayi = data.sayi;
+            //var label_list = data.label_list
+            //alert("data list..."+data_list)
+            //alert("label list..."+label_list)
+            //alert("ortalama..."+ortalama)
+            //alert("sayı..."+sayi)
+
+
+            var z = document.getElementById("table_table").rows.length;
+            //alert("tablodaki satır sayısı..."+z);
+            var y = z;
+            while (y > 1) {
+              document.getElementById("table_table").deleteRow(-1);
+              y = y-1;
+            }
+
+            var p = document.getElementById("table_table").rows.length;
+            //alert("tablodaki yeni satır sayısı..."+p);
+
+            for (var i in data_list) {
+
+                var table = document.getElementById("table_table");
+                var row = table.insertRow(-1);
+                var cell0 = row.insertCell(0);
+                var cell1 = row.insertCell(1);
+                var cell2 = row.insertCell(2);
+                var cell3 = row.insertCell(3);
+                var cell4 = row.insertCell(4);
+
+                cell0.innerHTML = data_list[i].proje;
+                cell1.innerHTML = data_list[i].mem_1+" - %"+data_list[i].yuzde_1;
+                cell2.innerHTML = data_list[i].mem_2+" - %"+data_list[i].yuzde_2;
+                cell3.innerHTML = data_list[i].mem_3+" - %"+data_list[i].yuzde_3;
+                cell4.innerHTML = data_list[i].mem_toplam;
+
+            }
+
+            setChart( data_list, ortalama);
+        },
+        error: function(error_data){
+            console.log("error");
+            console.log(error_data);
+        }
+    })
+  }
+  </script>
+
+
+
+
+  <script>
+  $(document).ready(function(){
+    //alert("buraya geldi....");
+    //dataChart();
+    sakla()
+  })
+  </script>
+
+
+
+</head>
+
+<body>
+
+<h4> Günlük Yer Detay Raporu </h4>
+<br>
+
+
+<form action="" method="POST" >
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.non_field_errors }}
+    {{ form }}
+    <input type="button" value="Göster" onclick="goster()">
+
+</form>
+
+<p>  &emsp; </p>
+
+<div class='row' id="div_table">
+    <div class='col-md-12' >
+
+        <div class='col-md-6'>
+
+          <table >
+                  <tr>
+                    <th></th>
+                    <th>Çok Memnun  &emsp;  &emsp; </th>
+                    <th>Memnun   &emsp; &emsp;  </th>
+                    <th>Memnun Değil   &emsp;  &emsp; </th>
+                    <th>Toplam  &emsp; &emsp;  </th>
+                  </tr>
+
+
+                  <tr>
+                    <td align="center"> &emsp;Adet&emsp; </td>
+                    <td id="m1" align="center">... </td>
+                    <td id="m2" align="center">... </td>
+                    <td id="m3" align="center">...  </td>
+                    <td id="mt" align="center">...  </td>
+                  </tr>
+
+
+                  <tr>
+                    <td align="center">&emsp; Yüzde &emsp; </td>
+                    <td id="my1" align="center">... </td>
+                    <td id="my2" align="center">... </td>
+                    <td id="my3" align="center">...  </td>
+                    <td align="center"> - </td>
+                  </tr>
+
+          </table>
+
+        </div>
+
+        <div class='col-md-6'>
+
+          <table>
+                  <tr>
+                    <th></th>
+                    <th>Sabunluk &emsp; </th>
+                    <th>Lavabo &emsp;   </th>
+                    <th>Havlu &emsp;   </th>
+                    <th>Koku &emsp;  </th>
+                    <th>Tuvalet &emsp;  </th>
+                    <th>T.Kağıdı &emsp;  </th>
+                    <th>Toplam &emsp;   </th>
+                  </tr>
+
+                  <tr>
+                    <td align="center">&emsp; Adet &emsp;</td>
+                    <td id="s1" align="center">... </td>
+                    <td id="s2" align="center">... </td>
+                    <td id="s3" align="center">...  </td>
+                    <td id="s4" align="center">... </td>
+                    <td id="s5" align="center">... </td>
+                    <td id="s6" align="center">...  </td>
+                    <td id="st" align="center">...  </td>
+                  </tr>
+
+
+                  <tr>
+                    <td align="center"> &emsp;Yüzde &emsp;</td>
+                    <td id="sy1" align="center">... </td>
+                    <td id="sy2" align="center">... </td>
+                    <td id="sy3" align="center">...  </td>
+                    <td id="sy4" align="center">... </td>
+                    <td id="sy5" align="center">... </td>
+                    <td id="sy6" align="center">...  </td>
+                    <td align="center"> - </td>
+                  </tr>
+
+          </table>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</body>
+</html>
+
+
+{% endblock %}

@@ -21,9 +21,9 @@ def create_notification(request):
     print("create notification kısmı...")
     print("request.user.id", request.user.id)
     Notification.objects.create(kisi_id=request.user.id,
-                                proje_id=1,
-                                title="8 nisan uyarı  1",
-                                message="8 nisan uyarı...111")
+                                proje_id=2,
+                                title="bildirim başlık ....",
+                                message="bildirim mesaj.........2 numaralı proje için ")
     return redirect('index')
 
 

@@ -124,7 +124,7 @@
 
 
             var z = document.getElementById("table_table").rows.length;
-            alert("tablodaki satır sayısı..."+z);
+            //alert("tablodaki satır sayısı..."+z);
             var y = z;
             while (y > 1) {
               document.getElementById("table_table").deleteRow(-1);
@@ -132,7 +132,7 @@
             }
 
             var p = document.getElementById("table_table").rows.length;
-            alert("tablodaki yeni satır sayısı..."+p);
+            //alert("tablodaki yeni satır sayısı..."+p);
 
             for (var i in data_list) {
 
@@ -172,10 +172,25 @@
       var data_x = [];
       var label_x = [];
       var data_line=[];
+      var bg_color=[];
+      var clr_sec=['rgba(0, 255, 0, 0.5)',
+                   'rgba(0, 0, 255, 0.5)',
+                   'rgba(128, 0, 128, 0.5)',
+                   'rgba(255, 0, 0, 0.5)',
+                   'rgba(218, 165, 32, 0.6)',
+                   'rgba(255, 255, 0, 0.6)',
+                   'rgba(0, 255, 0, 0.5)',
+                   'rgba(0, 0, 255, 0.5)',
+                   'rgba(128, 0, 128, 0.5)',
+                   'rgba(255, 0, 0, 0.5)',
+                   'rgba(218, 165, 32, 0.6)',
+                   'rgba(255, 255, 0, 0.6)',
+                   ]
 
       for(var i in data_list) {
           data_x.push(data_list[i].memnun_yuzdesi);
           label_x.push(data_list[i].proje);
+          bg_color.push(clr_sec[i]);
           data_line.push(ortalama);
           }
 
@@ -200,12 +215,7 @@
                       {
                         label: 'Proje Memnuniyet',
                         data: data_x,
-                        backgroundColor:[
-                          'rgba(54, 162, 235, 1)',
-                          'rgba(54, 162, 235, 1)',
-                        ],
-
-
+                        backgroundColor: bg_color,
                       }
 
 

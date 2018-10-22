@@ -618,6 +618,21 @@ class AcilKapaForm(forms.Form):
         print("queryset initial içinden..:", self.fields['denetim'].queryset)
 
 
+class YerSecForm(forms.Form):
+    yersec = forms.ModelChoiceField(queryset=yer.objects.all(), label="Yer Seçiniz..")
+    def __init__(self, *args, **kwargs):
+        proje = kwargs.pop("proje")
+        super(YerSecForm, self).__init__(*args, **kwargs)
+        palan_obj = proje_alanlari.objects.filter(proje=proje)
+        qs = yer.objects.none()
+        for palan in palan_obj:
+            qx = yer.objects.filter(proje_alanlari=palan)
+            qs = qs.union(qx)
+        self.fields['yersec'].queryset = qs
+        print("queryset initial içinden..:", self.fields['yersec'].queryset)
+
+
+
 class MacnoYerForm(forms.Form):
     macnoyer = forms.ModelChoiceField(queryset=yer_updown.objects.all(), label="Mac_no Seçiniz..")
 

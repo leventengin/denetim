@@ -135,7 +135,7 @@ def oran_memnuniyet(request, deger):
     if m_obj_c3 == 0:
         oran = 10000
     else:
-        oran = round((m_obj_c1+m_obj_c2)/m_obj_c3, 0)
+        oran = round((m_obj_c1+m_obj_c2)/m_obj_c3, 2)
 
     return oran
 

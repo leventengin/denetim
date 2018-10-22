@@ -25,7 +25,7 @@ SECRET_KEY = '0gd2u5e^uye5a5gvl!1p10=d35_z)y#gap11&f4%h7x4i0efqy'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ADMINS = [('admin', 'levent@ez-check.org')]
+ADMINS = [('admin', 'levent@ez-manage.org')]
 
 ALLOWED_HOSTS = ['37.148.210.226',
                  '172.104.239.247',
@@ -35,9 +35,9 @@ ALLOWED_HOSTS = ['37.148.210.226',
 
 
 
-EMAIL_HOST = 'mail.ez-check.org'
-EMAIL_HOST_USER = 'yonetici@ez-check.org'
-EMAIL_HOST_PASSWORD = '963f5cEk3'
+EMAIL_HOST = 'mail.ez-manage.org'
+EMAIL_HOST_USER = 'yonetici@ez-manage.org'
+EMAIL_HOST_PASSWORD = 'TXhp74S0'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
@@ -92,6 +92,8 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_select2',
     'jquery',
+    'django_extensions',
+    #'kronos',
     #'islem.apps.IslemConfig',
 ]
 

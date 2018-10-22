@@ -86,6 +86,7 @@ class Ariza_Data(models.Model):
     proje       = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
     yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
+    num         = models.CharField(max_length=20)
     rfid_no     = models.CharField(max_length=20)
     rfid_kapat  = models.CharField(max_length=20)
     sebep       = models.CharField(max_length=2)
