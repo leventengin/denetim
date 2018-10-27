@@ -89,6 +89,9 @@ th{
                             <th>Proje</th>
                             <th>Yer</th>
                             <th>Tarih</th>
+                            <th>Başla/Kapat</th>
+                            <th>Başla No:</th>
+                            <th>Kapat No:</th>
                             <th>Adı</th>
                             <th>Soyadı</th>
                             <th>Açıklama</th>
@@ -101,6 +104,9 @@ th{
                             <td>{{ deger.proje }}  </td>
                             <td>{{ deger.yer }}  </td>
                             <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
+                            <td>{{ deger.progress }}  </td>
+                            <td>{{ deger.basla_num }}  </td>
+                            <td>{{ deger.son_num }}  </td>
                             <td>{{ deger.adi }}  </td>
                             <td>{{ deger.soyadi }}  </td>
                             <td>{{ deger.aciklama }}  </td>

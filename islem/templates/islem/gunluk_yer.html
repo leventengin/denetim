@@ -7,37 +7,195 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+
+.button-list{/* background-color:#ffe6e6; */
+             text-align: center;
+       /* border:5px #ff4d4d solid;
+       border-radius: 25px;
+       text-align: center;
+	     padding:20px;
+       margin:20px;
+       display: inline;  */
+      }
+
+
+.but{
+    color:#660099;
+    text-align: center;
+    /*border-radius: 3px;
+    text-align: center;
+    */
+    }
+
+.but:hover {
+    background-color: #cc66ff;
+}
+
+table#m_table {
+  width:70%;
+  margin-left:15%;
+  margin-right:15%;
+}
+table#o_table {
+  width:70%;
+  margin-left:15%;
+  margin-right:15%;
+}
+table#d_table {
+  width:70%;
+  margin-left:15%;
+  margin-right:15%;
+}
+table#a_table {
+  width:70%;
+  margin-left:15%;
+  margin-right:15%;
+}
+table#s_table {
+  width:70%;
+  margin-left:15%;
+  margin-right:15%;
+}
+
+h4 {text-align:center;}
+</style>
+
 
 
   <script>
   function sakla(){
-    var z = document.getElementById("div_table");
-    z.style.display = "none";
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "none";
+    b.style.display = "none";
+    c.style.display = "none";
+    d.style.display = "none";
+    e.style.display = "none";
   }
   </script>
 
 
 
+
   <script>
-  function goster(){
-    //alert("göster.....................");
+  function goster_m(){
+    //alert("göster.....mmmmmmmmmmmmmmmmmmmmmmm.");
     var yer = document.getElementById('id_yersec').value;
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
-    var z = document.getElementById("div_table");
-    z.style.display = "block";
-    alert("yer...."+yer);
-    yukle(yer);
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "block";
+    b.style.display = "none";
+    c.style.display = "none";
+    d.style.display = "none";
+    e.style.display = "none";
+    //alert("yer...."+yer);
+    yukle_mem(yer);
     }
   </script>
 
 
+  <script>
+  function goster_o(){
+    //alert("göster......oooooooooooooooooooooooo");
+    var yer = document.getElementById('id_yersec').value;
+    if (yer=="")
+        {alert("yer seçilmedi...!"); return;}
+        var a = document.getElementById("div_1table");
+        var b = document.getElementById("div_2table");
+        var c = document.getElementById("div_3table");
+        var d = document.getElementById("div_4table");
+        var e = document.getElementById("div_5table");
+        a.style.display = "none";
+        b.style.display = "block";
+        c.style.display = "none";
+        d.style.display = "none";
+        e.style.display = "none";
+    //alert("yer...."+yer);
+    yukle_opr(yer);
+    }
+  </script>
 
   <script>
-  function yukle(yer){
-    alert("buraya da geldi.....yukle()......"+yer);
-    var endpoint = '/charts/api/gunluk_yer/';
+  function goster_d(){
+    //alert("göster.....ddddddddddddddddddddddd.");
+    var yer = document.getElementById('id_yersec').value;
+    if (yer=="")
+        {alert("yer seçilmedi...!"); return;}
+        var a = document.getElementById("div_1table");
+        var b = document.getElementById("div_2table");
+        var c = document.getElementById("div_3table");
+        var d = document.getElementById("div_4table");
+        var e = document.getElementById("div_5table");
+        a.style.display = "none";
+        b.style.display = "none";
+        c.style.display = "block";
+        d.style.display = "none";
+        e.style.display = "none";
+    //alert("yer...."+yer);
+    yukle_den(yer);
+    }
+  </script>
+
+
+  <script>
+  function goster_a(){
+    //alert("göster.....aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    var yer = document.getElementById('id_yersec').value;
+    if (yer=="")
+        {alert("yer seçilmedi...!"); return;}
+        var a = document.getElementById("div_1table");
+        var b = document.getElementById("div_2table");
+        var c = document.getElementById("div_3table");
+        var d = document.getElementById("div_4table");
+        var e = document.getElementById("div_5table");
+        a.style.display = "none";
+        b.style.display = "none";
+        c.style.display = "none";
+        d.style.display = "block";
+        e.style.display = "none";
+    //alert("yer...."+yer);
+    yukle_arz(yer);
+    }
+  </script>
+
+
+  <script>
+  function goster_s(){
+    //alert("göster.......ssssssssssssssssss.");
+    var yer = document.getElementById('id_yersec').value;
+    if (yer=="")
+        {alert("yer seçilmedi...!"); return;}
+        var a = document.getElementById("div_1table");
+        var b = document.getElementById("div_2table");
+        var c = document.getElementById("div_3table");
+        var d = document.getElementById("div_4table");
+        var e = document.getElementById("div_5table");
+        a.style.display = "none";
+        b.style.display = "none";
+        c.style.display = "none";
+        d.style.display = "none";
+        e.style.display = "block";
+    //alert("yer...."+yer);
+    yukle_say(yer);
+    }
+  </script>
+
+
+  <script>
+  function yukle_mem(yer){
+    //alert("buraya da geldi.....yukle()......"+yer);
+    var endpoint = '/charts/api/gunluk_yer_mem/';
     //var defaultData = [];
     //var labels = [];
     //alert("ilk_tarih..."+ilk_tarih);
@@ -53,32 +211,24 @@
           'yer' : yer,
          },
 
+
         success: function(data){
-            alert("gelen data..."+data)
-            var data_list = data.data_list;
-            var ortalama = data.ortalama;
-            var sayi = data.sayi;
-            //var label_list = data.label_list
-            //alert("data list..."+data_list)
-            //alert("label list..."+label_list)
-            //alert("ortalama..."+ortalama)
-            //alert("sayı..."+sayi)
+                //alert("gelen data..."+data);
+                var m_list = data.m_list;
 
+                //alert("m list..."+m_list);
+                //alert("adedi m list..."+m_list.length);
 
-            var z = document.getElementById("table_table").rows.length;
-            //alert("tablodaki satır sayısı..."+z);
-            var y = z;
-            while (y > 1) {
-              document.getElementById("table_table").deleteRow(-1);
-              y = y-1;
-            }
+                //  eğer tabloda veri varsa satırlar siliniyor....
+                var z = document.getElementById("m_table").rows.length;
+                while (z > 1) {
+                  document.getElementById("m_table").deleteRow(-1);
+                  z = z-1;
+                }
 
-            var p = document.getElementById("table_table").rows.length;
-            //alert("tablodaki yeni satır sayısı..."+p);
-
-            for (var i in data_list) {
-
-                var table = document.getElementById("table_table");
+                // memnuniyet için olan kısım.............
+               for (var i in m_list) {
+                var table = document.getElementById("m_table");
                 var row = table.insertRow(-1);
                 var cell0 = row.insertCell(0);
                 var cell1 = row.insertCell(1);
@@ -86,15 +236,28 @@
                 var cell3 = row.insertCell(3);
                 var cell4 = row.insertCell(4);
 
-                cell0.innerHTML = data_list[i].proje;
-                cell1.innerHTML = data_list[i].mem_1+" - %"+data_list[i].yuzde_1;
-                cell2.innerHTML = data_list[i].mem_2+" - %"+data_list[i].yuzde_2;
-                cell3.innerHTML = data_list[i].mem_3+" - %"+data_list[i].yuzde_3;
-                cell4.innerHTML = data_list[i].mem_toplam;
+                cell0.innerHTML = m_list[i][0];
+                cell1.innerHTML = "";
+                cell2.innerHTML = m_list[i][1];
+                cell3.innerHTML = "";
+                cell4.innerHTML = m_list[i][2];
 
-            }
+                //alert("innır mı..."+m_list[i][1]);
+                if (m_list[i][1] == "memnun değil")
+                     { //alert("extra memnun değil...");
+                       cell0.style.color = "red";
+                       cell2.style.color = "red";
+                       cell4.style.color = "red";
+                     }
+                  else { //alert("iyi gibi...");
+                         cell0.style.color = "blue";
+                         cell2.style.color = "blue";
+                         cell4.style.color = "blue";
+                       }
 
-            setChart( data_list, ortalama);
+              };   //memnuniyet bitti....
+
+
         },
         error: function(error_data){
             console.log("error");
@@ -104,6 +267,355 @@
   }
   </script>
 
+
+  <script>
+  function yukle_opr(yer){
+    //alert("buraya da geldi.....yukle_opr()......"+yer);
+    var endpoint = '/charts/api/gunluk_yer_opr/';
+
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        /*
+        dataType: "text",
+        */
+        data : {
+          'yer' : yer,
+         },
+
+        success: function(data){
+                //alert("gelen data..."+data);
+                var o_list = data.o_list;
+                var gun_opr_list = data.gun_opr_list;
+
+                //alert("d list..."+o_list);
+                //alert("adedi d list..."+o_list.length);
+                //alert("gun den list..."+gun_opr_list);
+                //alert("adedi gun den list..."+gun_opr_list.length);
+
+              // operasyon için olan kısım .....
+              var o_len = o_list.length;
+              var p_len = gun_opr_list.length;
+              var sayi = 0;
+              var j = 0;
+              if ( p_len > o_len ) { sayi = p_len;}
+                else { sayi = o_len;}
+
+              //alert("p_len..."+p_len+"o_len..."+o_len+"sayi..."+sayi);
+
+              //  eğer tabloda veri varsa satırlar siliniyor....
+              var z = document.getElementById("o_table").rows.length;
+              while (z > 1) {
+                document.getElementById("o_table").deleteRow(-1);
+                z = z-1;
+              }
+
+              while (j < sayi) {
+
+                  var table = document.getElementById("o_table");
+                  var row = table.insertRow(-1);
+                  var cell0 = row.insertCell(0);
+                  var cell1 = row.insertCell(1);
+                  var cell2 = row.insertCell(2);
+                  var cell3 = row.insertCell(3);
+                  var cell4 = row.insertCell(4);
+                  var cell5 = row.insertCell(5);
+                  var cell6 = row.insertCell(6);
+
+                  if (gun_opr_list[j]) {
+                      cell0.innerHTML = gun_opr_list[j];
+                      if (j % 2 == 0) { cell0.style.color = "blue"; }
+                          else { cell0.style.color = "green"; }
+                      }
+                  else
+                      { cell0.innerHTML = ""; }
+                  cell1.innerHTML = "";
+                  if ( o_list[j][0]) {
+                        cell2.innerHTML =  o_list[j][0];
+                        if (j % 2 == 0) { cell2.style.color = "blue"; }
+                            else { cell2.style.color = "green"; }
+                        }
+                  else
+                      { cell2.innerHTML = ""; }
+                  cell3.innerHTML = "";
+                  if ( o_list[j][1]) {
+                    cell4.innerHTML =  o_list[j][1];
+                    if (j % 2 == 0) { cell4.style.color = "blue"; }
+                        else { cell4.style.color = "green"; }
+                  }
+                  else
+                    { cell4.innerHTML = ""; }
+                    cell5.innerHTML = "";
+                    if ( o_list[j][2]) {
+                      cell6.innerHTML =  o_list[j][2];
+                      if (j % 2 == 0) { cell6.style.color = "blue"; }
+                          else { cell6.style.color = "green"; }
+                    }
+                    else
+                      { cell6.innerHTML = ""; }
+
+                  j++;
+
+                };
+
+
+        },
+        error: function(error_data){
+            console.log("error");
+            console.log(error_data);
+        }
+    })
+  }
+  </script>
+
+
+  <script>
+  function yukle_den(yer){
+    //alert("buraya da geldi.....yukle()......"+yer);
+    var endpoint = '/charts/api/gunluk_yer_den/';
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        /*
+        dataType: "text",
+        */
+        data : {
+          'yer' : yer,
+         },
+        success: function(data){
+                //alert("gelen data..."+data);
+                var d_list = data.d_list;
+                var gun_den_list = data.gun_den_list;
+
+                //alert("d list..."+d_list);
+                //alert("adedi d list..."+d_list.length);
+                //alert("gun den list..."+gun_den_list);
+                //alert("adedi gun den list..."+gun_den_list.length);
+
+                //alert("denetim için geldi....");
+                // denetim için olan kısım...........
+                var d_len = d_list.length;
+                var q_len = gun_den_list.length;
+                var say = 0;
+                var k = 0;
+                if ( q_len > d_len ) { say = q_len;}
+                  else { say = d_len;}
+
+                //alert("q_len..."+q_len+"d_len..."+d_len+"sayi..."+say);
+
+                //  eğer tabloda veri varsa satırlar siliniyor....
+                var z = document.getElementById("d_table").rows.length;
+                while (z > 1) {
+                  document.getElementById("d_table").deleteRow(-1);
+                  z = z-1;
+                }
+
+                while (k < say) {
+                    var table = document.getElementById("d_table");
+                    var row = table.insertRow(-1);
+                    var cell0 = row.insertCell(0);
+                    var cell1 = row.insertCell(1);
+                    var cell2 = row.insertCell(2);
+                    var cell3 = row.insertCell(3);
+                    var cell4 = row.insertCell(4);
+                    var cell5 = row.insertCell(5);
+                    var cell6 = row.insertCell(6);
+                    var cell7 = row.insertCell(7);
+                    var cell8 = row.insertCell(8);
+
+
+                    if (gun_den_list[k]) {
+                        cell0.innerHTML = gun_den_list[k];
+                        if (k % 2 == 0) { cell0.style.color = "blue"; }
+                            else { cell0.style.color = "green"; }
+                        }
+                    else
+                        { cell0.innerHTML = ""; }
+                    cell1.innerHTML = "";
+                    if ( d_list[k][0]) {
+                          cell2.innerHTML =  d_list[k][0];
+                          if (k % 2 == 0) { cell2.style.color = "blue"; }
+                              else { cell2.style.color = "green"; }
+                          }
+                    else
+                        { cell2.innerHTML = ""; }
+                    cell3.innerHTML = "";
+                    if ( d_list[k][1]) {
+                      cell4.innerHTML =  d_list[k][1];
+                      if (k % 2 == 0) { cell4.style.color = "blue"; }
+                          else { cell4.style.color = "green"; }
+                    }
+                    else
+                      { cell4.innerHTML = ""; }
+                    cell5.innerHTML = "";
+                    if ( d_list[k][2]) {
+                      cell6.innerHTML =  d_list[k][2];
+                      if (k % 2 == 0) { cell6.style.color = "blue"; }
+                          else { cell6.style.color = "green"; }
+                    }
+                    else
+                      { cell6.innerHTML = ""; }
+                    cell7.innerHTML = "";
+                    if ( d_list[k][3]) {
+                      cell8.innerHTML =  d_list[k][3];
+                      if (k % 2 == 0) { cell8.style.color = "blue"; }
+                          else { cell8.style.color = "green"; }
+                    }
+                    else
+                      { cell8.innerHTML = ""; }
+
+                    k++;
+
+                  }
+
+        },
+        error: function(error_data){
+            console.log("error");
+            console.log(error_data);
+        }
+    })
+  }
+  </script>
+
+
+  <script>
+  function yukle_arz(yer){
+    //alert("buraya da geldi.....yukle()......"+yer);
+    var endpoint = '/charts/api/gunluk_yer_arz/';
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        /*
+        dataType: "text",
+        */
+        data : {
+          'yer' : yer,
+         },
+        success: function(data){
+                //alert("gelen data..."+data);
+                var a_list = data.a_list;
+
+                //alert("a list..."+a_list);
+                //alert("adedi a list..."+a_list.length);
+
+                //  eğer tabloda veri varsa satırlar siliniyor....
+                var z = document.getElementById("a_table").rows.length;
+                while (z > 1) {
+                  document.getElementById("a_table").deleteRow(-1);
+                  z = z-1;
+                }
+
+                for (var i in a_list) {
+                 var table = document.getElementById("a_table");
+                 var row = table.insertRow(-1);
+                 var cell0 = row.insertCell(0);
+                 var cell1 = row.insertCell(1);
+                 var cell2 = row.insertCell(2);
+                 var cell3 = row.insertCell(3);
+                 var cell4 = row.insertCell(4);
+                 var cell5 = row.insertCell(5);
+                 var cell6 = row.insertCell(6);
+                 var cell7 = row.insertCell(7);
+                 var cell8 = row.insertCell(8);
+                 var cell9 = row.insertCell(9);
+                 var cell10 = row.insertCell(10);
+
+
+                 cell0.innerHTML = a_list[i][0];
+                 cell1.innerHTML = "";
+                 cell2.innerHTML = a_list[i][1];
+                 cell3.innerHTML = "";
+                 cell4.innerHTML = a_list[i][2];
+                 cell5.innerHTML = "";
+                 cell6.innerHTML = a_list[i][3];
+                 cell7.innerHTML = "";
+                 cell8.innerHTML = a_list[i][4];
+                 cell9.innerHTML = "";
+                 cell10.innerHTML = a_list[i][5];
+
+                 if ( a_list[i][1] == "Arıza Kaydı") { cell0.style.color = "red";
+                                   cell2.style.color = "red";
+                                   cell4.style.color = "red";
+                                   cell6.style.color = "red";
+                                   cell8.style.color = "red";
+                                   cell10.style.color = "red";
+                                  }
+                     else { cell0.style.color = "green";
+                            cell2.style.color = "green";
+                            cell4.style.color = "green";
+                            cell6.style.color = "green";
+                            cell8.style.color = "green";
+                            cell10.style.color = "green";
+                            }
+               };   //arıza bitti....
+
+        },
+        error: function(error_data){
+            console.log("error");
+            console.log(error_data);
+        }
+    })
+  }
+  </script>
+
+
+    <script>
+    function yukle_say(yer){
+      //alert("buraya da geldi.....yukle()......"+yer);
+      var endpoint = '/charts/api/gunluk_yer_say/';
+      $.ajax({
+          method: "GET",
+          url: endpoint,
+          /*
+          dataType: "text",
+          */
+          data : {
+            'yer' : yer,
+           },
+          success: function(data){
+                  //alert("gelen data..."+data);
+                  var s_list = data.s_list;
+
+                  //alert("s list..."+s_list);
+                  //alert("adedi s list..."+s_list.length);
+
+                  //  eğer tabloda veri varsa satırlar siliniyor....
+                  var z = document.getElementById("s_table").rows.length;
+                  while (z > 1) {
+                    document.getElementById("s_table").deleteRow(-1);
+                    z = z-1;
+                  }
+
+                  for (var i in s_list) {
+                   var table = document.getElementById("s_table");
+                   var row = table.insertRow(-1);
+                   var cell0 = row.insertCell(0);
+                   var cell1 = row.insertCell(1);
+                   var cell2 = row.insertCell(2);
+
+                   cell0.innerHTML = s_list[i][0];
+                   cell1.innerHTML = "";
+                   cell2.innerHTML = s_list[i][1];
+
+                   if ( i % 2 == 0) { cell0.style.color = "blue";
+                                     cell2.style.color = "blue";
+
+                                    }
+                       else { cell0.style.color = "green";
+                              cell2.style.color = "green";
+                              }
+
+
+                 };   //sayı bitti....
+
+          },
+          error: function(error_data){
+              console.log("error");
+              console.log(error_data);
+          }
+      })
+    }
+    </script>
 
 
 
@@ -124,96 +636,126 @@
 <h4> Günlük Yer Detay Raporu </h4>
 <br>
 
+<div class='row' id="div_1">
+  <!-- <div class='col-md-12' >  -->
+      <div class='col-md-5'>
+          <form action="" method="POST" >
+              {% csrf_token %}
+              {{ form.errors }}
+              {{ form.non_field_errors }}
+              {{ form }}
+              <input type="button" value="Göster" onclick="goster_m()">
+          </form>
+        </div>
 
-<form action="" method="POST" >
-    {% csrf_token %}
-    {{ form.errors }}
-    {{ form.non_field_errors }}
-    {{ form }}
-    <input type="button" value="Göster" onclick="goster()">
+        <div class='col-md-7 button-list'  id="but_list">
+            <input class="but" value="Memnuniyet" type="submit" onclick="goster_m()" id="m_but">
+            <input class="but" value="Operasyon" type="submit" onclick="goster_o()" id="o_but">
+            <input class="but" value="&emsp;Denetim&emsp;" type="submit" onclick="goster_d()" id="d_but">
+            <input class="but" value="&emsp;Arıza&emsp;" type="submit" onclick="goster_a()" id="a_but">
+            <input class="but" value="&emsp;Sayı&emsp;" type="submit" onclick="goster_s()" id="s_but">
+        </div>
 
-</form>
+  <!-- </div> -->
+</div>
+
 
 <p>  &emsp; </p>
 
-<div class='row' id="div_table">
-    <div class='col-md-12' >
-
+<div class='row' id="div_1table">
         <div class='col-md-6'>
-
-          <table >
-                  <tr>
-                    <th></th>
-                    <th>Çok Memnun  &emsp;  &emsp; </th>
-                    <th>Memnun   &emsp; &emsp;  </th>
-                    <th>Memnun Değil   &emsp;  &emsp; </th>
-                    <th>Toplam  &emsp; &emsp;  </th>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center"> &emsp;Adet&emsp; </td>
-                    <td id="m1" align="center">... </td>
-                    <td id="m2" align="center">... </td>
-                    <td id="m3" align="center">...  </td>
-                    <td id="mt" align="center">...  </td>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center">&emsp; Yüzde &emsp; </td>
-                    <td id="my1" align="center">... </td>
-                    <td id="my2" align="center">... </td>
-                    <td id="my3" align="center">...  </td>
-                    <td align="center"> - </td>
-                  </tr>
-
+         <h4> <strong> Memnuniyet  </strong> </h4>
+         <br>
+          <table  id="m_table">
+            <tr>
+              <th> Saat &emsp; </th>
+              <th> &emsp; &emsp; &emsp;</th>
+              <th> &emsp; Oy &emsp; </th>
+              <th> &emsp; &emsp; &emsp;</th>
+              <th> Sebep &emsp; </th>
+            </tr>
           </table>
-
-        </div>
-
-        <div class='col-md-6'>
-
-          <table>
-                  <tr>
-                    <th></th>
-                    <th>Sabunluk &emsp; </th>
-                    <th>Lavabo &emsp;   </th>
-                    <th>Havlu &emsp;   </th>
-                    <th>Koku &emsp;  </th>
-                    <th>Tuvalet &emsp;  </th>
-                    <th>T.Kağıdı &emsp;  </th>
-                    <th>Toplam &emsp;   </th>
-                  </tr>
-
-                  <tr>
-                    <td align="center">&emsp; Adet &emsp;</td>
-                    <td id="s1" align="center">... </td>
-                    <td id="s2" align="center">... </td>
-                    <td id="s3" align="center">...  </td>
-                    <td id="s4" align="center">... </td>
-                    <td id="s5" align="center">... </td>
-                    <td id="s6" align="center">...  </td>
-                    <td id="st" align="center">...  </td>
-                  </tr>
-
-
-                  <tr>
-                    <td align="center"> &emsp;Yüzde &emsp;</td>
-                    <td id="sy1" align="center">... </td>
-                    <td id="sy2" align="center">... </td>
-                    <td id="sy3" align="center">...  </td>
-                    <td id="sy4" align="center">... </td>
-                    <td id="sy5" align="center">... </td>
-                    <td id="sy6" align="center">...  </td>
-                    <td align="center"> - </td>
-                  </tr>
-
-          </table>
-
-        </div>
-    </div>
+      </div>
 </div>
+
+
+<div class='row' id="div_2table">
+        <div class='col-md-6'>
+          <h4> <strong> Operasyon   </strong> </h4>
+          <br>
+          <table  id="o_table">
+              <tr>
+                <th> Planlanan &emsp; </th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> Gerçek Saat &emsp; </th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> &emsp; Ad &emsp;</th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> &emsp; Soyad &emsp;</th>
+              </tr>
+          </table>
+        </div>
+</div>
+
+
+
+<div class='row' id="div_3table">
+        <div class='col-md-6'>
+           <h4> <strong> Denetim  </strong> </h4>
+           <br>
+            <table  id="d_table">
+              <tr>
+                <th> Planlanan &emsp; </th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> Gerçek Saat &emsp; </th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> &emsp; Ad &emsp;</th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> &emsp; Soyad &emsp;</th>
+                <th> &emsp; &emsp; &emsp;</th>
+                <th> &emsp; Açıklama &emsp;</th>
+              </tr>
+            </table>
+        </div>
+ </div>
+
+ <div class='row' id="div_4table">
+         <div class='col-md-12' >
+               <h4> <strong> Arıza   </strong> </h4>
+               <br>
+               <table  id="a_table">
+                       <tr>
+                         <th> Saat  </th>
+                         <th> &emsp; &emsp; &emsp;</th>
+                         <th> Tipi  </th>
+                         <th> &emsp; &emsp; &emsp;</th>
+                         <th> No &emsp;</th>
+                         <th> &emsp; &emsp; &emsp;</th>
+                         <th> Ad </th>
+                         <th> &emsp; &emsp; &emsp;</th>
+                         <th> Soyad </th>
+                         <th> &emsp; &emsp; &emsp;</th>
+                         <th> Açıklama </th>
+                       </tr>
+               </table>
+         </div>
+ </div>
+
+<div class='row' id="div_5table">
+        <div class='col-md-6'>
+           <h4> <strong> Sayı  </strong> </h4>
+           <br>
+            <table  id="s_table">
+                <tr>
+                  <th> Saat </th>
+                  <th> &emsp; &emsp; &emsp;</th>
+                  <th> Adet </th>
+                </tr>
+            </table>
+        </div>
+</div>
+
+
 
 
 

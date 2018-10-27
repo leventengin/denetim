@@ -27,7 +27,7 @@ class Memnuniyet(models.Model):
     timestamp   = models.DateTimeField()
 
     def __str__(self):
-        return str(self.mac_no)
+        return '%s-%s-%s' % (self.mac_no, self.yer, self.gelen_tarih)
 
     @property
     def owner(self):
@@ -50,11 +50,11 @@ class Operasyon_Data(models.Model):
     timestamp   = models.DateTimeField()
 
     def __str__(self):
-        return str(self.mac_no)
+        return '%s-%s-%s' % (self.mac_no, self.yer, self.bas_tarih)
 
     @property
     def owner(self):
-        return self.mac_no
+        return str(self.mac_no)
 
     def get_api_url(self, request=None):
         return api_reverse("api-ws:operasyon-rud", kwargs={'pk': self.pk}, request=request)
@@ -71,7 +71,7 @@ class Denetim_Data(models.Model):
     timestamp   = models.DateTimeField()
 
     def __str__(self):
-        return str(self.mac_no)
+        return '%s-%s-%s' % (self.mac_no, self.yer, self.gelen_tarih)
 
     @property
     def owner(self):
@@ -87,15 +87,15 @@ class Ariza_Data(models.Model):
     p_alani     = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
     yer         = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
     num         = models.CharField(max_length=20)
-    rfid_no     = models.CharField(max_length=20)
-    rfid_kapat  = models.CharField(max_length=20)
+    rfid_no     = models.CharField(max_length=20, blank=True, null=True)
+    rfid_kapat  = models.CharField(max_length=20, blank=True, null=True)
     sebep       = models.CharField(max_length=2)
     progress    = models.CharField(max_length=2)
     gelen_tarih = models.DateTimeField()
     timestamp   = models.DateTimeField()
 
     def __str__(self):
-        return str(self.mac_no)
+        return '%s-%s-%s' % (self.mac_no, self.yer, self.gelen_tarih)
 
     @property
     def owner(self):
@@ -118,7 +118,7 @@ class Sayi_Data(models.Model):
     timestamp   = models.DateTimeField()
 
     def __str__(self):
-        return str(self.mac_no)
+        return '%s-%s-%s' % (self.mac_no, self.yer, self.gelen_tarih)
 
     @property
     def owner(self):

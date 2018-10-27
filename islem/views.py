@@ -6986,13 +6986,13 @@ def bildirim(request):
             yedigun_once = bugun - yedigun
             print("yedi gün önce...", yedigun_once)
             n = Notification.objects.filter(viewed=False).filter(kisi=kisi).filter(timestamp__gt=yedigun_once).values()
-            print("obje - dictionary...",n)
+            #print("obje - dictionary...",n)
             if n:
                 n_list = list(n)
                 for i in n_list:
                     i['timestamp'] = str(i['timestamp'])
 
-                print("liste hali...", n_list)
+                #print("liste hali...", n_list)
                 response_data = {"response_data" : n_list}
                 #print("response  data...", response_data)
                 response_data = json.dumps(n_list)
@@ -7019,17 +7019,34 @@ def dosyalari_duzenle_kesin(request):
     mem_count_sil = 0
     for mem in mem_obj:
         mac_no_a = mem.mac_no
+        tipi_a = mem.tipi
+        yer_a = mem.yer.id
+        oy_a = mem.oy
+        sebep_a = mem.sebep
+        gelen_tarih_a = mem.gelen_tarih
+        timestamp_a = mem.timestamp
+
         yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            mem.proje=proje_obj
-            mem.p_alani=alan_obj
-            mem.save()
+
+            kaydetme_obj = Memnuniyet(  proje_id=proje_obj.id,
+                                        p_alani_id=alan_obj.id,
+                                        mac_no = mac_no_a,
+                                        tipi = tipi_a,
+                                        yer_id = yer_a,
+                                        oy = oy_a,
+                                        sebep = sebep_a,
+                                        gelen_tarih = gelen_tarih_a,
+                                        timestamp = timestamp_a,)
+            kaydetme_obj.save()
             mem_count_var = mem_count_var + 1
         else:
             mem.delete()
             mem_count_sil = mem_count_sil + 1
+
+
 
     #operasyon .....
     opr_obj = Operasyon_Data.objects.all()
@@ -7037,17 +7054,32 @@ def dosyalari_duzenle_kesin(request):
     opr_count_sil = 0
     for opr in opr_obj:
         mac_no_a = opr.mac_no
+        tipi_a = opr.tipi
+        yer_a = opr.yer.id
+        rfid_no_a = opr.rfid_no
+        bas_tarih_a = opr.bas_tarih
+        son_tarih_a = opr.son_tarih
+        bild_tipi_a = opr.bild_tipi
+        timestamp_a = opr.timeStamp
         yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            opr.proje=proje_obj
-            opr.p_alani=alan_obj
-            opr.save()
+            kaydetme_obj = Operasyon_Data(  proje_id=proje_obj.id,
+                                            p_alani_id=alan_obj.id,
+                                            mac_no = mac_no_a,
+                                            tipi = tipi_a,
+                                            yer_id = yer_a,
+                                            rfid_no = oy_a,
+                                            bas_tarih = bas_tarih_a,
+                                            son_tarih = son_tarih_a,
+                                            timestamp = timestamp_a,)
+            kaydetme_obj.save()
             opr_count_var = opr_count_var + 1
         else:
             opr.delete()
             opr_count_sil = opr_count_sil + 1
+
 
     #denetim .....
     den_obj = Denetim_Data.objects.all()
@@ -7055,35 +7087,31 @@ def dosyalari_duzenle_kesin(request):
     den_count_sil = 0
     for den in den_obj:
         mac_no_a = den.mac_no
+        tipi_a = den.tipi
+        yer_a = den.yer.id
+        rfid_no_a = den.rfid_no
+        kod_a = den.kod
+        gelen_tarih_a = den.gelen_tarih
+        timestamp_a = den.timestamp
         yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            den.proje=proje_obj
-            den.p_alani=alan_obj
-            den.save()
+            kaydetme_obj = Denetim_Data(  proje_id=proje_obj.id,
+                                        p_alani_id=alan_obj.id,
+                                        mac_no = mac_no_a,
+                                        tipi = tipi_a,
+                                        yer_id = yer_a,
+                                        kod = kod_a,
+                                        rfid_no = rfid_no_a,
+                                        gelen_tarih = gelen_tarih_a,
+                                        timestamp = timestamp_a,)
+            kaydetme_obj.save()
             den_count_var = den_count_var + 1
         else:
             den.delete()
             den_count_sil = den_count_sil + 1
 
-    #arıza.....
-    arz_obj = Ariza_Data.objects.all()
-    arz_count_var = 0
-    arz_count_sil = 0
-    for arz in arz_obj:
-        mac_no_a = arz.mac_no
-        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
-        if yer_obj:
-            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
-            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            arz.proje=proje_obj
-            arz.p_alani=alan_obj
-            arz.save()
-            arz_count_var = arz_count_var + 1
-        else:
-            arz.delete()
-            arz_count_sil = arz_count_sil + 1
 
     #sayı....
     say_obj = Sayi_Data.objects.all()
@@ -7091,13 +7119,24 @@ def dosyalari_duzenle_kesin(request):
     say_count_sil = 0
     for say in say_obj:
         mac_no_a = say.mac_no
+        tipi_a = say.tipi
+        yer_a = say.yer.id
+        adet_a = say.adet
+        gelen_tarih_a = say.gelen_tarih
+        timestamp_a = say.timestamp
         yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            say.proje=proje_obj
-            say.p_alani=alan_obj
-            say.save()
+            kaydetme_obj = Sayi_Data(   proje_id=proje_obj.id,
+                                        p_alani_id=alan_obj.id,
+                                        mac_no = mac_no_a,
+                                        tipi = tipi_a,
+                                        yer_id = yer_a,
+                                        adet = adet_a,
+                                        gelen_tarih = gelen_tarih_a,
+                                        timestamp = timestamp_a,)
+            kaydetme_obj.save()
             say_count_var = say_count_var + 1
         else:
             say.delete()
@@ -7108,7 +7147,6 @@ def dosyalari_duzenle_kesin(request):
                 'den_count_var': den_count_var, 'den_count_sil': den_count_sil,
                 'opr_count_var': opr_count_var, 'opr_count_sil': opr_count_sil,
                 'say_count_var': say_count_var, 'say_count_sil': say_count_sil,
-                'arz_count_var': arz_count_var, 'arz_count_sil': arz_count_sil,
                 }
 
 
@@ -7197,7 +7235,7 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "3"
+    proje = "1"
     p_alani = "1"
     yer = "1"
     oy = "1"
@@ -7458,7 +7496,7 @@ def operasyon_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     bas_tarih = str(datetime.datetime(2018, 10, 15, 13, 9, 45))
     tipi = "1"
-    proje = "2"
+    proje = "1"
     p_alani = "1"
     yer = "1"
     rfid_no = "21414016072178"
@@ -7709,7 +7747,7 @@ def den_saha_list(request, pk=None):
 def den_saha_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "2"
+    proje = "1"
     p_alani = "1"
     yer = "1"
     rfid_no = "1741053721759"
@@ -8007,11 +8045,13 @@ def ariza_list(request, pk=None):
                 temp = {}
                 temp['yer'] = x['yer']
                 temp['aciklama'] = x['aciklama']
-                temp['deger'] = x['deger']
                 temp['proje'] = x['proje']
                 temp['gelen_tarih'] = str(x['gelen_tarih'])
                 temp['adi'] = x['adi']
                 temp['soyadi'] = x['soyadi']
+                temp['progress'] = x['progress']
+                temp['basla_num'] = x['basla_num']
+                temp['son_num'] = x['son_num']
                 rs_a_list.append(temp)
             request.session['rs_a_list'] = rs_a_list
         else:
@@ -8023,10 +8063,12 @@ def ariza_list(request, pk=None):
                 temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
                 temp['yer'] = x['yer']
                 temp['aciklama'] = x['aciklama']
-                temp['deger'] = x['deger']
                 temp['proje'] = x['proje']
                 temp['adi'] = x['adi']
                 temp['soyadi'] = x['soyadi']
+                temp['progress'] = x['progress']
+                temp['basla_num'] = x['basla_num']
+                temp['son_num'] = x['son_num']
                 a_list.append(temp)
 
         paginator = Paginator(a_list, 25)
@@ -8056,7 +8098,7 @@ def ariza_list(request, pk=None):
 def ariza_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "2"
+    proje = "1"
     p_alani = "1"
     yer = "1"
     num = "115"
@@ -8097,10 +8139,12 @@ def mk_ariza_list(request):
                         temp['gelen_tarih'] = parser.parse(x['gelen_tarih'])
                         temp['adi'] = x['adi']
                         temp['soyadi'] = x['soyadi']
-                        temp['deger'] = x['deger']
                         temp['proje'] = x['proje']
                         temp['yer'] = x['yer']
                         temp['aciklama'] = x['aciklama']
+                        temp['progress'] = x['progress']
+                        temp['basla_num'] = x['basla_num']
+                        temp['son_num'] = x['son_num']
                         a2_list.append(temp)
 
                 else:
@@ -8122,7 +8166,12 @@ def mk_ariza_list(request):
                             temp['yer'] = mac_no
 
                         temp['proje'] = x.proje.proje_adi
-                        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+
+                        if x.progress == "0":
+                            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+                        else:
+                            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_kapat).first()
+
                         if rfid_obj:
                             temp['adi'] = rfid_obj.adi
                             temp['soyadi'] = rfid_obj.soyadi
@@ -8133,24 +8182,33 @@ def mk_ariza_list(request):
                         sebep = x.sebep
                         print("sebep", sebep)
 
-                        temp['deger'] = 0
+                        temp['progress'] = x.progress
+
+                        if x.progress == "0":
+                            temp['basla_num'] = x.num
+                            temp['son_num'] = ""
+                        else:
+                            temp['basla_num'] = ""
+                            temp['son_num'] = x.num
 
                         if sebep == "1":
-                            temp['aciklama'] = "mekanik"
+                            temp['aciklama'] = "Mekanik"
                         if sebep == "2":
-                            temp['aciklama'] = "elektrik"
+                            temp['aciklama'] = "Elektrik"
                         if sebep == "3":
-                            temp['aciklama'] = "su"
+                            temp['aciklama'] = "Su"
                         if sebep == "4":
-                            temp['aciklama'] = "ayna"
+                            temp['aciklama'] = "Ayna"
 
                         temp2['gelen_tarih'] = str(temp['gelen_tarih'])
                         temp2['adi'] = temp['adi']
                         temp2['soyadi'] = temp['soyadi']
-                        temp2['deger'] = temp['deger']
                         temp2['proje'] = temp['proje']
                         temp2['yer'] = temp['yer']
                         temp2['aciklama'] = temp['aciklama']
+                        temp2['progress'] = temp['progress']
+                        temp2['basla_num'] = temp['basla_num']
+                        temp2['son_num'] = temp['son_num']
                         a2_list.append(temp)
                         a_list.append(temp2)
 
@@ -8286,14 +8344,16 @@ def sayi_list(request, pk=None):
 @login_required
 def sayi_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
+    #g_tarih = str(datetime.datetime(2018,7,6,22,0,0))
+    g_tarih = str(datetime.datetime.now())
     tipi = "1"
-    proje = "2"
+    proje = "1"
     p_alani = "1"
     yer = "1"
-    adet = "40"
+    adet = "13"
     print("okunan zaman..sayi create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/sayi_list/",
-        json={"mac_no":12345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "adet": adet, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":12345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "adet": adet, "gelen_tarih": g_tarih, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     print("işte response....", response)
     response.json()
     print("status code..", response.status_code)

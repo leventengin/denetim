@@ -322,7 +322,7 @@ def index_hazirla_proje(request):
 def get_m_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(167,0,0)
     yedigun_once = bugun - yedigun
     memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     m_list = []
@@ -331,14 +331,15 @@ def get_m_list(request):
 
         ara_tarih = x.gelen_tarih
         temp['gelen_tarih'] = ara_tarih
-
+        """
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
         if yer_obj:
             temp['yer'] = yer_obj.yer_adi
         else:
             temp['yer'] = mac_no
-
+        """
+        temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
 
         oy = x.oy
@@ -377,7 +378,7 @@ def get_m_list(request):
 def get_o_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(167,0,0)
     yedigun_once = bugun - yedigun
     operasyon_obj = Operasyon_Data.objects.filter(proje=proje).filter(bas_tarih__gt=yedigun_once).order_by("-id")
     print("işte operasyon listesi...", operasyon_obj)
@@ -389,14 +390,15 @@ def get_o_list(request):
 
         temp['bas_tarih'] = x.bas_tarih
         temp['son_tarih'] = x.son_tarih
-
+        """
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
         if yer_obj:
             temp['yer'] = yer_obj.yer_adi
         else:
             temp['yer'] = mac_no
-
+        """
+        temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
 
         rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
@@ -425,7 +427,7 @@ def get_d_list(request):
     proje = request.user.profile.proje
     print("kontrol için proje...----------------------", proje)
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(167,0,0)
     yedigun_once = bugun - yedigun
     denetim_obj = Denetim_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     print("işte denetim listesi...", denetim_obj)
@@ -435,17 +437,15 @@ def get_d_list(request):
 
         gelen_tarih = x.gelen_tarih
         temp['gelen_tarih'] = gelen_tarih
-
+        """
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
         if yer_obj:
             temp['yer'] = yer_obj.yer_adi
         else:
             temp['yer'] = mac_no
-
-        #proje_no = x.proje
-        #proje_obj = proje.objects.get(id=proje_no)
-        #if proje_obj:
+        """
+        temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
         #else:
         #    temp['proje'] = proje
@@ -503,22 +503,29 @@ def get_d_list(request):
 def get_a_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(267,0,0)
     yedigun_once = bugun - yedigun
     ariza_obj = Ariza_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     a_list = []
     for x in ariza_obj:
         temp = {}
         temp['gelen_tarih'] = x.gelen_tarih
+        """
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
         if yer_obj:
             temp['yer'] = yer_obj.yer_adi
         else:
             temp['yer'] = mac_no
-
+        """
+        temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
-        rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+
+        if x.progress == "0":
+            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
+        else:
+            rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_kapat).first()
+
         if rfid_obj:
             temp['adi'] = rfid_obj.adi
             temp['soyadi'] = rfid_obj.soyadi
@@ -529,18 +536,26 @@ def get_a_list(request):
         sebep = x.sebep
         print("sebep", sebep)
 
-        temp['deger'] = 0
+        temp['progress'] = x.progress
+
+        if x.progress == "0":
+            temp['basla_num'] = x.num
+            temp['son_num'] = ""
+        else:
+            temp['basla_num'] = ""
+            temp['son_num'] = x.num
+
 
         if sebep == "0":
-            temp["aciklama"] = "mekanik"
+            temp["aciklama"] = ""
         if sebep == "1":
-            temp['aciklama'] = "mekanik"
+            temp['aciklama'] = "Mekanik"
         if sebep == "2":
-            temp['aciklama'] = "elektrik"
+            temp['aciklama'] = "Elektrik"
         if sebep == "3":
-            temp['aciklama'] = "su"
+            temp['aciklama'] = "Su"
         if sebep == "4":
-            temp['aciklama'] = "ayna"
+            temp['aciklama'] = "Ayna"
         a_list.append(temp)
 
     return a_list
@@ -549,22 +564,23 @@ def get_a_list(request):
 def get_sy_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(7,0,0)
+    yedigun = datetime.timedelta(167,0,0)
     yedigun_once = bugun - yedigun
     sayi_obj = Sayi_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     sy_list = []
     for x in sayi_obj:
         temp = {}
         temp['gelen_tarih'] = x.gelen_tarih
+        """
         mac_no = x.mac_no
         yer_obj = yer.objects.filter(mac_no=mac_no).first()
         if yer_obj:
             temp['yer'] = yer_obj.yer_adi
         else:
             temp['yer'] = mac_no
-
+        """
+        temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
-
         temp['adet'] = x.adet
 
         sy_list.append(temp)
