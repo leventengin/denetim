@@ -8,6 +8,10 @@
 <head>
   <meta charset="utf-8">
 
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+
+
 <style>
 
 
@@ -65,6 +69,28 @@ h4 {text-align:center;}
 
 
 
+<script>
+$( function() {
+$.datepicker.regional['tr'] = {
+  monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+  monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+  'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+  weekHeader: 'Hf', weekStatus: '',
+  dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+  dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+  dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+  dateFormat: 'DD, d MM, yy', firstDay: 1,
+  prevText: 'Önce',
+  nextText: 'Sonra',
+  isRTL: false};
+$.datepicker.setDefaults($.datepicker.regional['tr']);
+$( ".datepicker" ).datepicker()
+} );
+</script>
+
+
+
   <script>
   function sakla(){
     var a = document.getElementById("div_1table");
@@ -80,15 +106,33 @@ h4 {text-align:center;}
   }
   </script>
 
-
+<script>
+function zaman_al(t){
+  //alert("burada...");
+  var yil = t.getFullYear();
+  var a = t.getMonth() + 1;
+  var g = t.getDate();
+  var ay = ("0" + a).slice(-2);
+  var gun = ("0" + g).slice(-2);
+  //var tarih = t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate();
+  var tar = yil + '-' + ay + '-' + gun;
+  return tar;
+}
+</script>
 
 
   <script>
   function goster_m(){
-    //alert("göster.....mmmmmmmmmmmmmmmmmmmmmmm.");
     var yer = document.getElementById('id_yersec').value;
+    var t = $('#id_tarih').datepicker("getDate");
+    var tarih = zaman_al(t);
+
+    if (tarih=="")
+      {alert("tarih eksik...!"); return;}
+
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
+
     var a = document.getElementById("div_1table");
     var b = document.getElementById("div_2table");
     var c = document.getElementById("div_3table");
@@ -100,100 +144,112 @@ h4 {text-align:center;}
     d.style.display = "none";
     e.style.display = "none";
     //alert("yer...."+yer);
-    yukle_mem(yer);
+    yukle_mem(yer, tarih);
     }
   </script>
 
 
   <script>
   function goster_o(){
-    //alert("göster......oooooooooooooooooooooooo");
     var yer = document.getElementById('id_yersec').value;
+    var t = $('#id_tarih').datepicker("getDate");
+    var tarih = zaman_al(t);
+    if (tarih=="")
+      {alert("tarih eksik...!"); return;}
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
-        var a = document.getElementById("div_1table");
-        var b = document.getElementById("div_2table");
-        var c = document.getElementById("div_3table");
-        var d = document.getElementById("div_4table");
-        var e = document.getElementById("div_5table");
-        a.style.display = "none";
-        b.style.display = "block";
-        c.style.display = "none";
-        d.style.display = "none";
-        e.style.display = "none";
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "none";
+    b.style.display = "block";
+    c.style.display = "none";
+    d.style.display = "none";
+    e.style.display = "none";
     //alert("yer...."+yer);
-    yukle_opr(yer);
+    yukle_opr(yer,tarih);
     }
   </script>
 
   <script>
   function goster_d(){
-    //alert("göster.....ddddddddddddddddddddddd.");
     var yer = document.getElementById('id_yersec').value;
+    var t = $('#id_tarih').datepicker("getDate");
+    var tarih = zaman_al(t);
+    if (tarih=="")
+      {alert("tarih eksik...!"); return;}
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
-        var a = document.getElementById("div_1table");
-        var b = document.getElementById("div_2table");
-        var c = document.getElementById("div_3table");
-        var d = document.getElementById("div_4table");
-        var e = document.getElementById("div_5table");
-        a.style.display = "none";
-        b.style.display = "none";
-        c.style.display = "block";
-        d.style.display = "none";
-        e.style.display = "none";
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "none";
+    b.style.display = "none";
+    c.style.display = "block";
+    d.style.display = "none";
+    e.style.display = "none";
     //alert("yer...."+yer);
-    yukle_den(yer);
+    yukle_den(yer, tarih);
     }
   </script>
 
 
   <script>
   function goster_a(){
-    //alert("göster.....aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     var yer = document.getElementById('id_yersec').value;
+    var t = $('#id_tarih').datepicker("getDate");
+    var tarih = zaman_al(t);
+    if (tarih=="")
+      {alert("tarih eksik...!"); return;}
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
-        var a = document.getElementById("div_1table");
-        var b = document.getElementById("div_2table");
-        var c = document.getElementById("div_3table");
-        var d = document.getElementById("div_4table");
-        var e = document.getElementById("div_5table");
-        a.style.display = "none";
-        b.style.display = "none";
-        c.style.display = "none";
-        d.style.display = "block";
-        e.style.display = "none";
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "none";
+    b.style.display = "none";
+    c.style.display = "none";
+    d.style.display = "block";
+    e.style.display = "none";
     //alert("yer...."+yer);
-    yukle_arz(yer);
+    yukle_arz(yer,tarih);
     }
   </script>
 
 
   <script>
   function goster_s(){
-    //alert("göster.......ssssssssssssssssss.");
     var yer = document.getElementById('id_yersec').value;
+    var t = $('#id_tarih').datepicker("getDate");
+    var tarih = zaman_al(t);
+    if (tarih=="")
+      {alert("tarih eksik...!"); return;}
     if (yer=="")
         {alert("yer seçilmedi...!"); return;}
-        var a = document.getElementById("div_1table");
-        var b = document.getElementById("div_2table");
-        var c = document.getElementById("div_3table");
-        var d = document.getElementById("div_4table");
-        var e = document.getElementById("div_5table");
-        a.style.display = "none";
-        b.style.display = "none";
-        c.style.display = "none";
-        d.style.display = "none";
-        e.style.display = "block";
+    var a = document.getElementById("div_1table");
+    var b = document.getElementById("div_2table");
+    var c = document.getElementById("div_3table");
+    var d = document.getElementById("div_4table");
+    var e = document.getElementById("div_5table");
+    a.style.display = "none";
+    b.style.display = "none";
+    c.style.display = "none";
+    d.style.display = "none";
+    e.style.display = "block";
     //alert("yer...."+yer);
-    yukle_say(yer);
+    yukle_say(yer,tarih);
     }
   </script>
 
 
   <script>
-  function yukle_mem(yer){
+  function yukle_mem(yer,tarih){
     //alert("buraya da geldi.....yukle()......"+yer);
     var endpoint = '/charts/api/gunluk_yer_mem/';
     //var defaultData = [];
@@ -209,6 +265,7 @@ h4 {text-align:center;}
 
         data : {
           'yer' : yer,
+          'tarih': tarih,
          },
 
 
@@ -269,7 +326,7 @@ h4 {text-align:center;}
 
 
   <script>
-  function yukle_opr(yer){
+  function yukle_opr(yer,tarih){
     //alert("buraya da geldi.....yukle_opr()......"+yer);
     var endpoint = '/charts/api/gunluk_yer_opr/';
 
@@ -281,6 +338,7 @@ h4 {text-align:center;}
         */
         data : {
           'yer' : yer,
+          'tarih': tarih,
          },
 
         success: function(data){
@@ -370,7 +428,7 @@ h4 {text-align:center;}
 
 
   <script>
-  function yukle_den(yer){
+  function yukle_den(yer,tarih){
     //alert("buraya da geldi.....yukle()......"+yer);
     var endpoint = '/charts/api/gunluk_yer_den/';
     $.ajax({
@@ -381,6 +439,7 @@ h4 {text-align:center;}
         */
         data : {
           'yer' : yer,
+          'tarih': tarih,
          },
         success: function(data){
                 //alert("gelen data..."+data);
@@ -479,7 +538,7 @@ h4 {text-align:center;}
 
 
   <script>
-  function yukle_arz(yer){
+  function yukle_arz(yer,tarih){
     //alert("buraya da geldi.....yukle()......"+yer);
     var endpoint = '/charts/api/gunluk_yer_arz/';
     $.ajax({
@@ -490,6 +549,7 @@ h4 {text-align:center;}
         */
         data : {
           'yer' : yer,
+          'tarih': tarih,
          },
         success: function(data){
                 //alert("gelen data..."+data);
@@ -560,7 +620,7 @@ h4 {text-align:center;}
 
 
     <script>
-    function yukle_say(yer){
+    function yukle_say(yer,tarih){
       //alert("buraya da geldi.....yukle()......"+yer);
       var endpoint = '/charts/api/gunluk_yer_say/';
       $.ajax({
@@ -571,6 +631,7 @@ h4 {text-align:center;}
           */
           data : {
             'yer' : yer,
+            'tarih': tarih,
            },
           success: function(data){
                   //alert("gelen data..."+data);
@@ -643,7 +704,9 @@ h4 {text-align:center;}
               {% csrf_token %}
               {{ form.errors }}
               {{ form.non_field_errors }}
-              {{ form }}
+              <table>
+                 {{ form }}
+               </table>
               <input type="button" value="Göster" onclick="goster_m()">
           </form>
         </div>

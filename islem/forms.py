@@ -370,6 +370,7 @@ class GunForm(forms.ModelForm):
         cc_zaman = cleaned_data.get("zaman")
         print("cc gun - cc zaman", cc_gun, "-", cc_zaman)
 
+
 class SaatDenForm(forms.ModelForm):
     class Meta:
         model = plan_den_gun
@@ -619,7 +620,9 @@ class AcilKapaForm(forms.Form):
 
 
 class YerSecForm(forms.Form):
-    yersec = forms.ModelChoiceField(queryset=yer.objects.all(), label="Yer Seçiniz..")
+    tarih = forms.DateField(label='Tarih', required=False,
+                        widget=forms.TextInput(attrs={ 'class':'datepicker' }))
+    yersec = forms.ModelChoiceField(queryset=yer.objects.all(), label="Yer ")
     def __init__(self, *args, **kwargs):
         proje = kwargs.pop("proje")
         super(YerSecForm, self).__init__(*args, **kwargs)

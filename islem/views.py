@@ -8590,9 +8590,9 @@ def gunluk_yer(request, pk=None):
             form = YerSecForm(request.POST, proje=proje)
             if form.is_valid():
                 yersec = request.POST.get('yersec', "")
-                tarih = datetime.datetime.now()
+                tarih = request.POST.get('tarih', "")
+                #tarih = datetime.datetime.now()
                 #tarih = datetime.datetime(12,12,12)
-
 
                 context = { 'form': form,
                 }

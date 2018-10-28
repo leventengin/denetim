@@ -17,14 +17,14 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from .views import HomeView, get_data, get_data_krs, ChartData
-from .views import gunluk_yer, gunluk_yer_mem, gunluk_yer_opr, gunluk_yer_den, gunluk_yer_arz, gunluk_yer_say
+from .views import gunluk_yer_mem, gunluk_yer_opr, gunluk_yer_den, gunluk_yer_arz, gunluk_yer_say
 
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^api/data/$', get_data, name='api-data'),
     url(r'^api/data_krs/$', get_data_krs, name='api-data-krs'),
-    url(r'^api/gunluk_yer/$', gunluk_yer, name='gunluk_yer'),
+    #url(r'^api/gunluk_yer/$', gunluk_yer, name='gunluk_yer'),
     url(r'^api/gunluk_yer_mem/$', gunluk_yer_mem, name='gunluk_yer_mem'),
     url(r'^api/gunluk_yer_den/$', gunluk_yer_den, name='gunluk_yer_den'),
     url(r'^api/gunluk_yer_opr/$', gunluk_yer_opr, name='gunluk_yer_opr'),
