@@ -322,7 +322,7 @@ def index_hazirla_proje(request):
 def get_m_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(167,0,0)
+    yedigun = datetime.timedelta(27,0,0)
     yedigun_once = bugun - yedigun
     memnuniyet_obj = Memnuniyet.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     m_list = []
@@ -378,7 +378,7 @@ def get_m_list(request):
 def get_o_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(167,0,0)
+    yedigun = datetime.timedelta(27,0,0)
     yedigun_once = bugun - yedigun
     operasyon_obj = Operasyon_Data.objects.filter(proje=proje).filter(bas_tarih__gt=yedigun_once).order_by("-id")
     print("işte operasyon listesi...", operasyon_obj)
@@ -427,7 +427,7 @@ def get_d_list(request):
     proje = request.user.profile.proje
     print("kontrol için proje...----------------------", proje)
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(167,0,0)
+    yedigun = datetime.timedelta(27,0,0)
     yedigun_once = bugun - yedigun
     denetim_obj = Denetim_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     print("işte denetim listesi...", denetim_obj)
@@ -503,7 +503,7 @@ def get_d_list(request):
 def get_a_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(267,0,0)
+    yedigun = datetime.timedelta(27,0,0)
     yedigun_once = bugun - yedigun
     ariza_obj = Ariza_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     a_list = []
@@ -564,7 +564,7 @@ def get_a_list(request):
 def get_sy_list(request):
     proje = request.user.profile.proje
     bugun = datetime.datetime.now()
-    yedigun = datetime.timedelta(167,0,0)
+    yedigun = datetime.timedelta(27,0,0)
     yedigun_once = bugun - yedigun
     sayi_obj = Sayi_Data.objects.filter(proje=proje).filter(gelen_tarih__gt=yedigun_once).order_by("-id")
     sy_list = []

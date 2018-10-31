@@ -7011,6 +7011,7 @@ def dosyalari_duzenle(request):
         return render(request, 'islem/dosyalari_duzenle.html',)
 
 
+
 def dosyalari_duzenle_kesin(request):
     dosya = "dosyalar düzenlenecek..."
     # memnuniyet .....
@@ -7031,11 +7032,12 @@ def dosyalari_duzenle_kesin(request):
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
 
-            kaydetme_obj = Memnuniyet(  proje_id=proje_obj.id,
+            kaydetme_obj = Memnuniyet(  id=mem.id,
+                                        proje_id=proje_obj.id,
                                         p_alani_id=alan_obj.id,
                                         mac_no = mac_no_a,
                                         tipi = tipi_a,
-                                        yer_id = yer_a,
+                                        yer_id = yer_obj.id,
                                         oy = oy_a,
                                         sebep = sebep_a,
                                         gelen_tarih = gelen_tarih_a,
@@ -7055,17 +7057,19 @@ def dosyalari_duzenle_kesin(request):
     for opr in opr_obj:
         mac_no_a = opr.mac_no
         tipi_a = opr.tipi
-        yer_a = opr.yer.id
         rfid_no_a = opr.rfid_no
         bas_tarih_a = opr.bas_tarih
         son_tarih_a = opr.son_tarih
         bild_tipi_a = opr.bild_tipi
-        timestamp_a = opr.timeStamp
+        timestamp_a = opr.timestamp
         yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
         if yer_obj:
+            yer_a = yer_obj.id
+            print("işte yer obj id..........================", yer_a)
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            kaydetme_obj = Operasyon_Data(  proje_id=proje_obj.id,
+            kaydetme_obj = Operasyon_Data(  id=opr.id,
+                                            proje_id=proje_obj.id,
                                             p_alani_id=alan_obj.id,
                                             mac_no = mac_no_a,
                                             tipi = tipi_a,
@@ -7077,6 +7081,7 @@ def dosyalari_duzenle_kesin(request):
             kaydetme_obj.save()
             opr_count_var = opr_count_var + 1
         else:
+            print("else oldu----------------------------------")
             opr.delete()
             opr_count_sil = opr_count_sil + 1
 
@@ -7097,11 +7102,12 @@ def dosyalari_duzenle_kesin(request):
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            kaydetme_obj = Denetim_Data(  proje_id=proje_obj.id,
+            kaydetme_obj = Denetim_Data(  id=den.id,
+                                        proje_id=proje_obj.id,
                                         p_alani_id=alan_obj.id,
                                         mac_no = mac_no_a,
                                         tipi = tipi_a,
-                                        yer_id = yer_a,
+                                        yer_id = yer_obj.id,
                                         kod = kod_a,
                                         rfid_no = rfid_no_a,
                                         gelen_tarih = gelen_tarih_a,
@@ -7128,11 +7134,12 @@ def dosyalari_duzenle_kesin(request):
         if yer_obj:
             alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
             proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
-            kaydetme_obj = Sayi_Data(   proje_id=proje_obj.id,
+            kaydetme_obj = Sayi_Data(   id=say.id,
+                                        proje_id=proje_obj.id,
                                         p_alani_id=alan_obj.id,
                                         mac_no = mac_no_a,
                                         tipi = tipi_a,
-                                        yer_id = yer_a,
+                                        yer_id = yer_obj.id,
                                         adet = adet_a,
                                         gelen_tarih = gelen_tarih_a,
                                         timestamp = timestamp_a,)
@@ -7141,6 +7148,131 @@ def dosyalari_duzenle_kesin(request):
         else:
             say.delete()
             say_count_sil = say_count_sil + 1
+
+
+    context = { 'mem_count_var': mem_count_var, 'mem_count_sil': mem_count_sil,
+                'den_count_var': den_count_var, 'den_count_sil': den_count_sil,
+                'opr_count_var': opr_count_var, 'opr_count_sil': opr_count_sil,
+                'say_count_var': say_count_var, 'say_count_sil': say_count_sil,
+                }
+
+
+    return render(request, 'islem/dosyalari_duzenle_kesin.html', context)
+
+
+
+
+def dosyalari_duzenle_kesin_2(request):
+    dosya = "dosyalar düzenlenecek..."
+    # memnuniyet .....
+    mem_obj = Memnuniyet.objects.all()
+    mem_count_var = 0
+    mem_count_sil = 0
+    mem_list = []
+    for mem in mem_obj:
+        c = {}
+        mac_no_a = mem.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        c['i'] = mem.id
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            c['pi'] = proje_obj.id
+            c['pa'] = alan_obj.id
+            c['y'] = yer_obj.id
+            c['v'] = "T"
+            mem_count_var = mem_count_var + 1
+        else:
+            c['v'] = "F"
+            mem_count_sil = mem_count_sil + 1
+        print("ekle mem liste....", c)
+        mem_list.append(c)
+    #print("işte mem list.....", mem_list)
+
+
+    for m in mem_list:
+        #print("mmm............", m.['v'])
+        if m['v'] == "T":
+            print("m varrrrrrrrrrrrrrrrrrrrr..............", m)
+        else:
+            print("m yokkkkkkkkkkkkkkkkkkkkk..............", m)
+
+
+
+    #operasyon .....
+    opr_obj = Operasyon_Data.objects.all()
+    opr_count_var = 0
+    opr_count_sil = 0
+    opr_list = []
+    for opr in opr_obj:
+        c = {}
+        mac_no_a = opr.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        c['i'] = opr.id
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            c['pi'] = proje_obj.id
+            c['pa'] = alan_obj.id
+            c['y'] = yer_obj.id
+            c['v'] = "T"
+            opr_count_var = opr_count_var + 1
+        else:
+            c['v'] = "F"
+            opr_count_sil = opr_count_sil + 1
+        opr_list.append(c)
+    print("işte opr list.....", opr_list)
+
+
+
+    #denetim .....
+    den_obj = Denetim_Data.objects.all()
+    den_count_var = 0
+    den_count_sil = 0
+    den_list = []
+    for den in den_obj:
+        c = {}
+        mac_no_a = den.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        c['i'] = den.id
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            c['pi'] = proje_obj.id
+            c['pa'] = alan_obj.id
+            c['y'] = yer_obj.id
+            c['v'] = "T"
+            den_count_var = den_count_var + 1
+        else:
+            c['v'] = "F"
+            den_count_sil = den_count_sil + 1
+        den_list.append(c)
+    print("işte den list.....", den_list)
+
+
+    #sayı....
+    say_obj = Sayi_Data.objects.all()
+    say_count_var = 0
+    say_count_sil = 0
+    say_list = []
+    for say in say_obj:
+        c = {}
+        mac_no_a = say.mac_no
+        yer_obj = yer.objects.filter(mac_no=mac_no_a).first()
+        c['i'] = say.id
+        if yer_obj:
+            alan_obj = proje_alanlari.objects.filter(yer=yer_obj.id).first()
+            proje_obj = proje.objects.filter(proje_alanlari=alan_obj.id).first()
+            c['pi'] = proje_obj.id
+            c['pa'] = alan_obj.id
+            c['y'] = yer_obj.id
+            c['v'] = "T"
+            say_count_var = say_count_var + 1
+        else:
+            c['v'] = "F"
+            say_count_sil = say_count_sil + 1
+        say_list.append(c)
+    print("işte say list.....", say_list)
 
 
     context = { 'mem_count_var': mem_count_var, 'mem_count_sil': mem_count_sil,
