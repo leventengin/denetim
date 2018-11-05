@@ -24,6 +24,7 @@ SECRET_KEY = '0gd2u5e^uye5a5gvl!1p10=d35_z)y#gap11&f4%h7x4i0efqy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = False
 
 ADMINS = [('admin', 'levent@ez-manage.org')]
 

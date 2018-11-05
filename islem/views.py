@@ -6557,7 +6557,7 @@ from .models import denetim
 class denetimautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return denetim.objects.none()
         #qs = denetim.objects.all()
         qs = denetim.objects.order_by('id').exclude(durum="X").exclude(durum="Y")
@@ -6571,7 +6571,7 @@ class denetimautocomplete(autocomplete.Select2QuerySetView):
 class denetimrutinautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return denetim.objects.none()
         #qs = denetim.objects.all()
         qs = denetim.objects.filter(rutin_planli="R").filter(durum="A").filter(denetci=self.request.user.id)
@@ -6586,7 +6586,7 @@ class denetimrutinautocomplete(autocomplete.Select2QuerySetView):
 class denolusturautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return denetim.objects.none()
         #qs = denetim.objects.all()
         #qs = denetim.objects.order_by('id').filter(durum="A").filter(yaratan=request.user)
@@ -6600,7 +6600,7 @@ class denolusturautocomplete(autocomplete.Select2QuerySetView):
 class rutindenetimautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return denetim.objects.none()
         #qs = denetim.objects.all()
         #qs = denetim.objects.order_by('id').filter(durum="A").filter(yaratan=request.user)
@@ -6639,7 +6639,7 @@ def deneme_denetim(request, pk=None):
 class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return sonuc_bolum.objects.none()
         qs = sonuc_bolum.objects.all()
 
@@ -6655,7 +6655,7 @@ class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
 class sirketautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return sirket.objects.none()
         qs = sirket.objects.all()
 
@@ -6668,7 +6668,7 @@ class sirketautocomplete(autocomplete.Select2QuerySetView):
 class sirketprojeautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return proje.objects.none()
         qs = proje.objects.all()
 
@@ -6734,7 +6734,7 @@ def deneme_nebu(request, pk=None):
 class takipciautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        #if not self.request.user.is_authenticated():
+        #if not self.request.user.is_authenticated:
             #return sonuc_bolum.objects.none()
 
         #qs = Profile.objects.filter(denetim_takipcisi="E")
@@ -6748,7 +6748,7 @@ class takipciautocomplete(autocomplete.Select2QuerySetView):
 class bolumautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return bolum.objects.none()
         #bolum_tipi = request.session.get('bolum_tipi')
         bolum_tipi  = self.forwarded.get('tipi', None)
@@ -6773,7 +6773,7 @@ class bolumautocomplete(autocomplete.Select2QuerySetView):
 class detayautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return detay.objects.none()
         qs = detay.objects.all().order_by('id')
         if self.q:
@@ -6784,7 +6784,7 @@ class detayautocomplete(autocomplete.Select2QuerySetView):
 class spvautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return detay.objects.none()
         kullanici = self.request.user
         sirket = kullanici.profile.sirket
@@ -6829,7 +6829,7 @@ class spvautocomplete(autocomplete.Select2QuerySetView):
 class denautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return detay.objects.none()
         kullanici = self.request.user
         sirket = kullanici.profile.sirket
@@ -6875,7 +6875,7 @@ class denautocomplete(autocomplete.Select2QuerySetView):
 class tipiautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return tipi.objects.none()
         qs = tipi.objects.all().order_by('tipi_adi')
         if self.q:
@@ -6885,7 +6885,7 @@ class tipiautocomplete(autocomplete.Select2QuerySetView):
 class zonautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return zon.objects.none()
         qs = zon.objects.all().order_by('zon_adi')
         if self.q:
@@ -6895,7 +6895,7 @@ class zonautocomplete(autocomplete.Select2QuerySetView):
 class sirket2autocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return proje.objects.none()
         qs = sirket.objects.all().order_by('sirket_adi')
         if self.q:
@@ -6906,7 +6906,7 @@ class sirket2autocomplete(autocomplete.Select2QuerySetView):
 class projeautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return proje.objects.none()
         qs = proje.objects.all().order_by('proje_adi')
         if self.q:
@@ -6916,7 +6916,7 @@ class projeautocomplete(autocomplete.Select2QuerySetView):
 class denetciautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return user.objects.none()
         qs = Profile.objects.filter(denetci="E").order_by('user')
         if self.q:
@@ -6927,7 +6927,7 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
 class list_tipiautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return user.objects.none()
         qs = tipi.objects.all()
         return qs
@@ -6936,7 +6936,7 @@ class list_tipiautocomplete(autocomplete.Select2QuerySetView):
 class list_zonautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return user.objects.none()
         tipi = self.forwarded.get('tipi', None)
         print("tipi...", tipi)
@@ -6954,7 +6954,7 @@ class list_zonautocomplete(autocomplete.Select2QuerySetView):
 class list_bolumautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return user.objects.none()
         zon = self.forwarded.get('zon', None)
         print("zon...", zon)

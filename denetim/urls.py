@@ -13,7 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+#from django.conf.urls import url, include
+from django.urls import re_path, path, include
 from django.contrib import admin
 from islem import views
 from django.conf import settings
@@ -32,29 +33,29 @@ from django.conf.urls import (
 
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^islem/', include('islem.urls')),
-    url(r'^notification/', include('notification.urls')),
-    url(r'^charts/', include('charts.urls')),
-    #url(r'^rfid/', include('webservice.urls')),
-    url(r'^ws/', include('webservice.api.urls', namespace='api-ws')),
-    url(r'^bildirim/', views.bildirim, name='bildirim'),
-    url(r'^popup_notif/', views.popup_notif, name='popup_notif'),
-    #url(r'^pdf1/', views.GeneratePdf.as_view(), name='GeneratePdf'),
-    url(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
-    url(r'^pdf2/(?P<pk>\d+)$', views.Generate_Rapor_PDF.as_view(), name='Generate_Rapor_PDF'),
-    #url(r'^pdf2/', views.generate_pdf, name='generate_pdf'),
-    #url(r'^pdf2/', views.get_report, name='get_report'),
-    url(r'^pdf2/', views.report_example, name='report_example'),
-    url(r'^select2/', include('django_select2.urls')),
-    #url(r'^select2/', include('select2.urls')),
-    url(r'^xyz/', views.xyz, name='xyz'),
-    url(r'^abc/', views.kamera, name='kamera'),
-    url(r'^eposta/', views.eposta_gonder, name='eposta_gonder'),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-    url('^searchableselect/', include('searchableselect.urls')),
-    #url(r'^admin/jsi18n/$', 'django.views.i18n.javascript_catalog'),
+    re_path(r'^$', views.index, name='index'),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^islem/', include('islem.urls')),
+    re_path(r'^notification/', include('notification.urls')),
+    re_path(r'^charts/', include('charts.urls')),
+    #re_path(r'^rfid/', include('webservice.urls')),
+    re_path(r'^ws/', include('webservice.api.urls')),
+    re_path(r'^bildirim/', views.bildirim, name='bildirim'),
+    re_path(r'^popup_notif/', views.popup_notif, name='popup_notif'),
+    #re_path(r'^pdf1/', views.GeneratePdf.as_view(), name='GeneratePdf'),
+    re_path(r'^pdf1/', views.GeneratePDF.as_view(), name='GeneratePDF'),
+    re_path(r'^pdf2/(?P<pk>\d+)$', views.Generate_Rapor_PDF.as_view(), name='Generate_Rapor_PDF'),
+    #re_path(r'^pdf2/', views.generate_pdf, name='generate_pdf'),
+    #re_path(r'^pdf2/', views.get_report, name='get_report'),
+    re_path(r'^pdf2/', views.report_example, name='report_example'),
+    re_path(r'^select2/', include('django_select2.urls')),
+    #re_path(r'^select2/', include('select2.urls')),
+    re_path(r'^xyz/', views.xyz, name='xyz'),
+    re_path(r'^abc/', views.kamera, name='kamera'),
+    re_path(r'^eposta/', views.eposta_gonder, name='eposta_gonder'),
+    re_path(r'^accounts/', include('django.contrib.auth.urls')),
+    re_path('^searchableselect/', include('searchableselect.urls')),
+    #re_path(r'^admin/jsi18n/$', 'django.views.i18n.javascript_catalog'),
 
     ]
 
@@ -62,8 +63,8 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-    #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    #url(r'^report_builder/', include('report_builder.urls')),
+    #re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    #re_path(r'^report_builder/', include('report_builder.urls')),
 
 
 
