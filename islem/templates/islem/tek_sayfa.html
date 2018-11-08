@@ -5,6 +5,22 @@
 {% load crispy_forms_tags %}
 {% load static %}
 
+
+
+{% block head_js %}
+  {{ block.super }}
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+  {{ form.media }}
+
+
+{% endblock %}
+
+
+
+
 {% block content %}
 
 <!doctype html>
@@ -29,21 +45,22 @@
 
 
 
+
 <script>
 $( function() {
 $.datepicker.regional['tr'] = {
-  monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
-  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
-  monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
-  'Tem','Ağu','Eyl','Eki','Kas','Ara'],
-  weekHeader: 'Hf', weekStatus: '',
-  dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
-  dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
-  dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
-  dateFormat: 'yy-mm-dd', firstDay: 1,
-  prevText: 'Önce',
-  nextText: 'Sonra',
-  isRTL: false};
+monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
+'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+weekHeader: 'Hf', weekStatus: '',
+dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+dayNamesShort: ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'],
+dayNamesMin: ['Pa','Pt','Sa','Ça','Pe','Cu','Ct'],
+dateFormat: 'yy-mm-dd', firstDay: 1,
+prevText: 'Önce',
+nextText: 'Sonra',
+isRTL: false};
 $.datepicker.setDefaults($.datepicker.regional['tr']);
 $( ".datepicker" ).datepicker()
 } );
@@ -506,13 +523,6 @@ $( ".datepicker" ).datepicker()
 
 <!-- <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script> -->
 
-
-
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-
-{{ form.media }}
 
 
 

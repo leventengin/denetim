@@ -87,10 +87,10 @@ th{
                           <tr>
                             <th hidden>xxx</th>
                             <th>Proje</th>
-                            <th>Yer</th>
+                            <th>Yer&nbsp;&nbsp;&nbsp;&nbsp;</th>
                             <th>Tarih</th>
-                            <th>Başla/Kapat</th>
-                            <th>Başla No:</th>
+                            <th>Başlat/Kapat</th>
+                            <th>Başlat No:</th>
                             <th>Kapat No:</th>
                             <th>Adı</th>
                             <th>Soyadı</th>
@@ -104,7 +104,11 @@ th{
                             <td>{{ deger.proje }}  </td>
                             <td>{{ deger.yer }}  </td>
                             <td>{{ deger.gelen_tarih|date:" d/m/Y - H:i" }}  </td>
-                            <td>{{ deger.progress }}  </td>
+                            {% if deger.progress == "0" %}
+                              <td> &nbsp; başlatıldı   </td>
+                            {% else %}
+                              <td> &nbsp; kapatıldı  </td>
+                            {% endif %}
                             <td>{{ deger.basla_num }}  </td>
                             <td>{{ deger.son_num }}  </td>
                             <td>{{ deger.adi }}  </td>

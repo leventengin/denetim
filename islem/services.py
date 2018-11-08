@@ -371,7 +371,7 @@ def get_m_list(request):
                 temp['aciklama'] = "tuvalet kağıdı"
         m_list.append(temp)
     print("service get m list çalıştı......")
-    print("services içinden  m list....", m_list)
+    #print("services içinden  m list....", m_list)
     return m_list
 
 

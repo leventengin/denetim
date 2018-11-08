@@ -317,7 +317,6 @@ span.num {
                  <ul class="collapse list-unstyled" id="pageSubmenu8">
                     <li><a href="/islem/rapor_mk_memnuniyet">Memnuniyet Raporları</a></li>
                     <li><a href="/islem/rapor_krs_memnuniyet">Memnuniyet Karşılaştırma</a></li>
-                    <li><a href="/islem/sayi_create">WS-Sayı Ekle</a></li>
                   </ul>
                 </li>
                 {% endif %}
@@ -453,45 +452,44 @@ span.num {
 <script>
   var myVar;
   function myInterval() {
-      myVar = setInterval(new_notif, 120000);
+      myVar = setInterval(new_notif, 60000);
   }
 </script>
-<!--    -->
+
 
 
 
 <script>
 
   function new_notif()
-  {
-      //alert("buraya geldi ... new notif... on click...");
-      var selected = "deneme";
+  {   //alert("buraya geldi ... new notif... on click...");
+      var selected = "new notif...";
       console.log(selected);
       $.ajax({
         url : "/bildirim/",
         type : "GET",
-        dataType: "json",
+        dataType: "text",
         contentType: 'application/json; charset=utf-8',
         data : {
           'selected' : selected,
            },
         success: function(data) {
-            //alert(data);
-            var json = $.parseJSON(data);
-            //alert(json.length);
-            document.getElementById("mynum").innerHTML = json.length;
+            //alert("işte gelen data   "+data);
+            var pjson = JSON.parse(data);
+            //alert(pjson.length);
+            document.getElementById("mynum").innerHTML = pjson.length;
             $(myDropdown2).empty();
-            for (var i=0;i<json.length;++i)
+            for (var i=0;i<pjson.length;++i)
               {
-                  /*  alert(" maryak......");  */
+                    //alert(" maryak......");
                   var getdiv = document.getElementById('myDropdown2');
                   var createA = document.createElement('a');
-                  var createAText = document.createTextNode(json[i].message);
+                  var createAText = document.createTextNode(pjson[i].message);
                   //alert(createAText);
                   createA.setAttribute('href', "/islem/notification/");
                   createA.appendChild(createAText);
                   getdiv.appendChild(createA);
-              }
+              }  /* for için */
             },
         failure: function() {
             alert("bildirim listesi başarısız...");

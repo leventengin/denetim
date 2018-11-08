@@ -6996,7 +6996,7 @@ def bildirim(request):
                 response_data = {"response_data" : n_list}
                 #print("response  data...", response_data)
                 response_data = json.dumps(n_list)
-
+        print("işte bildirimden gelen response data...hem de JSON", response_data)
         return HttpResponse(response_data, content_type='application/json')
 
 
@@ -7367,14 +7367,14 @@ def memnuniyet_list(request, pk=None):
 def memnuniyet_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
-    p_alani = "1"
-    yer = "1"
-    oy = "1"
+    proje = "2"
+    p_alani = "10"
+    yer = "12"
+    oy = "3"
     sebep = "6"
     print("okunan zaman......menuniyet create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/memnuniyet_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani , "yer": yer, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":202481591856122, "tipi": tipi, "proje": proje, "p_alani": p_alani , "yer": yer, "oy": oy, "sebep": sebep, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('memnuniyet_list')
@@ -7628,11 +7628,11 @@ def operasyon_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     bas_tarih = str(datetime.datetime(2018, 10, 15, 13, 9, 45))
     tipi = "1"
-    proje = "1"
-    p_alani = "1"
-    yer = "1"
+    proje = "2"
+    p_alani = "10"
+    yer = "11"
     rfid_no = "21414016072178"
-    bild_tipi = "M"
+    bild_tipi = "A"
     print("okunan zaman......operasyon create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/operasyon_list/",
         json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani , "yer": yer, "rfid_no": rfid_no, "bas_tarih": bas_tarih, "son_tarih": t_stamp, "bild_tipi": bild_tipi, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
@@ -7879,14 +7879,14 @@ def den_saha_list(request, pk=None):
 def den_saha_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
-    p_alani = "1"
-    yer = "1"
+    proje = "2"
+    p_alani = "10"
+    yer = "20"
     rfid_no = "1741053721759"
-    kod = "3"
+    kod = "5"
     print("okunan zaman......denetim create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/denetim_list/",
-        json={"mac_no":123451234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":202481586979103, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer, "rfid_no": rfid_no, "kod": kod, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('den_saha_list')
@@ -8230,17 +8230,17 @@ def ariza_list(request, pk=None):
 def ariza_create(request, pk=None):
     t_stamp = str(datetime.datetime.now())
     tipi = "1"
-    proje = "1"
-    p_alani = "1"
-    yer = "1"
-    num = "115"
+    proje = "2"
+    p_alani = "10"
+    yer = "12"
+    num = "145"
     rfid_no = "21414016072178"
     rfid_kapat = "12345"
-    sebep = "2"
+    sebep = "3"
     progress = "1"
     print("okunan zaman......arıza create.............", t_stamp)
     response = requests.post("http://"+settings.ADR_LOCAL+"/ws/ariza_list/",
-        json={"mac_no":1234512345, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "num": num, "rfid_no": rfid_no, "rfid_kapat": rfid_kapat, "sebep": sebep, "progress": progress, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
+        json={"mac_no":202481599944893, "tipi": tipi, "proje": proje, "p_alani": p_alani, "yer": yer,  "num": num, "rfid_no": rfid_no, "rfid_kapat": rfid_kapat, "sebep": sebep, "progress": progress, "gelen_tarih": t_stamp, "timestamp": t_stamp }, auth=(settings.USER_GLB, settings.PASW_GLB))
     response.json()
     print("status code..", response.status_code)
     return redirect('ariza_list')

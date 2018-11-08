@@ -154,6 +154,31 @@ class ProjeSecForm(forms.Form):
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),
                  widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
 
+    def media(self):
+        media = super(ProjeSecForm, self).media
+        extend = False
+        css = {
+            "screen": (
+                'admin/css/vendor/select2/select2.css',
+                'admin/css/autocomplete.css',
+                'autocomplete_light/select2.css',
+            )
+        }
+        js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        media._css = css
+        media._js = js
+        return media
+
+
+
 
 class SirketSecForm(forms.Form):
     sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),

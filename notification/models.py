@@ -29,7 +29,7 @@ class Notification(models.Model):
 @receiver(post_save, sender=Memnuniyet)
 def create_notif_mem(sender, instance, **kwargs):
     print("receiver post save memnuniyet................")
-    if instance.tipi == 1 and instance.oy == 3:
+    if instance.tipi == "1" and instance.oy == "3":
         mac_no = instance.mac_no
         proje = instance.proje
         proje_no = instance.proje.id

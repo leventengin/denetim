@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+{% extends "base_generic.html" %}
 
 
-</head>
+{% block content %}
 
-<body>
 
 <h4>Proje Seç </h4>
 
@@ -38,10 +31,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 -->
 
-{{ form.media }}
+{{ form.media.css }}
+{{ form.media.js }}
 
 <script type="text/javascript" src="{% static 'autocomplete_light/vendor/select2/dist/js/select2.min.js' %}"></script>
 
-</body>
 
-</html>
+
+
+{% endblock %}
