@@ -118,6 +118,23 @@ class Denetim_Deneme_Form(forms.Form):
         cc_denetim = cleaned_data.get("denetim")
         print("cc denetim ..:", cc_denetim)
 
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 
@@ -125,7 +142,23 @@ class Denetim_Rutin_Baslat_Form(forms.Form):
     denetim = forms.ModelChoiceField(queryset=denetim.objects.all(),
                  widget=autocomplete.ModelSelect2(url='denetim-rutin-autocomplete'), required=False)
 
-
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 
@@ -134,28 +167,29 @@ class Den_Olustur_Form(forms.Form):
                  widget=autocomplete.ModelSelect2(url='denolustur-autocomplete'), required=False)
 
 
-
-class Qrcode_Form(forms.Form):
-    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(),
-                 widget=autocomplete.ModelSelect2(url='rutindenetim-autocomplete'), required=False)
-    qrcode = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '40'}))
-
-
-
-class Ikili_Deneme_Form(forms.Form):
-    denetim_deneme = forms.ModelChoiceField(queryset=denetim.objects.all(),
-         widget=autocomplete.ModelSelect2(url='denetim-autocomplete'), required=False)
-    sonuc_bolum_deneme = forms.ModelChoiceField(queryset=sonuc_bolum.objects.all(),
-         widget=autocomplete.ModelSelect2(url='sonucbolum-autocomplete', forward=['denetim_deneme']  ), required=False)
-
-
-
-class ProjeSecForm(forms.Form):
-    proje = forms.ModelChoiceField(queryset=proje.objects.all(),
-                 widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
-
+    @property
     def media(self):
-        media = super(ProjeSecForm, self).media
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
+
+
+"""
+    def media(self):
+        media = super(Den_Olustur_Form, self).media
         extend = False
         css = {
             "screen": (
@@ -171,11 +205,87 @@ class ProjeSecForm(forms.Form):
             'autocomplete_light/autocomplete.init.js',
             'autocomplete_light/forward.js',
             'autocomplete_light/select2.js',
+            #'admin/js/vendor/select2/i18n/tr.js',
+            #'autocomplete_light/vendor/select2/src/js/select2/i18n/tr.js',
             'autocomplete_light/jquery.post-setup.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
         ]
         media._css = css
         media._js = js
         return media
+"""
+
+
+class Qrcode_Form(forms.Form):
+    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(),
+                 widget=autocomplete.ModelSelect2(url='rutindenetim-autocomplete'), required=False)
+    qrcode = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '40'}))
+
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
+
+class Ikili_Deneme_Form(forms.Form):
+    denetim_deneme = forms.ModelChoiceField(queryset=denetim.objects.all(),
+         widget=autocomplete.ModelSelect2(url='denetim-autocomplete'), required=False)
+    sonuc_bolum_deneme = forms.ModelChoiceField(queryset=sonuc_bolum.objects.all(),
+         widget=autocomplete.ModelSelect2(url='sonucbolum-autocomplete', forward=['denetim_deneme']  ), required=False)
+
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
+
+class ProjeSecForm(forms.Form):
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(),
+                 widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
+
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 
@@ -183,6 +293,25 @@ class ProjeSecForm(forms.Form):
 class SirketSecForm(forms.Form):
     sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),
                  widget=autocomplete.ModelSelect2(url='sirket2-autocomplete'), required=False)
+
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
 
 
 class SoruListesiForm(forms.Form):
@@ -209,7 +338,23 @@ class SoruListesiForm(forms.Form):
         if cc_bolum == None:
             raise forms.ValidationError("denetim bölümü alanı boş olamaz")
 
-
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 
@@ -230,6 +375,24 @@ class BolumListesiForm(forms.Form):
         if cc_zon == None:
             raise forms.ValidationError("denetim zonu alanı boş olamaz")
 
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
 
 
 class ZonListesiForm(forms.Form):
@@ -243,7 +406,23 @@ class ZonListesiForm(forms.Form):
         if cc_tipi == None:
             raise forms.ValidationError("denetim tipi alanı boş olamaz")
 
-
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 # esas işin döndüğü yer foto yüklüyor................
 #
@@ -766,6 +945,51 @@ class DenetimForm(forms.Form):
         return self.cleaned_data
 
 
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+
+
+    """
+    def media(self):
+        print("MEDIA ÇALIŞTI..................")
+        media = super(ProjeSecForm, self).media
+        extend = False
+        css = {
+            "screen": (
+                'admin/css/vendor/select2/select2.css',
+                'admin/css/autocomplete.css',
+                'autocomplete_light/select2.css',
+            )
+        }
+        js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        media._css = css
+        media._js = js
+        return media
+    """
+
+
 class RaporTarihForm(forms.Form):
     hedef_baslangic = forms.DateField(label='Hedef başlangıç...:', required=False,
                         widget=forms.TextInput(attrs={ 'class':'datepicker' }))
@@ -833,12 +1057,45 @@ class SpvForm(forms.Form):
     spv = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label="Süpervizör",
                  widget=autocomplete.ModelSelect2Multiple(url='spv-autocomplete'), required=False)
 
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 class DenForm(forms.Form):
     den = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label="Denetci",
                  widget=autocomplete.ModelSelect2Multiple(url='den-autocomplete'), required=False)
 
-
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 #ilk bölümde detay işlemleri öncesinde denetim ve bölüm seçen form js ile...
@@ -924,6 +1181,7 @@ class IlkDenetimSecForm(forms.Form):
 
 class DenetimSecForm(forms.Form):
     denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DenetimSecForm, self).__init__(*args, **kwargs)
@@ -935,6 +1193,7 @@ class DenetimSecForm(forms.Form):
 
 class DuzenleDenetimSecForm(forms.Form):
     denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(DuzenleDenetimSecForm, self).__init__(*args, **kwargs)
@@ -964,6 +1223,7 @@ class DuzenleDenetimSecForm(forms.Form):
 # ikinci kısımda canlı denetimde kullanılan form
 class AcilDenetimSecForm(forms.Form):
     denetim_no = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
+
     def __init__(self, *args, **kwargs):
         denetci = kwargs.pop("denetci")
         super(AcilDenetimSecForm, self).__init__(*args, **kwargs)
@@ -977,6 +1237,7 @@ class AcilDenetimSecForm(forms.Form):
 
 class BolumSecForm(forms.Form):
     bolum = forms.ModelChoiceField(queryset=sonuc_bolum.objects.all(), label="Bölüm Seçiniz..")
+
     def __init__(self, *args, **kwargs):
         denetim_no = kwargs.pop("denetim_no")
         devam_tekrar = kwargs.pop("devam_tekrar")
@@ -997,7 +1258,24 @@ class Sirket_Proje_Form(forms.Form):
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),
          widget=autocomplete.ModelSelect2(url='sirketproje-autocomplete', forward=['sirket']  ), required=False)
 
-
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
+        
 
 class NebuForm(forms.Form):
     nedirbu = forms.ModelChoiceField(queryset=denetim.objects.all(), label="nedir bu")

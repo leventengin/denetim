@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-{% load static %}
+
 
 {% block content %}
 
@@ -9,15 +9,16 @@
 <title>jQuery UI Datepicker - Default functionality</title>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
-
-
+{% load i18n %}
+{% load static %}
+{% load cache %}
+{% load l10n %}
 
 <style type="text/css">
     label {
         font-weight: normal  !important; /* overwrites any other rules */
     }
 </style>
-
 
 
 
