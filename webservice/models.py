@@ -214,19 +214,11 @@ def create_rfid_yeni(sender, instance, **kwargs):
                 kaydetme_obj.save()
             else:
                 pass
-                """
-                mac_no = deger.mac_no
-                kaydetme_obj = yer_updown(proje=proje,
-                                          p_alani_id=alan.id,
-                                          yer_id=deger.id,
-                                          mac_no=mac_no,
-                                          degis="E")
-                kaydetme_obj.save()
-                """
+
 
 
 @receiver(post_save, sender=yer)
-def create_yerupdown_yeni(sender, instance, **kwargs):
+def create_yerupdown_yeni(sender, instance, created, **kwargs):
     print("receiver post save yer...............")
     yer_id_x = instance.id
     #yer_obj = yer.objects.get(id=yer_id_x)
@@ -263,11 +255,13 @@ EVETHAYIR = (
 )
 
 
+    #user = models.OneToOneField(User, on_delete=models.CASCADE)
+
 class yer_updown(models.Model):
     mac_no = models.CharField(max_length=20)
     proje = models.ForeignKey('islem.proje', on_delete=models.PROTECT)
     p_alani = models.ForeignKey('islem.proje_alanlari', on_delete=models.PROTECT)
-    yer = models.ForeignKey('islem.yer', on_delete=models.PROTECT)
+    yer = models.OneToOneField('islem.yer', on_delete=models.PROTECT)
     degis = models.CharField(max_length=1, choices=EVETHAYIR, default="E")
     alive_time = models.DateTimeField(blank=True, null=True)
     def __str__(self):

@@ -321,10 +321,26 @@ span.num {
                 </li>
                 {% endif %}
 
+                {% if  user.profile.opr_admin == "E" or  user.is_superuser %}
+                 <li>
+                  <a href="#pageSubmenu9" data-toggle="collapse" aria-expanded="false">Projeler Raporları</a>
+                   <ul class="collapse list-unstyled" id="pageSubmenu9">
+                      <li><a href="/islem/kullanici_ekle">Kullanıcı Ekle</a></li>
+                      <li><a href="/islem/kullanici_duzenle">Kullanıcı Düzenle</a></li>
+                      <li><a href="/islem/kullanici_kaldir">Kullanıcı Kaldır</a></li>
+                      <li><a href="/islem/kullanici_aktif">Kullanıcı Aktifleştir</a></li>
+                      <li><a href="/islem/kullanici_resim">Kullanıcı Resim Yükle</a></li>
+                      <li><a href="/islem/kullanici_sifre">Kullanıcı Şifre Değiştir</a></li>
+                      <li><a href="/islem/ipy_ata">İşletme Proje Yöneticisi Ata</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+
+
                 {% if user.is_superuser %}
                  <li>
-                    <a href="#pageSubmenu9" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu9">
+                    <a href="#pageSubmenu10" data-toggle="collapse" aria-expanded="false">Diğer İşlemler</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu10">
                         <li><a href="/islem/grup">Grup</a></li>
                         <li><a href="/islem/sirket">Şirket</a></li>
                         <li><a href="/islem/proje">Proje</a></li>

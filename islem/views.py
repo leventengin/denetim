@@ -23,7 +23,7 @@ from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, Si
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, GunDenForm, SaatForm, SaatDenForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
-from islem.forms import ElemanForm, VatandaslikForm, YerSecForm
+from islem.forms import ElemanForm, VatandaslikForm, YerSecForm, KullaniciForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -4558,8 +4558,41 @@ def opr_admin_kaldir_kesin(request, pk=None):
     return redirect('opr_admin')
 
 
+#------------------------------------------------------------------------------------
+
+@login_required
+def kullanici_ekle(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user.id
+        sirket = kullanan.profile.sirket
+        if sirket == None:
+            mesaj = "Admin Kullanıcısına Şirket Tanımlı Değil...Lütfen Düzeltiniz..."
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        form = KullaniciForm(request.POST, sirket=sirket)
+
+        if form.is_valid():
+            print("valid....")
+            denetim_no = request.POST.get('denetim_no', "")
+            print ("denetim_no", denetim_no)
+            request.session['ilk_secili_denetim'] = denetim_no
+            #form = GozlemciForm()
+            return redirect('isemrisonrasi_devam')
+            #return render(request, 'islem/gozlemci_sec_devam.html', {'form': form,})
+        else:
+            print(" nah valid............")
+            return render(request, 'kullanici/kullanici_yarat.html', {'form': form,})
 
 
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
+        kullanan = request.user.id
+        sirket = kullanan.profile.sirket
+        form = IlkDenetimSecForm(sirket=sirket)
+        return render(request, 'kullanici/kullanici_yarat.html', {'form': form,})
 
 
 #------------------------------------------------------------------------------------

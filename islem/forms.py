@@ -963,31 +963,6 @@ class DenetimForm(forms.Form):
         return forms.Media(css = m_css, js = m_js)
 
 
-    """
-    def media(self):
-        print("MEDIA ÇALIŞTI..................")
-        media = super(ProjeSecForm, self).media
-        extend = False
-        css = {
-            "screen": (
-                'admin/css/vendor/select2/select2.css',
-                'admin/css/autocomplete.css',
-                'autocomplete_light/select2.css',
-            )
-        }
-        js = [
-            #'admin/js/vendor/jquery/jquery.js',
-            'autocomplete_light/jquery.init.js',
-            'admin/js/vendor/select2/select2.full.js',
-            'autocomplete_light/autocomplete.init.js',
-            'autocomplete_light/forward.js',
-            'autocomplete_light/select2.js',
-            'autocomplete_light/jquery.post-setup.js',
-        ]
-        media._css = css
-        media._js = js
-        return media
-    """
 
 
 class RaporTarihForm(forms.Form):
@@ -1275,7 +1250,7 @@ class Sirket_Proje_Form(forms.Form):
             'autocomplete_light/jquery.post-setup.js',
         ]
         return forms.Media(css = m_css, js = m_js)
-        
+
 
 class NebuForm(forms.Form):
     nedirbu = forms.ModelChoiceField(queryset=denetim.objects.all(), label="nedir bu")
@@ -1283,6 +1258,72 @@ class NebuForm(forms.Form):
         cleaned_data = super(NebuForm, self).clean()
         cc_nebu = cleaned_data.get("nedirbu")
         print("ne bu...:", cc_nebu)
+
+
+
+
+class KullaniciForm(forms.Form):
+    pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
+    adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
+    soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
+    eposta = forms.EmailField()
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all())
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(),required=False)
+    denetci = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    dgy = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    opr_alan_sefi = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    opr_teknik = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    opr_proje_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    opr_merkez_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    isletme_projeyon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
+    passw_1 = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}))
+    passw_2 = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}))
+
+
+    def __init__(self, *args, **kwargs):
+        bolum_listesi = kwargs.pop("sirket")
+        sirket = kwargs.pop("sirket")
+        super(KullaniciForm, self).__init__(*args, **kwargs)
+        print("init içinden seçilen bölüm listesi", sirket)
+        self.fields['sirket'].queryset = sirket
+        qs = proje.objects.filter(sirket=sirket)
+        self.fields['proje'].queryset = qs
+
+
+    def clean(self):
+        cleaned_data = super(KullaniciForm, self).clean()
+        cc_kullanici_adi = cleaned_data.get("kullanici_adi")
+        cc_adi = cleaned_data.get("adi")
+        cc_soyadi = cleaned_data.get("soyadi")
+        cc_eposta = cleaned_data.get("eposta")
+        cc_proje = cleaned_data.get("proje")
+        cc_sirket = cleaned_data.get("sirket")
+        cc_denetci = cleaned_data.get("denetci")
+        cc_dgy = cleaned_data.get("dgy")
+        cc_opr_alan_sefi = cleaned_data.get("opr_alan_sefi")
+        cc_opr_teknik = cleaned_data.get("cc_opr_teknik")
+        cc_opr_proje_yon = cleaned_data.get("opr_proje_yon")
+        cc_opr_merkez_yon = cleaned_data.get("opr_merkez_yon")
+        cc_isletme_projeyon = cleaned_data.get("isletme_projeyon")
+        cc_passw_1 = cleaned_data.get("passw_1")
+        cc_passw_2 = cleaned_data.get("passw_2")
+        print("cc kullanici adı...:", cc_kullanici_adi)
+        print("cc adı...:", cc_adi)
+        print("cc soyadı...:", cc_soyadi)
+        print("cc eposta...:", cc_eposta)
+        print("cc proje", cc_proje)
+        print("cc sirket", cc_sirket)
+        print("cc denetçi...:", cc_denetci)
+        print("cc dgy", cc_dgy)
+        print("cc opr alan şefi", cc_opr_alan_sefi)
+        print("cc opr teknik...:", cc_opr_teknik)
+        print("cc opr proje yön ", cc_opr_proje_yon)
+        print("cc opr merkez yon ", cc_opr_merkez_yon)
+        print("cc işletme proje yön", cc_isletme_projeyon)
+        print("cc passw 1", cc_passw_1)
+        print("cc passw 2", cc_passw_2)
+        return self.cleaned_data
 
 
 

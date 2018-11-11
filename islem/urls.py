@@ -174,14 +174,22 @@ urlpatterns = [
     re_path(r'^denetim/teksayfa_sil/$', views.teksayfa_sil, name='teksayfa_sil'),
     re_path(r'^denetim/teksayfa_sil_kesin/$', views.teksayfa_sil_kesin, name='teksayfa_sil_kesin'),
 
+#---------------------------------------------------------------------------------------------
 
+#   kullanıcı ile ilgili işlemler..................
+    re_path(r'^kullanici_ekle/$', views.kullanici_ekle, name='kullanici_ekle'),
+    #re_path(r'^kullanici_duzenle/$', views.kullanici_duzenle, name='kullanici_duzenle'),
+    #re_path(r'^kullanici_kaldir/$', views.kullanici_kaldir, name='kullanici_kaldir'),
+    #re_path(r'^kullanici_aktif/$', views.kullanici_aktif, name='kullanici_aktif'),
+    #re_path(r'^kullanici_resim/$', views.kullanici_resim, name='kullanici_resim'),
+    #re_path(r'^kullanici_sifre/$', views.kullanici_sifre, name='kullanici_sifre'),
+    #re_path(r'^ipy_ata/$', views.ipy_ata, name='ipy_ata'),
 
 #-------------------------------------------------------------------------------------------------
     # grup re_pathleri aşağıda....
     re_path(r'^deneme/$', views.deneme_denetim, name='deneme_denetim'),
     re_path(r'^deneme_iki/$', views.deneme_sonucbolum, name='deneme_sonucbolum'),
     re_path(r'^deneme_uc/$', views.deneme_nebu, name='deneme_nebu'),
-
 
 
     re_path(r'^grup/$', views.GrupListView.as_view(), name='grup'),

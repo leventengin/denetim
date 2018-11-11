@@ -1,0 +1,430 @@
+
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+<style type="text/css">
+    label {
+        font-weight: normal  !important; /* overwrites any other rules */
+    }
+</style>
+
+
+
+
+
+<script>
+  function ilk_Func() {
+      //alert("buraya da geldi.....ilk func .........");
+      var rp_hidden = document.getElementById("id_rp_hidden").value;
+      //alert("rp hidden..."+rp_hidden);
+      if (rp_hidden == "P")
+        {
+          //alert("p ye geldi...");
+          document.getElementById("id_hedef_baslangic").hidden = false;
+          document.getElementById("id_hedef_bitis").hidden = false;
+          document.getElementById("id_rutin_planli_0").checked = true;
+        }
+      if (rp_hidden == "R")
+        {
+          //alert("r ye geldi...");
+          document.getElementById("id_hedef_baslangic").hidden = true;
+          document.getElementById("id_hedef_bitis").hidden = true;
+          document.getElementById("id_rutin_planli_1").checked = true;
+        }
+  }
+</script>
+
+
+<script>
+  function rutinplanli_Function() {
+      //alert("buraya da geldi.....rutin / planlı .........");
+      var x = document.getElementById("id_rutin_planli_0").checked;
+      var y = document.getElementById("id_rutin_planli_1").checked;
+      //alert ("p mi..."+x);
+      //alert ("r mi..."+y)
+      if (x == true)
+        {
+          document.getElementById("id_hedef_baslangic").hidden = false;
+          document.getElementById("id_hedef_bitis").hidden = false;
+        }
+      else
+        {
+          document.getElementById("id_hedef_baslangic").hidden = true;
+          document.getElementById("id_hedef_bitis").hidden = true;
+          document.getElementById("id_hedef_baslangic").value = "";
+          document.getElementById("id_hedef_bitis").value = "";
+        }
+  }
+</script>
+
+
+<script>
+  function gonder_Func() {
+      //alert("buraya da geldi.  gönder func..........");
+      var x = document.getElementById("id_rutin_planli_0").checked;
+      var y = document.getElementById("id_rutin_planli_1").checked;
+      //alert ("p mi..."+x);
+      //alert ("r mi..."+y)
+      if (x == false && y == false)
+                {
+                  alert("planlı yada rutin denetim olduğu seçilmemiş !!!");
+                  return false;
+                }
+      var todayDate = new Date().toISOString().slice(0,10);
+      //alert("today date...."+todayDate);
+      var tar_baslangic = document.getElementById("id_hedef_baslangic").value;
+      //alert("hedef başlangıç..."+tar_baslangic)
+      var tar_bitis = document.getElementById("id_hedef_bitis").value;
+      //alert("hedef bitiş..."+tar_bitis)
+      if ( x == True)
+      {
+        if (todayDate > tar_baslangic)
+            {
+              alert("başlangıç tarihi bugünden geride...!");
+              return false;
+            }
+        if (todayDate > tar_bitis)
+            {
+              alert("bitiş tarihi bugünden geride...!");
+              return false;
+            }
+        if (tar_baslangic > tar_bitis)
+            {
+              alert("tarih sıralaması yanlış...!");
+              return false;
+            }
+        }
+      //alert("kontrol sonu..................!!!!")
+  }
+</script>
+
+
+
+
+<script>
+  function tipisecFunction() {
+      var response = '';
+      var js_bolumler = [];
+      var js_takipciler = [];
+      /* liste = document.getElementById("id_bolum").value; */
+      $.ajaxSettings.traditional = true;
+      $("#id_bolum :selected").each(function(){
+          js_bolumler.push($(this).val());
+      });
+      $("#id_takipciler :selected").each(function(){
+          js_takipciler.push($(this).val());
+      });
+      var js_denetim_adi = document.getElementById("id_denetim_adi").value;
+      var js_proje = document.getElementById("id_proje").value;
+      var x = document.getElementById("id_rutin_planli_0").checked;
+      var y = document.getElementById("id_rutin_planli_1").checked;
+      if (x == true)
+          { var js_rutin_planli = "P";
+             //alert(" js rutin planlı ...p  "+js_rutin_planli);
+           }
+      else { if (y == true)
+              { var js_rutin_planli = "R";
+                //alert(" js rutin planlı...r "+js_rutin_planli);
+              }
+            else { var js_rutin_planli ="";
+                    //alert(" js rutin planlı...boş "+js_rutin_planli);
+            }}
+      var js_denetci = document.getElementById("id_denetci").value;
+      var js_tipi = document.getElementById("id_tipi").value;
+      var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
+      var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
+      var js_aciklama = document.getElementById("id_aciklama").value;
+      //alert(" bölümler..." + js_bolumler);
+      //alert("js rutin planlı ..."+js_rutin_planli);
+      console.log(js_bolumler);
+      $.ajax({
+        url : "tipisec_bolum_js/",
+        type : "GET",
+        dataType: "text",
+        data : {
+          'js_bolumler' : js_bolumler,
+          'js_takipciler' : js_takipciler,
+          'js_denetim_adi' : js_denetim_adi,
+          'js_proje' : js_proje,
+          'js_rutin_planli' : js_rutin_planli,
+          'js_denetci' : js_denetci,
+          'js_tipi' : js_tipi,
+          'js_hedef_baslangic' : js_hedef_baslangic,
+          'js_hedef_bitis' : js_hedef_bitis,
+          'js_aciklama' : js_aciklama,
+         },
+        success: function() {
+            //alert("tipi seçimi başarılı...");
+            window.location.reload();
+            },
+        failure: function() {
+            alert("hata var....veri aktarılamadı...");
+            }
+        });  /* ajax kapa...*/
+  }
+</script>
+
+
+
+  <script>
+    function detaysecFunction() {
+        var response = '';
+        var js_bolumler = [];
+        var js_takipciler = [];
+        /* liste = document.getElementById("id_bolum").value; */
+        $.ajaxSettings.traditional = true;
+        $("#id_bolum :selected").each(function(){
+            js_bolumler.push($(this).val());
+        });
+        $("#id_takipciler :selected").each(function(){
+            js_takipciler.push($(this).val());
+        });
+        var js_denetim_adi = document.getElementById("id_denetim_adi").value;
+        var js_proje = document.getElementById("id_proje").value;
+        var x = document.getElementById("id_rutin_planli_0").checked;
+        var y = document.getElementById("id_rutin_planli_1").checked;
+        if (x == true)
+            { var js_rutin_planli = "P";
+               //alert(" js rutin planlı ...p  "+js_rutin_planli);
+             }
+        else { if (y == true)
+                { var js_rutin_planli = "R";
+                  //alert(" js rutin planlı...r "+js_rutin_planli);
+                }
+              else { var js_rutin_planli ="";
+                      //alert(" js rutin planlı...boş "+js_rutin_planli);
+              }}
+        var js_denetci = document.getElementById("id_denetci").value;
+        var js_tipi = document.getElementById("id_tipi").value;
+        var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
+        var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
+        var js_aciklama = document.getElementById("id_aciklama").value;
+        //alert(" bölümler..." + js_bolumler);
+        console.log(js_bolumler);
+        $.ajax({
+          url : "detaylarsec_bolum_js/",
+          type : "GET",
+          dataType: "text",
+          data : {
+            'js_bolumler' : js_bolumler,
+            'js_takipciler' : js_takipciler,
+            'js_denetim_adi' : js_denetim_adi,
+            'js_proje' : js_proje,
+            'js_rutin_planli' : js_rutin_planli,
+            'js_denetci' : js_denetci,
+            'js_tipi' : js_tipi,
+            'js_hedef_baslangic' : js_hedef_baslangic,
+            'js_hedef_bitis' : js_hedef_bitis,
+            'js_aciklama' : js_aciklama,
+           },
+          success: function() {
+              //alert("bölüm seçimi başarılı...");
+              window.location.reload();
+              },
+          failure: function() {
+              alert("hata var....veri aktarılamadı...");
+              }
+          });  /* ajax kapa...*/
+    }
+  </script>
+
+
+
+<script>
+      $(document).ready(function(){
+             $("#id_bolum").change(function(){
+                  //alert ( "...bolum detay seç çalıştı...");
+                  detaysecFunction();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+<script>
+      $(document).ready(function(){
+             $("#id_tipi").change(function(){
+                  //alert ( "...tipi seç çalıştı...");
+                  tipisecFunction();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+<script>
+      $(document).ready(function(){
+             $("#id_rutin_planli").change(function(){
+                  //alert ( "...rutin - planlı çalıştı...");
+                  rutinplanli_Function();
+             });   /*  change  kapanıyor ...  */
+           });  /* document ready  kapanıyor */
+</script>
+
+
+<script>
+      $(document).ready(function(){
+                  //alert ( "...ilk func ...çalıştı...");
+                  ilk_Func();
+           });  /* document ready  kapanıyor */
+</script>
+
+
+
+
+
+<h4> Kullanıcı Tanımlama Sayfası </h4>
+
+
+
+    <p> </br> </p>
+
+
+
+            <form method="post" onsubmit="gonder_Func()" >
+              {% csrf_token %}
+
+              {{ form.non_field_errors }}
+
+              {{ form.source.errors }}
+              {{ form.source }}
+
+              <table border="0">
+
+                <tr>
+                    <td>
+                    {{ form.pk_no.errors }}
+                    {{ form.pk_no }}
+                  </td>
+                </tr>
+
+
+                  <tr>
+                    <th style="width: 50mm;">  {{ form.denetim_adi.label_tag }}  </th>
+                    <td>
+                      {{ form.denetim_adi.errors }}
+                      {{ form.denetim_adi }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.proje.label_tag }}</th>
+                    <td>
+                      {{ form.proje.errors }}
+                      {{ form.proje }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                      <td>
+                      {{ form.rp_hidden.errors }}
+                      {{ form.rp_hidden }}
+                    </td>
+                  </tr>
+
+
+                  <tr>
+                    <th>{{ form.denetci.label_tag }}</th>
+                    <td>
+                      {{ form.denetci.errors }}
+                      {{ form.denetci }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.tipi.label_tag }}</th>
+                    <td>
+                      {{ form.tipi.errors }}
+                      {{ form.tipi }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.takipciler.label_tag }}</th>
+                    <td>
+                      {{ form.takipciler.errors }}
+                      {{ form.takipciler }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.hedef_baslangic.label_tag }}</th>
+                    <td>
+                      {{ form.hedef_baslangic.errors }}
+                      {{ form.hedef_baslangic }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.hedef_bitis.label_tag }}</th>
+                    <td>
+                      {{ form.hedef_bitis.errors }}
+                      {{ form.hedef_bitis }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.aciklama.label_tag }}</th>
+                    <td>
+                      {{ form.aciklama.errors }}
+                      {{ form.aciklama }}
+                    </td>
+                  </tr>
+
+
+                  <tr>
+                    <th>{{ form.bolum.label_tag }}</th>
+                    <td>
+                      {{ form.bolum.errors }}
+                      {{ form.bolum }}
+
+                    </td>
+                  </tr>
+
+                    <tr height = 20px></tr>
+
+
+                  <tr>
+                    <th  style="font-weight:bold"> Detaylar / Sorular </th>
+                    </tr>
+
+                    <tr height = 20px></tr>
+
+
+
+                  </table>
+
+
+
+                  <table>
+
+
+                  <tr style="width: 200mm;">
+                    <td>
+                      {{ form.detay.errors }}
+                      {{ form.detay }}
+                    </td>
+                  </tr>
+
+
+
+
+              </table>
+
+              <button type="submit">Kaydet</button>
+            </form>
+
+
+
+
+
+
+
+
+
+</html>
+
+
+{% endblock %}
