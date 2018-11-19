@@ -4560,39 +4560,102 @@ def opr_admin_kaldir_kesin(request, pk=None):
 
 #------------------------------------------------------------------------------------
 
+from django.core.validators import EmailValidator
+from django.utils import translation
+from django.utils.translation import gettext as _
+from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.conf import settings
+
+@login_required
+def tercume(request):
+    # if this is a POST request we need to process the form data
+        #dil = 'tr'
+        #translation.activate(dil)
+        #request.session[translation.LANGUAGE_SESSION_KEY] = dil
+        dil = request.session.get('translation.LANGUAGE_SESSION_KEY')
+        deger = settings.USE_I18N
+        context = { 'dil' : dil,
+                    'deger' : deger,
+                    'tercume': _("First i18n trial.."),
+                    }
+        return render(request, 'kullanici/tercume.html', context)
+
+
+
+
+#------------------------------------------------------------------------------------
+
+
+
 @login_required
 def kullanici_ekle(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        kullanan = request.user.id
-        sirket = kullanan.profile.sirket
-        if sirket == None:
+        kullanan = request.user
+        sirket_adi = kullanan.profile.sirket
+        if sirket_adi == None:
             mesaj = "Admin Kullanıcısına Şirket Tanımlı Değil...Lütfen Düzeltiniz..."
             return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
-        form = KullaniciForm(request.POST, sirket=sirket)
+        form = KullaniciForm(request.POST, sirket_adi=sirket_adi)
 
         if form.is_valid():
             print("valid....")
-            denetim_no = request.POST.get('denetim_no', "")
-            print ("denetim_no", denetim_no)
-            request.session['ilk_secili_denetim'] = denetim_no
-            #form = GozlemciForm()
-            return redirect('isemrisonrasi_devam')
-            #return render(request, 'islem/gozlemci_sec_devam.html', {'form': form,})
+            kullanici_adi = request.POST.get('kullanici_adi', "")
+            adi = request.POST.get('adi', "")
+            soyadi = request.POST.get('soyadi', "")
+            eposta = request.POST.get('eposta', "")
+            sirket = request.POST.get('sirket', "")
+            proje = request.POST.get('proje', "")
+            denetci = request.POST.get('denetci', "")
+            dgy = request.POST.get('dgy', "")
+            opr_alan_sefi = request.POST.get('opr_alan_sefi', "")
+            opr_teknik = request.POST.get('opr_teknik', "")
+            opr_proje_yon = request.POST.get('opr_proje_yon', "")
+            opr_merkez_yon = request.POST.get('opr_merkez_yon', "")
+            isletme_projeyon = request.POST.get('isletme_projeyon', "")
+            passwd_1 = request.POST.get('passwd_1', "")
+            passwd_2 = request.POST.get('passwd_2', "")
+
+
+            print ("kullanici_adi...", kullanici_adi)
+            print ("adi...", adi)
+            print ("soyadi...", soyadi)
+            print ("eposta...", eposta)
+            print ("sirket...", sirket)
+            print ("proje...", proje)
+            print ("denetci...", denetci)
+            print ("dgy...", dgy)
+            print ("opr alan sefi...", opr_alan_sefi)
+            print ("opr teknik...", opr_teknik)
+            print ("opr proje yon ...", opr_proje_yon)
+            print ("opr merkez yon...", opr_merkez_yon)
+            print ("isletme projeyon...", isletme_projeyon)
+            print ("passwd 1...", passwd_1)
+            print ("passwd 2...", passwd_2)
+
+            return redirect('index')
+
         else:
             print(" nah valid............")
-            return render(request, 'kullanici/kullanici_yarat.html', {'form': form,})
+            return render(request, 'kullanici/kullanici_ekle.html', {'form': form,})
 
 
     # if a GET (or any other method) we'll create a blank form
     else:
         #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
-        kullanan = request.user.id
-        sirket = kullanan.profile.sirket
-        form = IlkDenetimSecForm(sirket=sirket)
-        return render(request, 'kullanici/kullanici_yarat.html', {'form': form,})
+        print("kullanıcı form get ++++++++++++++++++++++++++++++++++")
+        kullanan = request.user
+        sirket_adi = kullanan.profile.sirket
+        if sirket_adi == None:
+            mesaj = "Admin Kullanıcısına Şirket Tanımlı Değil...Lütfen Düzeltiniz..."
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+        form = KullaniciForm(sirket_adi=sirket_adi)
+        context = {'form': form,
+                    'tercume': _("First i18n trial.."),
+                    }
+        return render(request, 'kullanici/kullanici_ekle.html', context)
 
 
 #------------------------------------------------------------------------------------

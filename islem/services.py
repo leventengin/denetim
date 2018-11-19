@@ -521,7 +521,7 @@ def get_a_list(request):
         temp['yer'] = x.yer.yer_adi
         temp['proje'] = x.proje.proje_adi
 
-        if x.progress == "0":
+        if x.progress == "1":
             rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_no).first()
         else:
             rfid_obj = rfid_dosyasi.objects.filter(rfid_no=x.rfid_kapat).first()
@@ -538,7 +538,7 @@ def get_a_list(request):
 
         temp['progress'] = x.progress
 
-        if x.progress == "0":
+        if x.progress == "1":
             temp['basla_num'] = x.num
             temp['son_num'] = ""
         else:

@@ -1260,36 +1260,38 @@ class NebuForm(forms.Form):
         print("ne bu...:", cc_nebu)
 
 
-
+from django.core.validators import EmailValidator
 
 class KullaniciForm(forms.Form):
     pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
-    adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
-    soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
+    kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}), required=False)
+    adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
+    soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
+    #eposta = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
     eposta = forms.EmailField()
-    sirket = forms.ModelChoiceField(queryset=sirket.objects.all())
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),required=False)
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),required=False)
-    denetci = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    dgy = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    opr_alan_sefi = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    opr_teknik = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    opr_proje_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    opr_merkez_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    isletme_projeyon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci")
-    passw_1 = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}))
-    passw_2 = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}))
+    denetci = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci", initial="H")
+    dgy = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetim Gözetmeni", initial="H")
+    opr_alan_sefi = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Alan Şefi", initial="H")
+    opr_teknik = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Teknik Yetkili", initial="H")
+    opr_proje_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Yöneticisi", initial="H")
+    opr_merkez_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Projeler Merkez Yöneticisi", initial="H")
+    isletme_projeyon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="İşletme Proje Yöneticisi", initial="H")
+    passwd_1 = forms.CharField(widget=forms.PasswordInput, required=False)
+    passwd_2 = forms.CharField(widget=forms.PasswordInput, required=False)
 
 
     def __init__(self, *args, **kwargs):
-        bolum_listesi = kwargs.pop("sirket")
-        sirket = kwargs.pop("sirket")
+        sirket_adi = kwargs.pop("sirket_adi")
+        print("gelen şirket  ...", sirket_adi)
         super(KullaniciForm, self).__init__(*args, **kwargs)
-        print("init içinden seçilen bölüm listesi", sirket)
-        self.fields['sirket'].queryset = sirket
-        qs = proje.objects.filter(sirket=sirket)
+        sirket_obj = sirket.objects.filter(sirket_adi=sirket_adi)
+        self.fields['sirket'].queryset = sirket_obj
+        qs = proje.objects.filter(sirket=sirket_adi)
+        print("init içinden seçilen proje listesi", qs)
         self.fields['proje'].queryset = qs
-
+        #self.fields['eposta'].help_texts = " <br> abc@xyz.com   şeklinde girin </br>"
 
     def clean(self):
         cleaned_data = super(KullaniciForm, self).clean()
@@ -1306,14 +1308,14 @@ class KullaniciForm(forms.Form):
         cc_opr_proje_yon = cleaned_data.get("opr_proje_yon")
         cc_opr_merkez_yon = cleaned_data.get("opr_merkez_yon")
         cc_isletme_projeyon = cleaned_data.get("isletme_projeyon")
-        cc_passw_1 = cleaned_data.get("passw_1")
-        cc_passw_2 = cleaned_data.get("passw_2")
+        cc_passwd_1 = cleaned_data.get("passwd_1")
+        cc_passwd_2 = cleaned_data.get("passwd_2")
         print("cc kullanici adı...:", cc_kullanici_adi)
         print("cc adı...:", cc_adi)
         print("cc soyadı...:", cc_soyadi)
         print("cc eposta...:", cc_eposta)
-        print("cc proje", cc_proje)
         print("cc sirket", cc_sirket)
+        print("cc proje", cc_proje)
         print("cc denetçi...:", cc_denetci)
         print("cc dgy", cc_dgy)
         print("cc opr alan şefi", cc_opr_alan_sefi)
@@ -1321,8 +1323,23 @@ class KullaniciForm(forms.Form):
         print("cc opr proje yön ", cc_opr_proje_yon)
         print("cc opr merkez yon ", cc_opr_merkez_yon)
         print("cc işletme proje yön", cc_isletme_projeyon)
-        print("cc passw 1", cc_passw_1)
-        print("cc passw 2", cc_passw_2)
+        print("cc passw 1", cc_passwd_1)
+        print("cc passw 2", cc_passwd_2)
+        """
+        validate_email = EmailValidator()
+        print("validate email....", validate_email(cc_eposta))
+
+        if not(validate_email(cc_eposta)):
+            raise forms.ValidationError("geçerli bir eposta adresi giriniz...")
+        else:
+            print("eposta adresi doğru....")
+    
+        try:
+            validate_email(eposta)
+        except ValidationError:
+            raise forms.ValidationError('geçerli bir eposta adresi giriniz..')
+        """
+
         return self.cleaned_data
 
 

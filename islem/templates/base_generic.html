@@ -167,6 +167,8 @@ span.num {
 
 </style>
 
+{% load i18n %}
+
 </head>
 
 
@@ -323,8 +325,9 @@ span.num {
 
                 {% if  user.profile.opr_admin == "E" or  user.is_superuser %}
                  <li>
-                  <a href="#pageSubmenu9" data-toggle="collapse" aria-expanded="false">Projeler Raporları</a>
+                  <a href="#pageSubmenu9" data-toggle="collapse" aria-expanded="false">Kullanıcı İşlemleri</a>
                    <ul class="collapse list-unstyled" id="pageSubmenu9">
+                      <li><a href="/islem/tercume">tercume</a></li>                   
                       <li><a href="/islem/kullanici_ekle">Kullanıcı Ekle</a></li>
                       <li><a href="/islem/kullanici_duzenle">Kullanıcı Düzenle</a></li>
                       <li><a href="/islem/kullanici_kaldir">Kullanıcı Kaldır</a></li>

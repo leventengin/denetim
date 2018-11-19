@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>EZ-Check Denetim Sistemi</title>
+
+</head>
+
+<body>
+
+  {% load i18n %}
+
+
+  {% get_available_languages as LANGUAGES %}
+  {{ LANGUAGES }} </br>
+  {% get_current_language_bidi as LANGUAGE_BIDI %}
+  {{ LANGUAGE_BIDI }} </br>
+  {% get_current_language as LANGUAGE_CODE %}
+  {{ LANGUAGE_CODE }} </br>
+   USE_I18N:  {{ deger }}  </br>
+   dil:  {{ dil }}  </br>   
+
+
+   <h4> {%  trans  "hello world.....  " %} </h4>
+   <h4> {{ tercume }} </h4>
+
+
+
+   {% language 'tr' %}
+      {% get_current_language as LANGUAGE_CODE %}
+      {{ LANGUAGE_CODE }}
+      <h4> {%  trans  "hello world.....  " %} </h4>
+      <h4> {{ tercume }} </h4>
+   {% endlanguage %}
+
+</body>
+</html>

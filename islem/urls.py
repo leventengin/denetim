@@ -177,6 +177,7 @@ urlpatterns = [
 #---------------------------------------------------------------------------------------------
 
 #   kullanıcı ile ilgili işlemler..................
+    re_path(r'^tercume/$', views.tercume, name='tercume'),
     re_path(r'^kullanici_ekle/$', views.kullanici_ekle, name='kullanici_ekle'),
     #re_path(r'^kullanici_duzenle/$', views.kullanici_duzenle, name='kullanici_duzenle'),
     #re_path(r'^kullanici_kaldir/$', views.kullanici_kaldir, name='kullanici_kaldir'),
