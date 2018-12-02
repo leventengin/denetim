@@ -23,7 +23,7 @@ from islem.forms import IlkDenetimSecForm, KucukResimForm, YaziForm, YerForm, Si
 from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_Form, SoruListesiForm, GunForm, GunDenForm, SaatForm, SaatDenForm
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
-from islem.forms import ElemanForm, VatandaslikForm, YerSecForm, KullaniciForm
+from islem.forms import ElemanForm, VatandaslikForm, YerSecForm, KullaniciForm, ParolaForm, ProfilResimForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -65,7 +65,8 @@ import datetime
 from datetime import  timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
-
+from django.contrib.auth import password_validation
+from django.contrib.auth.password_validation import validate_password
 
 
 
@@ -4588,14 +4589,17 @@ def tercume(request):
 
 
 @login_required
+@transaction.atomic
 def kullanici_ekle(request):
     # if this is a POST request we need to process the form data
+    terc = _("second i18n trial..")
+
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         kullanan = request.user
         sirket_adi = kullanan.profile.sirket
         if sirket_adi == None:
-            mesaj = "Admin Kullanıcısına Şirket Tanımlı Değil...Lütfen Düzeltiniz..."
+            mesaj = _("Company is not defined for admin user...please correct...")
             return render(request, 'islem/uyari.html', {'mesaj': mesaj})
 
         form = KullaniciForm(request.POST, sirket_adi=sirket_adi)
@@ -4635,11 +4639,87 @@ def kullanici_ekle(request):
             print ("passwd 1...", passwd_1)
             print ("passwd 2...", passwd_2)
 
-            return redirect('index')
+            user_obj = User.objects.create_user(kullanici_adi, eposta, '')
+            print("user save den öncesi..........................")
+            user_obj.set_password(passwd_1)
+            user_obj.save()
+            print("user save den sonrası..........................")
+
+            mesaj_ilk_mail = _('You have subscribed to Ez-Manage.net system. You can use the below link to start using Ez-Manage system.')
+            sayin = _('Dear ')
+            isim = adi + " " + soyadi
+            konu = _('Subcription to Ez-Manage.net ')
+            temp_password = _('Temporary password:')
+            kull_adi = _('User name: ')
+            best_regards = _('Best Regards')
+            giris = _('Please change the password with your own as the first step.')
+            to = [user_obj.email]
+            from_email = settings.EMAIL_HOST_USER
+            yol = settings.HTTP_LOC
+            print("yol...", yol)
+            ctx = {
+                'sayin': sayin,
+                'isim': isim,
+                'mesaj_ilk_mail': mesaj_ilk_mail,
+                'konu': konu,
+                'temp_password': temp_password,
+                'passwd': passwd_1,
+                'best_regards': best_regards,
+                'giris': giris,
+                'usr_nm': kullanici_adi,
+                'kull_adi': kull_adi,
+                'yol': yol,
+                }
+            print("işte ctx....", ctx)
+            message = get_template('kullanici/ilk_mail.html').render(ctx)
+            msg = EmailMessage(konu, message, to=to, from_email=from_email)
+            msg.content_subtype = 'html'
+            msg.send()
+            print("mail atıldı.......ne oldu !!!")
+            profil_obj = Profile.objects.filter(user=user_obj).first()
+            if profil_obj:
+                print("seçili profil id si", profil_obj.id)
+                kaydetme_obj = Profile( id=profil_obj.id,
+                                        user_id=profil_obj.user.id,
+                                        sirket_id=sirket,
+                                        proje_id=proje,
+                                        denetci=denetci,
+                                        denetim_grup_yetkilisi=dgy,
+                                        opr_alan_sefi=opr_alan_sefi,
+                                        opr_teknik=opr_teknik,
+                                        opr_proje_yon=opr_proje_yon,
+                                        opr_merkez_yon=opr_merkez_yon,
+                                        isletme_projeyon=isletme_projeyon)
+                kaydetme_obj.save()
+                print("tüm kaydetme tamam ,  user ve profile.....")
+            form = KullaniciForm(sirket_adi=sirket_adi)
+            baslik = _("new user saved successfully..")
+            context = {'form': form,
+                        'terc': terc,
+                        'baslik': baslik,
+                        }
+            return render(request, 'kullanici/kullanici_ekle.html', context)
+
+            #return redirect('index')
 
         else:
             print(" nah valid............")
-            return render(request, 'kullanici/kullanici_ekle.html', {'form': form,})
+            request.session['user_sirket'] = ""
+            request.session['user_proje'] = ""
+            request.session['user_denetci'] = 'H'
+            request.session['user_dgy'] = 'H'
+            request.session['user_opr_alan_sefi'] = 'H'
+            request.session['user_opr_teknik'] = 'H'
+            request.session['user_opr_proje_yon'] = 'H'
+            request.session['user_opr_merkez_yon'] = 'H'
+            request.session['user_isletme_projeyon'] = 'H'
+            request.session['user_opr_admin'] = 'H'
+
+            context = {'form': form,
+                        'terc': terc,
+                        'baslık': '',
+                        }
+            return render(request, 'kullanici/kullanici_ekle.html', context)
 
 
     # if a GET (or any other method) we'll create a blank form
@@ -4649,18 +4729,127 @@ def kullanici_ekle(request):
         kullanan = request.user
         sirket_adi = kullanan.profile.sirket
         if sirket_adi == None:
-            mesaj = "Admin Kullanıcısına Şirket Tanımlı Değil...Lütfen Düzeltiniz..."
+            mesaj = _("Company is not defined for admin user...please correct...")
             return render(request, 'islem/uyari.html', {'mesaj': mesaj})
         form = KullaniciForm(sirket_adi=sirket_adi)
         context = {'form': form,
-                    'tercume': _("First i18n trial.."),
+                    'terc': terc,
+                    'baslik': '',
                     }
         return render(request, 'kullanici/kullanici_ekle.html', context)
 
 
 #------------------------------------------------------------------------------------
 
+@login_required
+def kullanici_resim(request):
 
+    kullanici = request.user
+    sirket_adi = kullanici.profile.sirket
+    prof_obj = Profile.objects.filter(user=kullanici).first()
+
+    if sirket_adi == None:
+        mesaj = _("Company is not defined for admin user...please correct...")
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ProfilResimForm(request.POST or None, request.FILES or None, instance=prof_obj)
+        if form.is_valid():
+            print(" gelen resim valid......")
+            kaydet = form.save(commit=False)
+            kaydet.save()
+            print("kaydetmiş olması lazım.................")
+            baslik = _('profile picture saved successfully..')
+            context = { 'form': form,
+                        'baslik': baslik,}
+            #return render(request, 'kullanici/kullanici_resim.html', context)
+            return redirect('index')
+        else:
+            print("bu ibnenin nesi valid değil anlamadım ki......")
+            context = { 'form': form,
+                        'baslik': '',}
+            return render(request, 'kullanici/kullanici_resim.html', context)
+
+    else:
+        print("kullanıcı resim form get ++++++++++++++++++++++++++++++++++")
+        form = ProfilResimForm(instance=prof_obj)
+        context = { 'form': form,
+                    'baslik': '',
+                    }
+        return render(request, 'kullanici/kullanici_resim.html', context)
+
+
+
+
+#-------------------------------------------------------------------------------------
+
+@login_required
+def kullanici_sifre(request):
+
+        if request.method == 'POST':
+            # create a form instance and populate it with data from the request:
+            kullanici = request.user
+            sirket_adi = kullanici.profile.sirket
+            if sirket_adi == None:
+                mesaj = _("Company is not defined for admin user...please correct...")
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+            form = ParolaForm(request.POST)
+
+            if form.is_valid():
+                print("valid....")
+                passwd_1 = request.POST.get('passwd_1', "")
+                passwd_2 = request.POST.get('passwd_2', "")
+
+                print ("passwd 1...", passwd_1)
+                print ("passwd 2...", passwd_2)
+
+                user_obj = User.objects.get(id=kullanici.id)
+                print("user save den öncesi..........................")
+                user_obj.set_password(passwd_1)
+                user_obj.save()
+                print("user save den sonrası..........................")
+
+                form = ParolaForm()
+                baslik = _("password updated successfully..")
+                save_phr = _("save")
+                context = {'form': form,
+                            'save_phr': save_phr,
+                            'baslik': baslik,
+                            }
+                return render(request, 'kullanici/kullanici_sifre.html', context)
+
+            else:
+                print(" nah valid............")
+                save_phr = _("save")
+                baslik = ""
+                context = {'form': form,
+                            'save_phr': save_phr,
+                            'baslik': baslik,
+                            }
+                return render(request, 'kullanici/kullanici_sifre.html', context)
+
+        # if a GET (or any other method) we'll create a blank form
+        else:
+            print("parola form get ++++++++++++++++++++++++++++++++++")
+            kullanici = request.user
+            sirket_adi = kullanici.profile.sirket
+            if sirket_adi == None:
+                mesaj = _("Company is not defined for admin user...please correct...")
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+            form = ParolaForm()
+            form.fields["kullanici_no"].initial = request.user.id
+            save_phr = _("save")
+            baslik = ""
+            context = {'form': form,
+                        'save_phr': save_phr,
+                        'baslik': baslik,
+                        }
+            return render(request, 'kullanici/kullanici_sifre.html', context)
+
+
+#-----------------------------------------------------------------------------------
 
 
 @login_required

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-18 21:52+0300\n"
+"POT-Creation-Date: 2018-11-20 18:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,20 +18,198 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: islem/forms.py:550 islem/forms.py:568 islem/forms.py:586 islem/forms.py:602
-msgid "zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. "
-msgstr ""
+#: islem/forms.py:51 islem/forms.py:77 islem/models.py:36 islem/models.py:52
+msgid "Operation"
+msgstr "Operasyon"
 
-#: islem/forms.py:628
-msgid "zamanları ss:dd:ss (saat : dakika : saniye) olarak giriniz.. "
-msgstr ""
+#: islem/forms.py:52 islem/models.py:37
+msgid "Technic"
+msgstr "Teknik"
 
-#: islem/models.py:343 islem/models.py:356
+#: islem/forms.py:53 islem/models.py:38
+msgid "Project Management"
+msgstr "Proje Yönetimi"
+
+#: islem/forms.py:57 islem/models.py:20
+msgid "Yes"
+msgstr "Evet"
+
+#: islem/forms.py:58 islem/models.py:21
+msgid "No"
+msgstr "Hayır"
+
+#: islem/forms.py:62 islem/models.py:62
+msgid "Monday"
+msgstr "Pazartesi"
+
+#: islem/forms.py:63 islem/models.py:63
+msgid "Tuesday"
+msgstr "Salı"
+
+#: islem/forms.py:64 islem/models.py:64
+msgid "Wednesday"
+msgstr "Çarşamba"
+
+#: islem/forms.py:65 islem/models.py:65
+msgid "Thursday"
+msgstr "Perşembe"
+
+#: islem/forms.py:66 islem/models.py:66
+msgid "Friday"
+msgstr "Cuma"
+
+#: islem/forms.py:67 islem/models.py:67
+msgid "Saturday"
+msgstr "Cumartesi"
+
+#: islem/forms.py:68 islem/models.py:68
+msgid "Sunday"
+msgstr "Pazar"
+
+#: islem/forms.py:73 islem/models.py:48
+msgid "Planned"
+msgstr "Planlı"
+
+#: islem/forms.py:74 islem/models.py:49
+msgid "Routine"
+msgstr "Rutin"
+
+#: islem/forms.py:75 islem/models.py:50
+msgid "Ordered"
+msgstr "Sıralı"
+
+#: islem/forms.py:76 islem/models.py:51
+msgid "Checklist"
+msgstr "Kontrol listesi"
+
+#: islem/forms.py:81 islem/models.py:56
+msgid "Ten based"
+msgstr "Onluk"
+
+#: islem/forms.py:82 islem/models.py:57
+msgid "Five based"
+msgstr "Beşlik"
+
+#: islem/forms.py:83 islem/models.py:58
+msgid "Two based"
+msgstr "İkilik"
+
+#: islem/forms.py:526 islem/forms.py:544 islem/forms.py:562 islem/forms.py:578
+#: islem/forms.py:604
+msgid "please enter the time in hh:mm:ss format (hour : minute : second) "
+msgstr "zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.."
+
+#: islem/forms.py:607
+msgid "Place name is missing.."
+msgstr "Yer adı girilmemiş.."
+
+#: islem/forms.py:1243
+msgid "User Id"
+msgstr "Kullanıcı-Adı"
+
+#: islem/forms.py:1244
+msgid "User Name"
+msgstr "Adı"
+
+#: islem/forms.py:1245
+msgid "User Surname"
+msgstr "Soyadı"
+
+#: islem/forms.py:1247
+msgid "Email address"
+msgstr "Eposta adresi"
+
+#: islem/forms.py:1248
+msgid "Please enter address."
+msgstr "lütfen adres giriniz."
+
+#: islem/forms.py:1249
+msgid "Malformed address. Please correct."
+msgstr "lütfen düzeltin, eposta değil."
+
+#: islem/forms.py:1250
+msgid "Company"
+msgstr "Şirket"
+
+#: islem/forms.py:1251
+msgid "Project"
+msgstr "Proje"
+
+#: islem/forms.py:1252
+msgid "Auditor"
+msgstr "Denetçi"
+
+#: islem/forms.py:1253
+msgid "Audit Supervisor"
+msgstr "Denetim Yöneticisi"
+
+#: islem/forms.py:1254
+msgid "Project Area Head"
+msgstr "Proje Alan Şefi"
+
+#: islem/forms.py:1255
+msgid "Project Technical Manager"
+msgstr "Proje Teknik Yöneticisi"
+
+#: islem/forms.py:1256
+msgid "Project Manager"
+msgstr "Proje Yöneticisi"
+
+#: islem/forms.py:1257
+msgid "Projects Central Manager"
+msgstr "Projeler Merkez Yöneticisi"
+
+#: islem/forms.py:1258
+msgid "Employer Project Manager"
+msgstr "İşveren Proje Yöneticisi"
+
+#: islem/forms.py:1259
+msgid "Password"
+msgstr "Parola"
+
+#: islem/forms.py:1260
+msgid "Password repeat"
+msgstr "Parola tekrar"
+
+#: islem/forms.py:1309
+msgid "this username is used before!"
+msgstr "bu kullanıcı adı daha önce kullanılmış!"
+
+#: islem/forms.py:1313
+msgid "this email is used before!"
+msgstr "bu eposta daha önce kullanılmış!"
+
+#: islem/models.py:26
+msgid "Open"
+msgstr "Açık"
+
+#: islem/models.py:27
+msgid "Closed"
+msgstr "Kapalı"
+
+#: islem/models.py:31
+msgid "Active Worker"
+msgstr "Aktif çalışan"
+
+#: islem/models.py:32
+msgid "Left"
+msgstr "Ayrıldı"
+
+#: islem/models.py:42
+msgid "Auditor Company"
+msgstr "Denetçi Firma"
+
+#: islem/models.py:43
+msgid "Project Company"
+msgstr "Proje Firması"
+
+#: islem/models.py:348 islem/models.py:361
 msgid "Date"
-msgstr ""
+msgstr "Tarih"
 
-#: islem/templates/kullanici/tercume.html:26
-#: islem/templates/kullanici/tercume.html:34
+#: islem/templates/kullanici/kullanici_ekle.html:98
+#: islem/templates/kullanici/tercume.html:27
+#: islem/templates/kullanici/tercume.html:35
 msgid "hello world.....  "
 msgstr "merhaba dünya.....  "
 
@@ -41,8 +219,16 @@ msgstr "Profiliniz başarıyla güncellendi.!"
 
 #: islem/views.py:3135
 msgid "Please correct the error below."
-msgstr ""
+msgstr "Lütfen yukarıdaki hatayı düzeltin."
 
-#: islem/views.py:4577 islem/views.py:4654
+#: islem/views.py:4579
 msgid "First i18n trial.."
 msgstr "İlk i18n sayfası.."
+
+#: islem/views.py:4593
+msgid "second i18n trial.."
+msgstr "İkinci i18n sayfası.."
+
+#: islem/views.py:4600 islem/views.py:4654
+msgid "Company is not defined for admin user...please correct..."
+msgstr "Admin kullanıcısı için şirket tanımlı değil..lütfen düzeltin.."

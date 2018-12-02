@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 #from datetime import datetime, date
 import datetime
-from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import requests
@@ -10,58 +9,64 @@ from gm2m import GM2MField
 from decimal import Decimal
 from django import forms
 #from webservice.models  import yer_updown
+from django.utils.translation import get_language
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
+from django.contrib.auth.decorators import login_required
+
+
 
 EVETHAYIR = (
-('E', 'Evet'),
-('H', 'Hayır'),
+('E', _lazy('Yes')),
+('H', _lazy('No')),
 )
 
+
 ACIKKAPANDI = (
-('A', 'Açık'),
-('K', 'Kapandı'),
+('A', _lazy('Open')),
+('K', _lazy('Closed')),
 )
 
 AKTIFCALISAN = (
-('E', 'Aktif Çalışan'),
-('H', 'Ayrıldı'),
+('E', _lazy('Active Worker')),
+('H', _lazy('Left')),
 )
 
 OPERASYONDIGER = (
-('O', 'Operasyon'),
-('T', 'Teknik'),
-('D', 'Proje Yönetim'),
+('O', _lazy('Operation')),
+('T', _lazy('Technic')),
+('D', _lazy('Project Management')),
 )
 
 DENETCIPROJE = (
-('D', 'Denetçi'),
-('P', 'Proje'),
+('D', _lazy('Auditor Company')),
+('P', _lazy('Project Company')),
 )
+
 
 RUTINPLANLI = (
-('P', 'Planlı'),
-('R', 'Rutin'),
-('S', 'Sıralı'),
-('C', 'Checklist'),
-('D', 'İşlem'),
+('P', _lazy('Planned')),
+('R', _lazy('Routine')),
+('S', _lazy('Ordered')),
+('C', _lazy('Checklist')),
+('D', _lazy('Operation')),
 )
 
-
 PUANLAMA_TURU = (
-('A', 'Onluk'),
-('B', 'Beşlik'),
-('C', 'İkilik'),
+('A', _lazy('Ten based')),
+('B', _lazy('Five based')),
+('C', _lazy('Two based')),
 )
 
 GUNLER = (
-('Pzt', 'Pazartesi'),
-('Sal', 'Salı'),
-('Çar', 'Çarşamba'),
-('Per', 'Perşembe'),
-('Cum', 'Cuma'),
-('Cmt', 'Cumartesi'),
-('Paz', 'Pazar'),
+('Pzt', _lazy('Monday')),
+('Sal', _lazy('Tuesday')),
+('Çar', _lazy('Wednesday')),
+('Per', _lazy('Thursday')),
+('Cum', _lazy('Friday')),
+('Cmt', _lazy('Saturday')),
+('Paz', _lazy('Sunday')),
 )
-
 
 
 ONLUK = (
@@ -138,9 +143,8 @@ def create_user_profile(sender, instance, created, **kwargs):
     #profile_created = False
     if created:
         profile_created = True
-        print("işte profile nesnesi created...")
         Profile.objects.create(user=instance)
-
+        print("profile created >>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 
 @receiver(post_save, sender=User)
@@ -461,14 +465,6 @@ class sonuc_operator(models.Model):
     def __str__(self):
         return(self.operator.username)
 
-"""
-class sms_donen(models.Model):
-    kod = models.CharField(max_length=2)
-    ek_kod = models.CharField(max_length=20)
-    timestamp = models.DateTimeField(default=datetime.datetime.now())
-    def __str__(self):
-        return '%s-%s-%s' % (self.kod, self.ek_kod, self.timestamp)
-"""
 
 
 class acil(models.Model):

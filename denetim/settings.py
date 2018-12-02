@@ -185,5 +185,11 @@ ADR_LOCAL = '127.0.0.1:7000'
 #ADR_LOCAL = '37.148.210.226'
 #ADR_LOCAL = '172.104.239.247'
 
+
+HTTP_LOC = '127.0.0.0:7000'
+#HTTP_LOC = '37.148.210.226'
+#HTTP_LOC = 'http://ez-manage.net'
+
+
 USER_GLB = 'ez-admin'
 PASW_GLB = 'ezadmincheck'

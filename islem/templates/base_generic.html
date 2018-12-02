@@ -59,6 +59,59 @@ background-color: #ececec;
     background-color: #f5ca0a;
 }
 
+/* ikinci dropdown ayarlar için..... */
+
+.drpbtn {
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+/*
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #2980B9;
+}
+*/
+
+.drpdwn {
+    position: relative;
+    display: inline-block;
+}
+
+.drpdwn-cntnt {
+    display: none;
+    text-align: left;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.drpdwn-cntnt a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.drpdwn a:hover {background-color: #ddd;}
+
+.show {display: block;}
+
+
+
+/* birinci dropdown bildirim  için.....*/
+
+
 
 .dropdown {
     float: left;
@@ -167,13 +220,16 @@ span.num {
 
 </style>
 
-{% load i18n %}
 
 </head>
 
 
 
 <body>
+
+{% load i18n %}
+{% load l10n %}
+
 
 
 
@@ -190,7 +246,6 @@ span.num {
        });
    });
 </script>
-
 
 
 
@@ -327,7 +382,7 @@ span.num {
                  <li>
                   <a href="#pageSubmenu9" data-toggle="collapse" aria-expanded="false">Kullanıcı İşlemleri</a>
                    <ul class="collapse list-unstyled" id="pageSubmenu9">
-                      <li><a href="/islem/tercume">tercume</a></li>                   
+                      <li><a href="/islem/tercume">tercume</a></li>
                       <li><a href="/islem/kullanici_ekle">Kullanıcı Ekle</a></li>
                       <li><a href="/islem/kullanici_duzenle">Kullanıcı Düzenle</a></li>
                       <li><a href="/islem/kullanici_kaldir">Kullanıcı Kaldır</a></li>
@@ -401,7 +456,7 @@ span.num {
                                 {% endif %}
 
 
-                                {% if user.profile.isletme_projeyon == "E" or user.profile.opr_proje_yon == "E" or user.profile.opr_alan_sefi == "E" %}
+                                {% if user.profile.isletme_projeyon == "E" or user.profile.opr_proje_yon == "E" or user.profile.opr_alan_sefi == "E" or user.profile.opr_teknik == "E" %}
                                 <div class="col-md-2 c" ><a class="dropbtn2 middler" onclick="myFunction()">Bildirim(<span id="mynum"></span>)<i class="fa fa-caret-down"></i> </a>
                                    <div class="dropdown-content2" id="myDropdown2">
                                    </div>
@@ -413,10 +468,17 @@ span.num {
 
 
 
-                             {% if user.is_staff %}
+                             {% if user.is_superuser %}
                              <div class="col-md-2 c"><a class="middler" href="/admin/"><font color="white">Ayarlar</font></a></div>
                              {% else %}
-                             <div class="col-md-2 c"> </div>
+                             <div class="col-md-2 c">
+                               <a class="drpbtn middler" onclick="ayar_drpdwn()"> Dropdown <i class="fa fa-caret-down"></i> </a>
+                               <!-- <button onclick="ayar_drpdwn()" class="drpbtn">Dropdown</button> -->
+                                  <div id="myDrpdwn" class="drpdwn-cntnt">
+                                    <a  href="{% url 'kullanici_resim'%}">Profil Resmi Yükle</a>
+                                    <a  href="{% url 'kullanici_sifre'%}">Parola Değiştir</a>
+                                  </div>
+                             </div>
                              {% endif %}
 
                             <div class="col-md-3 c"><a class="middler" href="{% url 'logout'%}?next={{request.path}}"><font color="white"><span class="glyphicon glyphicon-log-out"></span> Çıkış</font></a></div>
@@ -446,14 +508,39 @@ span.num {
       document.getElementById("myDropdown2").classList.toggle("show");
       }
       // Close the dropdown if the user clicks outside of it
-      window.onclick = function(e) {
-        if (!e.target.matches('.dropbtn2')) {
-          var myDropdown = document.getElementById("myDropdown2");
-            if (myDropdown.classList.contains('show')) {
-              myDropdown.classList.remove('show');
-            }
-          }
-        }
+        window.onclick = function(e) {
+            if (!e.target.matches('.dropbtn2')) {
+              var myDropdown = document.getElementById("myDropdown2");
+                if (myDropdown.classList.contains('show')) {
+                  myDropdown.classList.remove('show');
+                }
+              }  /* endif ....*/
+
+
+            if (!e.target.matches('.drpbtn')) {
+              var dropdowns = document.getElementsByClassName("drpdwn-cntnt");
+              var i;
+              for (i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                  openDropdown.classList.remove('show');
+                }
+              }
+            }  /*  endif .... */
+
+       }
+  </script>
+
+
+  <script>
+  /* When the user clicks on the button,
+  toggle between hiding and showing the dropdown content */
+  function ayar_drpdwn() {
+      document.getElementById("myDrpdwn").classList.toggle("show");
+  }
+
+  // Close the dropdown if the user clicks outside of it
+
   </script>
 
 

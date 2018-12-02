@@ -1,4 +1,4 @@
-""
+
 from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil, sonuc_resim, eleman, User
@@ -11,7 +11,6 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from datetime import datetime
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from bootstrap_datepicker.widgets import DatePicker
 import datetime
@@ -26,7 +25,7 @@ import datetime
 from datetime import date, datetime
 from django.template.loader import render_to_string
 import requests
-#from django.core.exceptions import ValidationError
+
 from django import forms
 from .models import sonuc_detay
 from webservice.models import yer_updown
@@ -43,41 +42,49 @@ from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
 from django.urls import reverse
 from django.utils.translation import get_language
-
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy  as _lazy
 from django.utils.encoding import force_text
+from django.contrib.auth import password_validation
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
+
 
 OPERASYONDIGER = (
-('O', 'Operasyon'),
-('T', 'Teknik'),
-('D', 'Proje Yönetim'),
+('O', _lazy('Operation')),
+('T', _lazy('Technic')),
+('D', _lazy('Project Management')),
 )
 
 EVETHAYIR = (
-('E', 'Evet'),
-('H', 'Hayır'),
+('E', _lazy('Yes')),
+('H', _lazy('No')),
 )
 
 GUNLER = (
-('Pzt', 'Pazartesi'),
-('Sal', 'Salı'),
-('Çar', 'Çarşamba'),
-('Per', 'Perşembe'),
-('Cum', 'Cuma'),
-('Cmt', 'Cumartesi'),
-('Paz', 'Pazar'),
+('Pzt', _lazy('Monday')),
+('Sal', _lazy('Tuesday')),
+('Çar', _lazy('Wednesday')),
+('Per', _lazy('Thursday')),
+('Cum', _lazy('Friday')),
+('Cmt', _lazy('Saturday')),
+('Paz', _lazy('Sunday')),
 )
 
 
 RUTINPLANLI = (
-('P', 'Planlı'),
-('R', 'Rutin'),
-('S', 'Sıralı'),
+('P', _lazy('Planned')),
+('R', _lazy('Routine')),
+('S', _lazy('Ordered')),
+('C', _lazy('Checklist')),
+('D', _lazy('Operation')),
 )
 
 PUANLAMA_TURU = (
-('A', 'Onluk'),
-('B', 'Beşlik'),
-('C', 'İkilik'),
+('A', _lazy('Ten based')),
+('B', _lazy('Five based')),
+('C', _lazy('Two based')),
 )
 
 ONLUK = (
@@ -187,33 +194,6 @@ class Den_Olustur_Form(forms.Form):
 
 
 
-"""
-    def media(self):
-        media = super(Den_Olustur_Form, self).media
-        extend = False
-        css = {
-            "screen": (
-                'admin/css/vendor/select2/select2.css',
-                'admin/css/autocomplete.css',
-                'autocomplete_light/select2.css',
-            )
-        }
-        js = [
-            #'admin/js/vendor/jquery/jquery.js',
-            'autocomplete_light/jquery.init.js',
-            'admin/js/vendor/select2/select2.full.js',
-            'autocomplete_light/autocomplete.init.js',
-            'autocomplete_light/forward.js',
-            'autocomplete_light/select2.js',
-            #'admin/js/vendor/select2/i18n/tr.js',
-            #'autocomplete_light/vendor/select2/src/js/select2/i18n/tr.js',
-            'autocomplete_light/jquery.post-setup.js',
-            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
-        ]
-        media._css = css
-        media._js = js
-        return media
-"""
 
 
 class Qrcode_Form(forms.Form):
@@ -547,7 +527,7 @@ class GunDenForm(forms.ModelForm):
             'zaman' : "Saat giriniz",
         }
         help_texts = {
-            'gun': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+            'gun': _("please enter the time in hh:mm:ss format (hour : minute : second) "),
         }
 
     def clean(self):
@@ -565,7 +545,7 @@ class GunForm(forms.ModelForm):
             'zaman' : "Saat giriniz",
         }
         help_texts = {
-            'gun': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+            'gun': _("please enter the time in hh:mm:ss format (hour : minute : second) "),
         }
 
     def clean(self):
@@ -583,7 +563,7 @@ class SaatDenForm(forms.ModelForm):
             'zaman' : "Saat giriniz:",
         }
         help_texts = {
-            'zaman': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+            'zaman': _("please enter the time in hh:mm:ss format (hour : minute : second) "),
         }
     def clean(self):
         cleaned_data = super(SaatDenForm, self).clean()
@@ -599,7 +579,7 @@ class SaatForm(forms.ModelForm):
             'zaman' : "Saat giriniz:",
         }
         help_texts = {
-            'zaman': _('zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+            'zaman': _("please enter the time in hh:mm:ss format (hour : minute : second) "),
         }
     def clean(self):
         cleaned_data = super(SaatForm, self).clean()
@@ -625,10 +605,10 @@ class YerForm(forms.ModelForm):
             'opr_sure': 'Öngörülen Operasyon Süresi:  ',
         }
         help_texts = {
-            'mac_no': _('zamanları ss:dd:ss (saat : dakika : saniye) olarak giriniz.. '),
+            'mac_no': _('please enter the time in hh:mm:ss format (hour : minute : second) '),
         }
         error_messages = {
-            'yer_adi': { 'required': 'This writer name is too long' },
+            'yer_adi': { 'required': _('Place name is missing..') },
         }
 
 
@@ -744,19 +724,7 @@ class RfidForm(forms.ModelForm):
         return cleaned_data
 
 
-        """
-        qs =User.objects.none()
-        if profile_obj:
-            for prof in profile_obj:
-                print("profile id..", prof.id)
-                # burada çözmek lazım....
-                us_id = prof.user.id
-                print("user id kaç bulundu...", us_id)
-                qx = User.objects.filter(id=us_id).first()
-                print("qx...", qx)
-                qs = qs.union(qx)
-        print("qs filtre öncesi..", qs)
-        """
+
 
 
 class ElemanForm(forms.ModelForm):
@@ -1260,26 +1228,28 @@ class NebuForm(forms.Form):
         print("ne bu...:", cc_nebu)
 
 
-from django.core.validators import EmailValidator
+
 
 class KullaniciForm(forms.Form):
-    pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}), required=False)
-    adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
-    soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
+    pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput(), )
+    kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}),label = _lazy("User Id"), localize=True,  required=False)
+    adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), label = _lazy("User Name"), localize=True, required=False)
+    soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), label =_lazy("User Surname"), localize=True, required=False)
     #eposta = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), required=False)
-    eposta = forms.EmailField()
-    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),required=False)
-    proje = forms.ModelChoiceField(queryset=proje.objects.all(),required=False)
-    denetci = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetci", initial="H")
-    dgy = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Denetim Gözetmeni", initial="H")
-    opr_alan_sefi = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Alan Şefi", initial="H")
-    opr_teknik = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Teknik Yetkili", initial="H")
-    opr_proje_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Proje Yöneticisi", initial="H")
-    opr_merkez_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="Projeler Merkez Yöneticisi", initial="H")
-    isletme_projeyon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, label="İşletme Proje Yöneticisi", initial="H")
-    passwd_1 = forms.CharField(widget=forms.PasswordInput, required=False)
-    passwd_2 = forms.CharField(widget=forms.PasswordInput, required=False)
+    eposta = forms.EmailField(label = _lazy("Email address"),
+                              error_messages = {'required' : _lazy("Please enter address."),
+                                                'invalid'  : _lazy("Malformed address. Please correct."),})
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(), label = _lazy("Company"), localize=True, required=False)
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(), label = _lazy("Project"), localize=True, required=False)
+    denetci = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Auditor"), initial="H")
+    dgy = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Audit Supervisor"), initial="H")
+    opr_alan_sefi = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Project Area Head"), initial="H")
+    opr_teknik = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Project Technical Manager"), initial="H")
+    opr_proje_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Project Manager"), initial="H")
+    opr_merkez_yon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Projects Central Manager"), initial="H")
+    isletme_projeyon = forms.ChoiceField(choices=EVETHAYIR, widget=forms.Select, localize=True, label = _lazy("Employer Project Manager"), initial="H")
+    passwd_1 = forms.CharField(widget=forms.PasswordInput, required=False, localize=True, label = _lazy("Password"))
+    passwd_2 = forms.CharField(widget=forms.PasswordInput, required=False, localize=True, label = _lazy("Password repeat"))
 
 
     def __init__(self, *args, **kwargs):
@@ -1325,24 +1295,49 @@ class KullaniciForm(forms.Form):
         print("cc işletme proje yön", cc_isletme_projeyon)
         print("cc passw 1", cc_passwd_1)
         print("cc passw 2", cc_passwd_2)
-        """
-        validate_email = EmailValidator()
-        print("validate email....", validate_email(cc_eposta))
 
-        if not(validate_email(cc_eposta)):
-            raise forms.ValidationError("geçerli bir eposta adresi giriniz...")
-        else:
-            print("eposta adresi doğru....")
-    
-        try:
-            validate_email(eposta)
-        except ValidationError:
-            raise forms.ValidationError('geçerli bir eposta adresi giriniz..')
-        """
+        user_obj = User.objects.filter(username=cc_kullanici_adi)
+        if user_obj:
+            raise forms.ValidationError(_("this username is used before!"))
+        user_obj = User.objects.filter(email=cc_eposta)
+        if user_obj:
+            raise forms.ValidationError(_("this email is used before!"))
+        if validate_password(cc_passwd_1) is not None:
+            raise forms.ValidationError(_(password_validators_help_texts()), code='pw_invalid')
 
         return self.cleaned_data
 
 
+
+
+class ProfilResimForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('profil_resmi',)
+        labels = {
+            'profil_resmi': 'Profil Resmi',
+        }
+
+
+
+
+class ParolaForm(forms.Form):
+    kullanici_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    passwd_1 = forms.CharField(widget=forms.PasswordInput, required=False, localize=True, label = _lazy("Password"))
+    passwd_2 = forms.CharField(widget=forms.PasswordInput, required=False, localize=True, label = _lazy("Password repeat"))
+
+    def clean(self):
+        cleaned_data = super(ParolaForm, self).clean()
+        cc_kullanici_no = cleaned_data.get("kullanici_no")
+        cc_passwd_1 = cleaned_data.get("passwd_1")
+        cc_passwd_2 = cleaned_data.get("passwd_2")
+        print("cc kullanici no", cc_kullanici_no)
+        print("cc passw 1", cc_passwd_1)
+        print("cc passw 2", cc_passwd_2)
+        user_nesne = User.objects.get(id=cc_kullanici_no)
+        if validate_password(cc_passwd_1, user=user_nesne) is not None:
+            raise forms.ValidationError(_(password_validators_help_texts()), code='pw_invalid')
+        return self.cleaned_data
 
 
 

@@ -1,0 +1,58 @@
+
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+    {% load i18n %}
+    {% load l10n %}
+
+
+
+
+
+
+
+<script>
+
+    function gonder_Func() {
+    alert("burata geldi..  gonder func..");
+    var fuData = document.getElementById('id_profil_resmi');
+    var FileUploadPath = fuData.value;
+    alert("fupldpath  "+FileUploadPath);
+    if (FileUploadPath == '') {
+        alert("Please upload an image");}
+    else {
+        var Extension = FileUploadPath.substring(FileUploadPath.lastIndexOf('.') + 1).toLowerCase();
+        alert("extension  "+Extension);
+        if (Extension == "png" || Extension == "bmp" || Extension == "jpeg" || Extension == "jpg")
+              {   if (fuData.files && fuData.files[0]) {
+                      var size = fuData.files[0].size;
+                      alert("büyüklük "+size);
+                      var MAX_SIZE = 100000;
+                      if(size > MAX_SIZE){
+                          alert("Maximum file size exceeds - 100kB");
+                          return;}
+                      else{ document.getElementById("my_Form").submit(); }
+                   }
+            }   /*  end if extension */
+        else {alert("Photo only allows file types of PNG, JPG, JPEG and BMP. ");}  /* end else extension */
+    }
+  }
+
+</script>
+
+
+
+<form id="my_Form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <!-- <button type="submit">Upload</button>  -->
+    <input type="button" value="{%  trans "save" %}" onclick="gonder_Func();" >
+</form>
+
+<!-- <p><a href="{% url 'index' %}">{%  trans "return to home" %}</a></p>  -->
+
+{% endblock %}

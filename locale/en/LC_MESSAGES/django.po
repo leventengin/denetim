@@ -1,0 +1,57 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-19 12:11+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: islem/forms.py:550 islem/forms.py:568 islem/forms.py:586 islem/forms.py:602
+msgid "zamanı ss:dd:ss (saat : dakika : saniye) olarak giriniz.. "
+msgstr ""
+
+#: islem/forms.py:628
+msgid "zamanları ss:dd:ss (saat : dakika : saniye) olarak giriniz.. "
+msgstr ""
+
+#: islem/models.py:343 islem/models.py:356
+msgid "Date"
+msgstr ""
+
+#: islem/templates/kullanici/kullanici_ekle.html:97
+#: islem/templates/kullanici/tercume.html:27
+#: islem/templates/kullanici/tercume.html:35
+msgid "hello world.....  "
+msgstr ""
+
+#: islem/views.py:3132
+msgid "Your profile was successfully updated!"
+msgstr ""
+
+#: islem/views.py:3135
+msgid "Please correct the error below."
+msgstr ""
+
+#: islem/views.py:4579
+msgid "First i18n trial.."
+msgstr ""
+
+#: islem/views.py:4593
+msgid "second i18n trial.."
+msgstr ""
+
+#: islem/views.py:4600 islem/views.py:4654
+msgid "Company is not defined for admin user...please correct..."
+msgstr ""

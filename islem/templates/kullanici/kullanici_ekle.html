@@ -6,20 +6,11 @@
 {% block content %}
 
 
-<style type="text/css">
-    label {
-        font-weight: normal  !important; /* overwrites any other rules */
-    }
-</style>
-
-
-
 
 <script>
   function gonder_Func() {
-      alert("buraya  geldi...  gönder func..........");
+      //alert("buraya  geldi...  gönder func..........");
       var kullanici_adi = document.getElementById("id_kullanici_adi").value;
-      alert("kullanıcı adı..."+kullanici_adi);
       var adi = document.getElementById("id_adi").value;
       var soyadi = document.getElementById("id_soyadi").value;
       var eposta = document.getElementById("id_eposta").value;
@@ -34,7 +25,7 @@
       var isletme_projeyon = document.getElementById("id_isletme_projeyon").value;
       var passwd_1 = document.getElementById("id_passwd_1").value;
       var passwd_2 = document.getElementById("id_passwd_2").value;
-
+      //alert("kullanıcı adı..."+kullanici_adi);
 
         if (kullanici_adi == "")
             {
@@ -88,150 +79,22 @@
 
 
 
-<script>
-  function tipisecFunction() {
-      var response = '';
-      var js_bolumler = [];
-      var js_takipciler = [];
-      /* liste = document.getElementById("id_bolum").value; */
-      $.ajaxSettings.traditional = true;
-      $("#id_bolum :selected").each(function(){
-          js_bolumler.push($(this).val());
-      });
-      $("#id_takipciler :selected").each(function(){
-          js_takipciler.push($(this).val());
-      });
-      var js_denetim_adi = document.getElementById("id_denetim_adi").value;
-      var js_proje = document.getElementById("id_proje").value;
-      var x = document.getElementById("id_rutin_planli_0").checked;
-      var y = document.getElementById("id_rutin_planli_1").checked;
-      if (x == true)
-          { var js_rutin_planli = "P";
-             //alert(" js rutin planlı ...p  "+js_rutin_planli);
-           }
-      else { if (y == true)
-              { var js_rutin_planli = "R";
-                //alert(" js rutin planlı...r "+js_rutin_planli);
-              }
-            else { var js_rutin_planli ="";
-                    //alert(" js rutin planlı...boş "+js_rutin_planli);
-            }}
-      var js_denetci = document.getElementById("id_denetci").value;
-      var js_tipi = document.getElementById("id_tipi").value;
-      var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
-      var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
-      var js_aciklama = document.getElementById("id_aciklama").value;
-      //alert(" bölümler..." + js_bolumler);
-      //alert("js rutin planlı ..."+js_rutin_planli);
-      console.log(js_bolumler);
-      $.ajax({
-        url : "tipisec_bolum_js/",
-        type : "GET",
-        dataType: "text",
-        data : {
-          'js_bolumler' : js_bolumler,
-          'js_takipciler' : js_takipciler,
-          'js_denetim_adi' : js_denetim_adi,
-          'js_proje' : js_proje,
-          'js_rutin_planli' : js_rutin_planli,
-          'js_denetci' : js_denetci,
-          'js_tipi' : js_tipi,
-          'js_hedef_baslangic' : js_hedef_baslangic,
-          'js_hedef_bitis' : js_hedef_bitis,
-          'js_aciklama' : js_aciklama,
-         },
-        success: function() {
-            //alert("tipi seçimi başarılı...");
-            window.location.reload();
-            },
-        failure: function() {
-            alert("hata var....veri aktarılamadı...");
-            }
-        });  /* ajax kapa...*/
-  }
-</script>
 
 
 
-  <script>
-    function detaysecFunction() {
-        var response = '';
-        var js_bolumler = [];
-        var js_takipciler = [];
-        /* liste = document.getElementById("id_bolum").value; */
-        $.ajaxSettings.traditional = true;
-        $("#id_bolum :selected").each(function(){
-            js_bolumler.push($(this).val());
-        });
-        $("#id_takipciler :selected").each(function(){
-            js_takipciler.push($(this).val());
-        });
-        var js_denetim_adi = document.getElementById("id_denetim_adi").value;
-        var js_proje = document.getElementById("id_proje").value;
-        var x = document.getElementById("id_rutin_planli_0").checked;
-        var y = document.getElementById("id_rutin_planli_1").checked;
-        if (x == true)
-            { var js_rutin_planli = "P";
-               //alert(" js rutin planlı ...p  "+js_rutin_planli);
-             }
-        else { if (y == true)
-                { var js_rutin_planli = "R";
-                  //alert(" js rutin planlı...r "+js_rutin_planli);
-                }
-              else { var js_rutin_planli ="";
-                      //alert(" js rutin planlı...boş "+js_rutin_planli);
-              }}
-        var js_denetci = document.getElementById("id_denetci").value;
-        var js_tipi = document.getElementById("id_tipi").value;
-        var js_hedef_baslangic = document.getElementById("id_hedef_baslangic").value;
-        var js_hedef_bitis = document.getElementById("id_hedef_bitis").value;
-        var js_aciklama = document.getElementById("id_aciklama").value;
-        //alert(" bölümler..." + js_bolumler);
-        console.log(js_bolumler);
-        $.ajax({
-          url : "detaylarsec_bolum_js/",
-          type : "GET",
-          dataType: "text",
-          data : {
-            'js_bolumler' : js_bolumler,
-            'js_takipciler' : js_takipciler,
-            'js_denetim_adi' : js_denetim_adi,
-            'js_proje' : js_proje,
-            'js_rutin_planli' : js_rutin_planli,
-            'js_denetci' : js_denetci,
-            'js_tipi' : js_tipi,
-            'js_hedef_baslangic' : js_hedef_baslangic,
-            'js_hedef_bitis' : js_hedef_bitis,
-            'js_aciklama' : js_aciklama,
-           },
-          success: function() {
-              //alert("bölüm seçimi başarılı...");
-              window.location.reload();
-              },
-          failure: function() {
-              alert("hata var....veri aktarılamadı...");
-              }
-          });  /* ajax kapa...*/
-    }
-  </script>
+    {% load i18n %}
+    {% load l10n %}
 
+    <!--
+   {% get_current_language as LANGUAGE_CODE %}
+   </br> Current language: {{ LANGUAGE_CODE }} </br>
+   <h4> {%  trans  "hello world.....  " %} </h4>
+   <h4> {{ terc }} </h4> </br>
+   -->
 
-
-  {% load i18n %}
-
-  {% get_current_language as LANGUAGE_CODE %}
-   Current language: {{ LANGUAGE_CODE }}
-
-
-
-
-<h4> {%  tercume  %} </h4>
-
-
-
-    <p> </br> </p>
-
-
+    {% localize on %}
+    </br>
+    {{ baslik}}  </br> </br>
 
             <form id="my_Form" onsubmit="return gonder_Func()" method="post">
               {% csrf_token %}
@@ -380,7 +243,7 @@
             </form>
 
 
-
+            {% endlocalize %}
 
 </html>
 

@@ -182,9 +182,10 @@ urlpatterns = [
     #re_path(r'^kullanici_duzenle/$', views.kullanici_duzenle, name='kullanici_duzenle'),
     #re_path(r'^kullanici_kaldir/$', views.kullanici_kaldir, name='kullanici_kaldir'),
     #re_path(r'^kullanici_aktif/$', views.kullanici_aktif, name='kullanici_aktif'),
-    #re_path(r'^kullanici_resim/$', views.kullanici_resim, name='kullanici_resim'),
-    #re_path(r'^kullanici_sifre/$', views.kullanici_sifre, name='kullanici_sifre'),
+    re_path(r'^kullanici_resim/$', views.kullanici_resim, name='kullanici_resim'),
+    re_path(r'^kullanici_sifre/$', views.kullanici_sifre, name='kullanici_sifre'),
     #re_path(r'^ipy_ata/$', views.ipy_ata, name='ipy_ata'),
+
 
 #-------------------------------------------------------------------------------------------------
     # grup re_pathleri aşağıda....

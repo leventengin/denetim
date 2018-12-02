@@ -1,0 +1,95 @@
+
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+
+<script>
+  function gonder_Func() {
+      //alert("buraya  geldi...  gönder func..........");
+      var passwd_1 = document.getElementById("id_passwd_1").value;
+      var passwd_2 = document.getElementById("id_passwd_2").value;
+      //alert("kullanıcı adı..."+kullanici_adi);
+
+        if (passwd_1 == "")
+            {
+              alert("parola - 1 girmelisiniz...!");
+              return false;
+            }
+
+        if (passwd_2 == "")
+            {
+              alert("parola - 2 girmelisiniz...!");
+              return false;
+            }
+
+        if (passwd_1 != passwd_2)
+            {
+              alert("parolalar aynı değil...!");
+              return false;
+            }
+
+        document.getElementById("my_Form").submit();
+
+  }
+</script>
+
+
+
+
+    {% load i18n %}
+    {% load l10n %}
+    {% localize on %}
+
+    <h3> <b>{% trans "Change Password" %}</b></h3></br>
+
+    {{ baslik}}  </br> </br>
+
+            <form id="my_Form" onsubmit="return gonder_Func()" method="post">
+              {% csrf_token %}
+
+              {{ form.non_field_errors }}
+
+              {{ form.source.errors }}
+              {{ form.source }}
+
+              <table border="0">
+
+                <tr>
+                  <td>
+                    {{ form.kullanici_no.errors }}
+                    {{ form.kullanici_no }}
+                  </td>
+                </tr>
+
+                  <tr>
+                    <th>{{ form.passwd_1.label_tag }}</th>
+                    <td>
+                      {{ form.passwd_1.errors }}
+                      {{ form.passwd_1 }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.passwd_2.label_tag }}</th>
+                    <td>
+                      {{ form.passwd_2.errors }}
+                      {{ form.passwd_2 }}
+                    </td>
+                  </tr>
+
+                  </table>
+                  <!-- <input type="submit" value={% trans "save" %}> -->
+                <input type="button" value="{% trans "save" %}" onclick="gonder_Func();" >
+            </form>
+
+
+            {% endlocalize %}
+
+</html>
+
+
+{% endblock %}
