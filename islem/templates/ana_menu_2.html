@@ -1,0 +1,119 @@
+
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if islem_olsun %}
+<button type="button" class="btn btn-xl"  onclick="window.location.href='{% url 'GeneratePDF' %}'">PDF Oluştur</button>
+<p> </p>
+<p> </p>
+    {% if durum == "A" %}
+
+<button type="button" class="btn btn-md"  onclick="window.location.href='{% url 'denetim_baslat' %}'">Denetim Başlat</button>
+
+    {% endif %}
+{% endif %}
+
+    <p> </p> &emsp;
+
+    <h4>  Denetim İş Emri Detayları </h4>
+    <p> </p> &emsp;
+
+
+        <table border="0">
+            <tbody>
+                <tr>
+                    <td><b>Denetim Adı:</b></td>
+                    <td>  &emsp; {{ denetim_adi }} </td>
+                </tr>
+                <tr>
+                    <td><b>Proje:</b></td>
+                    <td> &emsp; {{ proje }}  </td>
+                </tr>
+                <tr>
+                    <td><b>Rutin/Planlı:</b></td>
+                        {%  if rutin_planli == "P" %}
+                            <td> &emsp; Planlı  </td>
+                        {%  else %}
+                            <td> &emsp; Rutin  </td>
+                        {% endif %}
+                </tr>
+                <tr>
+                    <td><b>Denetçi:   </b></td>
+                    <td> &emsp; {{ denetci }}  </td>
+                </tr>
+                <tr>
+                    <td><b>Denetim Tipi:</b></td>
+                    <td>  &emsp;  {{ tipi }} </td>
+                </tr>
+                <tr>
+                    <td><b>Oluşturma Tarihi:</b></td>
+                    <td> &emsp; {{ yaratim_tarihi }}  </td>
+                </tr>
+                <tr>
+                    <td><b>Oluşturan:   </b></td>
+                    <td> &emsp;  {{ yaratan }}  </td>
+                </tr>
+
+                {%  if rutin_planli == "P" %}
+                <tr>
+                    <td><b>Hedef Başlangıç Tarihi:</b></td>
+                    <td> &emsp; {{ hedef_baslangic }} </td>
+                </tr>
+                <tr>
+                    <td><b>Hedef Bitiş Tarihi:   </b></td>
+                    <td> &emsp; {{ hedef_bitis }}  </td>
+                </tr>
+                {%  endif %}
+
+            </tbody>
+        </table>
+        <p> </p> &emsp;
+        <p> </p> &emsp;
+        <h5> <b> Takipciler: </b> <h5>
+        <p> </p>
+
+
+        {% for takipci in takipciler %}
+        <tr>
+            <td> {{ takipci }} </td>
+        </tr>
+        <p> </p>
+        {% endfor %}
+
+
+
+      {% if dict_bol_detay %}
+            <!-- <strong>There are logs present.</strong>  -->
+            <p> </p>
+      {% else %}
+            <strong>Kayıt yok......</strong>
+            <p> </p>
+      {% endif %}
+
+
+    <p> </p> &emsp;
+    <p> </p> &emsp;
+    <h5> <b> Denetlenecek bölüm ve detaylar: </b> <h5>
+    <p> </p> &emsp;
+    <p> </p>
+    {% for bolum, detay in dict_bol_detay.items %}
+        <tr>
+            <td> {{ bolum.bolum_kodu }} &emsp;  {{ bolum.bolum_adi }}</td>
+        </tr>
+        <p> </p>
+
+        {% for detay in detay %}
+        <tr>
+            <td> {{ detay.detay_kodu }} &emsp;   {{ detay.detay_adi }}</td>
+        </tr>
+        <p> </p>
+        {% endfor %}
+
+    {% endfor %}
+
+
+
+
+{% endblock %}
