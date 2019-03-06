@@ -240,27 +240,27 @@ class den_yetkilisi(models.Model):
 
 
 class tipi(models.Model):
-    tipi_kodu = models.CharField(max_length=10)
+    tipi_kodu = models.CharField(max_length=25)
     tipi_adi = models.CharField(max_length=200)
     def __str__(self):
         return(self.tipi_adi)
 
 class zon(models.Model):
-    zon_kodu = models.CharField(max_length=10)
+    zon_kodu = models.CharField(max_length=25)
     zon_adi = models.CharField(max_length=200)
     tipi = models.ForeignKey(tipi, on_delete=models.PROTECT)
     def __str__(self):
         return '%s-%s' % (self.zon_kodu, self.zon_adi)
 
 class bolum(models.Model):
-    bolum_kodu = models.CharField(max_length=10)
+    bolum_kodu = models.CharField(max_length=25)
     bolum_adi = models.CharField(max_length=200)
     zon = models.ForeignKey(zon, on_delete=models.PROTECT, default=1)
     def __str__(self):
         return '%s-%s' % (self.bolum_kodu, self.bolum_adi)
 
 class detay(models.Model):
-    detay_kodu = models.CharField(max_length=5)
+    detay_kodu = models.CharField(max_length=25)
     detay_adi = models.CharField(max_length=200)
     bolum = models.ForeignKey(bolum, on_delete=models.PROTECT)
     puanlama_turu = models.CharField(max_length=1, choices=PUANLAMA_TURU, default="A")

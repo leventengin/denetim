@@ -26,7 +26,7 @@ from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, spvau
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete, sirket2autocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
 from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
-from .views import sirketautocomplete, sirketprojeautocomplete, spvautocomplete, denautocomplete
+from .views import sirketautocomplete, sirketprojeautocomplete, spvautocomplete, denautocomplete, usersecautocomplete
 from notification.views import list_notification, show_notification, create_notification, delete_notification
 
 
@@ -43,6 +43,7 @@ urlpatterns = [
     re_path(r'^bolum-autocomplete/$', bolumautocomplete.as_view(),name='bolum-autocomplete',),
     re_path(r'^spv-autocomplete/$', spvautocomplete.as_view(),name='spv-autocomplete',),
     re_path(r'^den-autocomplete/$', denautocomplete.as_view(),name='den-autocomplete',),
+    re_path(r'^user-sec-autocomplete/$', usersecautocomplete.as_view(),name='user-sec-autocomplete',),
     re_path(r'^detay-autocomplete/$', detayautocomplete.as_view(),name='detay-autocomplete',),
     re_path(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
     re_path(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
@@ -179,13 +180,14 @@ urlpatterns = [
 #   kullanıcı ile ilgili işlemler..................
     re_path(r'^tercume/$', views.tercume, name='tercume'),
     re_path(r'^kullanici_ekle/$', views.kullanici_ekle, name='kullanici_ekle'),
-    #re_path(r'^kullanici_duzenle/$', views.kullanici_duzenle, name='kullanici_duzenle'),
+    re_path(r'^kullanici_duzenle/$', views.kullanici_duzenle, name='kullanici_duzenle'),
+    re_path(r'^kullanici_duzenle_devam/$', views.kullanici_duzenle_devam, name='kullanici_duzenle_devam'),
     #re_path(r'^kullanici_kaldir/$', views.kullanici_kaldir, name='kullanici_kaldir'),
     #re_path(r'^kullanici_aktif/$', views.kullanici_aktif, name='kullanici_aktif'),
     re_path(r'^kullanici_resim/$', views.kullanici_resim, name='kullanici_resim'),
     re_path(r'^kullanici_sifre/$', views.kullanici_sifre, name='kullanici_sifre'),
     #re_path(r'^ipy_ata/$', views.ipy_ata, name='ipy_ata'),
-
+    #re_path(r'^ipy_kaldir/$', views.ipy_kaldir, name='ipy_kaldir'),
 
 #-------------------------------------------------------------------------------------------------
     # grup re_pathleri aşağıda....

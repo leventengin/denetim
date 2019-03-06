@@ -45,6 +45,7 @@ from .models import sonuc_takipci
 from .models import sonuc_resim
 from .models import kucukresim
 from .models import spv_yetkilisi
+from .models import den_yetkilisi
 from .models import acil
 from .models import isaretler
 from .models import qrdosyasi
@@ -71,6 +72,7 @@ admin.site.register(sonuc_takipci)
 admin.site.register(sonuc_resim)
 admin.site.register(kucukresim)
 admin.site.register(spv_yetkilisi)
+admin.site.register(den_yetkilisi)
 admin.site.register(acil)
 admin.site.register(isaretler)
 admin.site.register(qrdosyasi)

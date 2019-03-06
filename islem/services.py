@@ -241,9 +241,10 @@ def mem_veri_hazirla(sayi):
 
 
 def index_hazirla_proje(request):
-
     kullanici_id = request.user.id
-    profile_obj = Profile.objects.get(id=kullanici_id)
+    print(kullanici_id)
+    profile_obj = Profile.objects.get(user_id=kullanici_id)
+    print(profile_obj)
     js_proje = profile_obj.proje.id
     p_obj = proje.objects.get(id=js_proje)
     proje_adi = str(p_obj.proje_adi)

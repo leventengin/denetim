@@ -7,13 +7,13 @@
     <h4> Şirket...:&emsp; {{ user.profile.sirket}} </h4>
     </br>
     </br>
-    <!-- <h4>Grup içinden planlayıcılar:</h4>  -->
+    
 
     {% if grup_list %}
 
         <table cellspacing="10" cellpadding="0">
                 <tr>
-                  <th>Süpervizör</th>
+                  <th>Denetçi</th>
                   <th> &emsp;&emsp; </th>
                   <th>Şirketi</th>
                 </tr>
@@ -61,7 +61,7 @@
   </br>
   </br>
 
-    <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'spv_yarat'  %}'">Ekle</button>
+    <button type="button" class="btn btn-sm"  onclick="window.location.href='{% url 'den_yarat'  %}'">Ekle</button>
 
 
 

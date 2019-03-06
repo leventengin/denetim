@@ -1231,7 +1231,7 @@ class NebuForm(forms.Form):
 
 
 class KullaniciForm(forms.Form):
-    pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput(), )
+    pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
     kullanici_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '20'}),label = _lazy("User Id"), localize=True,  required=False)
     adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), label = _lazy("User Name"), localize=True, required=False)
     soyadi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '30'}), label =_lazy("User Surname"), localize=True, required=False)
@@ -1307,6 +1307,28 @@ class KullaniciForm(forms.Form):
 
         return self.cleaned_data
 
+
+class KullaniciSecForm(forms.Form):
+    kullanici = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label="Kullanıcı",
+                 widget=autocomplete.ModelSelect2Multiple(url='user-sec-autocomplete'), required=False)
+
+    @property
+    def media(self):
+        m_css = {"screen": ('admin/css/vendor/select2/select2.css',
+                            'admin/css/autocomplete.css',
+                            'autocomplete_light/select2.css',)
+                            }
+        m_js = [
+            #'admin/js/vendor/jquery/jquery.js',
+            'autocomplete_light/jquery.init.js',
+            'admin/js/vendor/select2/select2.full.js',
+            'autocomplete_light/autocomplete.init.js',
+            'autocomplete_light/forward.js',
+            'autocomplete_light/select2.js',
+            'autocomplete_light/vendor/select2/dist/js/i18n/ru.js',
+            'autocomplete_light/jquery.post-setup.js',
+        ]
+        return forms.Media(css = m_css, js = m_js)
 
 
 

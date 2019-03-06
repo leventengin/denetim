@@ -14,7 +14,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import grup, sirket, proje, tipi, bolum, detay, acil, isaretler, zon, yer, proje_alanlari
 from .models import Profile, denetim, sonuc_detay, sonuc_bolum, kucukresim, sonuc_takipci, qrdosyasi
-from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi, eleman
+from .models import plan_opr_gun, plan_den_gun, sonuc_resim, spv_yetkilisi, den_yetkilisi, eleman
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import models, transaction
 from islem.forms import BolumSecForm, SonucForm, SonucResimForm, DenetimSecForm, Denetim_Rutin_Baslat_Form
@@ -24,6 +24,7 @@ from islem.forms import AcilAcForm, AcilKapaForm, AcilDenetimSecForm, Qrcode_For
 from islem.forms import Sirket_Proje_Form, RaporTarihForm, Sirket_Mem_RaporForm, BolumForm, BolumListesiForm, ZonForm, ZonListesiForm
 from islem.forms import Denetim_Deneme_Form, Ikili_Deneme_Form, NebuForm, Den_Olustur_Form, SoruForm, RfidForm, RfidProjeForm
 from islem.forms import ElemanForm, VatandaslikForm, YerSecForm, KullaniciForm, ParolaForm, ProfilResimForm
+from islem.forms import KullaniciSecForm
 import collections
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from notification.models import Notification
@@ -450,7 +451,7 @@ def index(request):
         )
 
     if kullanici.isletme_projeyon == "E":
-        print("operasyon prj yön yada alan şefi..  evet....")
+        print("işletme proje yöneticisi..  evet....")
         sirket = request.user.profile.sirket
         print("şirket", sirket)
         if sirket == None:
@@ -499,6 +500,7 @@ def index(request):
     if kullanici.denetci == "E":
         print(" denetçi   evet....")
         acik_denetimler = denetim.objects.filter(durum="A")
+        print(acik_denetimler)
         acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
         secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
         return render(request, 'ana_menu_denetci.html',
@@ -3880,8 +3882,12 @@ def soru_listesi_yarat(request, pk=None):
         if form.is_valid():
             print("valid....")
             detay_kodu = request.POST.get('detay_kodu', "")
+            print("detay kodu:", detay_kodu)
             detay_adi = request.POST.get('detay_adi', "")
+            print("detay adı:", detay_adi)
             puanlama_turu = request.POST.get('puanlama_turu', "")
+            print("puanlama türü:", puanlama_turu)
+            print("bölüm", bolum)
             kaydetme_obj = detay(detay_kodu=detay_kodu,
                                  detay_adi=detay_adi,
                                  bolum_id=bolum,
@@ -4370,7 +4376,7 @@ def spv_yarat(request, pk=None):
     kullanici = request.user
     sirket = kullanici.profile.sirket
     spvler_obj = Profile.objects.filter(denetim_grup_yetkilisi="E")
-
+    print(spvler_obj)
     serbest_spv_list = []
     for spv in spvler_obj:
         if spv.sirket.turu == "D":
@@ -4741,6 +4747,189 @@ def kullanici_ekle(request):
 
 #------------------------------------------------------------------------------------
 
+
+@login_required
+def kullanici_duzenle(request):
+    # if this is a POST request we need to process the form data
+    kullanan = request.user
+    sirket_adi = kullanan.profile.sirket
+    if sirket_adi == None:
+        mesaj = _("Company is not defined for admin user...please correct...")
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = KullaniciSecForm(request.POST)
+        if form.is_valid():
+            print("valid....")
+            kullanici_adi = request.POST.get('kullanici_adi', "")
+            print ("kullanici_adi...", kullanici_adi)
+            user_obj = User.objects.filter(kullanici_adi=user_name).first()
+            if not user_obj:
+                mesaj = _('this user is not defined !!')
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+            prof_obj = Profile.objects.filter(user=user_obj).first()
+            if not prof_obj:
+                mesaj = _('this user is not defined in Profile!!')
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+            request.session['secili_kullanici_id'] = user_obj.id
+            return redirect('kullanici_duzenle_devam')
+            #return redirect('index')
+        else:
+            print(" nah valid............")
+            context = {'form': form,
+                        }
+            return render(request, 'kullanici/kullanici_duzenle.html', context)
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
+        form = KullaniciSecForm()
+        context = {'form': form,
+                    }
+        return render(request, 'kullanici/kullanici_duzenle.html', context)
+
+#-------------------------------------------------------------------------------------------
+
+
+@login_required
+def kullanici_duzenle_devam(request):
+    # if this is a POST request we need to process the form data
+    secili_kullanici_id = request.session.get('secili_kullanici_id')
+    if not secili_kullanici_id:
+        mesaj = _('this user is not selected !!')
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        kullanan = request.user
+        sirket_adi = kullanan.profile.sirket
+        if sirket_adi == None:
+            mesaj = _("Company is not defined for admin user...please correct...")
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+        form = KullaniciForm(request.POST, sirket_adi=sirket_adi)
+
+        if form.is_valid():
+            print("valid....")
+            id_si = request.POST.get('pk_no'"")
+            kullanici_adi = request.POST.get('kullanici_adi', "")
+            adi = request.POST.get('adi', "")
+            soyadi = request.POST.get('soyadi', "")
+            eposta = request.POST.get('eposta', "")
+            sirket = request.POST.get('sirket', "")
+            proje = request.POST.get('proje', "")
+            denetci = request.POST.get('denetci', "")
+            dgy = request.POST.get('dgy', "")
+            opr_alan_sefi = request.POST.get('opr_alan_sefi', "")
+            opr_teknik = request.POST.get('opr_teknik', "")
+            opr_proje_yon = request.POST.get('opr_proje_yon', "")
+            opr_merkez_yon = request.POST.get('opr_merkez_yon', "")
+            isletme_projeyon = request.POST.get('isletme_projeyon', "")
+            #passwd_1 = request.POST.get('passwd_1', "")
+            #passwd_2 = request.POST.get('passwd_2', "")
+
+            print ("id si...", id_si)
+            print ("kullanici_adi...", kullanici_adi)
+            print ("adi...", adi)
+            print ("soyadi...", soyadi)
+            print ("eposta...", eposta)
+            print ("sirket...", sirket)
+            print ("proje...", proje)
+            print ("denetci...", denetci)
+            print ("dgy...", dgy)
+            print ("opr alan sefi...", opr_alan_sefi)
+            print ("opr teknik...", opr_teknik)
+            print ("opr proje yon ...", opr_proje_yon)
+            print ("opr merkez yon...", opr_merkez_yon)
+            print ("isletme projeyon...", isletme_projeyon)
+            #print ("passwd 1...", passwd_1)
+            #print ("passwd 2...", passwd_2)
+
+            user_obj = User.objects.filter(id=id_si).first()
+            if not user_obj:
+                mesaj = _("User is not defined..")
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+            prof_obj = Profile.objects.filter(user_id=secili_kullanici_id).first()
+            if not prof_obj:
+                mesaj = _("User is not defined in Profile..")
+                return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+            print("user save den öncesi..........................")
+            user_obj.first_name = adi
+            user_obj.last_name = soyadi
+            user_obj.save()
+            print("user save den sonrası..........................")
+
+            print("profile save den öncesi..........................")
+            prof_obj.denetci = denetci
+            prof_obj.dgy = dgy
+            prof_obj.opr_alan_sefi = opr_alan_sefi
+            prof_obj.opr_teknik = opr_teknik
+            prof_obj.opr_proje_yon = opr_proje_yon
+            prof_obj.opr_merkez_yon = opr_merkez_yon
+            prof_obj.isletme_projeyon = isletme_projeyon
+            prof_obj.save()
+            print("profile save den sonrası..........................")
+
+            return redirect('kullanici_duzenle')
+
+        else:
+            print(" nah valid............")
+            context = {'form': form,
+                        'baslık': '',
+                        }
+            return render(request, 'kullanici/kullanici_duzenle_devam.html', context)
+
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        #ilk_secili_denetim = request.session.get('ilk_secili_denetim')
+        print("kullanıcı form get ++++++++++++++++++++++++++++++++++")
+        kullanan = request.user
+        sirket_adi = kullanan.profile.sirket
+        if sirket_adi == None:
+            mesaj = _("Company is not defined for admin user...please correct...")
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+        user_obj = User.objects.filter(id=secili_kullanici_id).first()
+        if not user_obj:
+            mesaj = _("User is not defined..")
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+        prof_obj = Profile.objects.filter(user_id=secili_kullanici_id).first()
+        if not prof_obj:
+            mesaj = _("User is not defined in Profile..")
+            return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+        form = KullaniciForm(sirket_adi=sirket_adi)
+        form.fields["pk_no"].initial = secili_kullanici_id
+        form.fields["kullanici_adi"].initial = user_obj.username
+        form.fields["adi"].initial = user_obj.first_name
+        form.fields["soyadi"].initial = user_obj.second_name
+        form.fields["eposta"].initial = user_obj.email
+        form.fields["sirket"].initial = prof_obj.sirket
+        form.fields["proje"].initial = prof_obj.proje
+        form.fields["denetci"].initial = prof_obj.denetci
+        form.fields["dgy"].initial = prof_obj.dgy
+        form.fields["opr_alan_sefi"].initial = prof_obj.opr_alan_sefi
+        form.fields["opr_teknik"].initial = prof_obj.opr_teknik
+        form.fields["opr_proje_yon"].initial = prof_obj.opr_proje_yon
+        form.fields["opr_merkez_yon"].initial = prof_obj.opr_merkez_yon
+        form.fields["isletme_projeyon"].initial = prof_obj.isletme_projeyon
+        form.fields['kullanici_adi'].widget.attrs['readonly'] = True
+        form.fields['email'].widget.attrs['readonly'] = True
+        form.fields['sirket'].widget.attrs['readonly'] = True
+        form.fields['passwd_1'].widget.attrs['hidden'] = True
+        form.fields['passwd_2'].widget.attrs['hidden'] = True
+        context = {'form': form,
+                    'baslik': '',
+                    }
+        return render(request, 'kullanici/kullanici_duzenle_devam.html', context)
+
+
+
+
+#------------------------------------------------------------------------------------
+
 @login_required
 def kullanici_resim(request):
 
@@ -4778,7 +4967,6 @@ def kullanici_resim(request):
                     'baslik': '',
                     }
         return render(request, 'kullanici/kullanici_resim.html', context)
-
 
 
 
@@ -4939,7 +5127,7 @@ def den_yarat(request, pk=None):
     else:
 
         #form = SpvForm(serbest_spv=kalan_list)
-        form = SpvForm()
+        form = DenForm()
         return render(request, 'islem/den_form.html', {'form': form,})
 
 
@@ -7065,6 +7253,27 @@ class detayautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(detay_adi__icontains=self.q)
         return qs
 
+class usersecautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return user.objects.none()
+        kullanici = self.request.user
+        sirket = kullanici.profile.sirket
+        qs = None
+        prof_obj = Profile.objects.filter(sirket=sirket)
+        if not prof_obj:
+            return qs
+        id_s = []
+        for x in prof_obj:
+            id_s.append(x.user.id)
+        print("işte id ler...", id_s)
+        qs = User.objects.filter(pk__in=id_s)
+        print("seçili liste sonunda...", qs)
+        if self.q:
+            qs = qs.filter(username__icontains=self.q)
+        return qs
+
 
 class spvautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -7193,7 +7402,10 @@ class projeautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated:
             return proje.objects.none()
-        qs = proje.objects.all().order_by('proje_adi')
+        secili_sirket = self.request.user.profile.sirket
+        if not secili_sirket:
+            return proje.objects.none()
+        qs = proje.objects.filter(sirket=secili_sirket).order_by('proje_adi')
         if self.q:
             qs = qs.filter(proje_adi__icontains=self.q)
         return qs
@@ -7203,7 +7415,21 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated:
             return user.objects.none()
-        qs = Profile.objects.filter(denetci="E").order_by('user')
+        secili_sirket = self.request.user.profile.sirket
+        if not secili_sirket:
+            return proje.objects.none()
+        qs = Profile.objects.filter(denetci="E").filter(sirket=secili_sirket).order_by('user')
+        print(qs)
+        den_obj = den_yetkilisi.objects.filter(sirket=secili_sirket)
+        print(den_obj)
+        """
+        for de in den_obj:
+            user_den = de.den_yetkilisi
+            print(user_den)
+            qx = Profile.objects.filter(user_id=den.den_yetkilisi.id).first()
+            print(qx)
+            qs = qs.union(qx)
+        """
         if self.q:
             qs = qs.filter(user__username__icontains=self.q)
         return qs
