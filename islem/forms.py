@@ -3,6 +3,7 @@ from django import forms
 from django.forms import ModelForm
 from islem.models import Profile, grup, sirket, proje, tipi, bolum, detay, acil, sonuc_resim, eleman, User
 from islem.models import sonuc_bolum, denetim, kucukresim, zon, plan_opr_gun, plan_den_gun, yer, proje_alanlari
+from islem.models import spv_yetkilisi, den_yetkilisi
 from webservice.models import rfid_dosyasi
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
@@ -113,6 +114,13 @@ BESLIK = (
 IKILIK = (
 ('0', '0'),
 ('1', '1'),
+)
+
+
+ACILKONU = (
+('A', _lazy('Yoğun kirlilik')),
+('B', _lazy('Arıza')),
+('C', _lazy('İş kazası riski')),
 )
 
 
@@ -767,16 +775,36 @@ class VatandaslikForm(forms.Form):
 
 
 class AcilAcForm(forms.Form):
-    denetim = forms.ModelChoiceField(queryset=denetim.objects.all(), label="Denetim Seçiniz..")
-    konu = forms.CharField()
+    proje = forms.ModelChoiceField(queryset=proje.objects.all(), label="Proje Seçiniz:")
+    konu = forms.ChoiceField(choices=ACILKONU, widget=forms.Select, label="Konu:")
     aciklama = forms.CharField(label='Açıklama', widget=forms.Textarea(attrs={'cols': 50, 'rows': 8}),)
     def __init__(self, *args, **kwargs):
-        denetci = kwargs.pop("denetci")
+        kullanici = kwargs.pop("kullanici")
         super(AcilAcForm, self).__init__(*args, **kwargs)
-        denetim_obj_ilk = denetim.objects.filter(durum="B")
-        denetim_obj = denetim_obj_ilk.filter(denetci=denetci)
-        self.fields['denetim'].queryset = denetim_obj
-        print("queryset initial içinden..:", self.fields['denetim'].queryset)
+        kullanici_profile = Profile.objects.filter(user=kullanici).first()
+        kullanici_sirket = kullanici_profile.sirket
+        sirket_obj = sirket.objects.filter(id=kullanici_sirket.id)
+        spv_sirket = spv_yetkilisi.objects.filter(spv_yetkilisi=kullanici)
+        if spv_sirket:
+            for s in spv_sirket:
+                s_obj = sirket.objects.filter(id=s.id)
+                sirket_obj = sirket_obj.union(s_obj)
+        den_sirket = den_yetkilisi.objects.filter(den_yetkilisi=kullanici)
+        if den_sirket:
+            for d in den_sirket:
+                d_obj = sirket.objects.filter(id=d.id)
+                sirket_obj = sirket_obj.union(d_obj)
+
+        print(sirket_obj)
+        proje_obj = proje.objects.none()
+        for s in sirket_obj:
+            p_obj = proje.objects.filter(sirket_id=s.id)
+            proje_obj = proje_obj.union(p_obj)
+
+        self.fields['proje'].queryset = proje_obj
+        print("queryset initial içinden..:", self.fields['proje'].queryset)
+
+
 
 
 class AcilKapaForm(forms.Form):
@@ -831,16 +859,18 @@ class SirketIcinProjeForm(forms.Form):
 class DenetimForm(forms.Form):
     pk_no = forms.IntegerField(required=False, widget=forms.HiddenInput())
     denetim_adi = forms.CharField(widget=forms.TextInput(attrs={'class':'special', 'size': '50'}))
+    sirket = forms.ModelChoiceField(queryset=sirket.objects.all(),
+                     widget=autocomplete.ModelSelect2(url='spv-sirket-autocomplete'), required=False)
     proje = forms.ModelChoiceField(queryset=proje.objects.all(),
-                     widget=autocomplete.ModelSelect2(url='proje-autocomplete'), required=False)
+                     widget=autocomplete.ModelSelect2(url='den-proje-autocomplete', forward=['sirket']), required=False)
     rutin_planli = forms.ChoiceField(choices=RUTINPLANLI, widget=forms.RadioSelect, label="Planlı/Rutin")
     rp_hidden = forms.CharField(max_length=1, widget=forms.HiddenInput())
-    denetci = forms.ModelChoiceField(queryset=Profile.objects.filter(denetci="E"),
-                     widget=autocomplete.ModelSelect2(url='denetci-autocomplete'), required=False)
+    denetci = forms.ModelChoiceField(queryset=User.objects.all(), label='Denetçi',
+                     widget=autocomplete.ModelSelect2(url='denetci-autocomplete', forward=['sirket']), required=False)
     tipi = forms.ModelChoiceField(queryset=tipi.objects.all(),
                  widget=autocomplete.ModelSelect2(url='tipi-autocomplete'), required=False)
     takipciler = forms.ModelMultipleChoiceField(queryset=User.objects.all(), label='Takipçiler',
-                widget=autocomplete.ModelSelect2Multiple(url='takipci-autocomplete'), required=False)
+                widget=autocomplete.ModelSelect2Multiple(url='takipci-autocomplete', forward=['sirket']), required=False)
     hedef_baslangic = forms.DateField(label='Hedef başlangıç...:', required=False,
                         widget=forms.TextInput(attrs={ 'class':'datepicker' }))
     hedef_bitis = forms.DateField(label='Hedef bitiş...:', required=False,
@@ -878,6 +908,7 @@ class DenetimForm(forms.Form):
     def clean(self):
         cleaned_data = super(DenetimForm, self).clean()
         cc_denetim_adi = cleaned_data.get("denetim_adi")
+        cc_sirket = cleaned_data.get("sirket")
         cc_proje = cleaned_data.get("proje")
         cc_rutin_planli = cleaned_data.get("rutin_planli")
         cc_denetci = cleaned_data.get("denetci")
@@ -888,7 +919,8 @@ class DenetimForm(forms.Form):
         cc_aciklama = cleaned_data.get("aciklama")
         cc_bolum = cleaned_data.get("bolum")
         cc_detay = cleaned_data.get("detay")
-        print("cc denetim adı...:", cc_denetim_adi)
+        print("cc denetim adı", cc_denetim_adi)
+        print("şirket, cc_sirket")
         print("cc proje", cc_proje)
         print("cc rutin planlı", cc_rutin_planli)
         print("cc denetçi...:", cc_denetci)

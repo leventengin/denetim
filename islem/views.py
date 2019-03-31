@@ -632,11 +632,9 @@ def denetim_baslat(request, pk=None):
 
 #--------------------------------------------------------------------------------
 
-# denetimi başlatmaya karar verildiğinde durumu B yapıyor, A den B ye
 
-@login_required
-def denetim_baslat_kesin(request, pk=None):
 
+"""
     denetim_no = request.session.get('denetim_no')
     request.session['devam_tekrar'] = "devam"
     denetim_obj = denetim.objects.get(id=denetim_no)
@@ -656,6 +654,181 @@ def denetim_baslat_kesin(request, pk=None):
         request.session['bolum_atla_flag'] = False
 
     return redirect('denetim_bolum_sec' )
+"""
+
+
+
+
+
+
+# denetimi başlatmaya karar verildiğinde durumu B yapıyor, A den B ye
+
+@login_required
+def denetim_baslat_kesin(request, pk=None):
+
+    denetim_no = request.session.get('denetim_no')
+    print(" session içinden rutin secili denetim.......", denetim_no)
+
+    secili_denetim = denetim.objects.get(id=denetim_no)
+    dd_denetim_adi = secili_denetim.denetim_adi
+
+    bugun = datetime.datetime.now().strftime("%Y-%m-%d")
+    print("bugun...", bugun)
+    dd_denetim_yeni_adi = dd_denetim_adi + "- " + str(bugun)
+    print("yeni denetim adi...", dd_denetim_yeni_adi)
+
+    # bir de  yanına sayı ver.....
+    sayi = 1
+    sayi_chr = "{0:0=2d}".format(sayi)
+    print("sayi_chr...", sayi_chr)
+    dd_denetim_sonad = dd_denetim_yeni_adi + "/" + sayi_chr
+    print(" son denetim ad...", dd_denetim_sonad)
+    yok_mu = True
+    while yok_mu:
+        arama_obj =  denetim.objects.filter(denetim_adi=dd_denetim_sonad).first()
+        if arama_obj == None:
+            yok_mu = False
+            print("buradan çıkıyor bulamadı..")
+        else:
+            sayi = sayi + 1
+            sayi_chr = "{0:0=2d}".format(sayi)
+            print("sayi chr...", sayi_chr)
+            dd_denetim_sonad = dd_denetim_yeni_adi + "/" + sayi_chr
+            print(" son denetim ad...", dd_denetim_sonad)
+
+
+    dd_proje =  secili_denetim.proje.id
+    dd_rutin_planli = "S"
+    dd_r_erisim = denetim_no
+    dd_denetci = secili_denetim.denetci.id
+    dd_tipi =  secili_denetim.tipi.id
+    dd_hedef_baslangic =  secili_denetim.hedef_baslangic
+    dd_hedef_bitis = secili_denetim.hedef_bitis
+    dd_aciklama =  secili_denetim.aciklama
+    dd_durum = "B"
+    dd_yaratim_tarihi = bugun
+    dd_yaratan = secili_denetim.yaratan
+
+
+
+    print("denetim adı", dd_denetim_sonad)
+    print("proje", dd_proje)
+    print("r_erişim", dd_r_erisim)
+    print("rutin planlı", dd_rutin_planli)
+    print("denetci", dd_denetci)
+    print("tipi", dd_tipi)
+    print("hedef_baslangic", dd_hedef_baslangic)
+    print("hedef_bitis", dd_hedef_bitis)
+    print("açıklama", dd_aciklama)
+    print("durum", dd_durum)
+    print("yaratim tarihi", dd_yaratim_tarihi)
+    print("dd_yaratan", dd_yaratan)
+
+
+    kaydetme_obj = denetim(denetim_adi=dd_denetim_sonad,
+                                   proje_id=dd_proje,
+                                   r_erisim=dd_r_erisim,
+                                   rutin_planli=dd_rutin_planli,
+                                   denetci_id=dd_denetci,
+                                   tipi_id=dd_tipi,
+                                   hedef_baslangic=dd_hedef_baslangic,
+                                   hedef_bitis=dd_hedef_bitis,
+                                   aciklama=dd_aciklama,
+                                   yaratim_tarihi=dd_yaratim_tarihi,
+                                   durum=dd_durum,
+                                   yaratan=dd_yaratan
+                                   )
+    kaydetme_obj.save()
+
+    yeni_obj = denetim.objects.filter(r_erisim=denetim_no).last()
+    yeni_denetim_no = yeni_obj.id
+    print(" yeni denetimin numarası....", yeni_denetim_no)
+    print(" eski denetimin numarası....", denetim_no)
+
+
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no)
+    takipciler_obj= sonuc_takipci.objects.filter(denetim=denetim_no)
+
+    bolumler_list = []
+    if bolumler_obj:
+        for bolum in bolumler_obj:
+            bolumler_list.append(bolum.bolum)
+
+    print(bolumler_list)
+
+    if bolumler_obj:
+        for item in bolumler_list:
+            print("item...", item)
+            dd_denetim = yeni_denetim_no
+            dd_bolum = item.id
+            bolum_kaydet_obj = sonuc_bolum(denetim_id=dd_denetim,
+                                            bolum_id=dd_bolum)
+            bolum_kaydet_obj.save()
+
+
+
+
+    bolumler_list = []
+    detaylar_list = []
+    puanlama_list = []
+    i = 0
+    if detaylar_obj:
+        for detay in detaylar_obj:
+            bolumler_list.append(detay.bolum)
+            detaylar_list.append(detay.detay)
+            puanlama_list.append(detay.puanlama_turu)
+
+
+    if detaylar_obj:
+        for item_bolum, item_detay, item_puanlama in zip(bolumler_list, detaylar_list, puanlama_list):
+            print("item bölüm,  item detay, item_puanlama..", item_bolum, item_detay, item_puanlama)
+            dd_denetim = yeni_denetim_no
+            dd_bolum = item_bolum.id
+            dd_detay = item_detay.id
+            dd_puanlama_turu = item_puanlama
+            detay_kaydet_obj = sonuc_detay(denetim_id=dd_denetim,
+                                            bolum_id=dd_bolum,
+                                            detay_id=dd_detay,
+                                            puanlama_turu=dd_puanlama_turu)
+            detay_kaydet_obj.save()
+
+
+
+
+    takipciler_list = []
+
+    if takipciler_obj:
+        for takipci in takipciler_obj:
+            takipciler_list.append(takipci.takipci)
+
+
+
+    if takipciler_obj:
+        for item in takipciler_list:
+            print("item...", item)
+            dd_denetim = yeni_denetim_no
+            dd_takipci = item.id
+            takipci_kaydet_obj = sonuc_takipci(denetim_id=dd_denetim,
+                                               takipci_id=dd_takipci)
+            takipci_kaydet_obj.save()
+
+
+
+    request.session['devam_tekrar'] = "devam"
+    request.session['denetim_no'] = yeni_denetim_no
+
+    bolum_sayi = bolumler_obj.count()
+
+    print("bolum sayı...:", bolum_sayi)
+
+    if bolum_sayi == 1:
+        request.session['bolum_atla_flag'] = True
+    else:
+        request.session['bolum_atla_flag'] = False
+
+    return redirect('denetim_bolum_sec' )
+
 
 
 
@@ -923,45 +1096,44 @@ def rutin_baslat_kesin(request, pk=None):
 @login_required
 def acil_devam_sec(request, pk=None):
     # if this is a POST request we need to process the form data
-    denetci = request.user
+    kullanici = request.user
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = AcilAcForm(request.POST, denetci=denetci)
+        form = AcilAcForm(request.POST, kullanici=kullanici)
         print("buraya mı geldi acil aç form...")
         if form.is_valid():
-            dd_denetim = request.POST.get('denetim', "")
-            denetim_obj = denetim.objects.get(id=dd_denetim)
-            print ("denetim ", dd_denetim)
+            dd_proje = request.POST.get('proje', "")
+            print ("proje", dd_proje)
             dd_konu = request.POST.get('konu', "")
             print ("konu", dd_konu)
             dd_aciklama = request.POST.get('aciklama', "")
             print ("aciklama", dd_aciklama)
             # veri tabanına yazıyor
-            acil_obj = acil.objects.filter(denetim=dd_denetim)
+            acil_obj = acil.objects.filter(proje=dd_proje)
             #acil_obj, created = acil.objects.get_or_create(denetim=dd_denetim)
             if not(acil_obj):
                 # means you will create a new db object
                 print("yeni acil kaydı..........")
-                kaydetme_obj = acil(denetim_id=dd_denetim, konu=dd_konu, aciklama=dd_aciklama)
+                kaydetme_obj = acil(proje_id=dd_proje, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
             else:
                 # just refers to the existing one
                 acil_obj_2 = acil_obj.first()
                 print("id  iki", acil_obj_2.id)
-                print("denetim", acil_obj_2.denetim)
-                kaydetme_obj = acil(id=acil_obj_2.id, denetim_id=acil_obj_2.denetim.id, konu=dd_konu, aciklama=dd_aciklama)
+                print("proje", acil_obj_2.proje)
+                kaydetme_obj = acil(id=acil_obj_2.id, proje_id=acil_obj_2.proje.id, konu=dd_konu, aciklama=dd_aciklama)
                 kaydetme_obj.save()
 
 
-            print("denetim no...", dd_denetim)
-            denetim_obj = denetim.objects.get(id=dd_denetim)
-            denetci = denetim_obj.denetci
-            takipci_obj = sonuc_takipci.objects.filter(denetim=dd_denetim)
+            print("proje no...", dd_proje)
+            proje_obj = proje.objects.get(id=dd_proje)
+
 
             ##############################################
             ###   email işlemi....................
             ##############################################
-
+            """
+            denetci = denetim_obj.denetci
 
             adi = denetim_obj.yaratan.get_full_name()
             denetim_id = denetim_obj.id
@@ -986,36 +1158,18 @@ def acil_devam_sec(request, pk=None):
             msg.content_subtype = 'html'
             msg.send()
 
-            takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_id)
-
-            for takipci in takipci_obj:
-                adi = takipci.takipci.get_full_name()
-                subject = "Denetci tarafından acil bildirim"
-                to = [takipci.takipci.email]
-                from_email = settings.EMAIL_HOST_USER
-                ctx = {
-                    'adi': adi,
-                    'denetim_adi': denetim_adi,
-                    'konu': konu,
-                    'aciklama': aciklama
-                    }
-                message = get_template('islem/emt_acil_bildirim.html').render(ctx)
-                msg = EmailMessage(subject, message, to=to, from_email=from_email)
-                msg.content_subtype = 'html'
-                msg.send()
 
             #connection.close()
-
+            """
 
             messages.success(request, 'Acil bildirim gönderildi')
             return redirect('index')
         else:
             return render(request, 'islem/acil_devam_sec.html', {'form': form,})
 
-
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = AcilAcForm(denetci=denetci)
+        form = AcilAcForm(kullanici=kullanici)
         return render(request, 'islem/acil_devam_sec.html', {'form': form,})
 
 
@@ -1471,6 +1625,7 @@ def teksayfa_yarat(request, pk=None):
         if form.is_valid():
             print("neyse ki valid..bin...ext...")
             dd_denetim_adi = request.POST.get('denetim_adi', "")
+            dd_sirket = request.POST.get('sirket', "")
             dd_proje =  request.POST.get('proje', "")
             dd_rutin_planli = request.POST.get('rutin_planli', "")
             dd_denetci = request.POST.get('denetci', "")
@@ -1486,6 +1641,7 @@ def teksayfa_yarat(request, pk=None):
                 dd_hedef_baslangic = "2000-01-01"
                 dd_hedef_bitis = "2000-01-01"
             print("denetim adı", dd_denetim_adi)
+            print("şirket", dd_sirket)
             print("proje", dd_proje)
             print("rutin planlı", dd_rutin_planli)
             print("denetci", dd_denetci)
@@ -1612,6 +1768,7 @@ def teksayfa_yarat(request, pk=None):
             request.session['js_bolumler'] = None
             request.session['js_denetim_adi'] = None
             request.session['js_proje'] = None
+            request.session['js_sirket'] = None
             request.session['js_rutin_planli'] = None
             request.session['js_denetci'] = None
             request.session['js_tipi'] = None
@@ -1631,6 +1788,7 @@ def teksayfa_yarat(request, pk=None):
     # if a GET (or any other method) we'll create a blank form
     else:
         js_denetim_adi = request.session.get('js_denetim_adi', None)
+        js_sirket = request.session.get('js_sirket', None)
         js_proje = request.session.get('js_proje', None)
         js_denetci = request.session.get('js_denetci', None)
         js_rutin_planli = request.session.get('js_rutin_planli', None)
@@ -1645,6 +1803,7 @@ def teksayfa_yarat(request, pk=None):
         init_param = True
         form = DenetimForm(bolum_listesi=bolum_listesi)
         form.fields["denetim_adi"].initial = js_denetim_adi
+        form.fields["sirket"].initial = js_sirket
         form.fields["proje"].initial = js_proje
         form.fields["rp_hidden"].initial = js_rutin_planli
         print("işte js_rutin planlı....", js_rutin_planli)
@@ -1679,6 +1838,7 @@ def detaylarsec_bolum_js(request, pk=None):
     if request.method == 'GET':
         js_bolumler = request.GET.getlist('js_bolumler')
         js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_sirket = request.GET.get('js_sirket')
         js_proje = request.GET.get('js_proje')
         js_rutin_planli = request.GET.get('js_rutin_planli')
         print("js rutin planlı detayları seçerken okunan değer...js aldığında", js_rutin_planli)
@@ -1691,6 +1851,7 @@ def detaylarsec_bolum_js(request, pk=None):
         #js_zonlar = request.GET.get('js_zonlar')
         request.session['js_bolumler'] = js_bolumler
         request.session['js_denetim_adi'] = js_denetim_adi
+        request.session['js_sirket'] = js_sirket
         request.session['js_proje'] = js_proje
         request.session['js_rutin_planli'] = js_rutin_planli
         request.session['js_denetci'] = js_denetci
@@ -1716,6 +1877,7 @@ def tipisec_bolum_js(request, pk=None):
     if request.method == 'GET':
         js_bolumler = request.GET.getlist('js_bolumler')
         js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_sirket = request.GET.get('js_sirket')
         js_proje = request.GET.get('js_proje')
         js_rutin_planli = request.GET.get('js_rutin_planli')
         print("js rutin planlı tipi değiştiğinde okunan değer...js aldığında", js_rutin_planli)
@@ -1729,6 +1891,7 @@ def tipisec_bolum_js(request, pk=None):
         #js_zonlar = []
         request.session['js_bolumler'] = js_bolumler
         request.session['js_denetim_adi'] = js_denetim_adi
+        request.session['js_sirket'] = js_sirket
         request.session['js_proje'] = js_proje
         request.session['js_rutin_planli'] = js_rutin_planli
         request.session['js_denetci'] = js_denetci
@@ -1776,6 +1939,7 @@ def teksayfa_duzenle(request, pk=None):
 
             js_denetim_no = denetim_obj.id
             js_denetim_adi = denetim_obj.denetim_adi
+            js_sirket = denetim_obj.sirket.id
             js_proje = denetim_obj.proje.id
             js_rutin_planli = denetim_obj.rutin_planli
             js_denetci = denetim_obj.denetci.id
@@ -1786,6 +1950,7 @@ def teksayfa_duzenle(request, pk=None):
 
             print("denetim no", js_denetim_no)
             print("denetim adi", js_denetim_adi)
+            print("şirket", js_şirket)
             print("proje", js_proje)
             print("rutin planlı", js_rutin_planli)
             print("denetci", js_denetci)
@@ -1831,6 +1996,7 @@ def teksayfa_duzenle(request, pk=None):
             request.session['duz_js_pk_no'] = denetim_no
             request.session['duz_js_bolumler'] = js_bolumler
             request.session['duz_js_denetim_adi'] = js_denetim_adi
+            request.session['duz_js_sirket'] = js_sirket
             request.session['duz_js_proje'] = js_proje
             request.session['duz_js_rutin_planli'] = js_rutin_planli
             request.session['duz_js_denetci'] = js_denetci
@@ -1882,6 +2048,7 @@ def teksayfa_duzenle_devam(request, pk=None):
             print("neyse ki valid..tek sayfa düzenle devam .. artık düzenleyip  kaydediyor...")
             dd_pk_no = request.POST.get('pk_no', "")
             dd_denetim_adi = request.POST.get('denetim_adi', "")
+            dd_sirket =  request.POST.get('sirket', "")
             dd_proje =  request.POST.get('proje', "")
             dd_rutin_planli = request.POST.get('rutin_planli', "")
             dd_denetci = request.POST.get('denetci', "")
@@ -1898,6 +2065,7 @@ def teksayfa_duzenle_devam(request, pk=None):
 
             print("pk no", dd_pk_no)
             print("denetim adı", dd_denetim_adi)
+            print("şirket", dd_sirket)
             print("proje", dd_proje)
             print("rutin/planlı", dd_rutin_planli)
             print("denetci", dd_denetci)
@@ -2187,6 +2355,7 @@ def teksayfa_duzenle_devam(request, pk=None):
 
             request.session['js_bolumler'] = None
             request.session['js_denetim_adi'] = None
+            request.session['js_sirket'] = None
             request.session['js_proje'] = None
             request.session['js_rutin_planli'] = None
             request.session['js_denetci'] = None
@@ -2220,6 +2389,7 @@ def teksayfa_duzenle_devam(request, pk=None):
 
         js_denetim_no = request.session.get('duz_js_pk_no', None)
         js_denetim_adi = request.session.get('duz_js_denetim_adi', None)
+        js_sirket = request.session.get('duz_js_sirket', None)
         js_proje = request.session.get('duz_js_proje', None)
         js_rutin_planli = request.session.get('duz_js_rutin_planli', None)
         js_denetci = request.session.get('duz_js_denetci', None)
@@ -2233,6 +2403,7 @@ def teksayfa_duzenle_devam(request, pk=None):
         ilk_duzeltme = request.session.get('ilk_duzeltme', None)
         print("denetim no", js_denetim_no)
         print("denetim adi", js_denetim_adi)
+        print("şirket", js_sirket)
         print("proje", js_proje)
         print("rutin/planlı", js_rutin_planli)
         print("denetci", js_denetci)
@@ -2253,6 +2424,7 @@ def teksayfa_duzenle_devam(request, pk=None):
         form = DenetimForm(bolum_listesi=bolum_listesi)
         form.fields["pk_no"].initial = js_denetim_no
         form.fields["denetim_adi"].initial = js_denetim_adi
+        form.fields["sirket"].initial = js_sirket
         form.fields["proje"].initial = js_proje
         form.fields["rp_hidden"].initial = js_rutin_planli
         print("düzeltme init içinden js rutin planlı...", js_rutin_planli)
@@ -2280,6 +2452,7 @@ def detaylarsec_bolum_js_2(request, pk=None):
         denetim_no = request.GET.get('js_pk_no')
         js_bolumler = request.GET.getlist('js_bolumler')
         js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_sirket = request.GET.get('js_sirket')
         js_proje = request.GET.get('js_proje')
         js_rutin_planli = request.GET.get('js_rutin_planli')
         js_denetci = request.GET.get('js_denetci')
@@ -2300,6 +2473,7 @@ def detaylarsec_bolum_js_2(request, pk=None):
         request.session['duz_js_pk_no'] = denetim_no
         request.session['duz_js_bolumler'] = js_bolumler
         request.session['duz_js_denetim_adi'] = js_denetim_adi
+        request.session['duz_js_sirket'] = js_sirket
         request.session['duz_js_proje'] = js_proje
         request.session['duz_js_rutin_planli'] = js_rutin_planli
         request.session['duz_js_denetci'] = js_denetci
@@ -2324,6 +2498,7 @@ def tipisec_bolum_js_2(request, pk=None):
         denetim_no = request.GET.get('js_pk_no')
         js_bolumler = request.GET.getlist('js_bolumler')
         js_denetim_adi = request.GET.get('js_denetim_adi')
+        js_sirket = request.GET.get('js_sirket')
         js_proje = request.GET.get('js_proje')
         js_rutin_planli = request.GET.get('js_rutin_planli')
         js_denetci = request.GET.get('js_denetci')
@@ -2337,6 +2512,7 @@ def tipisec_bolum_js_2(request, pk=None):
         request.session['bolum_listesi'] = js_bolumler
         request.session['duz_js_bolumler'] = js_bolumler
         request.session['duz_js_denetim_adi'] = js_denetim_adi
+        request.session['duz_js_sirket'] = js_sirket
         request.session['duz_js_proje'] = js_proje
         request.session['duz_js_rutin_planli'] = js_rutin_planli
         request.session['duz_js_denetci'] = js_denetci
@@ -3521,6 +3697,12 @@ def raporlar_ilerle(request, pk=None):
         durum = denetim_obj.durum
         rutindenetci = denetim_obj.rutindenetci
         takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+        denetim_soru = denetim_obj.soru_adedi
+        denetim_dd = denetim_obj.dd_adedi
+        denetim_net = denetim_obj.net_adet
+        denetim_puan = denetim_obj.toplam_puan
+        ortalama_puan = denetim_obj.ortalama_puan
+
         print("takipci objesi...", takipci_obj)
         i = 0
         takipciler = []
@@ -7125,6 +7307,7 @@ class sonucbolumautocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(bolum__icontains=self.q)
         return qs
 
+
 class sirketautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
@@ -7134,6 +7317,46 @@ class sirketautocomplete(autocomplete.Select2QuerySetView):
 
         if self.q:
             qs = qs.filter(bolum__icontains=self.q)
+        return qs
+
+
+class spvsirketautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return sirket.objects.none()
+        qs = sirket.objects.all()
+        user = self.request.user
+        user_profile = Profile.objects.filter(user=user).first()
+
+        if (user_profile.sirket.turu == "P"):
+            qs = qs.filter(id=user_profile.sirket.id)
+        else:
+            spv_firmalari = spv_yetkilisi.objects.filter(spv_yetkilisi=self.request.user)
+            qs = sirket.objects.none()
+            for spv_sirket in spv_firmalari:
+                x_sirket = sirket.objects.filter(id=spv_sirket.sirket.id)
+                qs = qs.union(x_sirket)
+        if self.q:
+            qs = qs.filter(sirket_adi__icontains=self.q)
+        return qs
+
+
+
+class denprojeautocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated:
+            return sonuc_bolum.objects.none()
+        qs = proje.objects.all()
+
+        sirket  = self.forwarded.get('sirket', None)
+        print("sirket", sirket)
+        if sirket:
+            qs = qs.filter(sirket=sirket)
+        print("qs", qs)
+        if self.q:
+            qs = qs.filter(denetim__icontains=self.q)
         return qs
 
 
@@ -7204,15 +7427,26 @@ def deneme_nebu(request, pk=None):
 
 #---------------------------------response.json()--------------------------------------------------------
 
+from django.db.models import Q
+
 class takipciautocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        #if not self.request.user.is_authenticated:
-            #return sonuc_bolum.objects.none()
-
-        #qs = Profile.objects.filter(denetim_takipcisi="E")
-        qs = User.objects.all().order_by('id')
-        print("null olmasın şimdi...:", qs)
+        if not self.request.user.is_authenticated:
+            return sonuc_bolum.objects.none()
+        qs = User.objects.none()
+        sirket  = self.forwarded.get('sirket', None)
+        kisiler = Profile.objects.filter(sirket=sirket)
+        print(kisiler)
+        kisi_idlist = []
+        for kisi in kisiler:
+            print(kisi)
+            kisi_id = kisi.user.id
+            print(kisi_id)
+            kisi_idlist.append(kisi_id)
+        print(kisi_idlist)
+        qs = User.objects.filter(Q(id__in=kisi_idlist))
+        print(qs)
         if self.q:
             qs = qs.filter(user__username__icontains=self.q)
         return qs
@@ -7415,9 +7649,45 @@ class denetciautocomplete(autocomplete.Select2QuerySetView):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated:
             return user.objects.none()
-        secili_sirket = self.request.user.profile.sirket
-        if not secili_sirket:
-            return proje.objects.none()
+        sirket  = self.forwarded.get('sirket', None)
+        if not sirket:
+            return User.objects.none()
+        qs = User.objects.none()
+        kisiler = Profile.objects.filter(sirket=sirket).filter(denetci="E")
+        print(kisiler)
+        kisi_idlist = []
+        for kisi in kisiler:
+            print(kisi)
+            kisi_id = kisi.user.id
+            print(kisi_id)
+            kisi_idlist.append(kisi_id)
+        print(kisi_idlist)
+        qs = User.objects.filter(Q(id__in=kisi_idlist))
+
+        kisiler = den_yetkilisi.objects.filter(sirket=sirket)
+        print(kisiler)
+        kisi_idlist = []
+        for kisi in kisiler:
+            print(kisi)
+            kisi_id = kisi.den_yetkilisi.id
+            print(kisi_id)
+            kisi_idlist.append(kisi_id)
+        print(kisi_idlist)
+        qx = User.objects.filter(Q(id__in=kisi_idlist))
+        qs = qs.union(qx)
+        print(qs)
+        if self.q:
+            qs = qs.filter(user__username__icontains=self.q)
+        return qs
+
+
+
+
+
+
+
+
+
         qs = Profile.objects.filter(denetci="E").filter(sirket=secili_sirket).order_by('user')
         print(qs)
         den_obj = den_yetkilisi.objects.filter(sirket=secili_sirket)

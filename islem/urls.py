@@ -21,11 +21,11 @@ from django.forms.models import ModelChoiceIterator
 from django.urls import reverse
 from django.utils.translation import get_language
 
-from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete
+from .views import denetimautocomplete, sonucbolumautocomplete, takipciautocomplete, denprojeautocomplete
 from .views import bolumautocomplete, detayautocomplete, tipiautocomplete, spvautocomplete
 from .views import zonautocomplete, denetciautocomplete, projeautocomplete, sirket2autocomplete
 from .views import denolusturautocomplete, denetimrutinautocomplete, rutindenetimautocomplete
-from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete
+from .views import list_tipiautocomplete, list_zonautocomplete, list_bolumautocomplete, spvsirketautocomplete
 from .views import sirketautocomplete, sirketprojeautocomplete, spvautocomplete, denautocomplete, usersecautocomplete
 from notification.views import list_notification, show_notification, create_notification, delete_notification
 
@@ -48,6 +48,8 @@ urlpatterns = [
     re_path(r'^tipi-autocomplete/$', tipiautocomplete.as_view(),name='tipi-autocomplete',),
     re_path(r'^zon-autocomplete/$', zonautocomplete.as_view(),name='zon-autocomplete',),
     re_path(r'^proje-autocomplete/$', projeautocomplete.as_view(),name='proje-autocomplete',),
+    re_path(r'^den-proje-autocomplete/$', denprojeautocomplete.as_view(),name='den-proje-autocomplete',),
+    re_path(r'^spv-sirket-autocomplete/$', spvsirketautocomplete.as_view(),name='spv-sirket-autocomplete',),
     re_path(r'^sirket2-autocomplete/$', sirket2autocomplete.as_view(),name='sirket2-autocomplete',),
     re_path(r'^denetci-autocomplete/$', denetciautocomplete.as_view(),name='denetci-autocomplete',),
     re_path(r'^rutindenetim-autocomplete/$', rutindenetimautocomplete.as_view(),name='rutindenetim-autocomplete',),

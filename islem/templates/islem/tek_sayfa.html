@@ -158,6 +158,7 @@ $( ".datepicker" ).datepicker()
           js_takipciler.push($(this).val());
       });
       var js_denetim_adi = document.getElementById("id_denetim_adi").value;
+      var js_sirket = document.getElementById("id_sirket").value;
       var js_proje = document.getElementById("id_proje").value;
       var x = document.getElementById("id_rutin_planli_0").checked;
       var y = document.getElementById("id_rutin_planli_1").checked;
@@ -188,6 +189,7 @@ $( ".datepicker" ).datepicker()
           'js_bolumler' : js_bolumler,
           'js_takipciler' : js_takipciler,
           'js_denetim_adi' : js_denetim_adi,
+          'js_sirket' : js_sirket,
           'js_proje' : js_proje,
           'js_rutin_planli' : js_rutin_planli,
           'js_denetci' : js_denetci,
@@ -223,6 +225,7 @@ $( ".datepicker" ).datepicker()
             js_takipciler.push($(this).val());
         });
         var js_denetim_adi = document.getElementById("id_denetim_adi").value;
+        var js_sirket = document.getElementById("id_sirket").value;
         var js_proje = document.getElementById("id_proje").value;
         var x = document.getElementById("id_rutin_planli_0").checked;
         var y = document.getElementById("id_rutin_planli_1").checked;
@@ -252,6 +255,7 @@ $( ".datepicker" ).datepicker()
             'js_bolumler' : js_bolumler,
             'js_takipciler' : js_takipciler,
             'js_denetim_adi' : js_denetim_adi,
+            'js_sirket' : js_sirket,
             'js_proje' : js_proje,
             'js_rutin_planli' : js_rutin_planli,
             'js_denetci' : js_denetci,
@@ -370,6 +374,14 @@ $( ".datepicker" ).datepicker()
                     <td>
                       {{ form.denetim_adi.errors }}
                       {{ form.denetim_adi }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th>{{ form.sirket.label_tag }}</th>
+                    <td>
+                      {{ form.sirket.errors }}
+                      {{ form.sirket }}
                     </td>
                   </tr>
 

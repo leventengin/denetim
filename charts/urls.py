@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import re_path, path, include
 from django.contrib import admin
 
-from .views import HomeView, get_data, get_data_krs, ChartData
+from .views import HomeView, get_data, get_data_krs, ChartData, spv_ort_sonuc, denetci_ort_sonuc
 from .views import gunluk_yer_mem, gunluk_yer_opr, gunluk_yer_den, gunluk_yer_arz, gunluk_yer_say
 
 
@@ -31,6 +31,8 @@ urlpatterns = [
     re_path(r'^api/gunluk_yer_opr/$', gunluk_yer_opr, name='gunluk_yer_opr'),
     re_path(r'^api/gunluk_yer_arz/$', gunluk_yer_arz, name='gunluk_yer_arz'),
     re_path(r'^api/gunluk_yer_say/$', gunluk_yer_say, name='gunluk_yer_say'),
+    re_path(r'^api/spv_ort_sonuc/$', spv_ort_sonuc, name='spv_ort_sonuc'),
+    re_path(r'^api/denetci_ort_sonuc/$', denetci_ort_sonuc, name='denetci_ort_sonuc'),
     re_path(r'^api/chart/data/$', ChartData.as_view()),
     #re_path(r'^admin/', admin.site.urls),
 

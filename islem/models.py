@@ -311,6 +311,7 @@ class plan_opr_gun(models.Model):
     def __str__(self):
         return '%s-%s-%s' % (self.yer, self.gun, self.zaman)
 
+
 class plan_den_gun(models.Model):
     yer = models.ForeignKey(yer, on_delete=models.PROTECT)
     gun = models.CharField(max_length=3, choices=GUNLER)
@@ -330,8 +331,6 @@ class eleman(models.Model):
     kull_adi = models.CharField(max_length=11)
     def __str__(self):
         return '%s-%s' % (self.adi, self.soyadi)
-
-
 
 
 
@@ -466,9 +465,8 @@ class sonuc_operator(models.Model):
         return(self.operator.username)
 
 
-
 class acil(models.Model):
-    denetim = models.ForeignKey(denetim, on_delete=models.PROTECT)
+    proje = models.ForeignKey(proje, on_delete=models.PROTECT)
     konu = models.CharField(max_length=100)
     aciklama = models.TextField()
     sonuc = models.TextField()
@@ -476,7 +474,8 @@ class acil(models.Model):
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     timestamp = models.DateTimeField(default=datetime.datetime.now())
     def __str__(self):
-        return(self.denetim.denetim_adi)
+        return(self.proje.proje_adi)
+
 
 class isaretler(models.Model):
     bolum_listesi_flag = models.BooleanField(default=True)

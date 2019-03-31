@@ -55,6 +55,7 @@ def admin_kontrol(request):
         return False
 
 
+
 def rapor_verisi_hazirla(request, denetim_no):
     print("rapor verisine gelen denetim no...", denetim_no)
     denetim_obj = denetim.objects.get(id=denetim_no)

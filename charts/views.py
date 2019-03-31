@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
 from webservice.models import Memnuniyet, Operasyon_Data, Ariza_Data, Denetim_Data, Sayi_Data, rfid_dosyasi
-from islem.models import Profile, proje, plan_den_gun, plan_opr_gun
+from islem.models import Profile, proje, plan_den_gun, plan_opr_gun, denetim
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from operator import itemgetter
@@ -585,11 +585,44 @@ def gunluk_yer_say(request, *args, **kwargs):
 
 
 
+#---------------------------------------------------------------------------------
+
+def spv_ort_sonuc(request, *args, **kwargs):
+    print("spv_ort_sonuc")
+    kullanici = request.user
+    denetimler = denetim.objects.filter(yaratan=kullanici).filter(durum="C")
+    puan = []
+    sayi = []
+    x = 1
+    for d in denetimler:
+        puan.append(d.ortalama_puan)
+        sayi.append(x)
+        x = x + 1
+    print("puan ve sayı", puan, sayi)
+    data = {"default": puan, "labels": sayi}
+    print("data  ....", data)
+    return JsonResponse(data)
 
 
+#---------------------------------------------------------------------------------
+
+def denetci_ort_sonuc(request, *args, **kwargs):
+    print("spv_ort_sonuc")
+    kullanici = request.user
+    denetimler = denetim.objects.filter(denetci=kullanici).filter(durum="C")
+    puan = []
+    sayi = []
+    x = 1
+    for d in denetimler:
+        puan.append(d.ortalama_puan)
+        sayi.append(x)
+        x = x + 1
+    print("puan ve sayı", puan, sayi)
+    data = {"default": puan, "labels": sayi}
+    print("data  ....", data)
+    return JsonResponse(data)
 
 #----------------------------------------------------------------------
-
 
 class ChartData(APIView):
     authentication_classes = []
