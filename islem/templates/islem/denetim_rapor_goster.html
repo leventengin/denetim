@@ -1,6 +1,8 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+
+
 <style>
 
 header {
@@ -9,11 +11,23 @@ header {
     font-size: 300%;
 
 }
+
+/*
 p  {
     color: red;
     font-family: courier;
     font-size: 160%;
 }
+*/
+
+.chart-container {
+  position: relative;
+  margin: auto;
+  /* height: 80vh;
+  width: 80vw; */
+}
+
+
 .button {
     background-color: #4CAF50; /* Green */
     border: none;
@@ -32,42 +46,101 @@ p  {
 .button5 {background-color: #555555;} /* Black */
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<!--<link rel="stylesheet" type="text/css" href="style2.css">-->
 
-<!--Load the AJAX API-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current');   // Don't need to specify chart libraries!
-      google.charts.setOnLoadCallback(drawVisualization);
+<script>
+  function goster_chart(labels, defaultData, kalan_data, backC, borC){
+      //alert("buraya da geldi  goster_chart()..................");
+      //alert("script içinden label..."+labels);
+      //alert("script içinden default data .."+defaultData+" kalan data "+ kalan_data);
+      //alert("script içinden renkler .."+backC+borC);
 
-      function drawVisualization() {
-        var wrapper = new google.visualization.ChartWrapper({
-          chartType: 'ColumnChart',
-          dataTable: [['', 'puan',],
-                      ['',  8,]],
-          options: {'title': 'Denetim Puanı'},
-          containerId: 'vis_div'
-        });
-        wrapper.draw();
-      }
-    </script>
+      var ctx = document.getElementById("myChart").getContext("2d");
+      ctx.width = 20;
+      ctx.height = 100;
+      var label_arr = [];
+      var label_data = [];
+      var k_data = [];
+      var backC_arr = [];
+      var borC_arr = [];
+      label_arr.push("Puan(%)");
+      label_data.push(defaultData);
+      k_data.push(kalan_data);
+      backC_arr.push(backC);
+      borC_arr.push(borC);
+
+      //alert("label arr "+label_arr+" label data "+label_data+" kalan data "+k_data);
+      //alert("borC arr "+backC_arr+" borC arr "+borC_arr);
+      var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: ["Denetim Puanı"],
+              datasets: [{
+                  label: "Puan(%)",
+                  data: label_data,
+                  backgroundColor: backC,
+                  borderColor: borC,
+                  borderWidth: 1
+              }, {
+                type: 'bar',
+                label: '',
+                backgroundColor: 'rgba(100, 100, 100, 0)',
+                data: k_data
+              }]
+          },
+          options: {
+            scales: {
+              xAxes: [{
+                stacked: true
+              }],
+              yAxes: [{
+                stacked: true
+              }]
+            }
+          }
+      });  // mychart
+    }  // end ************  function  set chart  ****************
+
+</script>
+
+
+
+<script>
+  $(document).ready(function(){
+    //alert("buraya geldi  document ready....");
+    goster_data = {{ goster|safe }};
+    kalan_data = {{ kalan|safe}};
+    //alert("gelen ortalama verisi js içinde..."+goster_data+" ve kalan data "+kalan_data);
+    var backC = [];
+    var borC = [];
+    if (goster_data > '80')
+        { backC.push("rgba(88, 214, 141, 0.8)"); borC.push("rgba(88, 214, 141, 1)");}
+        else  if (goster_data > '60')
+            { backC.push("rgba(255, 220, 0, 0.8)"); borC.push("rgba(255, 220, 0, 1)");}
+             else
+              { backC.push("rgba(255, 51, 51, 0.8)"); borC.push("rgba(255, 51, 51, 1)");}
+    //alert ("backg"+backC+"border"+borC);
+    goster_chart("", goster_data, kalan_data, backC, borC);
+
+  })
+</script>
 
 
 
 
-<!--  buraya if konulacak ...-->
+
+<h4>Denetim tamamla</h4>
 
 
-  
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
 
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-
-          <p> </p> &emsp;
+    <p> </p> &emsp;
 
       <h4>  <b> <p> Denetim  Raporu</p></b> </h4>
           <p> </p> &emsp;
-
 
               <table border="0">
                   <tbody>
@@ -126,65 +199,57 @@ p  {
 
                       <tr>
                           <td><b>Denetim Puanı:   </b></td>
-                          <td> &emsp; {{ ortalama_puan |floatformat:2 }}  </td>
+                          <td> &emsp; % {{ ortalama_puan |floatformat:0 }}  </td>
                       </tr>
 
                   </tbody>
               </table>
 
 
-  <!--
-              <p> </p> &emsp;
-              <p> </p> &emsp;
-              <h5> <b> Takipçiler: </b> <h5>
-              <p> </p>
 
-
-              {% for takipci in takipciler %}
-              <tr>
-                  <td> {{ takipci }} </td>
-              </tr>
-              <p> </p>
-              {% endfor %}
--->
 </div>
-   <div class="col-md-6">
-         <style="font-family: Arial;border: 0 none;">
-         <div id="vis_div" style="width: 200px; height: 400px;"></div>
 
 
-     </div>
+
+
+<!-- <div class='col-md-6 chart-container' style="position:relative; margin-top: 80px;"  >  -->
+<div class='col-md-6 chart-container'>
+</br>
+</br>
+</br>
+</br>
+</br>
+    <canvas id="myChart"   ></canvas>
 </div>
+
+
+<!--</div> -->
 </div>
-<div class="container">
-  <div class="row">
+
+
+<!--<div class="container">-->
+<div class="row">
 <div class="col-md-6">
 
             {% if dict_bol_detay %}
                   <!-- <strong>There are logs present.</strong>  -->
                   <p> </p>
             {% else %}
-                  <strong>There are no logs present.</strong>
+                  <strong>Kayıt yok...</strong>
                   <p> </p>
             {% endif %}
 
-
-
-
-
           <p> </p> &emsp;
           <p> </p> &emsp;
-          <h4> <b> <p>Bölüm ve detaylar:</p> </b> </h4>
           <p> </p> &emsp;
           <p> </p>
+
           {% for bolum, detay in dict_bol_detay.items %}
+
+          <h5> <b> <p>Bölüm: &emsp; {{bolum.bolum.bolum_adi }} </p> </b> </h5>
 
           <table border="0">
               <tbody>
-              <tr>
-                  <td>&emsp; <b>{{bolum.bolum.bolum_adi }}</b></td>
-              </tr>
-              <p> </p>
               <tr>
                   <td>   &emsp;<b> Bölüm içi soru adedi: </b></td>
                   <td> &emsp; {{ bolum.soru_adedi }} </td>
@@ -209,7 +274,7 @@ p  {
               <p> </p>
               <tr>
                   <td>   &emsp;<b> Ortalama Bölüm Puanı: </b>  </td>
-                  <td> &emsp; {{ bolum.ortalama_puan}}  </td>
+                  <td> &emsp; %{{ bolum.ortalama_puan|floatformat:0 }}  </td>
               </tr>
               <p> </p>
               <p> &emsp;   </p>
@@ -218,13 +283,11 @@ p  {
           <p> </p> &emsp;
           <p> </p>
 
-          <h4> <b> <p>Soru Detayları:</p> </b> </h4>
+          <h5> <b> <p>Sorular:</p> </b> </h5>
           <p> </p> &emsp;
           <p> </p>
               {% for detay in detay %}
               <tr>
-
-
 
                   <td> &emsp;<b> {{ detay.detay.detay_adi }} </b>  </td>
 
@@ -253,9 +316,8 @@ p  {
 
           {% endfor %}
 
-</div>
-</div>
-</div>
 
-
+</div>
+</div>
+</div>
 {% endblock %}

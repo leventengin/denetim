@@ -6,10 +6,17 @@
 
 <style type="text/css">
 
-  td.block
-  {
+  h2 {
+  text-align: right;
+  color: white;
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 6vw;
+  }
+
+  td.block {
   border: 1px solid black;
   }
+
   .card2 {
       background:#f5ca0a;;
       border:1px solid #AAA;
@@ -18,11 +25,13 @@
       margin:15px;
       overflow:hidden;
   }
+
   .card2 h1 {
       margin:0px;
       padding:10px;
       padding-bottom:0px;
   }
+  
   .card2 p {
       margin:0px;
       padding:10px;
@@ -45,8 +54,8 @@ function dataChart() {
         method: "GET",
         url: endpoint,
         success: function(data){
-            alert("gelen data labels"+data.labels);
-            alert("gelen data default"+data.default);
+            //alert("gelen data labels"+data.labels);
+            //alert("gelen data default"+data.default);
             labels = data.labels;
             defaultData = data.default;
             displayChart(labels, defaultData);
@@ -113,8 +122,7 @@ function displayChart(labels, defaultData) {
           <div class="row">  &nbsp; </div>
           <div class="card2">
              <h1>Tanımlanmış denetimler!</h1>
-             <p> &nbsp; </p>
-             <p style="color:white">In essence, a card is just a rectangular region which contains content.  This content could be text, images, lists, etc... The card UI methaphor dictates the interaction and layout of these regions.</p>
+             <p style="color:white"> <h2> {{ num_atanmis_denetim}}  </h2> </p>
           </div>
       </div>
   </div>

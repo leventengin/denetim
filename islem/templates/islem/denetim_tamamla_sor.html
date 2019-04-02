@@ -11,12 +11,14 @@ header {
     font-size: 300%;
 
 }
+
+/*
 p  {
     color: red;
     font-family: courier;
     font-size: 160%;
 }
-
+*/
 
 .chart-container {
   position: relative;
@@ -45,14 +47,14 @@ p  {
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css">
+<!--<link rel="stylesheet" type="text/css" href="style2.css">-->
 
 <script>
   function goster_chart(labels, defaultData, kalan_data, backC, borC){
-      alert("buraya da geldi  goster_chart()..................");
-      alert("script içinden label..."+labels);
-      alert("script içinden default data .."+defaultData+" kalan data "+ kalan_data);
-      alert("script içinden renkler .."+backC+borC);
+      //alert("buraya da geldi  goster_chart()..................");
+      //alert("script içinden label..."+labels);
+      //alert("script içinden default data .."+defaultData+" kalan data "+ kalan_data);
+      //alert("script içinden renkler .."+backC+borC);
 
       var ctx = document.getElementById("myChart").getContext("2d");
       ctx.width = 20;
@@ -68,8 +70,8 @@ p  {
       backC_arr.push(backC);
       borC_arr.push(borC);
 
-      alert("label arr "+label_arr+" label data "+label_data+" kalan data "+k_data);
-      alert("borC arr "+backC_arr+" borC arr "+borC_arr);
+      //alert("label arr "+label_arr+" label data "+label_data+" kalan data "+k_data);
+      //alert("borC arr "+backC_arr+" borC arr "+borC_arr);
       var myChart = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -106,10 +108,10 @@ p  {
 
 <script>
   $(document).ready(function(){
-    alert("buraya geldi  document ready....");
+    //alert("buraya geldi  document ready....");
     goster_data = {{ goster|safe }};
     kalan_data = {{ kalan|safe}};
-    alert("gelen ortalama verisi js içinde..."+goster_data+" ve kalan data "+kalan_data);
+    //alert("gelen ortalama verisi js içinde..."+goster_data+" ve kalan data "+kalan_data);
     var backC = [];
     var borC = [];
     if (goster_data > '80')
@@ -118,7 +120,7 @@ p  {
             { backC.push("rgba(255, 220, 0, 0.8)"); borC.push("rgba(255, 220, 0, 1)");}
              else
               { backC.push("rgba(255, 51, 51, 0.8)"); borC.push("rgba(255, 51, 51, 1)");}
-    alert ("backg"+backC+"border"+borC);
+    //alert ("backg"+backC+"border"+borC);
     goster_chart("", goster_data, kalan_data, backC, borC);
 
   })

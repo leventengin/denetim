@@ -488,11 +488,14 @@ def index(request):
     if kullanici.denetim_grup_yetkilisi == "E":
         print(" denetçi   evet....")
         acik_denetimler = denetim.objects.filter(durum="A")
+        yaratan_denetim = denetim.objects.filter(yaratan=request.user)
+        num_yaratan_denetim = yaratan_denetim.count()
         acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
         secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
         return render(request, 'ana_menu_dgy.html',
             context={
             'secili_denetimler': secili_denetimler,
+            'num_yaratan_denetim': num_yaratan_denetim,
             },
         )
 
@@ -500,12 +503,15 @@ def index(request):
     if kullanici.denetci == "E":
         print(" denetçi   evet....")
         acik_denetimler = denetim.objects.filter(durum="A")
+        atanmis_denetimler = denetim.objects.filter(denetci=request.user)
+        num_atanmis_denetim = atanmis_denetimler.count()
         print(acik_denetimler)
         acik_denetimler_sirali = acik_denetimler.order_by('hedef_baslangic')
         secili_denetimler = acik_denetimler_sirali.filter(denetci=request.user).filter(rutin_planli="P")
         return render(request, 'ana_menu_denetci.html',
             context={
             'secili_denetimler': secili_denetimler,
+            'num_atanmis_denetim': num_atanmis_denetim,
             },
         )
 
@@ -3677,80 +3683,164 @@ def raporlar_devam(request, pk=None):
 
 #-------------------------------------------------------------------------------
 
+
+
 @login_required
 def raporlar_ilerle(request, pk=None):
     denetim_no = pk
+    denetim_obj = denetim.objects.get(id=denetim_no)
 
-    if rapor_verisi_hazirla(request, denetim_no=denetim_no):
-        denetim_obj = denetim.objects.get(id=denetim_no)
-        denetim_adi = denetim_obj.denetim_adi
-        proje = denetim_obj.proje
-        rutin_planli = denetim_obj.rutin_planli
-        denetci = denetim_obj.denetci
-        tipi = denetim_obj.tipi
-        yaratim_tarihi = denetim_obj.yaratim_tarihi
-        yaratan = denetim_obj.yaratan
-        hedef_baslangic = denetim_obj.hedef_baslangic
-        hedef_bitis = denetim_obj.hedef_bitis
-        gerc_baslangic = denetim_obj.gerc_baslangic
-        gerc_bitis = denetim_obj.gerc_bitis
-        durum = denetim_obj.durum
-        rutindenetci = denetim_obj.rutindenetci
-        takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
-        denetim_soru = denetim_obj.soru_adedi
-        denetim_dd = denetim_obj.dd_adedi
-        denetim_net = denetim_obj.net_adet
-        denetim_puan = denetim_obj.toplam_puan
-        ortalama_puan = denetim_obj.ortalama_puan
-
-        print("takipci objesi...", takipci_obj)
-        i = 0
-        takipciler = []
-        for takipci in takipci_obj:
-            takipciler.append(takipci.takipci)
-            i = i + 1
-        print("takipciler listesi..", takipciler)
-        d = collections.defaultdict(list)
-        bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
-        for bolum in bolum_obj:
-            print("bolum list . bolum", bolum.bolum)
-            detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
-            for detay in detay_obj:
-                print("detay list . detay", detay.bolum, detay.detay)
-                #d[detay.bolum].append(detay.detay)
-                d[bolum].append(detay)
-        print("***********************")
-        print(d)
-        d.default_factory = None
-        dict_bol_detay = dict(d)
-        print("************************")
-        print(dict_bol_detay)
-        context = { 'dict_bol_detay':dict_bol_detay,
-                    'takipciler': takipciler,
-                    'denetim_adi': denetim_adi,
-                    'proje' : proje,
-                    'rutin_planli' : rutin_planli,
-                    'rutindenetci' : rutindenetci,
-                    'denetci' : denetci,
-                    'tipi' : tipi,
-                    'yaratim_tarihi' : yaratim_tarihi,
-                    'yaratan' : yaratan,
-                    'hedef_baslangic' : hedef_baslangic,
-                    'hedef_bitis' : hedef_bitis,
-                    'durum' : durum,
-                    'soru_adedi' : denetim_soru,
-                    'dd_adedi' :  denetim_dd,
-                    'net_adet' : denetim_net,
-                    'toplam_puan' : denetim_puan,
-                    'ortalama_puan' : ortalama_puan,
-                    'pk' : denetim_no,
-                    }
-        #return render(request, 'islem/teksayfa_sil_soru.html', context )
-        return render(request, 'islem/denetim_rapor_goster.html', context )
-
-    else:
-        mesaj = request.session.get('mesaj_rapor_verisi')
+    bolumler_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    if not(bolumler_obj):
+        mesaj = "tanımlı bölüm yok "
         return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+    kontrol_degiskeni = True
+    for bolum in bolumler_obj:
+        if bolum.tamam == "H":
+            kontrol_degiskeni = False
+
+    if not(kontrol_degiskeni):
+        mesaj = "tamamlanmamış bölümler var !"
+        return render(request, 'islem/uyari.html', {'mesaj': mesaj})
+
+
+    #########################################################################
+    ###   RAPOR
+    #########################################################################
+
+    bolum_soru = 0
+    bolum_dd = 0
+    bolum_net = 0
+    bolum_puan = 0
+    denetim_soru = 0
+    denetim_dd = 0
+    denetim_net = 0
+    denetim_puan = 0
+    i = 0
+    for bolum in bolumler_obj:
+        bolum_no = bolum.bolum
+        detaylar_obj = sonuc_detay.objects.filter(denetim=denetim_no).filter(bolum=bolum_no)
+        print("seçilmiş olan detaylar...", detaylar_obj)
+        for detay in detaylar_obj:
+            bolum_soru = bolum_soru + 1
+            denetim_soru = denetim_soru + 1
+            if detay.denetim_disi == "E":
+                bolum_dd = bolum_dd + 1
+                denetim_dd = denetim_dd + 1
+            else:
+                bolum_net = bolum_net + 1
+                bolum_puan = bolum_puan + detay.puan
+                denetim_net = denetim_net +1
+                denetim_puan = denetim_puan + detay.puan
+        bolum.soru_adedi = bolum_soru
+        bolum.dd_adedi = bolum_dd
+        bolum.net_adet = bolum_net
+        bolum.toplam_puan = bolum_puan
+        ortalama_puan = bolum_puan / bolum_net
+        ortalama_puan = ortalama_puan * 10
+        print("ortalama puan ...", ortalama_puan)
+        bolum.ortalama_puan = ortalama_puan
+        bolum.save()
+        print("bölüm soru...", bolum_soru, "bölüm dd", bolum_dd, "bolum net", bolum_net, "bolum puan ", bolum_puan)
+        bolum_soru = 0
+        bolum_dd = 0
+        bolum_net = 0
+        bolum_puan = 0
+    denetim_obj.soru_adedi = denetim_soru
+    denetim_obj.dd_adedi = denetim_dd
+    denetim_obj.net_adet = denetim_net
+    denetim_obj.toplam_puan = denetim_puan
+    ortalama_puan = denetim_puan / denetim_net
+    ortalama_puan = ortalama_puan * 10
+    print("ortalama puan ...", ortalama_puan)
+    denetim_obj.ortalama_puan = ortalama_puan
+    denetim_obj.save()
+    print("denetim soru...", denetim_soru, "denetim dd", denetim_dd, "denetim net", denetim_net, "denetim puan ", denetim_puan)
+
+
+
+    denetim_adi = denetim_obj.denetim_adi
+    proje = denetim_obj.proje
+    rutin_planli = denetim_obj.rutin_planli
+    denetci = denetim_obj.denetci.get_full_name()
+    tipi = denetim_obj.tipi
+    yaratan = denetim_obj.yaratan.get_full_name()
+    if denetim_obj.yaratim_tarihi:
+        yaratim_tarihi = denetim_obj.yaratim_tarihi.strftime("%Y-%m-%d")
+    else:
+        yaratim_tarihi = None
+    if denetim_obj.hedef_baslangic:
+        hedef_baslangic = denetim_obj.hedef_baslangic.strftime("%Y-%m-%d")
+    else:
+        hedef_baslangic = None
+    if denetim_obj.hedef_bitis:
+        hedef_bitis = denetim_obj.hedef_bitis.strftime("%Y-%m-%d")
+    else:
+        hedef_bitis = None
+    if denetim_obj.gerc_baslangic:
+        gerc_baslangic = denetim_obj.gerc_baslangic.strftime("%Y-%m-%d")
+    else:
+        gerc_baslangic = None
+    if denetim_obj.gerc_bitis:
+        gerc_bitis = denetim_obj.gerc_bitis.strftime("%Y-%m-%d")
+    else:
+        gerc_bitis = None
+    durum = denetim_obj.durum
+    rutindenetci = denetim_obj.rutindenetci
+    takipci_obj = sonuc_takipci.objects.filter(denetim=denetim_no)
+    print("takipci objesi...", takipci_obj)
+    i = 0
+    takipciler = []
+    for takipci in takipci_obj:
+        takipciler.append(takipci.takipci)
+        i = i + 1
+    print("takipciler listesi..", takipciler)
+    d = collections.defaultdict(list)
+    bolum_obj = sonuc_bolum.objects.filter(denetim=denetim_no)
+    for bolum in bolum_obj:
+        print("bolum list . bolum", bolum.bolum)
+        detay_obj = sonuc_detay.objects.filter(denetim=denetim_no, bolum=bolum.bolum).order_by('detay')
+        for detay in detay_obj:
+            print("detay list . detay", detay.bolum, detay.detay)
+            #d[detay.bolum].append(detay.detay)
+            d[bolum].append(detay)
+    print("***********************")
+    print(d)
+    d.default_factory = None
+    dict_bol_detay = dict(d)
+    print("************************")
+    print(dict_bol_detay)
+    goster = str(round(ortalama_puan,0))
+    print("göster....", goster)
+    kalan = str(100 - round(ortalama_puan,0))
+    print("kalan...", kalan)
+    context = { 'dict_bol_detay':dict_bol_detay,
+                'takipciler': takipciler,
+                'denetim_adi': denetim_adi,
+                'proje' : proje,
+                'rutin_planli' : rutin_planli,
+                'rutindenetci' : rutindenetci,
+                'denetci' : denetci,
+                'tipi' : tipi,
+                'yaratim_tarihi' : yaratim_tarihi,
+                'yaratan' : yaratan,
+                'hedef_baslangic' : hedef_baslangic,
+                'hedef_bitis' : hedef_bitis,
+                'durum' : durum,
+                'soru_adedi' : denetim_soru,
+                'dd_adedi' :  denetim_dd,
+                'net_adet' : denetim_net,
+                'toplam_puan' : denetim_puan,
+                'ortalama_puan' : ortalama_puan,
+                'pk' : denetim_no,
+                'goster' : goster,
+                'kalan' : kalan,
+                }
+    #return render(request, 'islem/teksayfa_sil_soru.html', context )
+    return render(request, 'islem/denetim_rapor_goster.html', context )
+
+
+
 
 
 

@@ -272,14 +272,14 @@ span.num {
                     <h4><p>Operasyon ve Denetim Sistemleri</p></h4>
                    {% if  user.profile.denetci == "E" or user.is_superuser %}
                     <li>
-                        <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false">Yerinde Denetim</a>
+                        <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false">Denetim</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu1">
                             <li class="list-styled" > <a href="/islem">Bekleyen Planlı Denetim</a></li>
                             <li><a href="/islem/rutin_baslat">Rutin Denetim Başlatma</a></li>
                             <li><a href="/islem/devam_liste">Devam Eden Denetimler</a></li>
                             <li><a href="/islem/acil_devam_sec"><b><font color="f44336">Acil Bildirim</font></b></a></li>
                             <li><a href="/islem/sonuc">Denetim Sonuç Detayları</a></li>
-                            <li><a href="/islem/rapor_yazisi">Rapor Yazısı</a></li>
+                            <!-- <li><a href="/islem/rapor_yazisi">Rapor Yazısı</a></li>  -->
                         </ul>
                     </li>
                   {% endif %}
@@ -298,11 +298,11 @@ span.num {
 
                   {% if  user.profile.denetim_grup_yetkilisi == "E" or user.is_superuser %}
                    <li>
-                    <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">Denetimler</a>
+                    <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false">Denetim Detayları</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu3">
                       <li><a href="/islem/denetim/baslanmislar">Başlanmış Denetimler</a></li>
                       <li><a href="/islem/denetim/raporlar">Denetim Raporları</a></li>
-                      <li><a href="/islem/denetim/iptal">Denetim İptal</a></li>
+                      <li><a href="/islem/denetim/iptal">Denetim İade</a></li>
                     </ul>
                    </li>
                   {% endif %}
@@ -473,9 +473,9 @@ span.num {
                              <div class="col-md-2 c"><a class="middler" href="/admin/"><font color="white">Ayarlar</font></a></div>
                              {% else %}
                              <div class="col-md-2 c">
-                               <a class="drpbtn middler" onclick="ayar_drpdwn()"> Dropdown <i class="fa fa-caret-down"></i> </a>
+                               <a class="dropbtn2 middler" onclick="ayar_drpdwn()"> Profil <i class="fa fa-caret-down"></i> </a>
                                <!-- <button onclick="ayar_drpdwn()" class="drpbtn">Dropdown</button> -->
-                                  <div id="myDrpdwn" class="drpdwn-cntnt">
+                                  <div  class="dropdown-content2" id="myDrpdwn" >
                                     <a  href="{% url 'kullanici_resim'%}">Profil Resmi Yükle</a>
                                     <a  href="{% url 'kullanici_sifre'%}">Parola Değiştir</a>
                                   </div>
@@ -508,28 +508,44 @@ span.num {
       //alert("my function...");
       document.getElementById("myDropdown2").classList.toggle("show");
       }
+  </script>
+
+
+  <script>
       // Close the dropdown if the user clicks outside of it
-        window.onclick = function(e) {
-            if (!e.target.matches('.dropbtn2')) {
-              var myDropdown = document.getElementById("myDropdown2");
-                if (myDropdown.classList.contains('show')) {
-                  myDropdown.classList.remove('show');
-                }
-              }  /* endif ....*/
+    window.onclick = function(e) {
+        if (!e.target.matches('.dropbtn2')) {
+          //alert("onclick e");
+          var myDropdown = document.getElementById("myDropdown2");
+          var dropdowns = document.getElementById("myDrpdwn");
+          if (myDropdown.classList.contains('show')) {
+                //alert("myDropdown");
+                myDropdown.classList.remove('show');
+            }
 
+          else if (dropdowns.classList.contains('show')) {
+                //alert("myDrpdwn");
+                dropdowns.classList.remove('show');
+          }  /* endif ....*/
 
-            if (!e.target.matches('.drpbtn')) {
-              var dropdowns = document.getElementsByClassName("drpdwn-cntnt");
-              var i;
-              for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                  openDropdown.classList.remove('show');
-                }
-              }
-            }  /*  endif .... */
+        /*
+        if (!e.target.matches('.dropbtn2')) {
+          var dropdowns = document.getElementById("myDrpdwn");
+          if (dropdowns.classList.contains('show')) {
+            dropdowns.classList.remove('show');
+          }
+          */
+          /*
+          for ( var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+            }
+          }
+          */
+        }  /*  endif .... */
 
-       }
+   }
   </script>
 
 

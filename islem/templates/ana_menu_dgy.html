@@ -6,6 +6,13 @@
 
 <style type="text/css">
 
+  h2 {
+  text-align: right;
+  color: white;
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 6vw;
+  }
+
   td.block
   {
   border: 1px solid black;
@@ -32,8 +39,6 @@
 
 
 
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 <script>
@@ -45,8 +50,8 @@ function dataChart() {
         method: "GET",
         url: endpoint,
         success: function(data){
-            alert("gelen data labels"+data.labels);
-            alert("gelen data default"+data.default);
+            //alert("gelen data labels"+data.labels);
+            //alert("gelen data default"+data.default);
             labels = data.labels;
             defaultData = data.default;
             displayChart(labels, defaultData);
@@ -89,7 +94,6 @@ function displayChart(labels, defaultData) {
 </script>
 
 
-
 <script>
   $(document).ready(function(){
     //alert("buraya geldi....");
@@ -113,8 +117,7 @@ function displayChart(labels, defaultData) {
           <div class="row">  &nbsp; </div>
           <div class="card2">
              <h1>Tanımlanmış denetimler!</h1>
-             <p> &nbsp; </p>
-             <p style="color:white">In essence, a card is just a rectangular region which contains content.  This content could be text, images, lists, etc... The card UI methaphor dictates the interaction and layout of these regions.</p>
+             <p ><h2> {{ num_yaratan_denetim}}  </h2></p>
           </div>
       </div>
   </div>
@@ -138,6 +141,7 @@ function displayChart(labels, defaultData) {
       {% endif %}
     </div>
   </div>
+
 
   <div class="row">
     <div class="col-lg-4"> </div>
