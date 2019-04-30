@@ -35,7 +35,7 @@
 
 <script>
   function resim_kaldir(x) {
-    alert("resim kaldır için parametre..." + x);
+    //alert("resim kaldır için parametre..." + x);
     //document.getElementById('id_resim_varmi').value="H";
     var id_verisi = x;
 
@@ -45,7 +45,7 @@
         data: {'id_verisi':x},
         dataType: "text",
         success: function(){
-          alert("küçük resim silme başarı.....");
+          //alert("küçük resim silme başarı.....");
           window.location.reload();
         },
         failure: function(){
@@ -58,16 +58,16 @@
 
 <script>
   function update_resim_varmi(x) {
-    alert(" update resim var mı...");
+    //alert(" update resim var mı...");
     var degisken = x;
-    alert("değişken..." + degisken);
+    //alert("değişken..." + degisken);
     $.ajax({
         url: "update_resim_varmi/",
         type: "GET",
         dataType: "text",
         data: {'degisken': degisken,},
         success: function(){
-          alert("resim varmı s.v. değiştirildi.....");
+          //alert("resim varmı s.v. değiştirildi.....");
         },
         failure: function(){
           alert("resim var mı oturum değişkeninin değişiminde hata....");
@@ -87,7 +87,7 @@
         dataType: "text",
         contentType: 'application/json; charset=utf-8',
         success: function(data){
-          alert("resim varmı son mevcut değeri alındı ....." + data);
+          //alert("resim varmı son mevcut değeri alındı ....." + data);
           return data;
         },
         failure: function(data){
@@ -230,7 +230,7 @@ $(document).ready(function()
                           contentType: false,
                           processData: false,
                           success: function(){
-                            alert("küçük resim başarı.....");
+                            //alert("küçük resim başarı.....");
                             window.location.reload();
                           },
                           failure: function(){
@@ -253,11 +253,11 @@ $(document).ready(function()
 <script>
 $(document).ready(function()
 {
-            alert("document ready resim var mı yükle.....");
+            //alert("document ready resim var mı yükle.....");
             var resim_varmi = document.getElementById('id_resim_varmi').value;
-            alert("resim var mı..." + resim_varmi);
+            //alert("resim var mı..." + resim_varmi);
             sessionStorage.setItem("resim_varmi", resim_varmi);
-            alert(sessionStorage.getItem("resim_varmi"));
+            //alert(sessionStorage.getItem("resim_varmi"));
 
             var x = document.getElementById('preview');
             var y = document.getElementById('resim_kaldir');
