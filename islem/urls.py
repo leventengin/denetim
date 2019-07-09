@@ -140,7 +140,7 @@ urlpatterns = [
 
     re_path(r'^deneme_dropdown/$', views.deneme_dropdown, name='deneme_dropdown'),
 
-
+    re_path(r'^login_user/$', views.login_user, name='login_user'),
 
 #---------------------------------------------------------------------------------------------------
 #   denetim oluşturma re_path leri  eskiler .............................

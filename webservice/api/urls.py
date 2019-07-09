@@ -14,11 +14,18 @@ from .views import ArizaRudView, ArizaList, ArizaDetail, ArizaDetailView, ArizaB
 from .views import SayiRudView, SayiList, SayiDetail, SayiDetailView, SayiBul, SayiQuery, SayiFilter
 from .views import RfidRudView, RfidList, RfidDetail, RfidDetailView, RfidBul, RfidQuery, RfidFilter
 from .views import YerudRudView, YerudList, YerudDetail, YerudDetailView, YerudBul, YerudQuery, YerudFilter
+from .views import UserViewSet, UserList, UserLogin, MdLogin
+
 
 app_name = 'api-ws'
 
 urlpatterns = [
     re_path(r'^auth/login/$', obtain_jwt_token, name='api-login'),
+
+    re_path(r'^user_list/$', UserList.as_view(), name='user_list'),
+    re_path(r'^user_login/(?P<username>.+)/(?P<password>.+)/$', UserLogin.as_view(), name='user_login'),
+    re_path(r'^md_login/$', MdLogin, name='md_login'),
+
 
     re_path(r'^memnuniyet_list/$', MemnuniyetList.as_view(), name='memnuniyet_list'),
     re_path(r'^memnuniyet_bul/$', MemnuniyetBul.as_view(), name='memnuniyet_bul'),

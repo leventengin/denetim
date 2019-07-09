@@ -1,12 +1,13 @@
 # generic
 from django.db import models
 from django.db.models import Q
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, permissions
 from django.views.decorators.csrf import csrf_exempt
 from ..models import Memnuniyet
 from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, rfid_dosyasi, yer_updown, Sayi_Data
+from django.contrib.auth.models import User
 from .permissions import IsOwnerOrReadOnly
-from .serializers import MemnuniyetSerializer
+from .serializers import MemnuniyetSerializer, UserSerializer
 from .serializers import OperasyonSerializer, DenetimSerializer, SayiSerializer
 from .serializers import ArizaSerializer, RfidSerializer, YerudSerializer
 from rest_framework import viewsets
@@ -17,6 +18,145 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.http import HttpResponse, Http404
+#from django_filters import rest_framework as filters
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
+
+
+
+#---------------------------------------------------------------------------------
+# user login işlemleri....
+
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    print("userviewset")
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny,])
+def login(request):
+    username_or_email = request.data.get("username_or_email").rstrip()
+    password = request.data.get("password")
+    if not username_or_email or not password:
+        return Response({'error': 'Please provide both username and password'},
+                        status=HTTP_400_BAD_REQUEST)
+    if '@' in username_or_email:
+        kwargs = {'email': username_or_email}
+    else:
+        kwargs = {'username': username_or_email}
+
+    try:
+        user = User.objects.get(**kwargs)
+    except:
+        return Response({'error': 'Invalid Credentials'},
+                        status=HTTP_400_BAD_REQUEST)
+
+    check_password = user.check_password(password)
+    if not check_password:
+        return Response({'error': 'Invalid Credentials'},
+                        status=HTTP_400_BAD_REQUEST)
+
+    if user.is_active is False:
+        return Response({'error': 'Account is inactive.'},
+        status=HTTP_400_BAD_REQUEST)
+
+    token, created = Token.objects.get_or_create(user=user)
+    try:
+        pic_profile = BASE_URL + user.profile.pic_profile.url
+        return Response({'roles': user.profile.user_role.values_list('name'), 'user_id': user.id, 'pic_profile': pic_profile, 'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name, 'token': token.key, 'email': user.email, 'language': user.profile.language, 'profile_id': user.profile.id}, status=HTTP_200_OK)
+    except:
+        return Response({'token': token.key, 'user_id': user.id, 'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name, 'roles': user.profile.user_role.values_list('name'), 'email': user.email, 'language': user.profile.language, 'profile_id': user.profile.id}, status=HTTP_200_OK)
+
+
+
+class UserList(APIView):
+    """
+    List all  User  (get)
+    """
+    def get(self, request, format=None):
+        user_list = User.objects.all()
+        serializer = UserSerializer(user_list, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        print(request.data)
+        serializer = MemnuniyetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserLogin(generics.ListAPIView):
+    serializer_class = UserSerializer
+
+    def get(self, request, username, password):
+        #print(args)
+        #print(kwargs)
+        #username = self.request.query_params.get('username', None)
+        #password = self.request.query_params.get('password', None)
+        #username = self.kwargs["username"]
+        #password = self.kwargs["password"]
+        print(" get query set içinden -  username -  passsword...", username, password)
+        queryset = User.objects.filter(username=username).first()
+        if queryset is None:
+            print("no such user")
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        passw_filter = queryset.check_password(password)
+        print(passw_filter)
+        if passw_filter:
+            print("ok")
+            return Response(status=status.HTTP_200_OK)
+        else:
+            print("password does not match")
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@csrf_exempt
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny,])
+def MdLogin(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    print("username:", username)
+    print("password:", password)
+
+    if (not username) or (not password):
+        return Response({'result': 'Please provide both username and password'}, status=HTTP_400_BAD_REQUEST)
+    print("after empty field check")
+
+
+    user = User.objects.filter(username=username).first()
+    if not user:
+        return Response({'result': 'User not defined'},
+                        status=HTTP_400_BAD_REQUEST)
+
+    check_password = user.check_password(password)
+    if not check_password:
+        return Response({'result': 'Invalid password'},
+                        status=HTTP_400_BAD_REQUEST)
+
+    if user.is_active is False:
+        return Response({'result': 'Account is inactive.'},
+        status=HTTP_400_BAD_REQUEST)
+    else:
+        return Response( { 'result': 'Account found' }, status=HTTP_200_OK )
+"""
+    token, created = Token.objects.get_or_create(user=user)
+    try:
+        pic_profile = BASE_URL + user.profile.pic_profile.url
+        return Response({'roles': user.profile.user_role.values_list('name'), 'user_id': user.id, 'pic_profile': pic_profile, 'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name, 'token': token.key, 'email': user.email, 'language': user.profile.language, 'profile_id': user.profile.id}, status=HTTP_200_OK)
+    except:
+        return Response({'token': token.key, 'user_id': user.id, 'username': user.username, 'first_name': user.first_name, 'last_name': user.last_name, 'roles': user.profile.user_role.values_list('name'), 'email': user.email, 'language': user.profile.language, 'profile_id': user.profile.id}, status=HTTP_200_OK)
+"""
 
 
 

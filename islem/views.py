@@ -9118,6 +9118,22 @@ def ariza_create(request, pk=None):
 
 
 
+@login_required
+def login_user(request, pk=None):
+    username = "1"
+    password = "2"
+    print("login create.............", username, password)
+    #   response = requests.post("http://"+settings.ADR_LOCAL+"/ws/login_user/",
+    #    json={"username": username, "password": password }, auth=(settings.USER_GLB, settings.PASW_GLB))
+    response = requests.post("http://"+settings.ADR_LOCAL+"/ws/login_user/",
+         auth=(settings.USER_GLB, settings.PASW_GLB))
+    response.json()
+    print("status code..", response.status_code)
+    return redirect('index')
+
+
+
+
 
 
 @login_required

@@ -17,7 +17,8 @@ ADMINS = [('admin', 'levent@ez-manage.org')]
 
 ALLOWED_HOSTS = ['37.148.210.226',
                  '172.104.239.247',
-                 '127.0.0.1']
+                 '127.0.0.1',
+                 'ab60f1e1.ngrok.io']
 
 
 
@@ -44,7 +45,11 @@ INSTALLED_APPS = [
     'notification',
     'webservice',
     'charts',
+    #'rest_auth',
+    #'rest_auth.registration',
     'rest_framework',
+    #'rest_framework.authtoken',
+    #'django_filters',
     'bootstrap3',
     'searchableselect',
     'dal',
@@ -192,4 +197,26 @@ HTTP_LOC = '127.0.0.0:7000'
 
 
 USER_GLB = 'ez-admin'
-PASW_GLB = 'ezadmincheck'
+PASW_GLB = 'ez216check'
+
+"""
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        #'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    #'DEFAULT_FILTER_BACKENDS': (
+    #    'django_filters.rest_framework.DjangoFilterBackend',
+    #),
+}
+
+
+"""

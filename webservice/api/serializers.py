@@ -1,6 +1,14 @@
 from rest_framework import serializers
 from ..models import Memnuniyet, rfid_dosyasi, yer_updown
 from ..models import Operasyon_Data, Denetim_Data, Ariza_Data, Sayi_Data
+from django.contrib.auth.models import User
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'password')
 
 
 
@@ -200,3 +208,4 @@ class YerudSerializer(serializers.ModelSerializer):
         # request
         request = self.context.get("request")
         return obj.get_api_url(request=request)
+
