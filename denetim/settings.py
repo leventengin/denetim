@@ -26,7 +26,7 @@ ALLOWED_HOSTS = ['37.148.210.226',
 
 EMAIL_HOST = 'mail.ez-manage.org'
 EMAIL_HOST_USER = 'yonetici@ez-manage.org'
-EMAIL_HOST_PASSWORD = 'TXhp74S0'
+EMAIL_HOST_PASSWORD = 'Nooha126H'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     #'rest_auth',
     #'rest_auth.registration',
     'rest_framework',
+    'corsheaders',
     #'rest_framework.authtoken',
     #'django_filters',
     'bootstrap3',
@@ -73,6 +74,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -199,8 +201,18 @@ HTTP_LOC = '127.0.0.0:7000'
 USER_GLB = 'ez-admin'
 PASW_GLB = 'ez216check'
 
-"""
 
+# CORS_ORIGIN_ALLOW_ALL = True
+
+
+CORS_ORIGIN_WHITELIST = [
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+]
+
+
+
+"""
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
