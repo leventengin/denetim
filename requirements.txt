@@ -28,7 +28,7 @@ django-select2==6.0.0
 django-select2-forms==2.0.2
 django-sortedm2m==1.5.0
 django-timedeltatemplatefilter==0.1.2
-djangorestframework==3.7.3
+djangorestframework==3.11.2
 djangorestframework-jwt==1.11.0
 et-xmlfile==1.0.1
 ez-setup==0.9
