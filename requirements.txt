@@ -49,7 +49,7 @@ Pillow==4.3.0
 pkg-resources==0.0.0
 psycopg2==2.7.3.2
 pycparser==2.18
-PyJWT==1.6.1
+PyJWT==2.4.0
 PyPDF2==1.26.0
 Pyphen==0.9.4
 python-crontab==2.3.5
